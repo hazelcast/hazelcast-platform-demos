@@ -22,9 +22,6 @@
 <suppressions>
 
     <!-- General -->
-    <suppress checks="JavadocMethod" files=".*"/>
-    <suppress checks="JavadocType" files=".*"/>
-    <suppress checks="JavadocMethod" files=".*"/>
     <suppress checks="JavadocVariable" files=".*"/>
     <suppress checks="JavadocPackage" files=".*"/>
 
