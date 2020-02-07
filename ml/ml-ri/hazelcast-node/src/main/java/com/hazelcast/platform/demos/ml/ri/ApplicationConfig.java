@@ -24,7 +24,7 @@ import com.hazelcast.jet.config.JetConfig;
 import com.hazelcast.jet.impl.config.YamlJetConfigBuilder;
 
 /**
- * <p>Non-default configuration for Jet, to allow this example to run in Kubernetes (by default)
+ * <p>Non-default configuration for Jet, to allow this example to run in Kubernetes (by default),
  * in Docker or as a stand-alone Java.
  * </p>
  */

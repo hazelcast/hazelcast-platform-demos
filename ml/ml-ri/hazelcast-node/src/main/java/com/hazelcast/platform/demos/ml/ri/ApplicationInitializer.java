@@ -1,0 +1,93 @@
+/*
+ * Copyright (c) 2008-2020, Hazelcast, Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.hazelcast.platform.demos.ml.ri;
+
+import com.hazelcast.jet.JetInstance;
+import com.hazelcast.jet.config.JobConfig;
+import com.hazelcast.jet.pipeline.Pipeline;
+import com.hazelcast.topic.ITopic;
+
+/**
+ * <p>Initialise the Jet cluster to ensure the necessary extra parts
+ * exist and necessary jobs are running. These are idempotent operations,
+ * the will only do anything for the first node in the Jet cluster.
+ * </p>
+ */
+public class ApplicationInitializer {
+
+    /**
+     * <p>Ensure the necessary {@link com.hazelcast.core.DistributedObject} exist to
+     * hold processing results. Listen for job publishing output. Launch the
+     * pre-requisite Jet jobs for this example.
+     * </p>
+     */
+    public static void initialise(JetInstance jetInstance) {
+        createNeededObjects(jetInstance);
+        addNeededListeners(jetInstance);
+        launchNeededJobs(jetInstance);
+    }
+
+
+    /**
+     * <p>Access the {@link com.hazelcast.map.IMap} and other objects
+     * that are used by the example. This will create them on first
+     * access, so ensuring all are visible from the outset.
+     * </p>
+     */
+    static void createNeededObjects(JetInstance jetInstance) {
+        jetInstance.getHazelcastInstance().getMap("points");
+        //TODO Just one topic ?
+        jetInstance.getHazelcastInstance().getTopic("pi");
+    }
+
+
+    /**
+     * <p>TODO Documentation, generics
+     * </p>
+     */
+    static void addNeededListeners(JetInstance jetInstance) {
+        MyTopicListener myTopicListener = new MyTopicListener();
+
+        jetInstance
+        .getHazelcastInstance()
+        .getDistributedObjects()
+        .stream()
+        .filter(distributedObject -> distributedObject instanceof ITopic)
+        .filter(distributedObject -> distributedObject.getName().toLowerCase().contains("pi"))
+        .forEach(distributedObject -> {
+                //FIXME @SuppressWarnings("unchecked")
+                ITopic iTopic = (ITopic) distributedObject;
+
+                iTopic.addMessageListener(myTopicListener);
+        });
+    }
+
+
+    /**
+     * <p>TODO Documentation
+     * </p>
+     */
+    static void launchNeededJobs(JetInstance jetInstance) {
+        Pipeline pipeline = RandomXYGenerator.buildPipeline();
+
+        JobConfig jobConfig = new JobConfig();
+        jobConfig.setName(RandomXYGenerator.class.getName());
+
+        jetInstance.newJobIfAbsent(pipeline, jobConfig);
+    }
+
+}

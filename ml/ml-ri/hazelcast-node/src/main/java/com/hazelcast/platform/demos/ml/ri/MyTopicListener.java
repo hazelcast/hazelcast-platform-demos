@@ -16,28 +16,19 @@
 
 package com.hazelcast.platform.demos.ml.ri;
 
-import com.hazelcast.jet.Jet;
-import com.hazelcast.jet.JetInstance;
-import com.hazelcast.jet.config.JetConfig;
+import com.hazelcast.topic.Message;
+import com.hazelcast.topic.MessageListener;
 
 /**
- * <p>Entry point, "{@code main()}" method.
- * </p>
- * <p>TODO Confirm if server needs hazelcast-jet or hazelcast-jet-python
+ * <p>TODO Documentation, generics
  * </p>
  */
-public class Application {
+public class MyTopicListener implements MessageListener {
 
-    /**
-     * <p>Start Jet with specific configuration, and leave it running.
-     * </p>
-     */
-    public static void main(String[] args) {
-        JetConfig jetConfig = ApplicationConfig.buildJetConfig();
+    @Override
+    public void onMessage(Message message) {
+        // TODO Auto-generated method stub
 
-        JetInstance jetInstance = Jet.newJetInstance(jetConfig);
-
-        ApplicationInitializer.initialise(jetInstance);
     }
 
 }
