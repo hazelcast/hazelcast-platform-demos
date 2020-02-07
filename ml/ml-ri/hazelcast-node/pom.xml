@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+        <modelVersion>4.0.0</modelVersion>
+
+        <parent>
+                <groupId>com.hazelcast.platform.demos</groupId>
+                <artifactId>ml-ri</artifactId>
+                <version>4.0-SNAPSHOT</version>
+        </parent>
+
+        <artifactId>ml-ri-hazelcast-node</artifactId>
+
+        <name>Hazelcast Platform - ML - RI - Hazelcast Node</name>
+        <description>ML Reference Implementation - Hazelcast Node</description>
+
+        <properties>
+                <docker.image.name>hazelcast-node</docker.image.name>
+                <docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</docker.jar.file>
+                <main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
+                <main.class>com.hazelcast.platform.demos.ml.ri.Application</main.class>
+        </properties>
+
+        <dependencies>
+                <dependency>
+                        <groupId>com.hazelcast.jet</groupId>
+                        <artifactId>hazelcast-jet-python</artifactId>
+                </dependency>
+                <dependency>
+                        <groupId>com.hazelcast</groupId>
+                        <artifactId>hazelcast-kubernetes</artifactId>
+                </dependency>
+        </dependencies>
+
+        <build>
+                <resources>
+                        <resource>
+                                <directory>src/main/resources</directory>
+                                <filtering>true</filtering>
+                        </resource>
+                </resources>
+
+                <plugins>
+                        <plugin>
+                                <artifactId>maven-assembly-plugin</artifactId>
+                        </plugin>
+                        <plugin>
+                                <groupId>com.spotify</groupId>
+                                <artifactId>dockerfile-maven-plugin</artifactId>
+                        </plugin>
+                </plugins>
+        </build>
+</project>
