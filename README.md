@@ -3,7 +3,7 @@
 ## Demos
 
 * Machine Learning
-* [RI](./ml/ml-ri) Reference Implementation foe Machine Learning Inference, minimal dependencies.
+** [RI](./ml/ml-ri) Reference Implementation for Machine Learning Inference, minimal dependencies.
 
 ## Build Instructions
 
