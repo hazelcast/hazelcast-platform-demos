@@ -50,15 +50,18 @@ public class ApplicationInitializer {
      */
     static void createNeededObjects(JetInstance jetInstance) {
         jetInstance.getHazelcastInstance().getMap("points");
-        //TODO Just one topic ?
         jetInstance.getHazelcastInstance().getTopic("pi");
     }
 
 
     /**
-     * <p>TODO Documentation, generics
+     * <p>Attach a listener on this node for topic events that
+     * are published to topics with the selected names. These
+     * topics are created in the previous method. Use one
+     * listener for all, as low volume expected.
      * </p>
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     static void addNeededListeners(JetInstance jetInstance) {
         MyTopicListener myTopicListener = new MyTopicListener();
 
@@ -69,16 +72,19 @@ public class ApplicationInitializer {
         .filter(distributedObject -> distributedObject instanceof ITopic)
         .filter(distributedObject -> distributedObject.getName().toLowerCase().contains("pi"))
         .forEach(distributedObject -> {
-                //FIXME @SuppressWarnings("unchecked")
-                ITopic iTopic = (ITopic) distributedObject;
+            ITopic iTopic = (ITopic) distributedObject;
 
-                iTopic.addMessageListener(myTopicListener);
+            iTopic.addMessageListener(myTopicListener);
         });
     }
 
 
     /**
-     * <p>TODO Documentation
+     * <p>An input source is needed for the example jobs
+     * to process.
+     * </p>
+     * <p>Create one job per cluster that generates X &amp; Y
+     * co-ordinates to the map "{@code points}".
      * </p>
      */
     static void launchNeededJobs(JetInstance jetInstance) {

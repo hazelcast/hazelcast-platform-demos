@@ -19,15 +19,13 @@
         <properties>
                 <docker.image.prefix>${project.parent.artifactId}</docker.image.prefix>
                 <main.basedir>${project.parent.parent.basedir}</main.basedir>
-                <my.cluster.name>${project.artifactId}</my.cluster.name>
+                <my.cluster.name>ml-ri</my.cluster.name>
         </properties>
 
         <modules>
         	<module>hazelcast-node</module>
+                <module>python-job</module>
         </modules>
-
-        <dependencies>
-        </dependencies>
 
         <build>
                 <plugins>

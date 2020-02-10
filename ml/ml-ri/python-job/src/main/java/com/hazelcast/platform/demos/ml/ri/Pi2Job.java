@@ -16,28 +16,22 @@
 
 package com.hazelcast.platform.demos.ml.ri;
 
-import com.hazelcast.jet.Jet;
-import com.hazelcast.jet.JetInstance;
-import com.hazelcast.jet.config.JetConfig;
+import com.hazelcast.jet.pipeline.Pipeline;
 
 /**
- * <p>Entry point, "{@code main()}" method.
- * </p>
- * <p>TODO Confirm if server pom.xml needs hazelcast-jet or hazelcast-jet-python
- * </p>
+ * XXX
  */
-public class Application {
+public class Pi2Job {
 
     /**
-     * <p>Start Jet with specific configuration, and leave it running.
-     * </p>
+     * XXX
+     *
+     * @return
      */
-    public static void main(String[] args) {
-        JetConfig jetConfig = ApplicationConfig.buildJetConfig();
+    public static Pipeline buildPipeline() {
 
-        JetInstance jetInstance = Jet.newJetInstance(jetConfig);
+        Pipeline pipeline = Pipeline.create();
 
-        ApplicationInitializer.initialise(jetInstance);
+        return pipeline;
     }
-
 }

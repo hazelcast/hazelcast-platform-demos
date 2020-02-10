@@ -16,6 +16,15 @@ hazelcast:
         enabled: true
         service-dns: '@my.cluster.name@-service.default.svc.cluster.local'
   #
+  # Size constraint for selected map
+  map:
+    'points':
+      backup-count: 0
+      eviction:
+        eviction-policy: LRU
+        max-size-policy: PER_NODE
+        size: 271000
+  #
   # Event log for selected map
   event-journal:
     map:
