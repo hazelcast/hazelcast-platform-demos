@@ -20,15 +20,45 @@ import com.hazelcast.topic.Message;
 import com.hazelcast.topic.MessageListener;
 
 /**
- * <p>TODO Documentation, generics
+ * <p>Listener on a topic and produce output, with a banner above and
+ * below to make it more eye-catching.
  * </p>
  */
-public class MyTopicListener implements MessageListener {
+public class MyTopicListener implements MessageListener<Object> {
 
+    private static final String NEWLINE = System.getProperty("line.separator");
+    private static final String FOUR_SPACES = "    ";
+
+    /**
+     * <p>Called per message, we are passed the topic name and the
+     * message object. We assume the message object is a string, with
+     * the Jet job name as the first comma separated parameter.
+     * </p>
+     */
     @Override
-    public void onMessage(Message message) {
-        // TODO Auto-generated method stub
+    public void onMessage(Message<Object> message) {
+        String text = message.getMessageObject().toString();
+        int comma = text.indexOf(',');
 
+        String output;
+        if (comma > 0) {
+            output = String.format("Topic '%s' : Job '%s' : Value '%s'",
+                    message.getSource(), text.substring(0, comma), text.substring(comma));
+        } else {
+            output = String.format("Topic '%s' : Message '%s'",
+                    message.getSource(), text);
+        }
+
+        String[] results = new String[] { NEWLINE,
+                FOUR_SPACES + "***************************************************************" + FOUR_SPACES,
+                FOUR_SPACES + output + FOUR_SPACES,
+                FOUR_SPACES + "***************************************************************" + FOUR_SPACES, };
+
+        StringBuilder sb = new StringBuilder();
+        for (String line : results) {
+            sb.append(line).append(NEWLINE);
+        }
+
+        System.out.println(sb.toString());
     }
-
 }

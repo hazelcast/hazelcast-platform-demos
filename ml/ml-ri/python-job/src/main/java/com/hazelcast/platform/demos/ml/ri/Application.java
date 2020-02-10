@@ -51,10 +51,13 @@ public class Application {
         if (pythonJob.equals("pi1")) {
             pipeline = Pi1Job.buildPipeline();
             jobConfig.setName(Pi1Job.class.getName());
+            jobConfig.addClass(Pi1Job.class);
         } else {
             pipeline = Pi2Job.buildPipeline();
             jobConfig.setName(Pi2Job.class.getName());
+            jobConfig.addClass(Pi2Job.class);
         }
+        jobConfig.addClass(MyUtils.class);
 
         // Throw exception if job exists
         jetInstance.newJob(pipeline, jobConfig);
