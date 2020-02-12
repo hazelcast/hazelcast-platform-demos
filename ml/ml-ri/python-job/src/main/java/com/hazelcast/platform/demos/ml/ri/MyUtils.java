@@ -16,6 +16,13 @@
 
 package com.hazelcast.platform.demos.ml.ri;
 
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
 import com.hazelcast.jet.pipeline.Sink;
 import com.hazelcast.jet.pipeline.SinkBuilder;
 
@@ -41,6 +48,38 @@ public class MyUtils {
                         .receiveFn((iTopic, item) ->
                             iTopic.publish(klass.getSimpleName() + "," + item.toString()))
                         .build();
+    }
+
+    /**
+     * <p>Python files are in "/src/main/resources" and hence in the classpath,
+     * for easy deployment as a Docker image. Copy these to the main filesystem
+     * to make it easier for the Python service to find them and stream them
+     * to the cluster.
+     * <p>
+     *
+     * @param name The job name, eg. "{@code pi1}", used as a folder prefix
+     * @return A folder containing the Python code copied from the classpath.
+     */
+    protected static File getTemporaryDir(String name) throws Exception {
+
+        Path targetDirectory = Files.createTempDirectory(name);
+        targetDirectory.toFile().deleteOnExit();
+
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
+        String[] resourcesToCopy = { name + ".py", "requirements.txt" };
+        for (String resourceToCopy : resourcesToCopy) {
+            try (InputStream inputStream = classLoader.getResourceAsStream(resourceToCopy)) {
+                if (inputStream == null) {
+                    System.out.println(resourceToCopy + ": not found in Jar's src/main/resources");
+                } else {
+                    Path targetFile = Paths.get(targetDirectory + File.separator + resourceToCopy);
+                    Files.copy(inputStream, targetFile, StandardCopyOption.REPLACE_EXISTING);
+                }
+            }
+        }
+
+        return targetDirectory.toFile();
     }
 
 }
