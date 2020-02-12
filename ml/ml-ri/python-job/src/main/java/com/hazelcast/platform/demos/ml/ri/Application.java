@@ -25,6 +25,7 @@ import com.hazelcast.jet.pipeline.Pipeline;
 /**
  * <p>Entry point, "{@code main()}" method.
  * </p>
+ * TODO: Use requirements.txt in src/main/resources
  */
 public class Application {
 
@@ -46,21 +47,25 @@ public class Application {
 
         JetInstance jetInstance = Jet.newJetClient(clientConfig);
 
-        Pipeline pipeline = null;
-        JobConfig jobConfig = new JobConfig();
-        if (pythonJob.equals("pi1")) {
-            pipeline = Pi1Job.buildPipeline();
-            jobConfig.setName(Pi1Job.class.getName());
-            jobConfig.addClass(Pi1Job.class);
-        } else {
-            pipeline = Pi2Job.buildPipeline();
-            jobConfig.setName(Pi2Job.class.getName());
-            jobConfig.addClass(Pi2Job.class);
-        }
-        jobConfig.addClass(MyUtils.class);
+        try {
+            Pipeline pipeline = null;
+            JobConfig jobConfig = new JobConfig();
+            if (pythonJob.equals("pi1")) {
+                pipeline = Pi1Job.buildPipeline();
+                jobConfig.setName(Pi1Job.class.getName());
+                jobConfig.addClass(Pi1Job.class);
+            } else {
+                pipeline = Pi2Job.buildPipeline();
+                jobConfig.setName(Pi2Job.class.getName());
+                jobConfig.addClass(Pi2Job.class);
+            }
+            jobConfig.addClass(MyUtils.class);
 
-        // Throw exception if job exists
-        jetInstance.newJob(pipeline, jobConfig);
+            // Throws exception if job exists
+            jetInstance.newJob(pipeline, jobConfig);
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+        }
 
         jetInstance.shutdown();
     }

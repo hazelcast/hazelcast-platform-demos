@@ -16,22 +16,61 @@
 
 package com.hazelcast.platform.demos.ml.ri;
 
+import com.hazelcast.jet.pipeline.JournalInitialPosition;
 import com.hazelcast.jet.pipeline.Pipeline;
+import com.hazelcast.jet.pipeline.Sinks;
+import com.hazelcast.jet.pipeline.Sources;
+import com.hazelcast.jet.python.PythonTransforms;
 
 /**
- * XXX
+ * <p>Version 2 of the Python job to calculate Pi.
+ * </p>
+ * <p>For each input point, the Python routine determines if it is
+ * inside ("{@code true}") or outside ("{@code false}", unsurprisingly)
+ * the circle. The Jet job then calculates Pi from this ratio.
+ * </p>
+ * TODO Python coding.
  */
 public class Pi2Job {
 
+    // "Pi2Job" submits "pi2", for Python module "pi2.py".
+    private static final String NAME = Pi2Job.class.getSimpleName().substring(0, 3).toLowerCase();
+
     /**
-     * XXX
+     * <p>A Jet pipeline to calculate Pi. The essence of this version of the processing is that
+     * multiple Python processes independently calculate their approximation to Pi, and Jet
+     * averages these to give a global approximation.
+     * </p>
+     * <ul>
+     * <li><p>"{@code readFrom()}"</p>
+     * <p>Read in parallel across all nodes an input stream of X &amp; Y co-ordinates stored
+     * in the {@link com.hazelcast.map.IMap} named "{@code points}".</p>
+     * </li>
+     * <li><p>"{@code map()}"</p>
+     * <p>The X &amp; Y co-ordinates from the previous stage are held as a {@link java.util.Map.Entry}.
+     * Turn these into CSV format.</p>
+     * </li>
+     * <li><p>"{@code apply()}"</p>
+     * <p>Pass the points from the previous stage on this node to one or more Python workers.
+     * Jet will start one for each CPU by default, so using the full capacity of this node's CPUs.</p>
+     * </li>
+     *XXX Document later stages of job
+     * </ul>
      *
-     * @return
+     * @return A Jet pipeline to calculate PI
      */
-    public static Pipeline buildPipeline() {
+    public static Pipeline buildPipeline() throws Exception {
 
         Pipeline pipeline = Pipeline.create();
 
+        pipeline
+        .readFrom(Sources.mapJournal("points", JournalInitialPosition.START_FROM_CURRENT)).withIngestionTimestamps()
+        .map(entry -> entry.getKey() + "," + entry.getValue())
+        .apply(PythonTransforms.mapUsingPython(MyUtils.getPythonServiceConfig(NAME)))
+        //TODO Complete implementation
+        .writeTo(Sinks.logger(o -> "From Python: " + o));
+
         return pipeline;
     }
+
 }

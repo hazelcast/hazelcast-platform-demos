@@ -42,7 +42,9 @@ public class Pi1Job {
             = WindowDefinition.tumbling(TimeUnit.SECONDS.toMillis(5));
 
     /**
-     * <p>A Jet pipeline to calculate PI.
+     * <p>A Jet pipeline to calculate Pi. The essence of this version of the processing is that
+     * multiple Python processes independently calculate their approximation to Pi, and Jet
+     * averages these to give a global approximation.
      * </p>
      * <ul>
      * <li><p>"{@code readFrom()}"</p>
