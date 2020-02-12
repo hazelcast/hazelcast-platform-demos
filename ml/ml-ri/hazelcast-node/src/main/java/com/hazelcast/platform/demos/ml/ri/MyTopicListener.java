@@ -43,7 +43,7 @@ public class MyTopicListener implements MessageListener<Object> {
         String output;
         if (comma > 0) {
             output = String.format("Topic '%s' : Job '%s' : Value '%s'",
-                    message.getSource(), text.substring(0, comma), text.substring(comma));
+                    message.getSource(), text.substring(0, comma), text.substring(comma + 1));
         } else {
             output = String.format("Topic '%s' : Message '%s'",
                     message.getSource(), text);

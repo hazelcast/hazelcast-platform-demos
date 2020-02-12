@@ -25,12 +25,31 @@ import java.nio.file.StandardCopyOption;
 
 import com.hazelcast.jet.pipeline.Sink;
 import com.hazelcast.jet.pipeline.SinkBuilder;
+import com.hazelcast.jet.python.PythonServiceConfig;
 
 /**
  * <p>Utility functions to share between {@link Pi1Job} and {@link Pi2Job}.
  * </p>
  */
 public class MyUtils {
+
+    /**
+     * <p>Configuration for the Python runner. Where to find the Python module,
+     * which is presumed to have a "{@code handle()}" function.
+     *
+     * @param name The job name, eg. "{@code pi1}", used as a folder prefix
+     * @return Python configuration for use in a Jet job.
+     */
+    protected static PythonServiceConfig getPythonServiceConfig(String name) throws Exception {
+        File temporaryDir = MyUtils.getTemporaryDir(name);
+
+        PythonServiceConfig pythonServiceConfig = new PythonServiceConfig();
+        pythonServiceConfig.setBaseDir(temporaryDir.toString());
+        pythonServiceConfig.setHandlerFunction("handle");
+        pythonServiceConfig.setHandlerModule(name);
+
+        return pythonServiceConfig;
+    }
 
     /**
      * <p>Publish the event to a topic for all listeners to be aware

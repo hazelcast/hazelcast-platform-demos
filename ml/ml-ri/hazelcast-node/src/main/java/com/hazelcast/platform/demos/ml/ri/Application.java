@@ -23,8 +23,6 @@ import com.hazelcast.jet.config.JetConfig;
 /**
  * <p>Entry point, "{@code main()}" method.
  * </p>
- * <p>TODO Confirm if server pom.xml needs hazelcast-jet or hazelcast-jet-python
- * </p>
  */
 public class Application {
 
