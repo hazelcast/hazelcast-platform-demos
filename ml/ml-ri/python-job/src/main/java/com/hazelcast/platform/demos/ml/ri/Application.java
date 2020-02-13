@@ -25,7 +25,6 @@ import com.hazelcast.jet.pipeline.Pipeline;
 /**
  * <p>Entry point, "{@code main()}" method.
  * </p>
- * TODO: Use requirements.txt in src/main/resources
  */
 public class Application {
 

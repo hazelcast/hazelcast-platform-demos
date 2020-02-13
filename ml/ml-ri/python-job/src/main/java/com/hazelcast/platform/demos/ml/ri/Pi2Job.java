@@ -20,7 +20,6 @@ import com.hazelcast.jet.accumulator.MutableReference;
 import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.pipeline.JournalInitialPosition;
 import com.hazelcast.jet.pipeline.Pipeline;
-import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.pipeline.Sources;
 import com.hazelcast.jet.python.PythonTransforms;
 
@@ -31,13 +30,12 @@ import com.hazelcast.jet.python.PythonTransforms;
  * inside ("{@code true}") or outside ("{@code false}", unsurprisingly)
  * the circle. The Jet job then calculates Pi from this ratio.
  * </p>
- * TODO Python coding.
  */
 public class Pi2Job {
 
     // "Pi2Job" submits "pi2", for Python module "pi2.py".
     private static final String NAME = Pi2Job.class.getSimpleName().substring(0, 3).toLowerCase();
-    private static final int QUARTER_CIRCLE = 4;
+    private static final double QUARTER_CIRCLE = 4d;
 
     /**
      * <p>A Jet pipeline to calculate Pi. The essence of this version of the processing is that
@@ -57,7 +55,15 @@ public class Pi2Job {
      * <p>Pass the points from the previous stage on this node to one or more Python workers.
      * Jet will start one for each CPU by default, so using the full capacity of this node's CPUs.</p>
      * </li>
-     *XXX Document later stages of job
+     * <li><p>"{@code mapStateful()}"</p>
+     * <p>Pass each "{@code true}" or "{@code false}" from each Python instance running, into
+     * a mapping function that maintains state. The state here being the rolling count of "{@code true}"
+     * and "{@code false}" from which we output the current global estimate for Pi.
+     * </li>
+     * TODO Steps for Windowing
+     * <li><p>"{@code writeTo()}"</p>
+     * <p>Publish the average as a String to a Hazelcast {@link com.hazelcast.topic.ITopic}</p>
+     * </li>
      * </ul>
      *
      * @return A Jet pipeline to calculate PI
@@ -71,6 +77,7 @@ public class Pi2Job {
         .map(entry -> entry.getKey() + "," + entry.getValue())
         .apply(PythonTransforms.mapUsingPython(MyUtils.getPythonServiceConfig(NAME)))
         .mapStateful(MutableReference::new,
+        		//TODO Make this a separate method
                 (MutableReference<Tuple2<Long, Long>> reference, String string) -> {
                     long trueCount = 0;
                     long falseCount = 0;
@@ -93,7 +100,8 @@ public class Pi2Job {
                     double pi = QUARTER_CIRCLE * trueCount / (trueCount + falseCount);
                     return Double.toString(pi);
                 })
-        .writeTo(Sinks.logger());
+        //TODO Output every 5 second window
+        .writeTo(MyUtils.buildTopicSink(Pi2Job.class, "pi"));
 
         return pipeline;
     }
