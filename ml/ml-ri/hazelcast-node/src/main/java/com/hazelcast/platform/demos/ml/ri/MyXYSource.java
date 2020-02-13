@@ -25,7 +25,12 @@ import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.pipeline.SourceBuilder;
 
 /**
- * <p>TODO Documentation, stripe across nodes
+ * <p>A source of random X &amp; Y co-ordinates which fall between
+ * "{@code (0,0)}" inclusive to "{@code (1,1)}" exclusive.
+ * </p>
+ * <p>As this is invoked with "{@code .distributed(1)" Jet will create
+ * one instance of this source per node, so generating random numbers
+ * in a scalable way.
  * </p>
  */
 public class MyXYSource {
@@ -33,15 +38,19 @@ public class MyXYSource {
     private static Random random = new Random();
 
     /**
-     * <p>TODO Documentation
+     * <p>Generate a random X & Y coordinate, and add it to Jet's input
+     * buffer to pass to later stream stages. Only generate and add one
+     * point in this function, though we could add multiple at once if
+     * needed.
      * </p>
      *
-     * @param buffer TODO Documentation
+     * @param buffer Jet's unbounded input buffer.
      */
     void fillBufferFn(SourceBuilder.SourceBuffer<Map.Entry<Double, Double>> buffer) {
-        //TODO TMP implementation
         Tuple2<Double, Double> tuple2 = Tuple2.tuple2(random.nextDouble(), random.nextDouble());
         buffer.add(tuple2);
+
+        //TODO Set a better delay
         LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(1));
     }
 
