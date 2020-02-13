@@ -29,32 +29,32 @@ import com.hazelcast.jet.python.PythonServiceConfig;
 import com.hazelcast.jet.python.PythonTransforms;
 
 /**
- * <p>Test the correctness of "pi1.py" for various inputs
+ * <p>Test the correctness of "pi2.py" for various inputs
  * <p>
  */
-public class Pi1IT extends AbstractJetIT {
+public class Pi2IT extends AbstractJetIT {
 
     private static PythonServiceConfig pythonServiceConfig;
 
     @BeforeClass
     public static void beforeClass2() throws Exception {
-        pythonServiceConfig = MyUtils.getPythonServiceConfig("pi1");
+        pythonServiceConfig = MyUtils.getPythonServiceConfig("pi2");
     }
 
     /**
      * <p>The origin "{@code (0,0)}" is inside the circle.
      * 100% of the input batch lies within the circle. so the
-     * "{@code Pi == 4 * inside / total" should result in 4.
+     * "{@code Pi == 4 * inside / total" should result true.
      * </p>
      */
     @Test
     public void originInsideCircle() throws Exception {
         double x = 0.0d;
         double y = 0.0d;
-        double pi = 4.0d;
+        String inside = "true";
 
         List<String> input = List.of(x + "," + y);
-        List<String> expected = List.of(String.valueOf(pi));
+        List<String> expected = List.of(inside);
 
         Pipeline pipeline = Pipeline.create();
 
@@ -64,7 +64,7 @@ public class Pi1IT extends AbstractJetIT {
         .writeTo(AssertionSinks.assertOrdered(expected));
 
         JobConfig jobConfig = new JobConfig();
-        jobConfig.setName(super.testName.getMethodName());
+        jobConfig.setName(this.testName.getMethodName());
 
         jetInstance.newJob(pipeline, jobConfig).join();
     }
@@ -72,17 +72,17 @@ public class Pi1IT extends AbstractJetIT {
     /**
      * <p>The apex "{@code (1,1)}" of the square is outside the
      * circle. 0% of the input batch lies within the circle. so the
-     * "{@code Pi == 4 * inside / total" should result in 0.
+     * "{@code Pi == 4 * inside / total" should result in false.
      * </p>
      */
     @Test
     public void apexOutsideCircle() throws Exception {
         double x = 0.0d;
         double y = 0.0d;
-        double pi = 0d;
+        String inside = "false";
 
         List<String> input = List.of(x + "," + y);
-        List<String> expected = List.of(String.valueOf(pi));
+        List<String> expected = List.of(inside);
 
         Pipeline pipeline = Pipeline.create();
 
@@ -99,11 +99,8 @@ public class Pi1IT extends AbstractJetIT {
 
     /**
      * <p>Pass a batch of three points.</p>
-     * <p>The first is inside, so with 1 from 1 inside, Pi should be 4.
-     * </p>
-     * <p>The second is outside, so with 1 from 2 inside, Pi should be 2.
-     * </p>
-     * <p>The third is inside, so with 2 from 3 inside, Pi should be 2.666.
+     * <p>The first is inside, the second is outside, the third is inside.
+     * No rolling count is maintained, each should be evaluated individually.
      * </p>
      */
     @Test
@@ -114,12 +111,12 @@ public class Pi1IT extends AbstractJetIT {
         double y2 = 1.0d;
         double x3 = 0.1d;
         double y3 = 0.1d;
-        double pi1 = 4.0d;
-        double pi2 = 2.0d;
-        double pi3 = 8d / 3d;
+        String inside1 = "true";
+        String inside2 = "false";
+        String inside3 = "true";
 
         List<String> input = List.of(x1 + "," + y1, x2 + "," + y2, x3 + "," + y3);
-        List<String> expected = List.of(String.valueOf(pi1), String.valueOf(pi2), String.valueOf(pi3));
+        List<String> expected = List.of(inside1, inside2, inside3);
 
         Pipeline pipeline = Pipeline.create();
 
