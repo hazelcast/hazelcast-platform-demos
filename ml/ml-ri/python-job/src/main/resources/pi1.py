@@ -26,7 +26,6 @@
 # combined with the approximations produced by other Python processes.
 # See variant 2 of this (pi2.py) for a different approach.
 ########################################################################
-import math
 
 count_inside = 0
 count_all = 0
@@ -34,6 +33,8 @@ count_all = 0
 def handle(points):
     global count_inside
     global count_all
+
+    results = []
 
     for point in points:
       count_all += 1
@@ -46,8 +47,8 @@ def handle(points):
       if xy_squared <= 1 :
         count_inside += 1
 
-    pi = 4 * count_inside / count_all
+      pi = 4 * count_inside / count_all
 
-    s = str(pi)    
+      results.append(str(pi))
 
-    return [s for point in points]
+    return results

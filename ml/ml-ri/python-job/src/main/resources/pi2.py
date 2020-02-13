@@ -25,5 +25,28 @@
 # combined with the values from clones of this Python process running
 # in parallel to estimate Pi.
 # See variant 1 of this (pi1.py) for a different approach.
+# ----------------------------------------------------------------------
+# Note2:
+#  We use "tribool" purely to show how "requirements.txt" are imported by
+# Jet when this Python script is deployed to the cluster.
 ########################################################################
+from tribool import Tribool
 
+def handle(points):
+    results = []
+
+    for point in points:
+      xy = point.split(',')
+      x = xy[0]
+      y = xy[1]
+      x_squared = float(x) * float(x)
+      y_squared = float(y) * float(y)
+      xy_squared = (x_squared + y_squared)
+      if xy_squared <= 1 :
+        result = Tribool(True) 
+      else :
+        result = Tribool(False) 
+
+      results.append(str(result))
+
+    return results

@@ -77,8 +77,8 @@ public class Pi1IT extends AbstractJetIT {
      */
     @Test
     public void apexOutsideCircle() throws Exception {
-        double x = 0.0d;
-        double y = 0.0d;
+        double x = 1.0d;
+        double y = 1.0d;
         double pi = 0d;
 
         List<String> input = List.of(x + "," + y);

@@ -51,7 +51,7 @@ public class Pi2IT extends AbstractJetIT {
     public void originInsideCircle() throws Exception {
         double x = 0.0d;
         double y = 0.0d;
-        String inside = "true";
+        String inside = "True";
 
         List<String> input = List.of(x + "," + y);
         List<String> expected = List.of(inside);
@@ -77,9 +77,9 @@ public class Pi2IT extends AbstractJetIT {
      */
     @Test
     public void apexOutsideCircle() throws Exception {
-        double x = 0.0d;
-        double y = 0.0d;
-        String inside = "false";
+        double x = 1.0d;
+        double y = 1.0d;
+        String inside = "False";
 
         List<String> input = List.of(x + "," + y);
         List<String> expected = List.of(inside);
@@ -111,9 +111,9 @@ public class Pi2IT extends AbstractJetIT {
         double y2 = 1.0d;
         double x3 = 0.1d;
         double y3 = 0.1d;
-        String inside1 = "true";
-        String inside2 = "false";
-        String inside3 = "true";
+        String inside1 = "True";
+        String inside2 = "False";
+        String inside3 = "True";
 
         List<String> input = List.of(x1 + "," + y1, x2 + "," + y2, x3 + "," + y3);
         List<String> expected = List.of(inside1, inside2, inside3);
