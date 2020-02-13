@@ -10,9 +10,10 @@ if [ "$HOST_IP" == "" ]
 then
  HOST_IP=127.0.0.1
 fi
-if [ `echo $HOST_IP | wc -l` -ne 1 ]
+if [ `echo $HOST_IP | wc -w` -ne 1 ]
 then
- echo \$HOST_IP unclear: `ifconfig | grep -w inet`
+ echo \$HOST_IP unclear:
+ ifconfig | grep -w inet | grep -v 127.0.0.1
  exit 1
 fi
 

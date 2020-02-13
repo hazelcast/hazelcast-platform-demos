@@ -24,7 +24,7 @@
 
         <modules>
         	<module>hazelcast-node</module>
-                <module>python-job</module>
+            <module>python-job</module>
         </modules>
 
         <build>

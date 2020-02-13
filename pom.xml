@@ -29,6 +29,7 @@
 		<hazelcast.version>4.0</hazelcast.version>
 		<hazelcast-jet.version>4.0-SNAPSHOT</hazelcast-jet.version>
 		<hazelcast-kubernetes.version>2.0.1</hazelcast-kubernetes.version>
+		<junit.version>4.13</junit.version>
 		<spring-boot.version>2.2.4.RELEASE</spring-boot.version>
 
 		<!-- Plugins -->
@@ -37,12 +38,23 @@
 		<maven-checkstyle-plugin.version>3.1.0</maven-checkstyle-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
+		<maven-failsafe-plugin.version>3.0.0-M4</maven-failsafe-plugin.version>
 
 		<!-- Environments -->
 		<!-- Google Cloud -->
 		<gcp.project>NAME GOES HERE</gcp.project>
 		<gcp.registry>gcr.io</gcp.registry>
 	</properties>
+
+	<dependencies>
+		<!-- scope==test -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 
 	<dependencyManagement>
 		<dependencies>
@@ -133,6 +145,18 @@
 					<source>${java.version}</source>
 					<target>${java.version}</target>
 				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>${maven-failsafe-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
 			</plugin>
 		</plugins>
 		<pluginManagement>
