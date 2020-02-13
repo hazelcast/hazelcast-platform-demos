@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.ml.ri;
 
+import com.hazelcast.jet.accumulator.MutableReference;
+import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.pipeline.JournalInitialPosition;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.Sinks;
@@ -35,6 +37,7 @@ public class Pi2Job {
 
     // "Pi2Job" submits "pi2", for Python module "pi2.py".
     private static final String NAME = Pi2Job.class.getSimpleName().substring(0, 3).toLowerCase();
+    private static final int QUARTER_CIRCLE = 4;
 
     /**
      * <p>A Jet pipeline to calculate Pi. The essence of this version of the processing is that
@@ -67,8 +70,30 @@ public class Pi2Job {
         .readFrom(Sources.mapJournal("points", JournalInitialPosition.START_FROM_CURRENT)).withIngestionTimestamps()
         .map(entry -> entry.getKey() + "," + entry.getValue())
         .apply(PythonTransforms.mapUsingPython(MyUtils.getPythonServiceConfig(NAME)))
-        //TODO Complete implementation
-        .writeTo(Sinks.logger(o -> "From Python: " + o));
+        .mapStateful(MutableReference::new,
+                (MutableReference<Tuple2<Long, Long>> reference, String string) -> {
+                    long trueCount = 0;
+                    long falseCount = 0;
+
+                    Tuple2<Long, Long> previous = reference.get();
+                    if (previous != null) {
+                        trueCount = previous.f0();
+                        falseCount = previous.f1();
+                    }
+
+                    if (string.toLowerCase().equals("true")) {
+                        trueCount++;
+                    } else {
+                        falseCount++;
+                    }
+
+                    Tuple2<Long, Long> next = Tuple2.tuple2(trueCount, falseCount);
+                    reference.set(next);
+
+                    double pi = QUARTER_CIRCLE * trueCount / (trueCount + falseCount);
+                    return Double.toString(pi);
+                })
+        .writeTo(Sinks.logger());
 
         return pipeline;
     }
