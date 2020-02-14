@@ -16,7 +16,11 @@
 
 package com.hazelcast.platform.demos.ml.ri;
 
+import com.hazelcast.function.BiFunctionEx;
+import com.hazelcast.function.ToDoubleFunctionEx;
 import com.hazelcast.jet.accumulator.MutableReference;
+import com.hazelcast.jet.aggregate.AggregateOperation;
+import com.hazelcast.jet.aggregate.AggregateOperation1;
 import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.pipeline.JournalInitialPosition;
 import com.hazelcast.jet.pipeline.Pipeline;
@@ -36,6 +40,34 @@ public class Pi2Job {
     // "Pi2Job" submits "pi2", for Python module "pi2.py".
     private static final String NAME = Pi2Job.class.getSimpleName().substring(0, 3).toLowerCase();
     private static final double QUARTER_CIRCLE = 4d;
+
+    /**
+     * <p>Calculate Pi from a stream of "{@code true}" &amp; "{@code false}" values.
+     * Pi is the ratio of true in the stream.
+     * </p>
+     */
+    private static final BiFunctionEx<MutableReference<Tuple2<Long, Long>>, String, Double> PI_CALCULATOR =
+            (MutableReference<Tuple2<Long, Long>> reference, String string) -> {
+                long trueCount = 0;
+                long falseCount = 0;
+
+                Tuple2<Long, Long> previous = reference.get();
+                if (previous != null) {
+                    trueCount = previous.f0();
+                    falseCount = previous.f1();
+                }
+
+                if (string.toLowerCase().equals("true")) {
+                    trueCount++;
+                } else {
+                    falseCount++;
+                }
+
+                Tuple2<Long, Long> next = Tuple2.tuple2(trueCount, falseCount);
+                reference.set(next);
+
+                return QUARTER_CIRCLE * trueCount / (trueCount + falseCount);
+            };
 
     /**
      * <p>A Jet pipeline to calculate Pi. The essence of this version of the processing is that
@@ -60,7 +92,12 @@ public class Pi2Job {
      * a mapping function that maintains state. The state here being the rolling count of "{@code true}"
      * and "{@code false}" from which we output the current global estimate for Pi.
      * </li>
-     * TODO Steps for Windowing
+     * <li><p>"{@code window()}"</p>
+     * <p>Insert watermarks every 5 seconds in the stream of data, for later aggregation.</p>
+     * </li>
+     * <li><p>"{@code aggregate()}"</p>
+     * <p>For multiple refinements of Pi in the window, output the last as this is best.</p>
+     * </li>
      * <li><p>"{@code writeTo()}"</p>
      * <p>Publish the average as a String to a Hazelcast {@link com.hazelcast.topic.ITopic}</p>
      * </li>
@@ -76,34 +113,42 @@ public class Pi2Job {
         .readFrom(Sources.mapJournal("points", JournalInitialPosition.START_FROM_CURRENT)).withIngestionTimestamps()
         .map(entry -> entry.getKey() + "," + entry.getValue())
         .apply(PythonTransforms.mapUsingPython(MyUtils.getPythonServiceConfig(NAME)))
-        .mapStateful(MutableReference::new,
-        		//TODO Make this a separate method
-                (MutableReference<Tuple2<Long, Long>> reference, String string) -> {
-                    long trueCount = 0;
-                    long falseCount = 0;
-
-                    Tuple2<Long, Long> previous = reference.get();
-                    if (previous != null) {
-                        trueCount = previous.f0();
-                        falseCount = previous.f1();
-                    }
-
-                    if (string.toLowerCase().equals("true")) {
-                        trueCount++;
-                    } else {
-                        falseCount++;
-                    }
-
-                    Tuple2<Long, Long> next = Tuple2.tuple2(trueCount, falseCount);
-                    reference.set(next);
-
-                    double pi = QUARTER_CIRCLE * trueCount / (trueCount + falseCount);
-                    return Double.toString(pi);
-                })
-        //TODO Output every 5 second window
+        .mapStateful(MutableReference::new, PI_CALCULATOR)
+        .window(MyUtils.FIVE_SECOND_WINDOW)
+        .aggregate(lastInWindow(Double::doubleValue))
         .writeTo(MyUtils.buildTopicSink(Pi2Job.class, "pi"));
 
         return pipeline;
+    }
+
+    /**
+     * <p>Output the "<i>last</i>" item in the window. As we are refining Pi
+     * with every calculation, the last in the window will be the most accurate.
+     * </p>
+     * <p>Note because the job executes in parallel we can't guarantee "<i>last</i>",
+     * as the combine operation has no access to a timestamp, but nearly last is a
+     * sufficient approximation for the purposes of this job.
+     * </p>
+     *
+     * @param getDoubleValueFn How to get the double from the input
+     * @return An aggregate operation on a single stream
+     */
+    public static AggregateOperation1<Double, MutableReference<Double>, String> lastInWindow(
+            ToDoubleFunctionEx<Double> getDoubleValueFn
+    ) {
+        return AggregateOperation
+                .withCreate(() -> new MutableReference<Double>())
+                .andAccumulate((MutableReference<Double> reference, Double item) -> {
+                    reference.set(item);
+                })
+                .andCombine((reference1, reference2) -> {
+                    if (reference1.get() == null) {
+                        reference1.set(reference2.get());
+                    }
+                })
+                .andDeduct((reference1, reference2) -> {
+                })
+                .andExportFinish(reference -> reference.get() == null ? "<no value>" : reference.get().toString());
     }
 
 }

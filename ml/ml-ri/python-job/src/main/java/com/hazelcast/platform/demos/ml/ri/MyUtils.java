@@ -22,16 +22,23 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.concurrent.TimeUnit;
 
+import com.hazelcast.jet.datamodel.WindowResult;
 import com.hazelcast.jet.pipeline.Sink;
 import com.hazelcast.jet.pipeline.SinkBuilder;
+import com.hazelcast.jet.pipeline.WindowDefinition;
 import com.hazelcast.jet.python.PythonServiceConfig;
+import com.hazelcast.topic.ITopic;
 
 /**
  * <p>Utility functions to share between {@link Pi1Job} and {@link Pi2Job}.
  * </p>
  */
 public class MyUtils {
+
+    protected static final WindowDefinition FIVE_SECOND_WINDOW
+        = WindowDefinition.tumbling(TimeUnit.SECONDS.toMillis(5));
 
     /**
      * <p>Configuration for the Python runner. Where to find the Python module,
@@ -59,13 +66,13 @@ public class MyUtils {
      * @param klass - Sending job class name.
      * @param topicName - Topic name, should always be "{@code pi}".
      */
-    protected static Sink<? super String> buildTopicSink(Class<?> klass, String topicName) {
+    protected static Sink<? super WindowResult<?>> buildTopicSink(Class<?> klass, String topicName) {
         return SinkBuilder.sinkBuilder(
                         "topicSink-" + topicName,
                         context -> context.jetInstance().getHazelcastInstance().getTopic(topicName)
                         )
-                        .receiveFn((iTopic, item) ->
-                            iTopic.publish(klass.getSimpleName() + "," + item.toString()))
+                        .receiveFn((ITopic<Object> iTopic, WindowResult<?> item) ->
+                            iTopic.publish(klass.getSimpleName() + "," + item.result().toString()))
                         .build();
     }
 

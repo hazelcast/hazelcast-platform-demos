@@ -16,13 +16,10 @@
 
 package com.hazelcast.platform.demos.ml.ri;
 
-import java.util.concurrent.TimeUnit;
-
 import com.hazelcast.jet.aggregate.AggregateOperations;
 import com.hazelcast.jet.pipeline.JournalInitialPosition;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.Sources;
-import com.hazelcast.jet.pipeline.WindowDefinition;
 import com.hazelcast.jet.python.PythonTransforms;
 
 /**
@@ -37,9 +34,6 @@ public class Pi1Job {
 
     // "Pi1Job" submits "pi1", for Python module "pi1.py".
     private static final String NAME = Pi1Job.class.getSimpleName().substring(0, 3).toLowerCase();
-
-    private static final WindowDefinition FIVE_SECOND_WINDOW
-            = WindowDefinition.tumbling(TimeUnit.SECONDS.toMillis(5));
 
     /**
      * <p>A Jet pipeline to calculate Pi. The essence of this version of the processing is that
@@ -66,9 +60,6 @@ public class Pi1Job {
      * <p>Collate the value of PI calculated by the multiple Python workers, and every watermark
      * (every 5 seconds), output the average.</p>
      * </li>
-     * <li><p>"{@code map()}"</p>
-     * <p>Turn the average value into a String</p>
-     * </li>
      * <li><p>"{@code writeTo()}"</p>
      * <p>Publish the average as a String to a Hazelcast {@link com.hazelcast.topic.ITopic}</p>
      * </li>
@@ -84,9 +75,8 @@ public class Pi1Job {
         .readFrom(Sources.mapJournal("points", JournalInitialPosition.START_FROM_CURRENT)).withIngestionTimestamps()
         .map(entry -> entry.getKey() + "," + entry.getValue())
         .apply(PythonTransforms.mapUsingPython(MyUtils.getPythonServiceConfig(NAME)))
-        .window(FIVE_SECOND_WINDOW)
+        .window(MyUtils.FIVE_SECOND_WINDOW)
         .aggregate(AggregateOperations.averagingDouble(string -> Double.parseDouble(string)))
-        .map(average -> average.result().toString())
         .writeTo(MyUtils.buildTopicSink(Pi1Job.class, "pi"));
 
         return pipeline;

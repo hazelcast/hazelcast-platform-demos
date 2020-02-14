@@ -69,7 +69,7 @@ public class RandomXYGenerator {
                 return true;
             }
             return false;
-        })/*XXX .setLocalParallelism(1)*/.setName("log_every_" + LOG_THRESHOLD)
+        }).setName("log_every_" + LOG_THRESHOLD)
         .writeTo(Sinks.logger()).setLocalParallelism(1);
 
         return pipeline;
