@@ -28,4 +28,7 @@
     <!-- Suppress strict duplicate code checking -->
     <suppress checks="StrictDuplicateCode" files="\.java" lines="1-15"/>
 
+    <!-- Test suppressionsi, for "src/test" -->
+    <suppress checks="MagicNumber" files=".*[\\/]src[\\/]test[\\/]"/>
+
 </suppressions>
