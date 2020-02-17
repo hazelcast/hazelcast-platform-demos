@@ -1,0 +1,23 @@
+---
+# Create a job with fixed argument "pi2" to invoke Python script "pi2.py"
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: job-pi2
+  name: job-pi2
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: job-pi2
+    spec:
+      containers:
+        - args: ["pi2"]
+          image: "hazelcast-ml-ri/python-job"
+          imagePullPolicy: IfNotPresent
+          name: container-job
+      restartPolicy: Never
+---

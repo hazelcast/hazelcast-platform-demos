@@ -1,0 +1,44 @@
+---
+# Service DNS will be "ml-ri-service.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ml-ri-service
+spec:
+  clusterIP: None
+  selector:
+    app: hazelcast-node
+  ports:
+  - port: 5701
+---
+# Creates 2 pods, hazelcast-node-0 and hazelcast-node-1 in a stateful set.
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: hazelcast-node
+spec:
+  replicas: 2
+  serviceName: hazelcast-node-statefulset
+  selector:
+    matchLabels:
+      app: hazelcast-node
+  template:
+    metadata:
+      labels:
+        app: hazelcast-node
+    spec:
+      containers:
+        - image: "hazelcast-ml-ri/hazelcast-node"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /hazelcast/health/node-state
+              port: 5701
+          name: hazelcast-node-container
+          readinessProbe:
+            httpGet:
+              path: /hazelcast/health/ready
+              port: 5701
+            initialDelaySeconds: 30

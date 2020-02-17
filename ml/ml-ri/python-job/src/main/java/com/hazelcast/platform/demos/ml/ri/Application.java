@@ -37,10 +37,11 @@ public class Application {
         String pythonJob;
         if (args.length == 0) {
             pythonJob = "pi1";
+            System.out.println("No args, pythonJob=='" + pythonJob + ".py'");
         } else {
             pythonJob = args[0].equals("pi1") ? "pi1" : "pi2";
+            System.out.println("Arg='" + args[0] + "', pythonJob=='" + pythonJob + ".py'");
         }
-        System.out.println("pythonJob=='" + pythonJob + ".py'");
 
         ClientConfig clientConfig = ApplicationConfig.buildJetClientConfig();
 

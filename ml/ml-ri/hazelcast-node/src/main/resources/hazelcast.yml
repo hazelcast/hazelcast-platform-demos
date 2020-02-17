@@ -15,6 +15,11 @@ hazelcast:
       kubernetes:
         enabled: true
         service-dns: '@my.cluster.name@-service.default.svc.cluster.local'
+    rest-api:
+      enabled: true
+      endpoint-groups:
+        HEALTH_CHECK:
+          enabled: true
   #
   map:
     # The data in 'points' map is not required long term,
