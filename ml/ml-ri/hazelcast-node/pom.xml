@@ -24,6 +24,10 @@
         <dependencies>
                 <dependency>
                         <groupId>com.hazelcast.jet</groupId>
+                        <artifactId>hazelcast-jet</artifactId>
+                </dependency>
+                <dependency>
+                        <groupId>com.hazelcast.jet</groupId>
                         <artifactId>hazelcast-jet-python</artifactId>
                 </dependency>
                 <dependency>
