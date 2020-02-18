@@ -13,6 +13,7 @@
 	<description>Hazelcast Platform Demo Applications</description>
 
 	<modules>
+		<module>banking</module>
 		<module>ml</module>
 	</modules>
 
@@ -25,6 +26,7 @@
 		<main.basedir>${project.basedir}</main.basedir>
 		<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<spotbugs.skip>true</spotbugs.skip>
 
 		<!-- Version dependencies -->
 		<hazelcast.version>4.0</hazelcast.version>
@@ -40,6 +42,7 @@
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
 		<maven-failsafe-plugin.version>3.0.0-M4</maven-failsafe-plugin.version>
+		<spotbugs-maven-plugin.version>3.1.12.2</spotbugs-maven-plugin.version>
 
 		<!-- Environments -->
 		<!-- Google Cloud -->
@@ -162,6 +165,23 @@
                     </execution>
                 </executions>
 			</plugin>
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>${spotbugs-maven-plugin.version}</version>
+                <configuration>
+                    <effort>Max</effort>
+                    <threshold>Low</threshold>
+                </configuration>
+                <executions>
+                    <execution>
+                    	<phase>test</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -266,6 +286,7 @@
 			<properties>
 				<dockerfile.skip>false</dockerfile.skip>
 				<failsafe.skip>false</failsafe.skip>
+				<spotbugs.skip>false</spotbugs.skip>
 			</properties>
 			<build>
 				<plugins>

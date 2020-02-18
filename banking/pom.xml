@@ -10,19 +10,19 @@
                 <version>4.0-SNAPSHOT</version>
         </parent>
 
- 	<groupId>com.hazelcast.platform.demos.ml</groupId>
-        <artifactId>ml-root</artifactId>
+ 		<groupId>com.hazelcast.platform.demos.banking</groupId>
+        <artifactId>banking-root</artifactId>
         <packaging>pom</packaging>
 
-        <name>Hazelcast Platform - ML</name>
-        <description>Machine Learning Applications</description>
+        <name>Hazelcast Platform - Banking</name>
+        <description>Banking Applications</description>
 
         <properties>
                 <main.basedir>${project.parent.basedir}</main.basedir>
         </properties>
 
         <modules>
-        	<module>ml-ri</module>
+        	<module>trade-monitor</module>
         </modules>
 
 </project>
