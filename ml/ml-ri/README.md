@@ -1,6 +1,12 @@
 # Hazelcast Platform Demo Applications - Machine Learning - Reference Implementation
 
-TODO - Docker scripts
-TODO - Kubernetes scripts
 TODO - Add X,Y generator, log on all nodes, run at a faster speed
+TODO - Technical instructions
+TODO - Other documentation
 
+minikube start --cpus=8 --memory=12g
+kubectl config get-contexts
+eval $(minikube docker-env)
+
+docker pull library/python:3.7-buster
+docker pull library/openjdk:11-jre-slim
