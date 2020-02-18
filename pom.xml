@@ -84,6 +84,11 @@
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>
+				<artifactId>hazelcast-jet-kafka</artifactId>
+				<version>${hazelcast-jet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.hazelcast.jet</groupId>
 				<artifactId>hazelcast-jet-python</artifactId>
 				<version>${hazelcast-jet.version}</version>
 			</dependency>
