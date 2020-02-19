@@ -39,7 +39,7 @@ public class Application {
             pythonJob = "pi1";
             System.out.println("No args, pythonJob=='" + pythonJob + ".py'");
         } else {
-            pythonJob = args[0].equals("pi1") ? "pi1" : "pi2";
+            pythonJob = args[0].equals("pi1.py") ? "pi1" : "pi2";
             System.out.println("Arg='" + args[0] + "', pythonJob=='" + pythonJob + ".py'");
         }
 
