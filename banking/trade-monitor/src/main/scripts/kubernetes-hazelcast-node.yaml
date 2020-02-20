@@ -1,14 +1,14 @@
 ---
-# Service DNS will be "ml-ri-service.default.svc.cluster.local".
+# Service DNS will be "trade-monitor-service.default.svc.cluster.local".
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: ml-ri-service
+  name: trade-monitor-service
 spec:
   clusterIP: None
   selector:
-    app: ml-ri-hazelcast-node
+    app: trade-monitor-hazelcast-node
   ports:
   - port: 5701
 ---
@@ -17,20 +17,20 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: ml-ri-hazelcast-node
+  name: trade-monitor-hazelcast-node
 spec:
   replicas: 2
-  serviceName: ml-ri-hazelcast-node-statefulset
+  serviceName: trade-monitor-hazelcast-node-statefulset
   selector:
     matchLabels:
-      app: ml-ri-hazelcast-node
+      app: trade-monitor-hazelcast-node
   template:
     metadata:
       labels:
-        app: ml-ri-hazelcast-node
+        app: trade-monitor-hazelcast-node
     spec:
       containers:
-        - image: "hazelcast-ml-ri/hazelcast-node"
+        - image: "hazelcast-trade-monitor/hazelcast-node"
           imagePullPolicy: Never
           livenessProbe:
             httpGet:
