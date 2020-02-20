@@ -3,4 +3,5 @@
 .factorypath
 .project
 .settings
+*.code-workspace
 target
