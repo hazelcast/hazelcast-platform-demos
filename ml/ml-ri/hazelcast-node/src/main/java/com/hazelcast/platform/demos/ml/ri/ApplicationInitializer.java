@@ -93,7 +93,7 @@ public class ApplicationInitializer {
         Pipeline pipeline = RandomXYGenerator.buildPipeline();
 
         JobConfig jobConfig = new JobConfig();
-        jobConfig.setName(RandomXYGenerator.class.getName());
+        jobConfig.setName(RandomXYGenerator.class.getSimpleName());
 
         jetInstance.newJobIfAbsent(pipeline, jobConfig);
     }

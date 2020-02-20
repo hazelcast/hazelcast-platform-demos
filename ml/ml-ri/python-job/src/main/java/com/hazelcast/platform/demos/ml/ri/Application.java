@@ -52,11 +52,11 @@ public class Application {
             JobConfig jobConfig = new JobConfig();
             if (pythonJob.equals("pi1")) {
                 pipeline = Pi1Job.buildPipeline();
-                jobConfig.setName(Pi1Job.class.getName());
+                jobConfig.setName(Pi1Job.class.getSimpleName());
                 jobConfig.addClass(Pi1Job.class);
             } else {
                 pipeline = Pi2Job.buildPipeline();
-                jobConfig.setName(Pi2Job.class.getName());
+                jobConfig.setName(Pi2Job.class.getSimpleName());
                 jobConfig.addClass(Pi2Job.class);
             }
             jobConfig.addClass(MyUtils.class);

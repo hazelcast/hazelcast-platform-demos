@@ -49,7 +49,7 @@ public class RandomXYGenerator {
         Pipeline pipeline = Pipeline.create();
 
         StreamSource<Map.Entry<Double, Double>> mySource =
-                SourceBuilder.stream(MyXYSource.class.getName(), __ -> new MyXYSource())
+                SourceBuilder.stream(MyXYSource.class.getSimpleName(), __ -> new MyXYSource())
                 .fillBufferFn(MyXYSource::fillBufferFn)
                 .distributed(1)
                 .build();
@@ -59,17 +59,25 @@ public class RandomXYGenerator {
             .readFrom(mySource).withoutTimestamps();
 
         inputSource
+        .filter(tuple2 -> {
+            //TODO Debug
+            //System.out.println("Pipeline::writeTo::" + tuple2);
+            return true;
+        })
         .writeTo(Sinks.map("points"));
 
         inputSource
+        //XXX.mapUsingService(serviceFactory, mapFn)
         .filterStateful(LongAccumulator::new, (count, tuple2) -> {
             count.add(1);
+            //TODO Debug
+            //System.out.println("Pipeline::filterStateful::" + tuple2 + " -> " + count.get());
             if (count.get() >= LOG_THRESHOLD) {
                 count.set(0);
                 return true;
             }
             return false;
-        }).setName("log_every_" + LOG_THRESHOLD)
+        })/*XXX .setLocalParallelism(1).setName("log_every_" + LOG_THRESHOLD)*/
         .writeTo(Sinks.logger()).setLocalParallelism(1);
 
         return pipeline;
