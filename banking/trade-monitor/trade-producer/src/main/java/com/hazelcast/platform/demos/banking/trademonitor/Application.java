@@ -19,10 +19,6 @@ package com.hazelcast.platform.demos.banking.trademonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hazelcast.jet.Jet;
-import com.hazelcast.jet.JetInstance;
-import com.hazelcast.jet.config.JetConfig;
-
 /**
  * <p>Entry point, "{@code main()}" method.
  * </p>
@@ -30,38 +26,28 @@ import com.hazelcast.jet.config.JetConfig;
 public class Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
-    /**
-     * <p>Configure Hazelcast logging via Slf4j. Implementation
-     * in "{@code pom.xml}" is Logback.
-     * </p>
-     * <p>Set this before Hazelcast starts rather than in
-     * "{@code hazelcast.yml}", otherwise some log messages
-     * are produced before "{@code hazelcast.yml}" is read
-     * dictating the right logging framework to use.
-     * </p>
-     */
-    static {
-        System.setProperty("hazelcast.logging.type", "slf4j");
-    }
+    private static final int DEFAULT_RATE = 300;
 
     /**
-     * <p>Start Jet with specific configuration, and leave it running.
+     * <p>To run we need one argument, the Kafka brokers to connect
+     * to. The second argument, the rate at which to create trades is
+     * optional.
      * </p>
      */
     public static void main(String[] args) throws Exception {
-        if (args.length != 1) {
-            LOGGER.error("Usage: 1 arg expected: bootstrapServers");
-            LOGGER.error("eg: 127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094");
+        if (args.length < 1 || args.length > 2) {
+            LOGGER.error("Usage: 1 arg expected + 1 optional: bootstrapServers [rate]");
+            LOGGER.error("eg: 127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094 300");
             System.exit(1);
         }
 
         String bootstrapServers = args[0];
+        int rate = DEFAULT_RATE;
+        if (args.length == 2) {
+            rate = Integer.parseInt(args[1]);
+        }
 
-        JetConfig jetConfig = ApplicationConfig.buildJetConfig();
-
-        JetInstance jetInstance = Jet.newJetInstance(jetConfig);
-
-        ApplicationInitializer.initialise(jetInstance, bootstrapServers);
+        new ApplicationRunner(rate, bootstrapServers).run();
     }
 
 }

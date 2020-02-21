@@ -33,6 +33,7 @@
 		<hazelcast-jet.version>4.0-SNAPSHOT</hazelcast-jet.version>
 		<hazelcast-kubernetes.version>2.0.1</hazelcast-kubernetes.version>
 		<junit.version>4.13</junit.version>
+		<kafka-clients.version>2.4.0</kafka-clients.version>
 		<spring-boot.version>2.2.4.RELEASE</spring-boot.version>
 
 		<!-- Plugins -->

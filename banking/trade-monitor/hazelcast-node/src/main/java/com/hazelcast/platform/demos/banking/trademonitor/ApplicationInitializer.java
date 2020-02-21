@@ -16,11 +16,17 @@
 
 package com.hazelcast.platform.demos.banking.trademonitor;
 
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.hazelcast.jet.JetInstance;
-/*XXX
 import com.hazelcast.jet.config.JobConfig;
+import com.hazelcast.jet.config.ProcessingGuarantee;
 import com.hazelcast.jet.pipeline.Pipeline;
-*/
+import com.hazelcast.map.IMap;
+
 
 /**
  * <p>Initialise the Jet cluster to ensure the necessary extra parts
@@ -29,15 +35,17 @@ import com.hazelcast.jet.pipeline.Pipeline;
  * </p>
  */
 public class ApplicationInitializer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInitializer.class);
 
     /**
      * <p>Ensure the necessary {@link com.hazelcast.core.DistributedObject} exist to
      * hold processing results. Launch the Jet jobs for this example.
      * </p>
      */
-    public static void initialise(JetInstance jetInstance) {
+    public static void initialise(JetInstance jetInstance, String bootstrapServers) throws Exception {
         createNeededObjects(jetInstance);
-        launchNeededJobs(jetInstance);
+        loadNeededData(jetInstance);
+        launchNeededJobs(jetInstance, bootstrapServers);
     }
 
 
@@ -48,27 +56,45 @@ public class ApplicationInitializer {
      * </p>
      */
     static void createNeededObjects(JetInstance jetInstance) {
-        jetInstance.getHazelcastInstance().getMap("trades");
+        for (String iMapName : MyConstants.IMAP_NAMES) {
+            jetInstance.getHazelcastInstance().getMap(iMapName);
+        }
     }
 
 
     /**
-     * <p>An input source is needed for the example jobs
-     * to process.
-     * </p>
-     * <p>Create one job per cluster that generates X &amp; Y
-     * co-ordinates to the map "{@code points}".
+     * <p>Stock symbols are needed for trade look-up enrichment,
+     * the first member to start loads them from a file into
+     * a {@link com.hazelcast.map.IMap}.
      * </p>
      */
-    static void launchNeededJobs(JetInstance jetInstance) {
-        /*XXX
-        Pipeline pipeline = RandomXYGenerator.buildPipeline();
+    static void loadNeededData(JetInstance jetInstance) throws Exception {
+        IMap<String, String> symbolsMap = jetInstance.getMap(MyConstants.IMAP_NAME_SYMBOLS);
 
-        JobConfig jobConfig = new JobConfig();
-        jobConfig.setName(RandomXYGenerator.class.getName());
+        if (!symbolsMap.isEmpty()) {
+            LOGGER.trace("Skip loading '{}', not empty", symbolsMap.getName());
+        } else {
+            Map<String, String> localMap = MyUtils.nasdaqListed();
 
-        jetInstance.newJobIfAbsent(pipeline, jobConfig);
-        */
+            symbolsMap.putAll(localMap);
+
+            LOGGER.trace("Loaded {} into '{}'", localMap.size(), symbolsMap.getName());
+        }
+    }
+
+    /**
+     * <p>Launch a pipeline to read trades from Kafka, which needs the Kafka host names
+     * and ports for the broker servers.
+     * </p>
+     */
+    static void launchNeededJobs(JetInstance jetInstance, String bootstrapServers) {
+        Pipeline pipelineIngestTrades = IngestTrades.buildPipeline(bootstrapServers);
+
+        JobConfig jobConfigIngestTrades = new JobConfig();
+        jobConfigIngestTrades.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
+        jobConfigIngestTrades.setName(IngestTrades.class.getSimpleName());
+
+        jetInstance.newJobIfAbsent(pipelineIngestTrades, jobConfigIngestTrades);
     }
 
 }

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROJECT=trade-monitor
-MODULE=hazelcast-node
+MODULE=trade-producer
 
 BASEDIR=`dirname $0`
 cd $BASEDIR/../../../$MODULE
