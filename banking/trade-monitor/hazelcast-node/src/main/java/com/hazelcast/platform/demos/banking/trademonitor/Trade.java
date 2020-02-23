@@ -19,7 +19,12 @@ package com.hazelcast.platform.demos.banking.trademonitor;
 import java.io.Serializable;
 
 /**
- * XXX
+ * <p>A Java object representing some (in fact, all) of the
+ * JSON fields in the trade object read for Kafka.
+ * </p>
+ * <p>Required until <a href="https://github.com/hazelcast/hazelcast/issues/15140">Issue-15150</a>
+ * is addressed.
+ * </p>
  */
 @SuppressWarnings("serial")
 public class Trade implements Serializable {
