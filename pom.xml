@@ -32,6 +32,7 @@
 		<hazelcast.version>4.0</hazelcast.version>
 		<hazelcast-jet.version>4.0-SNAPSHOT</hazelcast-jet.version>
 		<hazelcast-kubernetes.version>2.0.1</hazelcast-kubernetes.version>
+		<jackson.version>2.10.2</jackson.version>
 		<junit.version>4.13</junit.version>
 		<kafka-clients.version>2.4.0</kafka-clients.version>
 		<spring-boot.version>2.2.4.RELEASE</spring-boot.version>
@@ -93,6 +94,12 @@
 				<artifactId>hazelcast-jet-python</artifactId>
 				<version>${hazelcast-jet.version}</version>
 			</dependency>
+
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -119,9 +126,9 @@
 				<updatePolicy>interval:720</updatePolicy>
 			</snapshots>
 		</repository>
-                <repository>
-                        <id>Public Release Repository</id>
-                        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		<repository>
+			<id>Public Release Repository</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 			<releases>
 				<enabled>false</enabled>
 			</releases>
@@ -159,60 +166,60 @@
 			<plugin>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>${maven-failsafe-plugin.version}</version>
-                <configuration>
-                    <skipITs>${failsafe.skip}</skipITs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
+				<configuration>
+					<skipITs>${failsafe.skip}</skipITs>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>com.github.spotbugs</groupId>
 				<artifactId>spotbugs-maven-plugin</artifactId>
 				<version>${spotbugs-maven-plugin.version}</version>
-                <configuration>
-                    <effort>Max</effort>
-                    <threshold>Low</threshold>
-                </configuration>
-                <executions>
-                    <execution>
-                    	<phase>test</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
+				<configuration>
+					<effort>Max</effort>
+					<threshold>Low</threshold>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>test</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
-                <plugin>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <configuration>
-                        <archive>
-                            <manifest>
-                                <mainClass>${main.class}</mainClass>
-                            </manifest>
-                        </archive>
-                        <descriptorRefs>
-                            <descriptorRef>jar-with-dependencies</descriptorRef>
-                        </descriptorRefs>
-                        <tarLongFileMode>posix</tarLongFileMode>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>single</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
+				<plugin>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<configuration>
+						<archive>
+							<manifest>
+								<mainClass>${main.class}</mainClass>
+							</manifest>
+						</archive>
+						<descriptorRefs>
+							<descriptorRef>jar-with-dependencies</descriptorRef>
+						</descriptorRefs>
+						<tarLongFileMode>posix</tarLongFileMode>
+					</configuration>
+					<executions>
+						<execution>
+							<phase>package</phase>
+							<goals>
+								<goal>single</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
 				<plugin>
 					<artifactId>maven-deploy-plugin</artifactId>
 					<version>${maven-deploy-plugin.version}</version>
@@ -238,28 +245,11 @@
 								<goal>build</goal>
 							</goals>
 						</execution>
-						<!-- 
-						<execution>
-							<phase>package</phase>
-							<id>tag-for-gcp</id>
-							<goals>
-								<goal>tag</goal>
-							</goals>
-							<configuration>
-								<repository>${gcp.registry}/${gcp.project}/${docker.image.prefix}/${docker.image.name}</repository>
-							</configuration>
-						</execution>
-						<execution>
-							<phase>deploy</phase>
-							<id>deploy-to-gcp</id>
-							<goals>
-								<goal>push</goal>
-							</goals>
-							<configuration>
-								<repository>${gcp.registry}/${gcp.project}/${docker.image.prefix}/${docker.image.name}</repository>
-							</configuration>
-						</execution>
-						 -->
+						<!-- <execution> <phase>package</phase> <id>tag-for-gcp</id> <goals> 
+							<goal>tag</goal> </goals> <configuration> <repository>${gcp.registry}/${gcp.project}/${docker.image.prefix}/${docker.image.name}</repository> 
+							</configuration> </execution> <execution> <phase>deploy</phase> <id>deploy-to-gcp</id> 
+							<goals> <goal>push</goal> </goals> <configuration> <repository>${gcp.registry}/${gcp.project}/${docker.image.prefix}/${docker.image.name}</repository> 
+							</configuration> </execution> -->
 					</executions>
 				</plugin>
 				<plugin>
