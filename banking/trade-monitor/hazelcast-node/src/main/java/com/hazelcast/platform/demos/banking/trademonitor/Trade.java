@@ -26,8 +26,9 @@ import java.io.Serializable;
  * is addressed.
  * </p>
  */
-@SuppressWarnings("serial")
 public class Trade implements Serializable {
+
+    private static final long serialVersionUID = 6879762869519299003L;
 
     private String id;
     private long timestamp;

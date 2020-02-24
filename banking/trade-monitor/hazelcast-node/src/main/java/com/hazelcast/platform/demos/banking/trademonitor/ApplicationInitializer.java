@@ -83,11 +83,20 @@ public class ApplicationInitializer {
     }
 
     /**
-     * <p>Launch a pipeline to read trades from Kafka, which needs the Kafka host names
-     * and ports for the broker servers.
+     * <p><i>1</i> Launch a job to read trades from Kafka and place them in a map,
+     * a simple upload.
+     * </p>
+     * <p><i>2</i> Launch a job to read the same trades from Kafka and to aggregate
+     * them, placing the results into another map.
+     * </p>
+     * <p>As we launch them at the same time, the 2nd job could be merged into the
+     * 1st, and use the same input. However, here we keep them separate for clarity.
+     * </p>
+     * <p>Both jobs need the Kafka connection, a list of brokers.
      * </p>
      */
     static void launchNeededJobs(JetInstance jetInstance, String bootstrapServers) {
+        // Trade ingest
         Pipeline pipelineIngestTrades = IngestTrades.buildPipeline(bootstrapServers);
 
         JobConfig jobConfigIngestTrades = new JobConfig();
@@ -95,6 +104,16 @@ public class ApplicationInitializer {
         jobConfigIngestTrades.setName(IngestTrades.class.getSimpleName());
 
         jetInstance.newJobIfAbsent(pipelineIngestTrades, jobConfigIngestTrades);
+
+        // Trade aggregation
+        Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(bootstrapServers);
+
+        JobConfig jobConfigAggregateQuery = new JobConfig();
+        jobConfigAggregateQuery.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
+        jobConfigAggregateQuery.setName(AggregateQuery.class.getSimpleName());
+
+        jetInstance.newJobIfAbsent(pipelineAggregateQuery, jobConfigAggregateQuery);
+
     }
 
 }

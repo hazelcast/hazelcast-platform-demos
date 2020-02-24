@@ -26,10 +26,11 @@ public class MyConstants {
 
     public static final String KAFKA_TOPIC_NAME_TRADES = "trades";
 
+    public static final String IMAP_NAME_AGGREGATE_QUERY_RESULTS = "AggregateQuery" + "_results";
     public static final String IMAP_NAME_SYMBOLS = "symbols";
     public static final String IMAP_NAME_TRADES = "trades";
 
     public static final List<String> IMAP_NAMES =
-            List.of(IMAP_NAME_SYMBOLS, IMAP_NAME_TRADES);
+            List.of(IMAP_NAME_AGGREGATE_QUERY_RESULTS, IMAP_NAME_SYMBOLS, IMAP_NAME_TRADES);
 
 }
