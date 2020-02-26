@@ -12,13 +12,17 @@
         </encoder>
     </appender>
 
-    <!-- Kafka connector -->
-    <logger name="org.apache.kafka" level="error" additivity="false">
-        <appender-ref ref="NORMAL"/>
-    </logger>
     <!-- Code for the sample -->
     <logger name="com.hazelcast.platform.demos" level="trace" additivity="false">
         <appender-ref ref="HIGHLIGHT"/>
+    </logger>
+    <!-- Webapp -->
+    <logger name="io.javalin" level="debug" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
+    <!-- Kafka connector -->
+    <logger name="org.apache.kafka" level="error" additivity="false">
+        <appender-ref ref="NORMAL"/>
     </logger>
     
     <root level="info">

@@ -70,7 +70,7 @@ public class RandomXYGenerator {
                     return tuple2;
                 }
                 return null;
-        }).setName("log_every_" + LOG_THRESHOLD)
+        }).setName("filter_every_" + LOG_THRESHOLD)
         .writeTo(Sinks.logger());
 
         return pipeline;

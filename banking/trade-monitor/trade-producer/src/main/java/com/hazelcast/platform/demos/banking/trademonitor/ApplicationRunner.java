@@ -33,7 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <p>Entry point, "{@code main()}" method.
+ * <p>The main "{@code run()}" method of the application, called
+ * once configuration created.
  * </p>
  */
 public class ApplicationRunner {
