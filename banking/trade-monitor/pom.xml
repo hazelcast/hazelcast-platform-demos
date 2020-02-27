@@ -21,19 +21,26 @@
 		<docker.image.prefix>trade-monitor</docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
 		<my.cluster.name>trade-monitor</my.cluster.name>
+
+		<!-- Project specific versions -->
+		<javalin.version>3.7.0</javalin.version>
 	</properties>
 
 	<modules>
 		<module>common</module>
 		<module>hazelcast-node</module>
 		<module>trade-producer</module>
-		<!--
 		<module>webapp</module>
-		-->
 	</modules>
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>io.javalin</groupId>
+				<artifactId>javalin</artifactId>
+				<version>${javalin.version}</version>
+			</dependency>
+
 			<dependency>
 				<groupId>org.apache.kafka</groupId>
 				<artifactId>kafka-clients</artifactId>

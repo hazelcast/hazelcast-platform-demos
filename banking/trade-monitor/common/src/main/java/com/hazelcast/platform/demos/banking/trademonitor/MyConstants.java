@@ -33,4 +33,6 @@ public class MyConstants {
     public static final List<String> IMAP_NAMES =
             List.of(IMAP_NAME_AGGREGATE_QUERY_RESULTS, IMAP_NAME_SYMBOLS, IMAP_NAME_TRADES);
 
+    public static final String WEBSOCKET_PATH_TRADES = "/trades";
+
 }

@@ -34,16 +34,21 @@
 		<hazelcast-kubernetes.version>2.0.1</hazelcast-kubernetes.version>
 		<jackson.version>2.10.2</jackson.version>
 		<junit.version>4.13</junit.version>
+		<json.version>20190722</json.version>
 		<kafka-clients.version>2.4.0</kafka-clients.version>
 		<spring-boot.version>2.2.4.RELEASE</spring-boot.version>
 
 		<!-- Plugins -->
 		<dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>
+		<frontend-maven-plugin.version>1.9.1</frontend-maven-plugin.version>
 		<maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
 		<maven-checkstyle-plugin.version>3.1.0</maven-checkstyle-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
 		<maven-failsafe-plugin.version>3.0.0-M4</maven-failsafe-plugin.version>
+		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
+		<maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
+		<maven-shade-plugin.version>3.2.2</maven-shade-plugin.version>
 		<spotbugs-maven-plugin.version>3.1.12.2</spotbugs-maven-plugin.version>
 
 		<!-- Environments -->
@@ -99,6 +104,12 @@
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-databind</artifactId>
 				<version>${jackson.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.json</groupId>
+				<artifactId>json</artifactId>
+				<version>${json.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -223,6 +234,23 @@
 				<plugin>
 					<artifactId>maven-deploy-plugin</artifactId>
 					<version>${maven-deploy-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>${maven-jar-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>${maven-resources-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-shade-plugin</artifactId>
+					<version>${maven-shade-plugin.version}</version>
+				</plugin>
+				<plugin>
+				    <groupId>com.github.eirslett</groupId>
+				    <artifactId>frontend-maven-plugin</artifactId>
+				    <version>${frontend-maven-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>com.spotify</groupId>
