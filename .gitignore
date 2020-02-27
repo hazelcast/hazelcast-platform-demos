@@ -4,4 +4,5 @@
 .project
 .settings
 *.code-workspace
+dependency-reduced-pom.xml
 target
