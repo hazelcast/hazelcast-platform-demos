@@ -21,7 +21,10 @@
 		<main.class>com.hazelcast.platform.demos.banking.trademonitor.Application</main.class>
 
 		<!-- See comment on maven-resources-plugin -->
-                <frontend.app.dir>${project.basedir}/src/main/app</frontend.app.dir>
+        <frontend.app.dir>${project.basedir}/src/main/app</frontend.app.dir>
+
+		<!-- For .env and application.properties files, need same value -->
+		<my.webapp.port>8080</my.webapp.port>
 	
 		<node.version>v12.16.1</node.version>
 		<yarn.version>v1.22.0</yarn.version>
@@ -127,7 +130,7 @@
 							<resources>
 								<resource>
 									<directory>${frontend.app.dir}/build</directory>
-									<filtering>false</filtering>
+									<filtering>true</filtering>
 								</resource>
 							</resources>
 						</configuration>

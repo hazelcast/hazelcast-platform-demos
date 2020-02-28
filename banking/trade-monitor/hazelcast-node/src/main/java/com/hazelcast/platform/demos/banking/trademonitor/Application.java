@@ -49,13 +49,18 @@ public class Application {
      * </p>
      */
     public static void main(String[] args) throws Exception {
-        if (args.length != 1) {
-            LOGGER.error("Usage: 1 arg expected: bootstrapServers");
-            LOGGER.error("eg: 127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094");
-            System.exit(1);
-        }
+        String bootstrapServers = null;
 
-        String bootstrapServers = args[0];
+        if (args.length == 1) {
+            bootstrapServers = args[0];
+        } else {
+            bootstrapServers = System.getProperty("my.bootstrap.servers");
+            if (bootstrapServers == null || bootstrapServers.length() == 0) {
+                LOGGER.error("Usage: 1 arg expected: bootstrapServers");
+                LOGGER.error("eg: 127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094");
+                System.exit(1);
+            }
+        }
 
         JetConfig jetConfig = ApplicationConfig.buildJetConfig();
 

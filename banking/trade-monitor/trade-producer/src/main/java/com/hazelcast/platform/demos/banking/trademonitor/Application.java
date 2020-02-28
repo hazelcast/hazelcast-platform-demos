@@ -35,13 +35,19 @@ public class Application {
      * </p>
      */
     public static void main(String[] args) throws Exception {
-        if (args.length < 1 || args.length > 2) {
-            LOGGER.error("Usage: 1 arg expected + 1 optional: bootstrapServers [rate]");
-            LOGGER.error("eg: 127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094 300");
-            System.exit(1);
+        String bootstrapServers = null;
+
+        if (args.length == 1) {
+            bootstrapServers = args[0];
+        } else {
+            bootstrapServers = System.getProperty("my.bootstrap.servers");
+            if (bootstrapServers == null || bootstrapServers.length() == 0) {
+                LOGGER.error("Usage: 1 arg expected: bootstrapServers");
+                LOGGER.error("eg: 127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094");
+                System.exit(1);
+            }
         }
 
-        String bootstrapServers = args[0];
         int rate = DEFAULT_RATE;
         if (args.length == 2) {
             rate = Integer.parseInt(args[1]);
