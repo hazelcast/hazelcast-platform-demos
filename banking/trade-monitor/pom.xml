@@ -31,6 +31,10 @@
 		<module>hazelcast-node</module>
 		<module>trade-producer</module>
 		<module>webapp</module>
+		<module>zookeeper</module>
+		<module>kafka-broker</module>
+		<module>kafdrop</module>
+		<module>topic-create</module>
 	</modules>
 
 	<dependencyManagement>
