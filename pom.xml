@@ -30,7 +30,7 @@
 
 		<!-- Version dependencies -->
 		<hazelcast.version>4.0</hazelcast.version>
-		<hazelcast-jet.version>4.0-SNAPSHOT</hazelcast-jet.version>
+		<hazelcast-jet.version>4.0</hazelcast-jet.version>
 		<hazelcast-kubernetes.version>2.0.1</hazelcast-kubernetes.version>
 		<jackson.version>2.10.2</jackson.version>
 		<junit.version>4.13</junit.version>
