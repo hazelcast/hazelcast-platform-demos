@@ -15,7 +15,7 @@ spec:
         app: ml-ri-job-pi2
     spec:
       containers:
-        - args: ["pi2"]
+        - args: ["pi2.py"]
           image: "hazelcast-ml-ri/python-job"
           imagePullPolicy: IfNotPresent
           name: container-job
