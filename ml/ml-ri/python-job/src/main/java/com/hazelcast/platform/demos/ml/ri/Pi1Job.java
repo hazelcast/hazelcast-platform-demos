@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.ml.ri;
 
+import java.util.Locale;
+
 import com.hazelcast.jet.aggregate.AggregateOperations;
 import com.hazelcast.jet.pipeline.JournalInitialPosition;
 import com.hazelcast.jet.pipeline.Pipeline;
@@ -33,7 +35,7 @@ import com.hazelcast.jet.python.PythonTransforms;
 public class Pi1Job {
 
     // "Pi1Job" submits "pi1", for Python module "pi1.py".
-    private static final String NAME = Pi1Job.class.getSimpleName().substring(0, 3).toLowerCase();
+    private static final String NAME = Pi1Job.class.getSimpleName().substring(0, 3).toLowerCase(Locale.ROOT);
 
     /**
      * <p>A Jet pipeline to calculate Pi. The essence of this version of the processing is that

@@ -39,7 +39,7 @@ public class Application {
             pythonJob = "pi1";
             System.out.println("No args, pythonJob=='" + pythonJob + ".py'");
         } else {
-            pythonJob = args[0].equals("pi1") ? "pi1" : "pi2";
+            pythonJob = args[0].equals("pi1.py") ? "pi1" : "pi2";
             System.out.println("Arg='" + args[0] + "', pythonJob=='" + pythonJob + ".py'");
         }
 
@@ -52,11 +52,11 @@ public class Application {
             JobConfig jobConfig = new JobConfig();
             if (pythonJob.equals("pi1")) {
                 pipeline = Pi1Job.buildPipeline();
-                jobConfig.setName(Pi1Job.class.getName());
+                jobConfig.setName(Pi1Job.class.getSimpleName());
                 jobConfig.addClass(Pi1Job.class);
             } else {
                 pipeline = Pi2Job.buildPipeline();
-                jobConfig.setName(Pi2Job.class.getName());
+                jobConfig.setName(Pi2Job.class.getSimpleName());
                 jobConfig.addClass(Pi2Job.class);
             }
             jobConfig.addClass(MyUtils.class);

@@ -13,6 +13,7 @@
 	<description>Hazelcast Platform Demo Applications</description>
 
 	<modules>
+		<module>banking</module>
 		<module>ml</module>
 	</modules>
 
@@ -25,21 +26,30 @@
 		<main.basedir>${project.basedir}</main.basedir>
 		<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<spotbugs.skip>true</spotbugs.skip>
 
 		<!-- Version dependencies -->
 		<hazelcast.version>4.0</hazelcast.version>
-		<hazelcast-jet.version>4.0-SNAPSHOT</hazelcast-jet.version>
+		<hazelcast-jet.version>4.0</hazelcast-jet.version>
 		<hazelcast-kubernetes.version>2.0.1</hazelcast-kubernetes.version>
+		<jackson.version>2.10.2</jackson.version>
 		<junit.version>4.13</junit.version>
+		<json.version>20190722</json.version>
+		<kafka-clients.version>2.4.0</kafka-clients.version>
 		<spring-boot.version>2.2.4.RELEASE</spring-boot.version>
 
 		<!-- Plugins -->
 		<dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>
+		<frontend-maven-plugin.version>1.9.1</frontend-maven-plugin.version>
 		<maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
 		<maven-checkstyle-plugin.version>3.1.0</maven-checkstyle-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
 		<maven-failsafe-plugin.version>3.0.0-M4</maven-failsafe-plugin.version>
+		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
+		<maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
+		<maven-shade-plugin.version>3.2.2</maven-shade-plugin.version>
+		<spotbugs-maven-plugin.version>3.1.12.2</spotbugs-maven-plugin.version>
 
 		<!-- Environments -->
 		<!-- Google Cloud -->
@@ -81,8 +91,25 @@
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>
+				<artifactId>hazelcast-jet-kafka</artifactId>
+				<version>${hazelcast-jet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.hazelcast.jet</groupId>
 				<artifactId>hazelcast-jet-python</artifactId>
 				<version>${hazelcast-jet.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.json</groupId>
+				<artifactId>json</artifactId>
+				<version>${json.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -110,9 +137,9 @@
 				<updatePolicy>interval:720</updatePolicy>
 			</snapshots>
 		</repository>
-                <repository>
-                        <id>Public Release Repository</id>
-                        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		<repository>
+			<id>Public Release Repository</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 			<releases>
 				<enabled>false</enabled>
 			</releases>
@@ -150,46 +177,80 @@
 			<plugin>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>${maven-failsafe-plugin.version}</version>
-                <configuration>
-                    <skipITs>${failsafe.skip}</skipITs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
+				<configuration>
+					<skipITs>${failsafe.skip}</skipITs>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>${spotbugs-maven-plugin.version}</version>
+				<configuration>
+					<effort>Max</effort>
+					<threshold>Low</threshold>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>test</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
-                <plugin>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <configuration>
-                        <archive>
-                            <manifest>
-                                <mainClass>${main.class}</mainClass>
-                            </manifest>
-                        </archive>
-                        <descriptorRefs>
-                            <descriptorRef>jar-with-dependencies</descriptorRef>
-                        </descriptorRefs>
-                        <tarLongFileMode>posix</tarLongFileMode>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>single</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
+				<plugin>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<configuration>
+						<archive>
+							<manifest>
+								<mainClass>${main.class}</mainClass>
+							</manifest>
+						</archive>
+						<descriptorRefs>
+							<descriptorRef>jar-with-dependencies</descriptorRef>
+						</descriptorRefs>
+						<tarLongFileMode>posix</tarLongFileMode>
+					</configuration>
+					<executions>
+						<execution>
+							<phase>package</phase>
+							<goals>
+								<goal>single</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
 				<plugin>
 					<artifactId>maven-deploy-plugin</artifactId>
 					<version>${maven-deploy-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>${maven-jar-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>${maven-resources-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-shade-plugin</artifactId>
+					<version>${maven-shade-plugin.version}</version>
+				</plugin>
+				<plugin>
+				    <groupId>com.github.eirslett</groupId>
+				    <artifactId>frontend-maven-plugin</artifactId>
+				    <version>${frontend-maven-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>com.spotify</groupId>
@@ -212,28 +273,11 @@
 								<goal>build</goal>
 							</goals>
 						</execution>
-						<!-- 
-						<execution>
-							<phase>package</phase>
-							<id>tag-for-gcp</id>
-							<goals>
-								<goal>tag</goal>
-							</goals>
-							<configuration>
-								<repository>${gcp.registry}/${gcp.project}/${docker.image.prefix}/${docker.image.name}</repository>
-							</configuration>
-						</execution>
-						<execution>
-							<phase>deploy</phase>
-							<id>deploy-to-gcp</id>
-							<goals>
-								<goal>push</goal>
-							</goals>
-							<configuration>
-								<repository>${gcp.registry}/${gcp.project}/${docker.image.prefix}/${docker.image.name}</repository>
-							</configuration>
-						</execution>
-						 -->
+						<!-- <execution> <phase>package</phase> <id>tag-for-gcp</id> <goals> 
+							<goal>tag</goal> </goals> <configuration> <repository>${gcp.registry}/${gcp.project}/${docker.image.prefix}/${docker.image.name}</repository> 
+							</configuration> </execution> <execution> <phase>deploy</phase> <id>deploy-to-gcp</id> 
+							<goals> <goal>push</goal> </goals> <configuration> <repository>${gcp.registry}/${gcp.project}/${docker.image.prefix}/${docker.image.name}</repository> 
+							</configuration> </execution> -->
 					</executions>
 				</plugin>
 				<plugin>
@@ -266,6 +310,7 @@
 			<properties>
 				<dockerfile.skip>false</dockerfile.skip>
 				<failsafe.skip>false</failsafe.skip>
+				<spotbugs.skip>false</spotbugs.skip>
 			</properties>
 			<build>
 				<plugins>
