@@ -4,8 +4,8 @@
         <modelVersion>4.0.0</modelVersion>
 
         <parent>
-                <groupId>com.hazelcast.platform.demos</groupId>
-                <artifactId>ml-ri</artifactId>
+                <groupId>com.hazelcast.platform.demos.ml.ri</groupId>
+                <artifactId>ml-ri-root</artifactId>
                 <version>4.0-SNAPSHOT</version>
         </parent>
 

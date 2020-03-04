@@ -1,0 +1,32 @@
+hazelcast:
+  # Replaced by Maven
+  cluster-name: '@my.cluster.name@'
+  #
+  properties:
+    # Graceful shutdown is helpful for Kubernetes scale-down.
+    hazelcast.member.naming.moby.enabled: true
+    hazelcast.shutdownhook.policy: GRACEFUL
+  #
+  # Assuming Kubernetes, but override from Java code if we detect otherwise
+  network:
+    join:
+      multicast:
+        enabled: false
+      kubernetes:
+        enabled: true
+        service-dns: '@my.cluster.name@-service.default.svc.cluster.local'
+    rest-api:
+      enabled: true
+      endpoint-groups:
+        HEALTH_CHECK:
+          enabled: true
+#
+  map:
+     # 'trades' map needs defined as non-default configuration.
+    'trades':
+      indexes:
+        # Unordered index on Trade.getSymbol().
+        - type: HASH
+          attributes:
+            - 'symbol'
+          

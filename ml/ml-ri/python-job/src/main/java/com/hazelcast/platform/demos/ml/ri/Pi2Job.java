@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.ml.ri;
 
+import java.util.Locale;
+
 import com.hazelcast.function.BiFunctionEx;
 import com.hazelcast.function.ToDoubleFunctionEx;
 import com.hazelcast.jet.accumulator.MutableReference;
@@ -38,7 +40,7 @@ import com.hazelcast.jet.python.PythonTransforms;
 public class Pi2Job {
 
     // "Pi2Job" submits "pi2", for Python module "pi2.py".
-    private static final String NAME = Pi2Job.class.getSimpleName().substring(0, 3).toLowerCase();
+    private static final String NAME = Pi2Job.class.getSimpleName().substring(0, 3).toLowerCase(Locale.ROOT);
     private static final double QUARTER_CIRCLE = 4d;
 
     /**
@@ -57,7 +59,7 @@ public class Pi2Job {
                     falseCount = previous.f1();
                 }
 
-                if (string.toLowerCase().equals("true")) {
+                if (string.toLowerCase(Locale.ROOT).equals("true")) {
                     trueCount++;
                 } else {
                     falseCount++;

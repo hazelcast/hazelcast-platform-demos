@@ -5,19 +5,20 @@
         <modelVersion>4.0.0</modelVersion>
 
         <parent>
-                <groupId>com.hazelcast.platform.demos</groupId>
-                <artifactId>ml</artifactId>
+                <groupId>com.hazelcast.platform.demos.ml</groupId>
+                <artifactId>ml-root</artifactId>
                 <version>4.0-SNAPSHOT</version>
         </parent>
 
-        <artifactId>ml-ri</artifactId>
+	<groupId>com.hazelcast.platform.demos.ml.ri</groupId>
+        <artifactId>ml-ri-root</artifactId>
         <packaging>pom</packaging>
 
         <name>Hazelcast Platform - ML - Reference Implementation</name>
         <description>Reference Implementation for ML</description>
 
         <properties>
-                <docker.image.prefix>${project.parent.artifactId}</docker.image.prefix>
+                <docker.image.prefix>ml-ri</docker.image.prefix>
                 <main.basedir>${project.parent.parent.basedir}</main.basedir>
                 <my.cluster.name>ml-ri</my.cluster.name>
         </properties>

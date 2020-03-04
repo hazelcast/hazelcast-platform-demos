@@ -50,8 +50,7 @@ public class MyXYSource {
         Tuple2<Double, Double> tuple2 = Tuple2.tuple2(random.nextDouble(), random.nextDouble());
         buffer.add(tuple2);
 
-        //TODO Set a better delay
-        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(1));
+        LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(1));
     }
 
 }

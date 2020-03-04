@@ -8,7 +8,7 @@ metadata:
 spec:
   clusterIP: None
   selector:
-    app: hazelcast-node
+    app: ml-ri-hazelcast-node
   ports:
   - port: 5701
 ---
@@ -17,17 +17,17 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: hazelcast-node
+  name: ml-ri-hazelcast-node
 spec:
   replicas: 2
-  serviceName: hazelcast-node-statefulset
+  serviceName: ml-ri-hazelcast-node-statefulset
   selector:
     matchLabels:
-      app: hazelcast-node
+      app: ml-ri-hazelcast-node
   template:
     metadata:
       labels:
-        app: hazelcast-node
+        app: ml-ri-hazelcast-node
     spec:
       containers:
         - image: "hazelcast-ml-ri/hazelcast-node"
