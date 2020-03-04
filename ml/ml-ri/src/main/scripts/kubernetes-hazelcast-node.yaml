@@ -20,7 +20,7 @@ metadata:
   name: ml-ri-hazelcast-node
 spec:
   replicas: 2
-  serviceName: ml-ri-hazelcast-node-statefulset
+  serviceName: ml-ri-hazelcast-node-service
   selector:
     matchLabels:
       app: ml-ri-hazelcast-node
