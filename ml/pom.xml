@@ -10,7 +10,8 @@
                 <version>4.0-SNAPSHOT</version>
         </parent>
 
-        <artifactId>ml</artifactId>
+ 	<groupId>com.hazelcast.platform.demos.ml</groupId>
+        <artifactId>ml-root</artifactId>
         <packaging>pom</packaging>
 
         <name>Hazelcast Platform - ML</name>

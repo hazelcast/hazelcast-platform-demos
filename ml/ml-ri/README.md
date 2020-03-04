@@ -1,8 +1,7 @@
 # Hazelcast Platform Demo Applications - Machine Learning - Reference Implementation
 
 TODO - Add X,Y generator, log on all nodes, run at a faster speed
-TODO - Technical instructions
-TODO - Other documentation
+TODO - Update names on Kubernetes scriopts or use namespace?
 
 minikube start --cpus=8 --memory=12g
 kubectl config get-contexts

@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.ml.ri;
 
+import java.util.Locale;
+
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.pipeline.Pipeline;
@@ -70,7 +72,7 @@ public class ApplicationInitializer {
         .getDistributedObjects()
         .stream()
         .filter(distributedObject -> distributedObject instanceof ITopic)
-        .filter(distributedObject -> distributedObject.getName().toLowerCase().contains("pi"))
+        .filter(distributedObject -> distributedObject.getName().toLowerCase(Locale.ROOT).contains("pi"))
         .forEach(distributedObject -> {
             ITopic iTopic = (ITopic) distributedObject;
 
@@ -91,7 +93,7 @@ public class ApplicationInitializer {
         Pipeline pipeline = RandomXYGenerator.buildPipeline();
 
         JobConfig jobConfig = new JobConfig();
-        jobConfig.setName(RandomXYGenerator.class.getName());
+        jobConfig.setName(RandomXYGenerator.class.getSimpleName());
 
         jetInstance.newJobIfAbsent(pipeline, jobConfig);
     }

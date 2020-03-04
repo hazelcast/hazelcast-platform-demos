@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hazelcast.platform.demos.banking</groupId>
+		<artifactId>banking-root</artifactId>
+		<version>4.0-SNAPSHOT</version>
+	</parent>
+
+	<groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
+	<artifactId>trade-monitor-root</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Hazelcast Platform - Banking - Trade Monitor</name>
+	<description>Example implementation for monitoring a series of trades</description>
+
+	<properties>
+		<docker.image.prefix>trade-monitor</docker.image.prefix>
+		<main.basedir>${project.parent.parent.basedir}</main.basedir>
+		<my.cluster.name>trade-monitor</my.cluster.name>
+
+		<!-- Project specific versions -->
+		<javalin.version>3.7.0</javalin.version>
+	</properties>
+
+	<modules>
+		<module>common</module>
+		<module>hazelcast-node</module>
+		<module>trade-producer</module>
+		<module>webapp</module>
+		<module>zookeeper</module>
+		<module>kafka-broker</module>
+		<module>kafdrop</module>
+		<module>topic-create</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>io.javalin</groupId>
+				<artifactId>javalin</artifactId>
+				<version>${javalin.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.kafka</groupId>
+				<artifactId>kafka-clients</artifactId>
+				<version>${kafka-clients.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<configuration>
+					<target>
+						<echo message="====================================" />
+						<echo message="TODO: 'mvn deploy' to upload to GKE" />
+						<echo message="====================================" />
+						<echo message="TODO: Dockerfile is default for brokers meaningful" />
+						<echo message="====================================" />
+					</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

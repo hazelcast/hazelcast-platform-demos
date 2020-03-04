@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="NORMAL" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %thread %logger{40} - %msg %n</pattern>
+        </encoder>
+    </appender>
+    <appender name="HIGHLIGHT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level %thread %logger{40} - %msg) %n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Code for the sample -->
+    <logger name="com.hazelcast.platform.demos" level="trace" additivity="false">
+        <appender-ref ref="HIGHLIGHT"/>
+    </logger>
+    <!-- Webapp -->
+    <logger name="io.javalin" level="debug" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
+    <!-- Kafka connector -->
+    <logger name="org.apache.kafka" level="error" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
+    
+    <root level="info">
+        <appender-ref ref="NORMAL"/>
+    </root>
+</configuration>

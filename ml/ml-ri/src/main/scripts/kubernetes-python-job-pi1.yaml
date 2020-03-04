@@ -5,14 +5,14 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   labels:
-    app: job-pi1
-  name: job-pi1
+    app: ml-ri-job-pi1
+  name: ml-ri-job-pi1
 spec:
   backoffLimit: 0
   template:
     metadata:
       labels:
-        app: job-pi1
+        app: ml-ri-job-pi1
     spec:
       containers:
         - args: ["pi1"]

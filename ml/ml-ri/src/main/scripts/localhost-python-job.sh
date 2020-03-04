@@ -1,5 +1,6 @@
 #!/bin/bash
 
+PROJECT=ml-ri
 MODULE=python-job
 
 BASEDIR=`dirname $0`
@@ -17,7 +18,7 @@ then
  exit 1
 fi
 
-JAR_FILE=ml-ri-$MODULE-4.0-SNAPSHOT-jar-with-dependencies.jar
+JAR_FILE=${PROJECT}-${MODULE}-4.0-SNAPSHOT-jar-with-dependencies.jar
 
 JAVA_ARGS="-Dmy.kubernetes.enabled=false"
 JAVA_ARGS="${JAVA_ARGS} -Dhazelcast.local.publicAddress=${HOST_IP}"
