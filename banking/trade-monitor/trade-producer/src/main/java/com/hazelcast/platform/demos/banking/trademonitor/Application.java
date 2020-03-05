@@ -47,6 +47,7 @@ public class Application {
                 System.exit(1);
             }
         }
+        LOGGER.info("bootstrapServers={}", bootstrapServers);
 
         int rate = DEFAULT_RATE;
         if (args.length == 2) {

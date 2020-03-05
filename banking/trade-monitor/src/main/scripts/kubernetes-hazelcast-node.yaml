@@ -20,7 +20,7 @@ metadata:
   name: trade-monitor-hazelcast-node
 spec:
   replicas: 2
-  serviceName: trade-monitor-hazelcast-node-statefulset
+  serviceName: trade-monitor-hazelcast-node-service
   selector:
     matchLabels:
       app: trade-monitor-hazelcast-node
@@ -30,7 +30,10 @@ spec:
         app: trade-monitor-hazelcast-node
     spec:
       containers:
-        - image: "hazelcast-trade-monitor/hazelcast-node"
+        - env:
+          - name: "MY_BOOTSTRAP_SERVERS"
+            value: "trade-monitor-kafka-broker-0.trade-monitor-kafka-broker-service.default.svc.cluster.local:9092,trade-monitor-kafka-broker-1.trade-monitor-kafka-broker-service.default.svc.cluster.local:9092,trade-monitor-kafka-broker-2.trade-monitor-kafka-broker-service.default.svc.cluster.local:9092"
+          image: "hazelcast-trade-monitor/hazelcast-node"
           imagePullPolicy: Never
           livenessProbe:
             httpGet:
