@@ -16,6 +16,7 @@ spec:
     app: trade-monitor-kafdrop
   ports:
   - port: 8080
+    targetPort: 9000
   type: NodePort
 ---
 # Kafka Broker : DNS will be "trade-monitor-kafka-broker-service.default.svc.cluster.local".
@@ -69,7 +70,7 @@ spec:
       initContainers:
         - name: wait-for-pod-zookeeper
           image: busybox
-          command: ['sh', '-c', 'sleep 240']
+          command: ['sh', '-c', 'sleep 300']
       containers:
         - env:
           - name: "KAFKA_BROKERCONNECT"
@@ -79,14 +80,14 @@ spec:
           livenessProbe:
             httpGet:
               path: /
-              port: 8080
+              port: 9000
           name: kafdrop-container
           ports:
-            - containerPort: 8080
+            - containerPort: 9000
           readinessProbe:
             httpGet:
               path: /
-              port: 8080
+              port: 9000
             initialDelaySeconds: 30
 ---
 # Zookeeper
