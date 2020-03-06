@@ -42,7 +42,9 @@ class SymbolDetails extends Component {
 
     render() {
         const {symbol} = this.state;
-        const WS_HOST = process.env.REACT_APP_WS_HOST;
+
+        // Same code duplicated in: src/main/app/src/components/home/home.js
+        const WS_HOST = "ws:/" + window.location.host + "/trades";
 
         const columns = [
             {
