@@ -62,7 +62,7 @@
 						<echo message="====================================" />
 						<echo message="TODO: 'mvn deploy' to upload to GKE" />
 						<echo message="====================================" />
-						<echo message="TODO: Dockerfile is default for brokers meaningful" />
+						<echo message="TODO: YAML Use readinessGate for sequencing" />
 						<echo message="====================================" />
 					</target>
 				</configuration>

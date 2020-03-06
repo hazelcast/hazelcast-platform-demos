@@ -16,8 +16,8 @@
 
 package com.hazelcast.platform.demos.banking.trademonitor;
 
-import java.io.InputStream;
-import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.jet.Jet;
@@ -28,6 +28,9 @@ import com.hazelcast.jet.JetInstance;
  * </p>
  */
 public class Application {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
+
+    private static final int DEFAULT_PORT = 8080;
 
     private static int port;
 
@@ -51,7 +54,12 @@ public class Application {
      * </p>
      */
     public static void main(String[] args) throws Exception {
-        loadPort();
+        if (args.length != 1) {
+            port = DEFAULT_PORT;
+        } else {
+            port = Integer.parseInt(args[0]);
+            LOGGER.debug("Using port {} from command line argument.", port);
+        }
 
         ClientConfig clientConfig = ApplicationConfig.buildJetClientConfig();
 
@@ -70,26 +78,6 @@ public class Application {
      */
     public static int getPort() {
         return port;
-    }
-
-    /**
-     * <p>React has a reliance on the port the web server
-     * is using. Use Maven to set the same value in
-     * "{@code src/main/resources/application.properties}"
-     * and "{@code src/main/app/,env}".
-     * </p>
-     */
-    public static void loadPort() throws Exception {
-        Properties properties = new Properties();
-
-        try (InputStream inputStream =
-                Application.class.getClassLoader().getResourceAsStream("application.properties");) {
-            properties.load(inputStream);
-
-            String myWebappPort = properties.getProperty("my.webapp.port");
-
-            port = Integer.parseInt(myWebappPort);
-        }
     }
 
 }

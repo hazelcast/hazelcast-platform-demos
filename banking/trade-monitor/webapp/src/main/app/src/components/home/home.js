@@ -94,7 +94,10 @@ class Home extends Component {
                         accessor: "volume"
                     }
                 ];
-        const WS_HOST = process.env.REACT_APP_WS_HOST;
+
+        // Same code duplicated in: src/main/app/src/components/symbol-details/symbol-details.js
+        const WS_HOST = "ws:/" + window.location.host + "/trades";
+
         return (
                     <Page header="Trade Monitor Dashboard">
                         <ReactTable

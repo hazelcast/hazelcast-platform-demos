@@ -1,0 +1,27 @@
+############################################################################
+# Jobs
+############################################################################
+---
+# Trade Producer
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: job-trade-producer
+  name: job-trade-producer
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: job-trade-producer
+    spec:
+      containers:
+        - env:
+          - name: "MY_BOOTSTRAP_SERVERS"
+            value: "trade-monitor-kafka-broker-0.trade-monitor-kafka-broker-service.default.svc.cluster.local:9092,trade-monitor-kafka-broker-1.trade-monitor-kafka-broker-service.default.svc.cluster.local:9092,trade-monitor-kafka-broker-2.trade-monitor-kafka-broker-service.default.svc.cluster.local:9092"
+          image: "hazelcast-trade-monitor/trade-producer"
+          imagePullPolicy: IfNotPresent
+          name: container-job-trade-producer
+      restartPolicy: Never
