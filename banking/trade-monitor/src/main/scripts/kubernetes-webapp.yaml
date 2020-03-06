@@ -10,6 +10,8 @@ spec:
     app: trade-monitor-webapp
   ports:
   - port: 8080
+    protocol: TCP
+    targetPort: 8080
   type: NodePort
 ---
 # Only need 1 webapp
@@ -34,7 +36,7 @@ spec:
             httpGet:
               path: /
               port: 8080
-          name: hazelcast-node-container
+          name: webapp-container
           readinessProbe:
             httpGet:
               path: /
