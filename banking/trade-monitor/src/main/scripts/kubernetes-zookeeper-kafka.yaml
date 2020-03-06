@@ -224,7 +224,7 @@ spec:
           - name: "MY_ZOOKEEPER"
             value: "trade-monitor-zookeeper-service.default.svc.cluster.local"
           image: "hazelcast-trade-monitor/topic-create"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Never
           name: container-job-topic-create
       restartPolicy: Never
 ---
