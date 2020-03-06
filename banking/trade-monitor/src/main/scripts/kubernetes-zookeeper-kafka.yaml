@@ -17,7 +17,7 @@ spec:
   ports:
   - port: 8080
     targetPort: 9000
-  type: NodePort
+  type: LoadBalancer
 ---
 # Kafka Broker : DNS will be "trade-monitor-kafka-broker-service.default.svc.cluster.local".
 ---
