@@ -1,1 +1,1 @@
-Hazelcast Platform Demo Applications - Banking - Trade Monitor
+# Hazelcast Platform Demo Applications - Banking - Trade Monitor
