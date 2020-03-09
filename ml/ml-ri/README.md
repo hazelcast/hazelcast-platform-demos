@@ -21,6 +21,14 @@ To build a containerized image, and assuming you have Docker running, activate t
 mvn clean install -Prelease
 ```
 
+## Modules
+
+This example consists of two modules.
+
+### `hazelcast-node`
+
+### `python-job`
+
 ## Running -- Localhost
 
 ## Running -- Docker
