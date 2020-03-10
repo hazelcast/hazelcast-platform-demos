@@ -9,7 +9,7 @@ This example uses open-source Hazelcast only.
 
 This text is just the quick reference to help you build and deploy the application.
 
-For details of what it does, how and why, refer to <a href="_blank">TODO</a>.
+For details of what it does, how and why, refer to <a href="_blank">TODO Link to website goes here TODO</a>.
 
 ## Building
 
@@ -192,3 +192,24 @@ Topic 'pi' : Job 'Pi2Job' : Value '3.156316310652143'
 
 Jobs `Pi1Job` and `Pi2Job` are trying to calculate Pi, and the approximation
 will get more accurate the longer they are left running.
+
+## Summary
+
+This is an example showing how Python can become a stage in a Jet pipeline.
+
+The Python module will probably be more complex, but needs to follow a similar
+structure.
+
+It will have a handler method (here `def handle(points)`) that takes a list of
+string input inputs, runs each through your business logic, and produces a list
+of string output.
+
+Your Python code is just a collection of interpreted files that are sent from
+the host where the Jet job is submitted to all hosts where the Jet job is
+executed.
+
+Jet will arrange that the actual input is distributed across multiple Python
+instances to exploit the available CPUs on your host machines, and to collate
+the output for later stages of the job.
+
+Python is easy to deploy, it's just a step in the processing pipeline.
