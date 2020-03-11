@@ -203,7 +203,7 @@ It has the same input as the `Ingest Trades` job, namely the Kafka "`trades`" to
 
 What this job does differently is grouping and aggregation. All incoming trades are grouped by their
 stock symbol, and for each of the 3000 or so symbols a rolling aggregation updates a total of
-trade count and trade volume (price times quantity).
+trade count and trade volume (stock price * trade quantity).
 
 For each trade that comes in, the running total for that trade is updated in the
 [IMap](https://docs.hazelcast.org/docs/4.0/javadoc/com/hazelcast/map/IMap.html) called
@@ -215,6 +215,15 @@ time. So they could be merged for efficiency, but here they are kept apart for c
 ### 8. `webapp`
 
 TODO
+The last module in the demo is a web-based UI to display the trade data and trade aggregation
+stored in the Hazelcast grid.
+
+`webapp` is a Hazelcast client that connects to the Hazelcast grid nodes, and presents this
+information using a reactive interface.
+
+When module is started, if you go to it's home page you will see a list of stock symbol codes,
+the stock's real name, the latest price, and the trading volume (stock price * trade quantity).
+
 
 ## Running -- Localhost
 
