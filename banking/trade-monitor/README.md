@@ -319,24 +319,42 @@ TODO
 
 ## Running -- Expected Output
 
+### `webapp`
 ![Image of the Trade Monitor][Screenshot1]
 
 TODO
+
+### Logs
+
+Trades are produced at a high rate, so logging is configured to log only periodically, the first item, then
+every 100,000th after that.
+
+`trade-producer` produces random trades, which appear in the logs like this.
 
 ```
 14:41:55.933 INFO  main c.h.p.d.b.trademonitor.ApplicationRunner - Wrote 0 => "{"id": "eca117f8-c44e-47d2-aad4-b0d358769456","timestamp": 1583934115727,"symbol": "ENTG","price": 2501,"quantity": 99}" 
 ```
 
+`hazelcast-node` has two Jet jobs running, each with a [Logger Sink](https://docs.hazelcast.org/docs/jet/4.0/javadoc/com/hazelcast/jet/pipeline/Sinks.html#logger--). 
+
+There will be output from the `IngestTrades` job, which is an upload, so the format is the same as the `trade-producer`.
+
 ```
 14:42:40.090 INFO  hz.wonderful_goldwasser.jet.blocking.thread-4 c.h.j.i.c.W.IngestTrades/loggerSink#0 - [192.168.0.125]:5701 [trade-monitor] [4.0] 846b4539-e4de-4545-a3cd-9976c1fa0a9f={"id": "846b4539-e4de-4545-a3cd-9976c1fa0a9f","timestamp": 1583934115940,"symbol": "AMSF","price": 2501,"quantity": 378} 
+```
+
+And there will be output from the `AggregateQuery` job. As below, the stock symbol is "_WPCS_" and for this a trio of numbers are produced "_(1, 702219, 2499)_" (which means 1 trade for that symbol, volume is 702,219, price $24.99).
+
+```
 14:42:40.354 INFO  hz.wonderful_goldwasser.jet.blocking.thread-9 c.h.j.i.c.W.AggregateQuery/loggerSink#0 - [192.168.0.125]:5701 [trade-monitor] [4.0] WPCS=(1, 702219, 2499) 
 ```
+
+Finally, the `webapp` also produces logs, of trade changes it is listening to. Again, this is the raw trade not the
+aggregate, so the format is the same as for `trade-producer` log and the `IngestTrades` Jet job log.
 
 ```
 14:43:11.181 INFO  trade-monitor-webapp.event-2 c.h.p.d.b.trademonitor.TradesMapListener - Received 1 => "{"id": "5af8cf39-4db7-4663-8b31-1169dd9398ca","timestamp": 1583934191165,"symbol": "MTGE","price": 2501,"quantity": 5729}" 
 ```
-
-
 
 ## Summary
 
