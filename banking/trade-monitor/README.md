@@ -244,12 +244,11 @@ TODO
 The following sections describe how to run the example on your local machine, on Docker
 or Kubernetes. For all, there is a partial ordering on the modules.
 
-1. `zookeeper` TODO
-TODO TODO
+1. `zookeeper` Zookeeper must be first, it is the configuration registry used by Kafka.
 
-2. `kafka-broker` TODO
+2. `kafka-broker` Kafka is second, as it uses Zookeeper for configuration.
 
-3 `topic-create` TODO
+3 `topic-create` Kafka starts without topics, this module should be run third to create the needed topic.
 
 4. `hazelcast-node` TODO
 
