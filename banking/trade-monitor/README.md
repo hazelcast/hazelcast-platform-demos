@@ -143,7 +143,26 @@ For example, the symbol "_FB_" is [Facebook](https://www.nasdaq.com/market-activ
 
 ### 7. `hazelcast-node`
 
-TODO
+The `hazelcast-node` is the module where actual work of the Trade Monitor is done, even though
+this needs the separate `webapp` module below to visualize.
+
+This module creates a single Hazelcast node with both in-memory data grid (IMDG) and Jet functionality.
+
+IMDG functionality here is the storage of trade data and trade aggregation results in maps.
+Specifically, [IMap](https://docs.hazelcast.org/docs/4.0/javadoc/com/hazelcast/map/IMap.html) which is
+a distributed map spread across as many Hazelcast nodes as you have. To increase storage capacity,
+all you need do is run more Hazelcast nodes, and capacity scales linearly.
+
+Jet functionality here is the processing of trades to aggregate their values to produce running
+totals. This aggregation gives us the values per stock symbol for trading volume. Calculating these
+aggregations is distributed across the Hazelcast nodes. Adding more Hazelcast nodes spreads the
+aggregation across them linearly, allowing the same number of stock symbols to be aggregated
+faster or to aggregate a larger number of stock symbols at the previous rate.
+
+Since Jet and IMDG functionality are present in the same node, they must scale together.
+Storage need for trades and processing need for aggregation are unlikely to need the same
+scaling, so if this deviates substantially running Jet and IMDG functionality in separate
+Hazelcast clusters would be the solution.
 
 #### Configuration
 
@@ -182,7 +201,16 @@ is a separate Jeb job that is also automatically initiated when the Hazelcast no
 
 It has the same input as the `Ingest Trades` job, namely the Kafka "`trades`" topic.
 
-TODO why two jobs.
+What this job does differently is grouping and aggregation. All incoming trades are grouped by their
+stock symbol, and for each of the 3000 or so symbols a rolling aggregation updates a total of
+trade count and trade volume (price times quantity).
+
+For each trade that comes in, the running total for that trade is updated in the
+[IMap](https://docs.hazelcast.org/docs/4.0/javadoc/com/hazelcast/map/IMap.html) called
+"`AggregateQuery_results`".
+
+Jet job `AggregatedQuery` processes the same input as Jet job `IngestTrades`, and at the same
+time. So they could be merged for efficiency, but here they are kept apart for clarity of understanding.
 
 ### 8. `webapp`
 
@@ -192,6 +220,7 @@ TODO
 
 TODO
 kafka_2.13-2.4.0
+don't run multiple on local host for scaling speed up
 
 ## Running -- Docker
 
