@@ -396,12 +396,13 @@ Finding the external IP address for these will depend on your flavor of Kubernet
 For example, for this output from Google Kubernetes Engine:
 
 ```
-$ kubectl get services | grep trade-monitor
-trade-monitor-kafdrop-service        LoadBalancer   10.122.4.224    75.205.164.151   8080:31257/TCP   9m9s
-trade-monitor-kafka-broker-service   ClusterIP      None            <none>           9092/TCP         9m9s
-trade-monitor-service                ClusterIP      None            <none>           5701/TCP         4m13s
-trade-monitor-webapp                 LoadBalancer   10.122.1.250    75.205.91.17     8080:32760/TCP   2m15s
-trade-monitor-zookeeper-service      ClusterIP      10.122.11.197   <none>           2181/TCP         9m9s
+$ kubectl get services | egrep 'trade-monitor|EXTERNAL'
+NAME                                 TYPE           CLUSTER-IP      EXTERNAL-IP      PORT(S)          AGE
+trade-monitor-kafdrop-service        LoadBalancer   10.104.4.224    35.205.164.151   8080:31257/TCP   8m45s
+trade-monitor-kafka-broker-service   ClusterIP      None            <none>           9092/TCP         8m45s
+trade-monitor-service                ClusterIP      None            <none>           5701/TCP         3m49s
+trade-monitor-webapp                 LoadBalancer   10.104.1.250    35.205.91.17     8080:32760/TCP   111s
+trade-monitor-zookeeper-service      ClusterIP      10.104.11.197   <none>           2181/TCP         8m45s
 ```
 
 So here Kafdrop would be available as [http://75.205.164.151:8080/](https://www.youtube.com/watch?v=dQw4w9WgXcQ) and the WebApp as
