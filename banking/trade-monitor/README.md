@@ -113,7 +113,25 @@ Kafdrop itself is unchanged in this module.
 
 ### 6. `trade-producer`
 
-TODO
+The `trade-producer` module is the source of the stock market trades that the Trade
+Monitor application is monitoring.
+
+The companies being traded are real, the trades are not.
+
+What this module does is random select from 3000 companies listed on the New York
+Stock Exchange ( [NASDAQ](https://www.nasdaq.com/) ), and generate trades for
+these companies. The trades have random prices and random quantities.
+
+Trades are generated at a default rate of 300 per second to the Kafka topic named
+"`trades`". 
+
+You can generated millions of trades this way, depending what rate you set for
+generation, how long you leave the `trade-producer` running for, and how much
+disk space Kafka has for retention.
+
+This is part of the purpose of this demonstration. Millions of trades can be
+processed in seconds, depending on how many machines you have and how many
+CPUs each has.
 
 ### 7. `hazelcast-node`
 
