@@ -22,6 +22,6 @@ spec:
           - name: "MY_BOOTSTRAP_SERVERS"
             value: "trade-monitor-kafka-broker-0.trade-monitor-kafka-broker-service.default.svc.cluster.local:9092,trade-monitor-kafka-broker-1.trade-monitor-kafka-broker-service.default.svc.cluster.local:9092,trade-monitor-kafka-broker-2.trade-monitor-kafka-broker-service.default.svc.cluster.local:9092"
           image: "hazelcast-trade-monitor/trade-producer"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Never
           name: container-job-trade-producer
       restartPolicy: Never
