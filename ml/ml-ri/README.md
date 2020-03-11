@@ -200,9 +200,9 @@ This is an example showing how Python can become a stage in a Jet pipeline.
 The Python module will probably be more complex, but needs to follow a similar
 structure.
 
-It will have a handler method (here `def handle(points)`) that takes a list of
-string input inputs, runs each through your business logic, and produces a list
-of string output.
+It will have a handler method (here "`def handle(points)`") that takes a list of
+string inputs, runs each through your business logic, and produces a list
+of string outputs.
 
 Your Python code is just a collection of interpreted files that are sent from
 the host where the Jet job is submitted to all hosts where the Jet job is
