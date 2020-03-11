@@ -1,5 +1,8 @@
 # Hazelcast Platform Demo Applications
 
+Demonstration applications for the [Hazelcast Platform](https://hazelcast.org/platform/), the usage
+of [Hazelcast Jet](https://hazelcast.org/jet/) and [Hazelcast IMDG](https://hazelcast.org/imdg/) together.
+
 ## Demos
 
 1. Banking
