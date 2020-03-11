@@ -133,9 +133,56 @@ This is part of the purpose of this demonstration. Millions of trades can be
 processed in seconds, depending on how many machines you have and how many
 CPUs each has.
 
+Trades have a random [UUID](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/UUID.html)
+as their key on the Kafka topic. The main trade details are the value on the Kafka topic, structured as
+JSON but written as a string.
+
+Most of the trade fields should be intuitive. The "`symbol`" field is the lookup code for the stock symbol
+on [NASDAQ](https://www.nasdaq.com/).
+For example, the symbol "_FB_" is [Facebook](https://www.nasdaq.com/market-activity/stocks/fb).
+
 ### 7. `hazelcast-node`
 
 TODO
+
+#### Configuration
+
+The Hazelcast node is mainly configured from the
+[hazelcast.yml](./hazelcast-node/src/main/resources/hazelcast.yml) file.
+
+Following the _cloud-first_ approach, the networking section of this file configures for Kubernetes.
+This assumes DNS based discovery, for a service named "`trade-monitor-service.default.svc.cluster.local`"
+and with some REST endpoints enabled to that Kubernetes probes can determine if the node is healthy.
+This network is overridden by the scripts described below to run in Docker or localhost.
+
+Also defined is an unordered index on the "`symbol`" field in the "`trades`" map. 
+The index improves the query speed when looking up stock market trades by their
+string symbol.
+
+#### Ingest Trades
+
+[IngestTrades](./hazelcast-node/src/main/java/com/hazelcast/platform/demos/banking/trademonitor/IngestTrades.java#L62)
+is a Jet job that is automatically initiated when the Hazelcast node starts.
+
+This job is a simple upload, or _ingest_ of data from Kafka into Hazelcast.
+
+The input stage of the pipeline is a Kafka source, with the topic name "`trades`".
+
+The output stage of the pipeline is an [IMap](https://docs.hazelcast.org/docs/4.0/javadoc/), also called "`trades`".
+
+What is read from Kafka is written directly into Hazelcast, without enrichment, depletion, filtering or any
+sophisticated stream processing.
+
+So the effect of this job is to make trades written to Kafka visible in Hazelcast unchanged.
+
+#### Aggregate Query
+
+[AggregateQuery](./hazelcast-node/src/main/java/com/hazelcast/platform/demos/banking/trademonitor/AggregateQuery.java#L87)
+is a separate Jeb job that is also automatically initiated when the Hazelcast node starts.
+
+It has the same input as the `Ingest Trades` job, namely the Kafka "`trades`" topic.
+
+TODO why two jobs.
 
 ### 8. `webapp`
 
@@ -165,4 +212,5 @@ TODO
 ## Summary
 
 TODO
+3 node cluster, 10 million in 30 seconds
 
