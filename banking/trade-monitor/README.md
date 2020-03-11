@@ -12,7 +12,9 @@ This example uses open-source Hazelcast only.
 
 Input is simulated and injected into a Kafka topic. Hazelcast reads from
 this topic to present via  a reactive web UI, but is not aware how of
-where the data originated,
+where the data originated:
+
+![Image of the Trade Monitor expanded view of "ASPS" symbol][Screenshot2]
 
 ## Description
 
