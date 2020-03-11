@@ -2,7 +2,7 @@
 
 [Screenshot1]: src/site/markdown/images/Screenshot1.png "Image screenshot1.png"
 [Screenshot2]: src/site/markdown/images/Screenshot2.png "Image screenshot2.png"
-[Screenshot3]: src/site/markdown/images/Screenshot3.png "Image screenshot3.3.3.
+[Screenshot3]: src/site/markdown/images/Screenshot3.png "Image screenshot3.png"
 
 An example showing continuous aggregation of stock market trades, providing
 a UI for inspection of the aggregated values with the ability to drill-down
@@ -325,18 +325,31 @@ Trade Monitor uses web UIs to present the data, but it is also logged.
 
 ### `webapp`
 
-On the
+For the `webapp` a browser will show something similar to the below:
 
 ![Image of the Trade Monitor aggregation view of symbols][Screenshot1]
 
-TODO
+Here the symbol "ASPS" is temporarily shown in green to reflect a recent price rise,
+and "ABCO" in red for a recent price fall.
+
+For "ASPS", clicking on the expand button to it's left (the "^gt;") gives more detail:
 
 ![Image of the Trade Monitor expanded view of "ASPS" symbol][Screenshot2]
 
-### `webapp`
+This now shows all trades for "ASPS", with their individual trade UUID, individual
+price and quantity. Collectively there trades sum to the aggregation value.
+
+### `kafdrop`
+
+The `webapp` module displays the output of the Trade Monitor, which is what we
+are really interested in.
+
+If the optional module `kafdrop` is run, you can see the input, the contents
+of the Kafka topic.
+
 ![Image of the Kafdrop browsing the "trades" topic][Screenshot3]
 
-TODO
+This 
 
 
 ### Logs
