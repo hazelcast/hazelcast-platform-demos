@@ -311,7 +311,40 @@ command scripts in the obvious places.
 
 ## Running -- Docker
 
-TODO
+9 scripts are provided to run the various modules as Docker containers.
+In sequence:
+
+1. [docker-zookeeper.sh](src/main/scripts/docker-zookeeper.sh)
+2. [docker-kafka0.sh](src/main/scripts/docker-kafka0.sh)
+3. [docker-kafka1.sh](src/main/scripts/docker-kafka1.sh)
+4. [docker-kafka2.sh](src/main/scripts/docker-kafka2.sh)
+5. [docker-topic-create.sh](src/main/scripts/docker-topic-create.sh)
+6. [docker-kafdrop.sh](src/main/scripts/docker-kafdrop.sh)
+7. [docker-trade-producer.sh](src/main/scripts/docker-trade-producer.sh)
+8. [docker-hazelcast-node.sh](src/main/scripts/docker-hazelcast-node.sh)
+9. [docker-webapp.sh](src/main/scripts/docker-webapp.sh)
+
+You should wait for Zookeeper (1) to have started before starting the three Kafka brokers (2,3,4).
+
+You should wait for Kafka brokers (2,3,4) before starting the container that creates the topic (5).
+
+Kafdrop (6), the Trade Producer (7) and a Hazelcast node (8) can all be started in parallel once the topic exists.
+
+The Web UI (9) is started last, once everything else is ready.
+
+Once started, the `webapp` UI is available as http://localhost:8080/ and `kafdrop` as http://localhost:8083/.
+
+### Host network
+
+To enable the Docker containers to find each other, a local Docker network named "_trade-monitor_" is created.
+
+The container for Zookeeper takes the name "_zookeeper_" so that the Kafka brokers can refer to it by host name,
+as this is simpler than determining the IP address at run time and passing it as an argument.
+
+The containers for the Kafka brokers take the names "_kafka-broker0_", "_kafka-broker1_" and "_kafka-broker2_"
+so that the `trade-producer`, `topic-create`, `kafdrop` and `hazelcast-node` modules can find them by host name.
+
+Use the command `docker network inspect trade-monitor` if you really wish to see the details of this networking.
 
 ## Running -- Kubernetes
 
@@ -319,7 +352,8 @@ TODO
 
 ## Running -- Lifecycle
 
-All the modules here are continuous rather than batch, they are intended to run forever.
+Apart from `topic-create` which is one-off set-up, all the modules here are continuous rather than batch,
+they are intended to run forever.
 
 The Jet jobs are requesting the next unread message from the Kafka topic. If there isn't
 one because the `trade-producer` has been paused, that's no different from the stock
