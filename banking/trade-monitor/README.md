@@ -314,15 +314,15 @@ command scripts in the obvious places.
 9 scripts are provided to run the various modules as Docker containers.
 In sequence:
 
-1. [docker-zookeeper.sh](src/main/scripts/docker-zookeeper.sh)
-2. [docker-kafka0.sh](src/main/scripts/docker-kafka0.sh)
-3. [docker-kafka1.sh](src/main/scripts/docker-kafka1.sh)
-4. [docker-kafka2.sh](src/main/scripts/docker-kafka2.sh)
-5. [docker-topic-create.sh](src/main/scripts/docker-topic-create.sh)
-6. [docker-kafdrop.sh](src/main/scripts/docker-kafdrop.sh)
-7. [docker-trade-producer.sh](src/main/scripts/docker-trade-producer.sh)
-8. [docker-hazelcast-node.sh](src/main/scripts/docker-hazelcast-node.sh)
-9. [docker-webapp.sh](src/main/scripts/docker-webapp.sh)
+1. [docker-zookeeper.sh](./src/main/scripts/docker-zookeeper.sh)
+2. [docker-kafka0.sh](./src/main/scripts/docker-kafka0.sh)
+3. [docker-kafka1.sh](./src/main/scripts/docker-kafka1.sh)
+4. [docker-kafka2.sh](./src/main/scripts/docker-kafka2.sh)
+5. [docker-topic-create.sh](./src/main/scripts/docker-topic-create.sh)
+6. [docker-kafdrop.sh](./src/main/scripts/docker-kafdrop.sh)
+7. [docker-trade-producer.sh](./src/main/scripts/docker-trade-producer.sh)
+8. [docker-hazelcast-node.sh](./src/main/scripts/docker-hazelcast-node.sh)
+9. [docker-webapp.sh](./src/main/scripts/docker-webapp.sh)
 
 You should wait for Zookeeper (1) to have started before starting the three Kafka brokers (2,3,4).
 
@@ -348,7 +348,48 @@ Use the command `docker network inspect trade-monitor` if you really wish to see
 
 ## Running -- Kubernetes
 
-TODO
+4 deployment files are provided to run the Trade Monitor in Kubernetes.
+
+1. [kubernetes-zookeeper-kafka.yaml](./src/main/scripts/kubernetes-zookeeper-kafka.yaml)
+2. [kubernetes-trade-producer.yaml](./src/main/scripts/kubernetes-trade-producer.yaml)
+3. [kubernetes-hazelcast-node.yaml](./src/main/scripts/kubernetes-hazelcast-node.yaml)
+4. [kubernetes-webapp.yaml](./src/main/scripts/kubernetes-webapp.yaml)
+
+These are deliberately simple Kubernetes deployment file. Resource limits, auto-scaling,
+namespaces, etc could all be added to move towards production quality.
+For each file, ensure all the created pods report as being healthy ("_1/1_" in the "_READY_" column)
+before progressing to the next deployment.
+
+The first will create a pod for Zookeeper, three pods for Kafka brokers, run a job to create the needed
+topic, and start a pod for Kafdrop.
+
+The second creates a job pod to run the Trade Producer.
+
+The third creates two pods for the Hazelcast cluster to process the trades. This is a stateful set,
+you can vary the number of replicas after from 2 down to 1 or up to a larger number.
+
+The last creates a pod for the web UI.
+
+Once all are running, use `kubectl get services` to find the location of `kafdrop` and `webapp`.
+
+The IP address for these will depend on your flavor of Kubernetes.
+
+For example, for this output:
+
+```
+$ kubectl get services
+NAME                                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+kubernetes                           ClusterIP   10.96.0.1        <none>        443/TCP          11m
+trade-monitor-kafdrop-service        NodePort    10.97.179.86     <none>        8080:30190/TCP   6m14s
+trade-monitor-kafka-broker-service   ClusterIP   None             <none>        9092/TCP         6m14s
+trade-monitor-service                ClusterIP   None             <none>        5701/TCP         91s
+trade-monitor-webapp                 NodePort    10.105.189.87    <none>        8080:32627/TCP   36s
+trade-monitor-zookeeper-service      ClusterIP   10.100.235.253   <none>        2181/TCP         6m13s
+```
+
+This shows `kafdrop` on port 30190, and `webapp` on port 32627.
+
+TODO Add GKE
 
 ## Running -- Lifecycle
 
