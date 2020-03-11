@@ -241,12 +241,14 @@ The following sections describe how to run the example on your local machine, on
 or Kubernetes. For all, there is a partial ordering on the modules.
 
 1. `zookeeper` TODO
+TODO TODO
 2. `kafka-broker` TODO
- * `kafdrop` TODO
- * `topic-create` TODO
-3. `hazelcast-node` TODO
-4. `webapp` TODO
- * `trade-producer` TODO
+3 `topic-create` TODO
+4. `hazelcast-node` TODO
+5. `webapp` TODO
+
+* `kafdrop` TODO
+* `trade-producer` TODO
 
 ## Running -- Localhost
 
