@@ -253,14 +253,14 @@ or Kubernetes. For all, there is a partial ordering on the modules.
 
 2. `kafka-broker` Kafka is second, as it uses Zookeeper for configuration.
 
-3.== `topic-create` Kafka starts without topics, this module should be run third to create the needed topic.
+3. == `topic-create` Kafka starts without topics, this module should be run third to create the needed topic.
 
-3.== `kafdrop` The Kafka browser has to start after Kafka. It doesn't have to start after the topic is
+3. == `kafdrop` The Kafka browser has to start after Kafka. It doesn't have to start after the topic is
 created, but it shows the most if the topic exists and is being written to.
 
-4.== `trade-producer` This writes the trade data to the Kafka topic created.
+4. == `trade-producer` This writes the trade data to the Kafka topic created.
 
-4.== `hazelcast-node` The Hazelcast node has Jet jobs that read from the Kafka topic created. There doesn't
+4. == `hazelcast-node` The Hazelcast node has Jet jobs that read from the Kafka topic created. There doesn't
 need to be anything being written to the Kafka topic, but if there is no input there is no output from
 a streaming job.
 
