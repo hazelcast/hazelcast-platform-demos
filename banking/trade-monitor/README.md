@@ -168,7 +168,7 @@ This job is a simple upload, or _ingest_ of data from Kafka into Hazelcast.
 
 The input stage of the pipeline is a Kafka source, with the topic name "`trades`".
 
-The output stage of the pipeline is an [IMap](https://docs.hazelcast.org/docs/4.0/javadoc/), also called "`trades`".
+The output stage of the pipeline is an [IMap](https://docs.hazelcast.org/docs/4.0/javadoc/com/hazelcast/map/IMap.html), also called "`trades`".
 
 What is read from Kafka is written directly into Hazelcast, without enrichment, depletion, filtering or any
 sophisticated stream processing.
