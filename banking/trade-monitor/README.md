@@ -234,6 +234,20 @@ the demonstration. The trades for that symbol are listed most recent first, but 
 millions of trades then that means thousands of trades for each stock symbol, so potentially
 a very long list.
 
+## Running -- sequence
+
+TODO
+The following sections describe how to run the example on your local machine, on Docker
+or Kubernetes. For all, there is a partial ordering on the modules.
+
+1. `zookeeper` TODO
+2. `kafka-broker` TODO
+ * `kafdrop` TODO
+ * `topic-create` TODO
+3. `hazelcast-node` TODO
+4. `webapp` TODO
+ * `trade-producer` TODO
+
 ## Running -- Localhost
 
 TODO
