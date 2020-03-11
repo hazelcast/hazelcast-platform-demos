@@ -1,6 +1,8 @@
 # Hazelcast Platform Demo Applications - Banking - Trade Monitor
 
 [Screenshot1]: src/site/markdown/images/Screenshot1.png "Image screenshot1.png"
+[Screenshot2]: src/site/markdown/images/Screenshot2.png "Image screenshot2.png"
+[Screenshot3]: src/site/markdown/images/Screenshot3.png "Image screenshot3.3.3.
 
 An example showing continuous aggregation of stock market trades, providing
 a UI for inspection of the aggregated values with the ability to drill-down
@@ -319,10 +321,23 @@ TODO
 
 ## Running -- Expected Output
 
+Trade Monitor uses web UIs to present the data, but it is also logged.
+
 ### `webapp`
-![Image of the Trade Monitor][Screenshot1]
+
+On the
+
+![Image of the Trade Monitor aggregation view of symbols][Screenshot1]
 
 TODO
+
+![Image of the Trade Monitor expanded view of "ASPS" symbol][Screenshot2]
+
+### `webapp`
+![Image of the Kafdrop browsing the "trades" topic][Screenshot3]
+
+TODO
+
 
 ### Logs
 
