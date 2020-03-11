@@ -26,7 +26,7 @@ mvn clean install
 
 If you have Docker, and want to run Docker images or Kubernetes, use:
 
-``
+```
 mvn clean install -Prelease
 ```
 
