@@ -1,5 +1,7 @@
 # Hazelcast Platform Demo Applications - Banking - Trade Monitor
 
+[Screenshot1]: src/site/markdown/images/Screenshot1.png "Image screenshot1.png"
+
 An example showing continuous aggregation of stock market trades, providing
 a UI for inspection of the aggregated values with the ability to drill-down
 to see the trades contained in each aggregation.
@@ -240,7 +242,6 @@ a very long list.
 
 ## Running -- sequence
 
-TODO
 The following sections describe how to run the example on your local machine, on Docker
 or Kubernetes. For all, there is a partial ordering on the modules.
 
@@ -248,23 +249,61 @@ or Kubernetes. For all, there is a partial ordering on the modules.
 
 2. `kafka-broker` Kafka is second, as it uses Zookeeper for configuration.
 
-3 `topic-create` Kafka starts without topics, this module should be run third to create the needed topic.
+3.== `topic-create` Kafka starts without topics, this module should be run third to create the needed topic.
 
-4. `hazelcast-node` TODO
+3.== `kafdrop` The Kafka browser has to start after Kafka. It doesn't have to start after the topic is
+created, but it shows the most if the topic exists and is being written to.
 
-5. `webapp` TODO
+4.== `trade-producer` This writes the trade data to the Kafka topic created.
 
-* `kafdrop` TODO
+4.== `hazelcast-node` The Hazelcast node has Jet jobs that read from the Kafka topic created. There doesn't
+need to be anything being written to the Kafka topic, but if there is no input there is no output from
+a streaming job.
 
-* `trade-producer` TODO
+5. `webapp` The web UI is a client of the Hazelcast cluster, so needs Hazelcast node(s) to be runnning.
+
+Ignoring the partial ordering, the recommended start sequence would be `zookeeper`, `kafka-broker`,
+`topic-create`, `kafdrop`, `trade-producer`, `hazelcast-node` and finally `webapp`.
 
 ## Running -- Localhost
 
-TODO
+For running directly on your local machine, the assumption is made that you already have Kafka
+and Zookeeper running and with an appropriate configuration as described in the following
+subsection.
+
+Assuming so, run the [localhost-trade-producer.sh](./localhost-trade-producer.sh) script
+to start writing trades to the Kafka topic "`trades`". This takes an optional integer
+argument on the command line for the rate at which to generate trades. If not specified
+300 will be used, for a rate of 300 random trades per second.
+
+Next run one or more instances of the Hazelcast grid nodes, using the
+[localhost-hazelcast-node.sh](./src/main/scripts/localhost-hazelcast-node.sh) script.
+These will automatically cluster together, but since each will attempt to use all the
+CPUs available, running two or more nodes on the same machine won't give increased
+performance.
+
+Finally, [localhost-webapp.sh](./src/main/scripts/localhost-webapp.sh) will start the
+web client that displays the results of the Trade Monitor. Access this from:
+
+```
+http://localhost:8080/
+```
+
 ### Kafka &amp; Zookeeper on Localhost
-TODO
-kafka_2.13-2.4.0
-don't run multiple on local host for scaling speed up
+To match the containerized version, you should have one Zookeeper instance on port 2181
+and three Kafka broker instances running on ports 9092, 9093 and 9094 using that Zookeeper.
+
+You will also need the "`trades`" topic, which you could create:
+
+```
+kafka-topics.sh --zookeeper 127.0.0.1:2181 --create --partitions 3 --replication-factor 1 --topic trades
+```
+
+The main code dependency is for Kafka 2.4.0. Using other recent versions of Kafka
+has been successful, but this is not exactly guaranteed or adviseable.
+
+If your set-up has to be different for ports, or the number of instances, just modify the
+command scripts in the obvious places.
 
 ## Running -- Docker
 
@@ -280,7 +319,24 @@ TODO
 
 ## Running -- Expected Output
 
+![Image of the Trade Monitor][Screenshot1]
+
 TODO
+
+```
+14:41:55.933 INFO  main c.h.p.d.b.trademonitor.ApplicationRunner - Wrote 0 => "{"id": "eca117f8-c44e-47d2-aad4-b0d358769456","timestamp": 1583934115727,"symbol": "ENTG","price": 2501,"quantity": 99}" 
+```
+
+```
+14:42:40.090 INFO  hz.wonderful_goldwasser.jet.blocking.thread-4 c.h.j.i.c.W.IngestTrades/loggerSink#0 - [192.168.0.125]:5701 [trade-monitor] [4.0] 846b4539-e4de-4545-a3cd-9976c1fa0a9f={"id": "846b4539-e4de-4545-a3cd-9976c1fa0a9f","timestamp": 1583934115940,"symbol": "AMSF","price": 2501,"quantity": 378} 
+14:42:40.354 INFO  hz.wonderful_goldwasser.jet.blocking.thread-9 c.h.j.i.c.W.AggregateQuery/loggerSink#0 - [192.168.0.125]:5701 [trade-monitor] [4.0] WPCS=(1, 702219, 2499) 
+```
+
+```
+14:43:11.181 INFO  trade-monitor-webapp.event-2 c.h.p.d.b.trademonitor.TradesMapListener - Received 1 => "{"id": "5af8cf39-4db7-4663-8b31-1169dd9398ca","timestamp": 1583934191165,"symbol": "MTGE","price": 2501,"quantity": 5729}" 
+```
+
+
 
 ## Summary
 
