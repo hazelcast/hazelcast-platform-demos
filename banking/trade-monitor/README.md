@@ -317,7 +317,12 @@ TODO
 
 ## Running -- Lifecycle
 
-TODO
+All the modules here are continuous rather than batch, they are intended to run forever.
+
+The Jet jobs are requesting the next unread message from the Kafka topic. If there isn't
+one because the `trade-producer` has been paused, that's no different from the stock
+market being closed so no trading or from Jet reading from Kafka faster than the
+producer can produce.
 
 ## Running -- Expected Output
 
@@ -344,13 +349,10 @@ price and quantity. Collectively there trades sum to the aggregation value.
 The `webapp` module displays the output of the Trade Monitor, which is what we
 are really interested in.
 
-If the optional module `kafdrop` is run, you can see the input, the contents
+If the optional module `kafdrop` is run, you can see the raw input, the contents
 of the Kafka topic.
 
 ![Image of the Kafdrop browsing the "trades" topic][Screenshot3]
-
-This 
-
 
 ### Logs
 
@@ -386,6 +388,14 @@ aggregate, so the format is the same as for `trade-producer` log and the `Ingest
 
 ## Summary
 
-TODO
-3 node cluster, 10 million in 30 seconds
+This is an example showing real-time aggregation of data from a Kafka topic, giving a live
+view of what is happening to an end-user available via a web front-end.
 
+It happens here this is stock market trade data, but in some sense this is just a detail.
+
+The important part is the raw data (the trades) and the aggregated data (the running totals) are maintained
+in parallel, so the web front-end can show derived data that is consistent with the raw data. The high
+level view is in step with the low level view.
+
+To give some numbers, 3 hosts with 16 CPUs each can process 10,000 items per second, or replay 10,000,000 items
+in 20 seconds. If your messages arrive at twice the rate, just have twice the number of hosts.
