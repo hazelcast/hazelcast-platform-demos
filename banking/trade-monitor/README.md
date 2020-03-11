@@ -30,8 +30,8 @@ If you have Docker, and want to run Docker images or Kubernetes, use:
 mvn clean install -Prelease
 ```
 
-The `-Prelease` flag activates the release quality build profile, which will assume the
-Docker exists and build containers for deployment.
+The `-Prelease` flag activates the release quality build profile, which will assume that
+Docker exists and build container images for deployment.
 
 ## Modules
 
@@ -54,44 +54,62 @@ understand and execute them.
 ### 1. `common`
 
 The `common` module is not a deployed executable. As the name suggests, it is a common dependency
-for many of the other modules in the project, to hold communal objects such as logging configuration
+for many of the other modules in the project, to hold shared items such as logging configuration
 and the definition of constants.
 
 ### 2. `zookeeper`
 
-The `zookeeper` module is only used for containerized deployments (ie. Docker and Kubernetes).
+The `zookeeper` module is only used for containerized deployments (ie. Docker and Kubernetes)
+and *does not* represent a production quality Zookeeper deployment.
 
-It exists only to create a predictable and repeatable copy of Zookeeper to connect to. You can
-and should replace this with your own Zookeeper installation for more realistic experiments.
+Zookeeper is not part of Hazelcast, but it's part of the external ecosystem this demonstration
+needs as a data source.
 
-Part of Zookeeper's role is maintain a persistent disk based configuration store. For a real
-deployment this would need to be an externally mounted volume, which draws questions of whether
-this module really belongs as a container.
+For running on localhost, it is assumed you will already have Zookeeper running.
 
-Since this example isn't directly concerned with the optimal production set-up of Zookeeper, it is
-also deployed here un-clustered (ie. only one copy runs).
+To facilitate running in a containerized environment, the `zookeeper` module provides an adequate
+Zookeeper image to use. This Zookeeper is un-clustered (only one copy runs) and does not use
+persistent volumes, so if it is stopped all data is lost. This is ideal for a demonstration,
+but obviously not for production use.
 
 ### 3. `kafka-broker`
 
-Similar to `zookeeper`, the `kafka-broker` module is used only for containerized deployments.
+Similar to `zookeeper`, the `kafka-broker` module is used only for containerized deployments
+and again *does not* represent a production quality Kafka deployment.
 
-It creates one Kafka broker which connects to the `zookeeper` module, and multiple should be
-started to create a more realistic Kafka broker deployment.
+Kafka is not part of Hazelcast, but for the same reason as Zookeeper it's needed as the
+external data source for the demonstration.
 
-As for `zookeeper`, this is questionable production deployment pattern. Persistent volumes
-are required, which means external storage and this negates much of the purpose of
-containerization.
+For running on localhost, it assumed you have Kafka running and connected to Zookeeper.
 
-Unlike `zookeeper`, multiple `kafka-broker` modules will be deployed. However, this is not
-for resilience but for scaling and partitioning.
+For running in a containerized environment, the `kafka-broker` module produces an adequate
+image to use as a convenience. This is deployed in parallel (multiple copies run), but this
+is for scaling not resilience. Kafka stored in the image is not on persistent volumes. This
+is a useful simplification for a demonstration, and again not suitable for production.
 
 ### 4. `topic-create`
 
-TODO
+The `topic-create` module is only for containerized deployments.
+
+It creates a container image, which if run will create the necessary Kafka topic ("`trades`")
+used by the Trade Monitor applicaiton in Hazelcast.
+
+It is not needed when running on localhost, the Kafka command line is used instead to
+create the topic.
 
 ### 5. `kafdrop`
 
-TODO
+The `kafdrop` module is optional.
+
+[Kafdrop](https://github.com/obsidiandynamics/kafdrop) is an open-source tool with an
+appealing web UI for browsing a Kafka deployment.
+
+It is used here as a way to independently browse the input to the Trade Monitor. This
+could equally be done with the Kafka's command line "`kafka-console-consumer.sh`" tool,
+although items are written to the topic at a high rate, so command line output tends
+to flood the screen.
+
+Kafdrop itself is unchanged in this module. 
 
 ### 6. `trade-producer`
 
@@ -108,6 +126,7 @@ TODO
 ## Running -- Localhost
 
 TODO
+kafka_2.13-2.4.0
 
 ## Running -- Docker
 
