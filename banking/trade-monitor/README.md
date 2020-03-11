@@ -370,26 +370,42 @@ you can vary the number of replicas after from 2 down to 1 or up to a larger num
 
 The last creates a pod for the web UI.
 
+If all looks well, you should something like this listed for the default namespace:
+
+```
+$ kubectl get pods
+NAME                                       READY   STATUS      RESTARTS   AGE
+job-topic-create-cs2cv                     0/1     Completed   0          8m12s
+job-trade-producer-fjf76                   1/1     Running     0          3m27s
+trade-monitor-hazelcast-node-0             1/1     Running     0          3m16s
+trade-monitor-hazelcast-node-1             1/1     Running     0          2m37s
+trade-monitor-kafdrop-579b64c495-qbkrv     1/1     Running     2          8m12s
+trade-monitor-kafka-broker-0               1/1     Running     0          8m12s
+trade-monitor-kafka-broker-1               1/1     Running     0          7m22s
+trade-monitor-kafka-broker-2               1/1     Running     0          6m35s
+trade-monitor-webapp-55bcd675d7-kc5vf      1/1     Running     0          78s
+trade-monitor-zookeeper-66f6b4c6d4-8kjns   1/1     Running     0          8m12s
+```
+
+All nodes are at "_READY_" status "_1/1_" (exception the topic creation job which has completed).
+
 Once all are running, use `kubectl get services` to find the location of `kafdrop` and `webapp`.
 
-The IP address for these will depend on your flavor of Kubernetes.
+Finding the external IP address for these will depend on your flavor of Kubernetes.
 
-For example, for this output:
+For example, for this output from Google Kubernetes Engine:
 
 ```
-$ kubectl get services
-NAME                                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
-kubernetes                           ClusterIP   10.96.0.1        <none>        443/TCP          11m
-trade-monitor-kafdrop-service        NodePort    10.97.179.86     <none>        8080:30190/TCP   6m14s
-trade-monitor-kafka-broker-service   ClusterIP   None             <none>        9092/TCP         6m14s
-trade-monitor-service                ClusterIP   None             <none>        5701/TCP         91s
-trade-monitor-webapp                 NodePort    10.105.189.87    <none>        8080:32627/TCP   36s
-trade-monitor-zookeeper-service      ClusterIP   10.100.235.253   <none>        2181/TCP         6m13s
+$ kubectl get services | grep trade-monitor
+trade-monitor-kafdrop-service        LoadBalancer   10.122.4.224    75.205.164.151   8080:31257/TCP   9m9s
+trade-monitor-kafka-broker-service   ClusterIP      None            <none>           9092/TCP         9m9s
+trade-monitor-service                ClusterIP      None            <none>           5701/TCP         4m13s
+trade-monitor-webapp                 LoadBalancer   10.122.1.250    75.205.91.17     8080:32760/TCP   2m15s
+trade-monitor-zookeeper-service      ClusterIP      10.122.11.197   <none>           2181/TCP         9m9s
 ```
 
-This shows `kafdrop` on port 30190, and `webapp` on port 32627.
-
-TODO Add GKE
+So here Kafdrop would be available as [http://75.205.164.151:8080/](https://www.youtube.com/watch?v=dQw4w9WgXcQ) and the WebApp as
+[http://75.205.91.17:8080/](https://www.youtube.com/watch?v=dQw4w9WgXcQ).
 
 ## Running -- Lifecycle
 
