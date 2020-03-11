@@ -174,6 +174,10 @@ This assumes DNS based discovery, for a service named "`trade-monitor-service.de
 and with some REST endpoints enabled to that Kubernetes probes can determine if the node is healthy.
 This network is overridden by the scripts described below to run in Docker or localhost.
 
+Hazelcast is also able to use Zookeeper for discovery, using the
+[hazelcast-zookeeper](https://github.com/hazelcast/hazelcast-zookeeper) plugin, although this is not
+done here.
+
 Also defined is an unordered index on the "`symbol`" field in the "`trades`" map. 
 The index improves the query speed when looking up stock market trades by their
 string symbol.
@@ -242,12 +246,17 @@ or Kubernetes. For all, there is a partial ordering on the modules.
 
 1. `zookeeper` TODO
 TODO TODO
+
 2. `kafka-broker` TODO
+
 3 `topic-create` TODO
+
 4. `hazelcast-node` TODO
+
 5. `webapp` TODO
 
 * `kafdrop` TODO
+
 * `trade-producer` TODO
 
 ## Running -- Localhost
