@@ -214,7 +214,6 @@ time. So they could be merged for efficiency, but here they are kept apart for c
 
 ### 8. `webapp`
 
-TODO
 The last module in the demo is a web-based UI to display the trade data and trade aggregation
 stored in the Hazelcast grid.
 
@@ -224,9 +223,21 @@ information using a reactive interface.
 When module is started, if you go to it's home page you will see a list of stock symbol codes,
 the stock's real name, the latest price, and the trading volume (stock price * trade quantity).
 
+There are several pages of data here, as there are more than 3000 stock symbol codes. 
+
+The page updates dynamically. As trades are processed, the values shown on screen will change,
+and will briefly go green if the price is increasing or red if the price is decreasing.
+
+For every stock symbol, there is an expand/collapse toggle at the left. If you click on this,
+you will see a list of all trades for that stock symbol since the beginning of execution of
+the demonstration. The trades for that symbol are listed most recent first, but if there are
+millions of trades then that means thousands of trades for each stock symbol, so potentially
+a very long list.
 
 ## Running -- Localhost
 
+TODO
+### Kafka &amp; Zookeeper on Localhost
 TODO
 kafka_2.13-2.4.0
 don't run multiple on local host for scaling speed up
