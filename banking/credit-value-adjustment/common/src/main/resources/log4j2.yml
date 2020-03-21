@@ -1,0 +1,33 @@
+Configuration:
+
+  Appenders:
+    Console:
+      - name: ConsoleBlue
+        target: SYSTEM_OUT
+        PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %blue{%msg%n}"
+      - name: ConsoleGreen
+        target: SYSTEM_OUT
+        PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %green{%msg%n}"
+      - name: ConsoleMagenta
+        target: SYSTEM_OUT
+        PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %magenta{%msg%n}"
+
+  Loggers:
+    logger:
+        - name: com.hazelcast
+          level: trace
+          additivity: false
+          AppenderRef:
+            ref: ConsoleBlue
+        - name: com.hazelcast.platform.demos
+          level: trace
+          additivity: false
+          AppenderRef:
+            ref: ConsoleMagenta
+    Root:
+      level: info
+      AppenderRef:
+        ref: ConsoleGreen
