@@ -19,8 +19,12 @@ package com.hazelcast.platform.demos.banking.cva;
 import java.io.BufferedOutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.Collections;
+import java.util.List;
 
+import org.python.core.PyList;
 import org.python.core.PyString;
+import org.python.core.PyTuple;
 import org.python.modules.cPickle;
 
 import com.hazelcast.jet.datamodel.Tuple2;
@@ -58,7 +62,7 @@ public class MyUtils {
      * @param host The location of Graphite/Grafana, port 2004 assumed
      * @return A sink to save to that location.
      */
-    protected static Sink<? super GraphiteMetric> buildGraphiteSink(String host) {
+    protected static Sink<? super GraphiteMetric> buildGraphiteSinkSingleton(String host) {
         return SinkBuilder.sinkBuilder(
                         "graphite",
                         context -> {
@@ -66,8 +70,8 @@ public class MyUtils {
                             return Tuple2.tuple2(socket, new BufferedOutputStream(socket.getOutputStream()));
                             }
                         )
-                .receiveFn((Tuple2<Socket, BufferedOutputStream> tuple2, GraphiteMetric metric) -> {
-                    PyString payload = cPickle.dumps(metric.getAsList(), PROTOCOL_2);
+                .receiveFn((Tuple2<Socket, BufferedOutputStream> tuple2, GraphiteMetric graphiteMetric) -> {
+                    PyString payload = cPickle.dumps(getAsListFromSingleton(graphiteMetric), PROTOCOL_2);
                     byte[] header = ByteBuffer.allocate(INT_SIZE).putInt(payload.__len__()).array();
 
                     tuple2.f1().write(header);
@@ -80,6 +84,67 @@ public class MyUtils {
                  })
                 .preferredLocalParallelism(1)
                 .build();
+    }
+
+    /**
+     * <p>Similar to {@link #buildGraphiteSinkSingleton()} except a more
+     * efficient version taking a list of {@link GraphiteMetric} objects.
+     * All that changes from the above is "{@code receiveFn()}".
+     * </p>
+     * <p>It would be possible, though not as type safe to combine this
+     * method with the above, and look at the type of the passed item
+     * to determine whether a single metric or list of metrics is to
+     * be sent across the socket.
+     * </p>
+     *
+     * @param host The location of Graphite/Grafana, port 2004 assumed
+     * @return A sink to save to that location.
+     */
+    protected static Sink<List<GraphiteMetric>> buildGraphiteSinkMultiple(String host) {
+        return SinkBuilder.sinkBuilder(
+                        "graphite",
+                        context -> {
+                            Socket socket = new Socket(host, MyConstants.GRAPHITE_PORT);
+                            return Tuple2.tuple2(socket, new BufferedOutputStream(socket.getOutputStream()));
+                            }
+                        )
+                .receiveFn((Tuple2<Socket, BufferedOutputStream> tuple2, List<GraphiteMetric> graphiteMetrics) -> {
+                    PyString payload = cPickle.dumps(getAsListFromList(graphiteMetrics), PROTOCOL_2);
+                    byte[] header = ByteBuffer.allocate(INT_SIZE).putInt(payload.__len__()).array();
+
+                    tuple2.f1().write(header);
+                    tuple2.f1().write(payload.toBytes());
+                })
+                .flushFn(tuple2 -> tuple2.f1().flush())
+                .destroyFn(tuple2 -> {
+                    tuple2.f1().close();
+                    tuple2.f0().close();
+                 })
+                .preferredLocalParallelism(1)
+                .build();
+    }
+
+    /**
+     * <p>A metric list build from a singleton metric.
+     * </p>
+     */
+    private static PyList getAsListFromSingleton(GraphiteMetric graphiteMetric) {
+        return getAsListFromList(Collections.singletonList(graphiteMetric));
+    }
+
+
+    /**
+     * <p>A metric list build from a singleton metric.
+     * </p>
+     */
+    private static PyList getAsListFromList(List<GraphiteMetric> graphiteMetrics) {
+        PyList list = new PyList();
+        for (GraphiteMetric graphiteMetric : graphiteMetrics) {
+            PyTuple metric = new PyTuple(graphiteMetric.getMetricName(),
+                    new PyTuple(graphiteMetric.getTimestamp(), graphiteMetric.getMetricValue()));
+            list.add(metric);
+        }
+        return list;
     }
 
 }

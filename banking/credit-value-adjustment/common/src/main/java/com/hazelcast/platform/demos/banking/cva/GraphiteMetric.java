@@ -21,9 +21,7 @@ import java.time.Instant;
 
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
-import org.python.core.PyList;
 import org.python.core.PyString;
-import org.python.core.PyTuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +35,6 @@ import org.slf4j.LoggerFactory;
 public class GraphiteMetric implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphiteMetric.class);
-    private static final String SEPARATOR = ".";
 
     private final String site;
     private PyString metricName;
@@ -61,7 +58,7 @@ public class GraphiteMetric implements Serializable {
      * @param arg0 A String
      */
     public void setMetricName(String arg0) {
-        this.metricName = new PyString(this.site + SEPARATOR + arg0);
+        this.metricName = new PyString(this.site + MyConstants.GRAPHITE_SEPARATOR + arg0);
     }
 
 
@@ -97,17 +94,33 @@ public class GraphiteMetric implements Serializable {
     }
 
     /**
-     * <p>Turn this singleton metric into a list with one item.
-     * Although it isn't done here, metrics could be passed
-     * as a list of multiple.
-     * </p>
-     *
-     * @return
+     * <p>Generated</p>
      */
-    PyList getAsList() {
-        PyList list = new PyList();
-        PyTuple metric = new PyTuple(metricName, new PyTuple(timestamp, metricValue));
-        list.add(metric);
-        return list;
+    public PyString getMetricName() {
+        return metricName;
     }
+
+    /**
+     * <p>Generated</p>
+     */
+    public PyFloat getMetricValue() {
+        return metricValue;
+    }
+
+    /**
+     * <p>Generated</p>
+     */
+    public PyInteger getTimestamp() {
+        return timestamp;
+    }
+
+    /**
+     * <p>Generated</p>
+     */
+    @Override
+    public String toString() {
+        return "GraphiteMetric [site=" + site + ", metricName=" + metricName + ", timestamp=" + timestamp
+                + ", metricValue=" + metricValue + "]";
+    }
+
 }

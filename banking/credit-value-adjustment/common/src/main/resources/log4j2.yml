@@ -27,6 +27,12 @@ Configuration:
           additivity: false
           AppenderRef:
             ref: ConsoleMagenta
+        # Hide irrelevant warnings from Jython
+        - name: org.python
+          level: error
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
     Root:
       level: info
       AppenderRef:
