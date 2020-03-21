@@ -34,10 +34,13 @@
 		<hazelcast-kubernetes.version>2.0.1</hazelcast-kubernetes.version>
 		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
 		<jackson.version>2.10.2</jackson.version>
-		<junit.version>4.13</junit.version>
 		<json.version>20190722</json.version>
+		<junit.version>4.13</junit.version>
+		<jython.version>2.7.2rc1</jython.version>
 		<kafka-clients.version>2.4.0</kafka-clients.version>
+		<poi-ooxml.version>4.1.2</poi-ooxml.version>
 		<spring-boot.version>2.2.5.RELEASE</spring-boot.version>
+		<springfox-swagger.version>2.9.2</springfox-swagger.version>
 
 		<!-- Plugins -->
 		<dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>
@@ -113,6 +116,23 @@
 			</dependency>
 
 			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger2</artifactId>
+				<version>${springfox-swagger.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger-ui</artifactId>
+				<version>${springfox-swagger.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi-ooxml</artifactId>
+				<version>${poi-ooxml.version}</version>
+			</dependency>
+
+			<dependency>
 				<groupId>org.hibernate.validator</groupId>
 				<artifactId>hibernate-validator</artifactId>
 				<version>${hibernate-validator.version}</version>
@@ -122,6 +142,12 @@
 				<groupId>org.json</groupId>
 				<artifactId>json</artifactId>
 				<version>${json.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.python</groupId>
+				<artifactId>jython</artifactId>
+				<version>${jython.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

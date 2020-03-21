@@ -18,7 +18,7 @@ Configuration:
   Loggers:
     logger:
         - name: com.hazelcast
-          level: trace
+          level: info
           additivity: false
           AppenderRef:
             ref: ConsoleBlue

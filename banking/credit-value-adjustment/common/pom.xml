@@ -18,4 +18,17 @@
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<groupId>org.python</groupId>
+			<artifactId>jython</artifactId>
+		</dependency>
+
+		<!-- scope==provided -->
+		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet</artifactId>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
 </project>

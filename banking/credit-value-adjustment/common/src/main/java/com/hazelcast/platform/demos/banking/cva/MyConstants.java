@@ -34,4 +34,6 @@ public class MyConstants {
     // Live and DR, but which is which depends on you
     public static final String SITE1_NAME = "cva-site1";
     public static final String SITE2_NAME = "cva-site2";
+
+    public static final int GRAPHITE_PORT = 2004;
 }
