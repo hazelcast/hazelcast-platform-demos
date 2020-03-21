@@ -20,22 +20,27 @@
 	<properties>
 		<docker.image.prefix>cva</docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
-		<my.cluster1.name>cva-live</my.cluster1.name>
-		<my.cluster2.name>cva-dr</my.cluster2.name>
+		<!-- Live, probably -->
+		<my.cluster1.name>cva-site1</my.cluster1.name>
+		<!-- DR, probably, unless you alternate -->
+		<my.cluster2.name>cva-site2</my.cluster2.name>
 	</properties>
 
 	<modules>
-		<!--
+                <!--
 		<module>grafana</module>
 		<module>management-center</module>
+                -->
 		<module>common</module>
-		<module>cva-cpp</module>
-		<module>data-loader</module>
+                <!--
 		<module>abstract-hazelcast-node</module>
 		<module>hazelcast-node-site1</module>
 		<module>hazelcast-node-site2</module>
+		<module>abstract-hazelcast-client</module>
+		<module>cva-cpp</module>
+		<module>data-loader</module>
 		<module>webapp</module>
-		-->
+                -->
 	</modules>
 
 	<dependencies>
@@ -51,7 +56,7 @@
 		
 		<!-- Validates configuration properties -->
 		<dependency>
-  	 		<groupId>org.hibernate</groupId>
+  	 		<groupId>org.hibernate.validator</groupId>
    			<artifactId>hibernate-validator</artifactId>
 		</dependency>
 
