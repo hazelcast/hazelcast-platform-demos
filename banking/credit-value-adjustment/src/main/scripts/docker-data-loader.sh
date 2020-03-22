@@ -24,7 +24,7 @@ if [ "${1}" == "CVA_SITE2" ]
 then
  CMD="docker run -e MY_KUBERNETES_ENABLED=false -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP} ${DOCKER_IMAGE} CVA_SITE2"
 else
- CMD="docker run -e MY_KUBERNETES_ENABLED=false -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP} ${DOCKER_IMAGE} CVA_SITE1"
+ CMD="docker run -e MY_KUBERNETES_ENABLED=false -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP} ${DOCKER_IMAGE}"
 fi
 #echo $CMD
 
