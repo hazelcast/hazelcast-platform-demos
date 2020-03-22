@@ -35,6 +35,7 @@ public class MyConstants {
     public static final String SITE1_NAME = "cva-site1";
     public static final String SITE2_NAME = "cva-site2";
 
+    public static final int GRAPHITE_COLLECTION_INTERVAL_SECONDS = 5;
     public static final int GRAPHITE_PORT = 2004;
     public static final char GRAPHITE_SEPARATOR = '.';
 }
