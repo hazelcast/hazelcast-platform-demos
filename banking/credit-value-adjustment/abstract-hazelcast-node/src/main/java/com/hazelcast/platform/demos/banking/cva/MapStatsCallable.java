@@ -33,14 +33,21 @@ public class MapStatsCallable implements Callable<MapStatsCallable.MyMapStats>, 
 
     private static final long serialVersionUID = 1L;
     private final String mapName;
-    private HazelcastInstance hazelcastInstance;
+    private transient HazelcastInstance hazelcastInstance;
 
     public MapStatsCallable(String arg0) {
         this.mapName = arg0;
+        // See comment on setHazelcastInstance()
+        this.hazelcastInstance = null;
     }
 
     /**
      * <p>Set on called node by Hazelcast prior to execution.</p>
+     * <p><a href="https://spotbugs.github.io/">SpotBugs</a> will
+     * complain if transient field "{@code hazelcastInstance}" is
+     * not set in the constructor, as it is not aware that Hazelcast
+     * will call "{@code setHazelcastInstance()}" before "{@code call()}".
+     * </p>
      */
     @Override
     public void setHazelcastInstance(HazelcastInstance arg0) {
@@ -72,7 +79,7 @@ public class MapStatsCallable implements Callable<MapStatsCallable.MyMapStats>, 
     /** <p>A convenience internal class for the return
      * object.</p>
      */
-    public class MyMapStats {
+    public static class MyMapStats {
         private long read;
         private long write;
         private long delete;

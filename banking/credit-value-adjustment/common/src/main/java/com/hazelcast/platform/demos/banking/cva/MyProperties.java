@@ -16,8 +16,9 @@
 
 package com.hazelcast.platform.demos.banking.cva;
 
+import com.hazelcast.platform.demos.banking.cva.MyConstants.Site;
+
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,9 +44,9 @@ public class MyProperties {
 
     @NotNull
     private String buildTimestamp;
+
     @NotNull
-    @Pattern(regexp = MyConstants.SITE1_NAME + "|" + MyConstants.SITE2_NAME)
-    private String site;
+    private Site site;
 
     public String getBuildTimestamp() {
         return buildTimestamp;
@@ -54,10 +55,10 @@ public class MyProperties {
         this.buildTimestamp = buildTimestamp;
         LOGGER.info("myProperties.buildTimestamp=='{}'", this.buildTimestamp);
     }
-    public String getSite() {
+    public Site getSite() {
         return site;
     }
-    public void setSite(String site) {
+    public void setSite(Site site) {
         this.site = site;
         LOGGER.info("myProperties.site=='{}'", this.site);
     }

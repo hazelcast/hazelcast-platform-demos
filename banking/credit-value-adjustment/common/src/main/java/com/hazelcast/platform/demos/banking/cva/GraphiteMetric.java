@@ -25,6 +25,8 @@ import org.python.core.PyString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hazelcast.platform.demos.banking.cva.MyConstants.Site;
+
 /**
  * <p>A holder object for a metric trio to send to Grafana,
  * a metric name and value, plus the time captured.
@@ -36,7 +38,7 @@ public class GraphiteMetric implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphiteMetric.class);
 
-    private final String site;
+    private final Site site;
     private PyString metricName;
     private PyInteger timestamp;
     private PyFloat metricValue;
@@ -46,7 +48,7 @@ public class GraphiteMetric implements Serializable {
      * from.
      * </p>
      */
-    public GraphiteMetric(String arg0) {
+    public GraphiteMetric(Site arg0) {
         this.site = arg0;
     }
 
@@ -58,7 +60,7 @@ public class GraphiteMetric implements Serializable {
      * @param arg0 A String
      */
     public void setMetricName(String arg0) {
-        this.metricName = new PyString(this.site + MyConstants.GRAPHITE_SEPARATOR + arg0);
+        this.metricName = new PyString(this.site.toString() + MyConstants.GRAPHITE_SEPARATOR + arg0);
     }
 
 

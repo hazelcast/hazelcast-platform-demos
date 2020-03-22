@@ -27,9 +27,11 @@ import org.python.core.PyString;
 import org.python.core.PyTuple;
 import org.python.modules.cPickle;
 
+import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.pipeline.Sink;
 import com.hazelcast.jet.pipeline.SinkBuilder;
+import com.hazelcast.platform.demos.banking.cva.MyConstants.Site;
 
 /**
  * <p>Utility functions that may be useful to more than one module.
@@ -41,6 +43,7 @@ public class MyUtils {
     private static final int INT_SIZE = 4;
     // Protocol 2 == Python 2.3 upwards. No constant for this apparantly.
     private static final int PROTOCOL_2 = 2;
+    private static final int PORT_RANGE = 1000;
 
     /**
      * <p>A sink that saves an instance of our {@link GraphiteMetric}
@@ -145,6 +148,22 @@ public class MyUtils {
             list.add(metric);
         }
         return list;
+    }
+
+    /**
+     * <p>When trying to run two clusters on the same host,
+     * keep the port ranges apart.
+     * </p>
+     * <p>Put the first cluster on the default port, to make
+     * it easy for Management Center to connect.
+     * </p>
+     *
+     * @param site "{@code CVA_SITE1}" or "{@code CVA_SITE2}"
+     * @return 5701 or 6701.
+     */
+    public static int getLocalhostBasePort(Site site) {
+        int multiplier = (site == Site.CVA_SITE1) ? 0 : 1;
+        return NetworkConfig.DEFAULT_PORT + multiplier * PORT_RANGE;
     }
 
 }

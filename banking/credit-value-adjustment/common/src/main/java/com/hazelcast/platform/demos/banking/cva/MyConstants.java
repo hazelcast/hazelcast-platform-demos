@@ -31,9 +31,13 @@ public class MyConstants {
     public static final List<String> IMAP_NAMES =
             List.of(IMAP_NAME_CURVES, IMAP_NAME_FIXINGS, IMAP_NAME_TRADES);
 
-    // Live and DR, but which is which depends on you
-    public static final String SITE1_NAME = "cva-site1";
-    public static final String SITE2_NAME = "cva-site2";
+    /**
+     * <p>Live and DR sites, but which is which depends on you.</p>
+     */
+    public enum Site {
+        CVA_SITE1,
+        CVA_SITE2
+    };
 
     public static final int GRAPHITE_COLLECTION_INTERVAL_SECONDS = 5;
     public static final int GRAPHITE_PORT = 2004;

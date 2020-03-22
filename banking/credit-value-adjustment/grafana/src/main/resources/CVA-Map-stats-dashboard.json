@@ -89,11 +89,11 @@
           "targets": [
             {
               "refId": "A",
-              "target": "cva-site1.GrafanaGlobalMetricsJob.map.curves.size"
+              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.curves.size"
             },
             {
               "refId": "B",
-              "target": "cva-site2.GrafanaGlobalMetricsJob.map.curves.size"
+              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.curves.size"
             }
           ],
           "thresholds": [],
@@ -166,11 +166,11 @@
           "targets": [
             {
               "refId": "A",
-              "target": "cva-site1.GrafanaGlobalMetricsJob.map.trades.size"
+              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.trades.size"
             },
             {
               "refId": "B",
-              "target": "cva-site2.GrafanaGlobalMetricsJob.map.trades.size"
+              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.trades.size"
             }
           ],
           "thresholds": [],
@@ -255,27 +255,27 @@
           "targets": [
             {
               "refId": "A",
-              "target": "cva-site1.GrafanaGlobalMetricsJob.map.curves.read"
+              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.curves.read"
             },
             {
               "refId": "B",
-              "target": "cva-site1.GrafanaGlobalMetricsJob.map.curves.write"
+              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.curves.write"
             },
             {
               "refId": "C",
-              "target": "cva-site1.GrafanaGlobalMetricsJob.map.curves.delete"
+              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.curves.delete"
             },
             {
               "refId": "D",
-              "target": "cva-site2.GrafanaGlobalMetricsJob.map.curves.read"
+              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.curves.read"
             },
             {
               "refId": "E",
-              "target": "cva-site2.GrafanaGlobalMetricsJob.map.curves.write"
+              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.curves.write"
             },
             {
               "refId": "F",
-              "target": "cva-site2.GrafanaGlobalMetricsJob.map.curves.delete"
+              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.curves.delete"
             }
           ],
           "thresholds": [],
@@ -348,27 +348,27 @@
           "targets": [
             {
               "refId": "A",
-              "target": "cva-site1.GrafanaGlobalMetricsJob.map.trades.read"
+              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.trades.read"
             },
             {
               "refId": "B",
-              "target": "cva-site1.GrafanaGlobalMetricsJob.map.trades.write"
+              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.trades.write"
             },
             {
               "refId": "C",
-              "target": "cva-site1.GrafanaGlobalMetricsJob.map.trades.delete"
+              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.trades.delete"
             },
             {
               "refId": "D",
-              "target": "cva-site2.GrafanaGlobalMetricsJob.map.trades.read"
+              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.trades.read"
             },
             {
               "refId": "E",
-              "target": "cva-site2.GrafanaGlobalMetricsJob.map.trades.write"
+              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.trades.write"
             },
             {
               "refId": "F",
-              "target": "cva-site2.GrafanaGlobalMetricsJob.map.trades.delete"
+              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.trades.delete"
             }
           ],
           "thresholds": [],
