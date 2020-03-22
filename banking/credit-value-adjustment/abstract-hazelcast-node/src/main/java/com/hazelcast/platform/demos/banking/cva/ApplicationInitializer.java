@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.banking.cva;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +35,7 @@ import com.hazelcast.jet.pipeline.Pipeline;
  */
 @Configuration
 public class ApplicationInitializer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInitializer.class);
 
     @Autowired
     private JetInstance jetInstance;
@@ -47,8 +50,13 @@ public class ApplicationInitializer {
     @Bean
     public CommandLineRunner commandLineRunner() {
        return args -> {
+           boolean isLocalhost =
+               !System.getProperty("my.docker.enabled", "false").equalsIgnoreCase(Boolean.TRUE.toString())
+               &&
+               !System.getProperty("my.kubernetes.enabled", "false").equalsIgnoreCase(Boolean.TRUE.toString());
+
            this.createNeededObjects();
-           this.launchNeededJobs();
+           this.launchNeededJobs(isLocalhost);
        };
     }
 
@@ -69,14 +77,23 @@ public class ApplicationInitializer {
      * capture statistics about maps and send them to Graphite/Grafana.
      * <p>
      */
-    private void launchNeededJobs() {
+    private void launchNeededJobs(boolean isLocalhost) {
+
         Pipeline pipelineGrafanaGlobalMetrics =
-            GrafanaGlobalMetricsJob.buildPipeline(this.myProperties.getSite());
+                GrafanaGlobalMetricsJob.buildPipeline(this.myProperties.getSite());
 
         JobConfig jobConfigGrafanaGlobalMetrics = new JobConfig();
         jobConfigGrafanaGlobalMetrics.setName(GrafanaGlobalMetricsJob.class.getSimpleName());
 
-        this.jetInstance.newJobIfAbsent(pipelineGrafanaGlobalMetrics, jobConfigGrafanaGlobalMetrics);
+        if (isLocalhost) {
+            LOGGER.warn("Assuming localhost so no Grafana, skipping '{}', as '{}'=={} & '{}'=={}",
+                jobConfigGrafanaGlobalMetrics.getName(),
+                "my.docker.enabled", System.getProperty("my.docker.enabled"),
+                "my.kubernetes.enabled", System.getProperty("my.kubernetes.enabled"));
+        } else {
+            this.jetInstance.newJobIfAbsent(pipelineGrafanaGlobalMetrics, jobConfigGrafanaGlobalMetrics);
+        }
+
     }
 
 }

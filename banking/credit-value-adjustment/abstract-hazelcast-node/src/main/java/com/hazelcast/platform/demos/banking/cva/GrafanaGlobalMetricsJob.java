@@ -50,6 +50,7 @@ import com.hazelcast.platform.demos.banking.cva.MyConstants.Site;
  * </p>
  */
 public class GrafanaGlobalMetricsJob {
+    private static final String GRAFANA_HOSTNAME = "grafana";
     private static final Logger LOGGER = LoggerFactory.getLogger(GrafanaGlobalMetricsJob.class);
     private static final long LOG_THRESHOLD = 12L;
     private static final String METRIC_PREFIX = GrafanaGlobalMetricsJob.class.getSimpleName();
@@ -86,8 +87,8 @@ public class GrafanaGlobalMetricsJob {
         .readFrom(GrafanaGlobalMetricsJob.mySource(site)).withoutTimestamps()
         //TODO Make this once per node not once per job
         .filterStateful(LongAccumulator::new, noopLoggerFilter)
-        //FIXME Replace 127.0.0.1
-        .writeTo(MyUtils.buildGraphiteSinkMultiple("127.0.0.1"));
+        //FIXME Replace with Service K8S or Hostname Docker
+        .writeTo(MyUtils.buildGraphiteSinkMultiple(GRAFANA_HOSTNAME));
 
         return pipeline;
     }
