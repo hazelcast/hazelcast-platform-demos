@@ -47,20 +47,30 @@ public class MyProperties {
 
     @NotNull
     private Site site;
+    private Site remoteSite;
 
     public String getBuildTimestamp() {
-        return buildTimestamp;
+        return this.buildTimestamp;
     }
     public void setBuildTimestamp(String buildTimestamp) {
         this.buildTimestamp = buildTimestamp;
         LOGGER.info("myProperties.buildTimestamp=='{}'", this.buildTimestamp);
     }
+    public Site getRemoteSite() {
+        return this.remoteSite;
+    }
     public Site getSite() {
-        return site;
+        return this.site;
     }
     public void setSite(Site site) {
         this.site = site;
+        if (this.site == Site.CVA_SITE1) {
+            this.remoteSite = Site.CVA_SITE2;
+        } else {
+            this.remoteSite = Site.CVA_SITE1;
+        }
         LOGGER.info("myProperties.site=='{}'", this.site);
+        LOGGER.info("myProperties.remoteSite=='{}'", this.remoteSite);
     }
 
 }
