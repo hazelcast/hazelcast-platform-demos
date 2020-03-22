@@ -9,15 +9,24 @@
 		<version>4.0</version>
 	</parent>
 
-	<artifactId>cva-grafana</artifactId>
+	<artifactId>cva-data-loader</artifactId>
 
-	<name>Hazelcast Platform - CVA - Grafana</name>
-	<description>Credit Value Adjustment - Re-package Grafana</description>
+	<name>Hazelcast Platform - CVA - Data Loader Job</name>
+	<description>Credit Value Adjustment - Data Loader Job</description>
 
 	<properties>
-		<docker.image.name>grafana</docker.image.name>
+		<docker.image.name>data-loader</docker.image.name>
+		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>cva-abstract-hazelcast-client</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<resources>
@@ -28,6 +37,10 @@
 		</resources>
 
 		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
 			<plugin>
 				<groupId>com.spotify</groupId>
 				<artifactId>dockerfile-maven-plugin</artifactId>

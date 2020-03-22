@@ -78,7 +78,7 @@ public class ApplicationConfig {
             tcpIpConfig.setEnabled(true);
             String host = System.getProperty("hazelcast.local.publicAddress", "127.0.0.1");
             List<String> memberList = List.of(host + ":" + port,
-                    host + ":" + (port + 1), host + (port + 2));
+                    host + ":" + (port + 1), host + ":" + (port + 2));
             tcpIpConfig.setMembers(memberList);
 
             networkConfig.getJoin().setTcpIpConfig(tcpIpConfig);

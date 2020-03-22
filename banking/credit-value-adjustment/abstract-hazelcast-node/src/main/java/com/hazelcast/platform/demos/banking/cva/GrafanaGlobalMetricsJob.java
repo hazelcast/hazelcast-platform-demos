@@ -84,9 +84,9 @@ public class GrafanaGlobalMetricsJob {
 
         pipeline
         .readFrom(GrafanaGlobalMetricsJob.mySource(site)).withoutTimestamps()
-        //TODO Make this once per node not per job
+        //TODO Make this once per node not once per job
         .filterStateful(LongAccumulator::new, noopLoggerFilter)
-        //TODO Replace 127.0.0.1
+        //FIXME Replace 127.0.0.1
         .writeTo(MyUtils.buildGraphiteSinkMultiple("127.0.0.1"));
 
         return pipeline;

@@ -9,27 +9,44 @@
 		<version>4.0</version>
 	</parent>
 
-	<artifactId>cva-hazelcast-node-site1</artifactId>
+	<artifactId>cva-abstract-hazelcast-client</artifactId>
 
-	<name>Hazelcast Platform - CVA - Hazelcast Node Site 1</name>
-	<description>Credit Value Adjustment - Hazelcast Node - Site 1</description>
+	<name>Hazelcast Platform - CVA - Abstract Hazelcast Client</name>
+	<description>Credit Value Adjustment - Abstract Hazelcast Client</description>
 
 	<properties>
-		<docker.image.name>hazelcast-node-site1</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
-		<my.cluster.name>${my.cluster1.name}</my.cluster.name>
-		<my.site>CVA_SITE1</my.site>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>cva-abstract-hazelcast-node</artifactId>
+			<artifactId>cva-common</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-kubernetes</artifactId>
 		</dependency>
 	</dependencies>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-parent</artifactId>
+				<type>pom</type>
+				<scope>import</scope>
+				<version>${spring-boot.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
 	<build>
 		<resources>
 			<resource>
@@ -37,16 +54,5 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
 	</build>
 </project>

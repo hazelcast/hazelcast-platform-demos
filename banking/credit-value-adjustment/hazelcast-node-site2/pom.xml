@@ -15,6 +15,8 @@
 	<description>Credit Value Adjustment - Hazelcast Node - Site 2</description>
 
 	<properties>
+		<docker.image.name>hazelcast-node-site2</docker.image.name>
+		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 		<my.cluster.name>${my.cluster2.name}</my.cluster.name>
 		<my.site>CVA_SITE2</my.site>
@@ -40,6 +42,10 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>dockerfile-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>
