@@ -27,12 +27,12 @@
 	</properties>
 
 	<modules>
-                <!--
 		<module>grafana</module>
+		<!--
 		<module>management-center</module>
-                -->
+		-->
 		<module>common</module>
-                <!--
+		<!--
 		<module>abstract-hazelcast-node</module>
 		<module>hazelcast-node-site1</module>
 		<module>hazelcast-node-site2</module>
@@ -40,7 +40,7 @@
 		<module>cva-cpp</module>
 		<module>data-loader</module>
 		<module>webapp</module>
-                -->
+		-->
 	</modules>
 
 	<dependencies>
