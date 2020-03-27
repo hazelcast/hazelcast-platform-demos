@@ -67,6 +67,7 @@ public class JsonLoaderService {
     public boolean load(String mapName, String inputFileName, String keyFieldName) {
         IMap<String, HazelcastJsonValue> iMap = this.hazelcastInstance.getMap(mapName);
 
+        this.duplicates = 0;
         this.errors = 0;
         this.read = 0;
         this.written = 0;
