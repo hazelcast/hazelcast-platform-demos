@@ -24,12 +24,12 @@ import java.util.List;
  */
 public class MyConstants {
 
-    public static final String IMAP_NAME_CURVES  = "curves";
+    public static final String IMAP_NAME_IRCURVES  = "ircurves";
     public static final String IMAP_NAME_FIXINGS = "fixings";
     public static final String IMAP_NAME_TRADES  = "trades";
 
     public static final List<String> IMAP_NAMES =
-            List.of(IMAP_NAME_CURVES, IMAP_NAME_FIXINGS, IMAP_NAME_TRADES);
+            List.of(IMAP_NAME_FIXINGS, IMAP_NAME_IRCURVES, IMAP_NAME_TRADES);
 
     /**
      * <p>Live and DR sites, but which is which depends on you.</p>
