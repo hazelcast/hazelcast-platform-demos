@@ -30,9 +30,22 @@
 
 	<build>
 		<resources>
+			<!-- Don't scan/replace Json or Zip -->
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
+				<excludes>
+          			<exclude>**/*.json</exclude>
+          			<exclude>**/*.zip</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<includes>
+          			<include>**/*.json</include>
+          			<include>**/*.zip</include>
+				</includes>
 			</resource>
 		</resources>
 
