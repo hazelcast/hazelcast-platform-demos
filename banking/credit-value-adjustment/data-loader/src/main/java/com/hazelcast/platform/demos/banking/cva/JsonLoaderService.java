@@ -52,6 +52,7 @@ public class JsonLoaderService {
     @Autowired
     private HazelcastInstance hazelcastInstance;
 
+    private int duplicates;
     private int errors;
     private int read;
     private int written;
@@ -77,15 +78,18 @@ public class JsonLoaderService {
             this.handleNormalFile(resource, inputFileName, keyFieldName, iMap);
         }
 
-        if (this.errors == 0) {
+        if (this.duplicates == 0 && this.errors == 0) {
             LOGGER.info("File '{}', read {} lines, wrote {} entries into map '{}'",
                     inputFileName, this.read, this.written, iMap.getName());
         } else {
-            LOGGER.warn("File '{}', read {} lines, wrote {} entries into map '{}', {} errors",
-                    inputFileName, this.read, this.written, iMap.getName(), this.errors);
+            LOGGER.warn("File '{}', read {} lines, wrote {} entries into map '{}', {} duplicates {} errors",
+                    inputFileName, this.read, this.written, iMap.getName(),
+                    this.duplicates, this.errors);
         }
         return (this.errors == 0);
     }
+
+
     /**
      * <p>Read each line of the input file, parse it as JSON and find the named
      * field. Used the named field as the key to insert into Hazelcast's map.
@@ -112,6 +116,10 @@ public class JsonLoaderService {
                         JSONObject json = new JSONObject(value.toString());
                         String key = json.get(keyFieldName).toString();
 
+                        if (iMap.containsKey(key)) {
+                            this.duplicates++;
+                            LOGGER.warn("Duplicate key '{}' on '{}'", key, line);
+                        }
                         iMap.set(key, value);
                         this.written++;
                     } catch (Exception exception) {
@@ -164,6 +172,10 @@ public class JsonLoaderService {
                                 JSONObject json = new JSONObject(value.toString());
                                 String key = json.get(keyFieldName).toString();
 
+                                if (iMap.containsKey(key)) {
+                                    this.duplicates++;
+                                    LOGGER.warn("Duplicate key '{}' on '{}'", key, line);
+                                }
                                 iMap.set(key, value);
                                 this.written++;
                             } catch (Exception exception) {
