@@ -45,6 +45,7 @@ import com.hazelcast.map.IMap;
 public class JsonLoaderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonLoaderService.class);
 
+    private static final int HALF_SCREEN_WIDTH = 66;
     private static final int PERIODIC_PROGRESS_INTERVAL = 50_000;
 
     @Autowired
@@ -118,7 +119,12 @@ public class JsonLoaderService {
 
                         if (iMap.containsKey(key)) {
                             this.duplicates++;
-                            LOGGER.warn("Duplicate key '{}' on '{}'", key, line);
+                            if (line.length() > HALF_SCREEN_WIDTH) {
+                                LOGGER.warn("Duplicate key '{}' on '{} ......", key,
+                                        line.substring(0, HALF_SCREEN_WIDTH));
+                            } else {
+                                LOGGER.warn("Duplicate key '{}' on '{}'", key, line);
+                            }
                         }
                         iMap.set(key, value);
                         this.written++;
@@ -174,7 +180,12 @@ public class JsonLoaderService {
 
                                 if (iMap.containsKey(key)) {
                                     this.duplicates++;
-                                    LOGGER.warn("Duplicate key '{}' on '{}'", key, line);
+                                    if (line.length() > HALF_SCREEN_WIDTH) {
+                                        LOGGER.warn("Duplicate key '{}' on '{} ......", key,
+                                                line.substring(0, HALF_SCREEN_WIDTH));
+                                    } else {
+                                        LOGGER.warn("Duplicate key '{}' on '{}'", key, line);
+                                    }
                                 }
                                 iMap.set(key, value);
                                 this.written++;
