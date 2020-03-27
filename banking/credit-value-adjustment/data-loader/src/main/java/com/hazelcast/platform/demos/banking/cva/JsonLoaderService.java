@@ -16,10 +16,14 @@
 
 package com.hazelcast.platform.demos.banking.cva;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,62 +45,147 @@ import com.hazelcast.map.IMap;
 public class JsonLoaderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonLoaderService.class);
 
+    private static final int PERIODIC_PROGRESS_INTERVAL = 50_000;
+
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired
     private HazelcastInstance hazelcastInstance;
 
+    private int errors;
+    private int read;
+    private int written;
+
     /**
      * <p>Read through the provided file, trying to parse each line as JSON
      * and write into the provided map. Find the key as an element in the JSON.
      * </p>
+     * <p>If the file is a Zip, look for the files inside and process them.</p>
      */
     public boolean load(String mapName, String inputFileName, String keyFieldName) {
         IMap<String, HazelcastJsonValue> iMap = this.hazelcastInstance.getMap(mapName);
 
-        int errors = 0;
-        int read = 0;
-        int written = 0;
-        try {
-            Resource resource = this.applicationContext.getResource("classpath:" + inputFileName);
+        this.errors = 0;
+        this.read = 0;
+        this.written = 0;
 
-            try (BufferedReader bufferedReader =
-                    new BufferedReader(
-                            new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    if (!line.startsWith("#")) {
-                        try {
-                            HazelcastJsonValue value = new HazelcastJsonValue(line);
+        Resource resource = this.applicationContext.getResource("classpath:" + inputFileName);
 
-                            // Needed until https://github.com/hazelcast/hazelcast/issues/15140
-                            JSONObject json = new JSONObject(value.toString());
-                            String key = json.get(keyFieldName).toString();
+        if (inputFileName.endsWith(".zip")) {
+            this.handleZipFile(resource, inputFileName, keyFieldName, iMap);
+        } else {
+            this.handleNormalFile(resource, inputFileName, keyFieldName, iMap);
+        }
 
-                            iMap.set(key, value);
-                            written++;
-                        } catch (Exception exception) {
-                            errors++;
-                            LOGGER.error("Line {} of {}: '{}' for '{}'", read, inputFileName,
-                                    exception.getMessage(), line);
-                        }
+        if (this.errors == 0) {
+            LOGGER.info("File '{}', read {} lines, wrote {} entries into map '{}'",
+                    inputFileName, this.read, this.written, iMap.getName());
+        } else {
+            LOGGER.warn("File '{}', read {} lines, wrote {} entries into map '{}', {} errors",
+                    inputFileName, this.read, this.written, iMap.getName(), this.errors);
+        }
+        return (this.errors == 0);
+    }
+    /**
+     * <p>Read each line of the input file, parse it as JSON and find the named
+     * field. Used the named field as the key to insert into Hazelcast's map.
+     * Assumes the JSON does not continue over the line.
+     * </p>
+     *
+     * @param resource A zip file
+     * @param inputFileName The file's name, for logging
+     * @param keyFieldName The name of the key field in JSON
+     * @param iMap The map to insert the JSON lines into
+     */
+    private void handleNormalFile(Resource resource, String inputFileName, String keyFieldName,
+            IMap<String, HazelcastJsonValue> iMap) {
+        try (BufferedReader bufferedReader =
+                new BufferedReader(
+                        new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                if (!line.startsWith("#")) {
+                    try {
+                        HazelcastJsonValue value = new HazelcastJsonValue(line);
+
+                        // Needed until https://github.com/hazelcast/hazelcast/issues/15140
+                        JSONObject json = new JSONObject(value.toString());
+                        String key = json.get(keyFieldName).toString();
+
+                        iMap.set(key, value);
+                        this.written++;
+                    } catch (Exception exception) {
+                        this.errors++;
+                        LOGGER.error("Line {} of {}: '{}' for '{}'", this.read, inputFileName,
+                                exception.getMessage(), line);
                     }
-                    read++;
+                }
+                this.read++;
+                if (this.read % PERIODIC_PROGRESS_INTERVAL == 0) {
+                    LOGGER.debug("Line {} of {} ... processing", this.read, inputFileName);
                 }
             }
         } catch (IOException e) {
-           errors++;
-           LOGGER.error("Problem reading '" + inputFileName + "'", e);
+            this.errors++;
+            LOGGER.debug("Processing line {} of {} ...", this.read, inputFileName);
         }
+    }
 
-        if (errors == 0) {
-            LOGGER.info("File '{}', read {} lines, wrote {} entries into map '{}'",
-                    inputFileName, read, written, iMap.getName());
-        } else {
-            LOGGER.warn("File '{}', read {} lines, wrote {} entries into map '{}', {} errors",
-                    inputFileName, read, written, iMap.getName(), errors);
+    /**
+     * <p>ZIP friendly version of {@link #handleNormalFile()}, which takes
+     * a ZIP file and applies the same kind of processing to each file in
+     * the ZIP. There should really only be one.
+     * </p>
+     *
+     * @param resource A zip file
+     * @param inputFileName The file's name, for logging
+     * @param keyFieldName The name of the key field in JSON
+     * @param iMap The map to insert the JSON lines into
+     */
+    private void handleZipFile(Resource resource, String inputFileName, String keyFieldName,
+            IMap<String, HazelcastJsonValue> iMap) {
+        Scanner scanner = null;
+        try (BufferedInputStream bufferedInputStream =
+                new BufferedInputStream(resource.getInputStream());
+             ZipInputStream zipInputStream = new ZipInputStream(bufferedInputStream)) {
+            ZipEntry zipEntry = zipInputStream.getNextEntry();
+            while (zipEntry != null) {
+                    scanner = new Scanner(zipInputStream, StandardCharsets.UTF_8);
+                    while (scanner.hasNextLine()) {
+                        if (scanner.ioException() != null) {
+                            throw scanner.ioException();
+                        }
+                        String line = scanner.nextLine();
+                        if (!line.startsWith("#")) {
+                            try {
+                                HazelcastJsonValue value = new HazelcastJsonValue(line);
+
+                                // Needed until https://github.com/hazelcast/hazelcast/issues/15140
+                                JSONObject json = new JSONObject(value.toString());
+                                String key = json.get(keyFieldName).toString();
+
+                                iMap.set(key, value);
+                                this.written++;
+                            } catch (Exception exception) {
+                                this.errors++;
+                                LOGGER.error("Line {} of {}: '{}' for '{}'", this.read, inputFileName,
+                                        exception.getMessage(), line);
+                            }
+                        }
+                        this.read++;
+                        if (this.read % PERIODIC_PROGRESS_INTERVAL == 0) {
+                            LOGGER.debug("Processing line {} of {} ...", this.read, inputFileName);
+                        }
+                    }
+                    zipEntry = zipInputStream.getNextEntry();
+            }
+            if (scanner != null) {
+                scanner.close();
+            }
+        } catch (IOException e) {
+            this.errors++;
+            LOGGER.error("Problem reading '" + inputFileName + "'", e);
         }
-        return (errors == 0);
     }
 
 }
