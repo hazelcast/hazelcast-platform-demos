@@ -61,7 +61,7 @@
           "dashLength": 10,
           "dashes": false,
           "datasource": "Local Graphite",
-          "description": "IMap \"curves\" in both clusters",
+          "description": "IMap \"ircurves\" in both clusters",
           "fill": 1,
           "id": 1,
           "legend": {
@@ -89,17 +89,17 @@
           "targets": [
             {
               "refId": "A",
-              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.curves.size"
+              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.ircurves.size"
             },
             {
               "refId": "B",
-              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.curves.size"
+              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.ircurves.size"
             }
           ],
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "\"curves\" map size",
+          "title": "\"ircurves\" map size",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -227,7 +227,7 @@
           "dashLength": 10,
           "dashes": false,
           "datasource": "Local Graphite",
-          "description": "IMap \"curves\" in both clusters",
+          "description": "IMap \"ircurves\" in both clusters",
           "fill": 1,
           "id": 3,
           "legend": {
@@ -255,33 +255,33 @@
           "targets": [
             {
               "refId": "A",
-              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.curves.read"
+              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.ircurves.read"
             },
             {
               "refId": "B",
-              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.curves.write"
+              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.ircurves.write"
             },
             {
               "refId": "C",
-              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.curves.delete"
+              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.ircurves.delete"
             },
             {
               "refId": "D",
-              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.curves.read"
+              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.ircurves.read"
             },
             {
               "refId": "E",
-              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.curves.write"
+              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.ircurves.write"
             },
             {
               "refId": "F",
-              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.curves.delete"
+              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.ircurves.delete"
             }
           ],
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "\"curves\" map usage",
+          "title": "\"ircurves\" map usage",
           "tooltip": {
             "shared": true,
             "sort": 0,
