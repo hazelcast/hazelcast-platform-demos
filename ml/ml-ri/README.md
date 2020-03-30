@@ -9,8 +9,6 @@ This example uses open-source Hazelcast only.
 
 This text is just the quick reference to help you build and deploy the application.
 
-For details of what it does, how and why, refer to <a href="_blank">TODO Link to website goes here TODO</a>.
-
 ## Building
 
 To build for running from the command line, use:
