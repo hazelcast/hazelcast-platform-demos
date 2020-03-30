@@ -21,7 +21,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>cva-common</artifactId>
+			<artifactId>cva-jet-jobs</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
