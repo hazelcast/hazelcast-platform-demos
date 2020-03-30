@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.banking.cva;
 
+import java.util.Arrays;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -35,28 +37,69 @@ import com.hazelcast.platform.demos.banking.cva.MyConstants.Site;
 public class Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
+    private static int threshold = -1;
+
     /**
      * <p>Start a client of the specified cluster, and once the data
      * loader classes have finished, shut down.
      * </p>
+     * <p>Has two arguments, both optional in any order, one text one numeric:</p>
+     * <ul>
+     * <li><b>site</b> Select "{@code CVA_SITE1}" "{@code CVA_SITE2}", default "{@code CVA_SITE1}"
+     * <li><b>threshold</b> Record limit per map for upload, default unlimited
+     * </ul>
      */
     public static void main(String[] args) throws Exception {
         String siteStr = System.getProperty("my.site");
 
-        if (siteStr == null) {
-            if (args.length == 0) {
-                siteStr = Site.CVA_SITE1.toString();
-                LOGGER.info("No args, site=='{}'", siteStr);
-            } else {
-                siteStr = args[0].equals(Site.CVA_SITE1.toString()) ? Site.CVA_SITE1.toString() : Site.CVA_SITE2.toString();
-                LOGGER.info("Arg='{}', site=='{}'", args[0], siteStr);
-            }
-
-            System.setProperty("my.site", siteStr);
+        if (args.length > 2) {
+            String[] ignored = Arrays.copyOfRange(args, 2, args.length);
+            LOGGER.warn("Ignoring {} excess arg{}: {}",
+                    ignored.length, (ignored.length == 1 ? "" : "s"), ignored);
         }
+
+        // Set each once at most.
+        for (String arg : Arrays.copyOf(args,  2)) {
+            try {
+                if (threshold == -1) {
+                    threshold = Math.abs(Integer.parseInt(arg));
+                }
+            } catch (NumberFormatException ignored) {
+                if (siteStr == null) {
+                    if (arg.equals(Site.CVA_SITE1.toString())) {
+                        siteStr = Site.CVA_SITE1.toString();
+                    } else {
+                        if (arg.equals(Site.CVA_SITE2.toString())) {
+                            siteStr = Site.CVA_SITE2.toString();
+                        }
+                    }
+                }
+            }
+        }
+
+        // Default
+        if (siteStr == null) {
+            siteStr = Site.CVA_SITE1.toString();
+        }
+
+        System.setProperty("my.site", siteStr);
+        LOGGER.info("Upload threshold {}/site, site '{}'", threshold, siteStr);
 
         SpringApplication.run(Application.class, args);
         System.exit(0);
+    }
+
+
+    /**
+     * <p>Return the maximum number of lines to upload from each file.
+     * We probably can't accommodate billions of intermediate results
+     * when developing on a laptop.
+     * </p>
+     *
+     * @return 0 for unlimited, a positive integer in all cases.
+     */
+    public static int getThreshold() {
+        return threshold;
     }
 
 }

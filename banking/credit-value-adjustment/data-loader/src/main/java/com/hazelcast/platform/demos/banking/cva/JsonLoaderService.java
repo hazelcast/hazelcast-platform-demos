@@ -46,6 +46,7 @@ public class JsonLoaderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonLoaderService.class);
 
     private static final int HALF_SCREEN_WIDTH = 66;
+    private static final int MAX_DUPLICATES_TO_LOG = 10;
     private static final int PERIODIC_PROGRESS_INTERVAL = 50_000;
 
     @Autowired
@@ -56,7 +57,12 @@ public class JsonLoaderService {
     private int duplicates;
     private int errors;
     private int read;
+    private int threshold;
     private int written;
+
+    public JsonLoaderService() {
+        this.threshold = Application.getThreshold();
+    }
 
     /**
      * <p>Read through the provided file, trying to parse each line as JSON
@@ -118,17 +124,12 @@ public class JsonLoaderService {
                         JSONObject json = new JSONObject(value.toString());
                         String key = json.get(keyFieldName).toString();
 
-                        if (iMap.containsKey(key)) {
-                            this.duplicates++;
-                            if (line.length() > HALF_SCREEN_WIDTH) {
-                                LOGGER.warn("Duplicate key '{}' on '{} ......", key,
-                                        line.substring(0, HALF_SCREEN_WIDTH));
-                            } else {
-                                LOGGER.warn("Duplicate key '{}' on '{}'", key, line);
-                            }
+                        this.testDuplicate(iMap, key, line);
+
+                        if (this.threshold > 0 && this.written < this.threshold) {
+                            iMap.set(key, value);
+                            this.written++;
                         }
-                        iMap.set(key, value);
-                        this.written++;
                     } catch (Exception exception) {
                         this.errors++;
                         LOGGER.error("Line {} of {}: '{}' for '{}'", this.read, inputFileName,
@@ -179,17 +180,12 @@ public class JsonLoaderService {
                                 JSONObject json = new JSONObject(value.toString());
                                 String key = json.get(keyFieldName).toString();
 
-                                if (iMap.containsKey(key)) {
-                                    this.duplicates++;
-                                    if (line.length() > HALF_SCREEN_WIDTH) {
-                                        LOGGER.warn("Duplicate key '{}' on '{} ......", key,
-                                                line.substring(0, HALF_SCREEN_WIDTH));
-                                    } else {
-                                        LOGGER.warn("Duplicate key '{}' on '{}'", key, line);
-                                    }
+                                this.testDuplicate(iMap, key, line);
+
+                                if (this.threshold > 0 && this.written < this.threshold) {
+                                    iMap.set(key, value);
+                                    this.written++;
                                 }
-                                iMap.set(key, value);
-                                this.written++;
                             } catch (Exception exception) {
                                 this.errors++;
                                 LOGGER.error("Line {} of {}: '{}' for '{}'", this.read, inputFileName,
@@ -209,6 +205,30 @@ public class JsonLoaderService {
         } catch (IOException e) {
             this.errors++;
             LOGGER.error("Problem reading '" + inputFileName + "'", e);
+        }
+    }
+
+    /**
+     * <p>Common code to test if a map contains an item we are due to
+     * insert. Input should be unique, but data loader may be run
+     * twice by mistake, so only log the first few duplicates.
+     * </p>
+     *
+     * @param iMap Target map to test
+     * @param key Key to test presence
+     * @param line Value to log some of
+     */
+    private void testDuplicate(IMap<String, HazelcastJsonValue> iMap, String key, String line) {
+        if (iMap.containsKey(key)) {
+            this.duplicates++;
+            if (this.duplicates <= MAX_DUPLICATES_TO_LOG) {
+                if (line.length() > HALF_SCREEN_WIDTH) {
+                    LOGGER.warn("Duplicate key '{}' on '{} ......", key,
+                            line.substring(0, HALF_SCREEN_WIDTH));
+                } else {
+                    LOGGER.warn("Duplicate key '{}' on '{}'", key, line);
+                }
+            }
         }
     }
 
