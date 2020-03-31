@@ -54,7 +54,7 @@ public class Application {
         Tuple2<Integer, Site> handledArgs = MyUtils.twoArgsIntSite(args, Application.class.getName());
 
         // Override threshold if specified and sensible
-        if (handledArgs.f0() != null || handledArgs.f0() > 0) {
+        if (handledArgs.f0() != null && handledArgs.f0() > 0) {
             threshold = handledArgs.f0();
         }
 

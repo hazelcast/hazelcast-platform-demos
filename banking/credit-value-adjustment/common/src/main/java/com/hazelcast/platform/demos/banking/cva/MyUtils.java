@@ -19,6 +19,10 @@ package com.hazelcast.platform.demos.banking.cva;
 import java.io.BufferedOutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hazelcast.config.NetworkConfig;
+import com.hazelcast.jet.JetInstance;
+import com.hazelcast.jet.Job;
+import com.hazelcast.jet.core.JobStatus;
 import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.pipeline.Sink;
 import com.hazelcast.jet.pipeline.SinkBuilder;
@@ -218,5 +225,63 @@ public class MyUtils {
         }
 
         return Tuple2.tuple2(integerValue, siteValue);
+    }
+
+
+    /**
+     * <p>Test if another job is doing the same thing at the same
+     * time, to avoid swamping the system. We don't want
+     * "{@code CALCULATE_EXPOSURE@10AM}" to run if
+     * "{@code CALCULATE_EXPOSURE@9AM}" is still going.
+     * </p>
+     * <p>This method isn't bulletproof. It relies on jobs having
+     * a name and this following a naming pattern.
+     * </p>
+     * <p>Also, since we don't (and don't want to) suspend processing
+     * while we decide, we may spot at job that is running now but
+     * actually finishes by the time we want to submit our clone.
+     * </p>
+     *
+     * @param prefix The start of a job name
+     * @param jetInstance To access the job registry
+     * @return The first match, or null if none.
+     */
+    public static Job findRunningJobsWithSamePrefix(String prefix, JetInstance jetInstance) {
+        Job match = null;
+
+        for (Job job : jetInstance.getJobs()) {
+            if (job.getName() != null && job.getName().startsWith(prefix)) {
+                if ((job.getStatus() == JobStatus.STARTING)
+                     || (job.getStatus() == JobStatus.RUNNING)
+                     || (job.getStatus() == JobStatus.SUSPENDED)
+                     || (job.getStatus() == JobStatus.SUSPENDED_EXPORTING_SNAPSHOT)) {
+                    return job;
+                }
+            }
+        }
+
+        return match;
+    }
+
+    /**
+     * <p>Take a timestamp {@code long} and convert it into an ISO-8601
+     * style string, but drop the millisecond accuracy.
+     * </p>
+     *
+     * @see <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO-8601</a>
+     * @param timestamp From "{@code System.currentTimeMillis()}" probabaly
+     * @return Time as a string
+     */
+    public static String timestampToISO8601(long timestamp) {
+        LocalDateTime localDateTime =
+                Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+        String timestampStr = DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(localDateTime);
+
+        if (timestampStr.indexOf('.') > 0) {
+            timestampStr = timestampStr.substring(0, timestampStr.indexOf('.'));
+        }
+
+        return timestampStr;
     }
 }
