@@ -16,14 +16,13 @@
 
 package com.hazelcast.platform.demos.banking.cva;
 
-import java.util.Arrays;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
+import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.platform.demos.banking.cva.MyConstants.Site;
 
 /**
@@ -52,40 +51,28 @@ public class Application {
     public static void main(String[] args) throws Exception {
         String siteStr = System.getProperty("my.site");
 
-        if (args.length > 2) {
-            String[] ignored = Arrays.copyOfRange(args, 2, args.length);
-            LOGGER.warn("Ignoring {} excess arg{}: {}",
-                    ignored.length, (ignored.length == 1 ? "" : "s"), ignored);
+        Tuple2<Integer, Site> handledArgs = MyUtils.twoArgsIntSite(args, Application.class.getName());
+
+        // Override threshold if specified and sensible
+        if (handledArgs.f0() != null || handledArgs.f0() > 0) {
+            threshold = handledArgs.f0();
         }
 
-        // Set each once at most.
-        for (String arg : Arrays.copyOf(args,  2)) {
-            try {
-                if (threshold == -1) {
-                    threshold = Math.abs(Integer.parseInt(arg));
-                }
-            } catch (NumberFormatException ignored) {
-                if (siteStr == null) {
-                    if (arg.equals(Site.CVA_SITE1.toString())) {
-                        siteStr = Site.CVA_SITE1.toString();
-                    } else {
-                        if (arg.equals(Site.CVA_SITE2.toString())) {
-                            siteStr = Site.CVA_SITE2.toString();
-                        }
-                    }
-                }
+        // Site, System property wins if specified twice
+        if (siteStr != null) {
+            siteStr = (siteStr.equals(Site.CVA_SITE2.toString()) ? Site.CVA_SITE2.toString() : Site.CVA_SITE1.toString());
+        } else {
+            if (handledArgs.f1() != null) {
+                siteStr = (handledArgs.f1() == Site.CVA_SITE2 ? Site.CVA_SITE2.toString() : Site.CVA_SITE1.toString());
+            } else {
+                siteStr = Site.CVA_SITE1.toString();
             }
-        }
-
-        // Default
-        if (siteStr == null) {
-            siteStr = Site.CVA_SITE1.toString();
         }
 
         System.setProperty("my.site", siteStr);
         LOGGER.info("Upload threshold {}/site, site '{}'", threshold, siteStr);
 
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(Application.class);
         System.exit(0);
     }
 

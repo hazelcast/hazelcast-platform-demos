@@ -19,6 +19,7 @@ package com.hazelcast.platform.demos.banking.cva;
 import java.io.BufferedOutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,6 +27,8 @@ import org.python.core.PyList;
 import org.python.core.PyString;
 import org.python.core.PyTuple;
 import org.python.modules.cPickle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.jet.datamodel.Tuple2;
@@ -38,6 +41,7 @@ import com.hazelcast.platform.demos.banking.cva.MyConstants.Site;
  * </p>
  */
 public class MyUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MyUtils.class);
 
     // Primitive int takes 4 bytes to transmit
     private static final int INT_SIZE = 4;
@@ -166,4 +170,53 @@ public class MyUtils {
         return NetworkConfig.DEFAULT_PORT + multiplier * PORT_RANGE;
     }
 
+    /**
+     * <p>Handle two args on the command line, the site and a
+     * numeric (eg. port). Either, neither or both may be
+     * specified, and if both allow any order.
+     * </p>
+     *
+     * @param args A String array of unknown size
+     * @param prefix For logging output
+     * @return An int and a {@link Site}
+     */
+    public static Tuple2<Integer, Site> twoArgsIntSite(String[] args, String prefix) {
+        if (args.length > 2) {
+            String[] ignored = Arrays.copyOfRange(args, 2, args.length);
+            LOGGER.warn("{}: Ignoring {} excess arg{}: {}",
+                    prefix, ignored.length, (ignored.length == 1 ? "" : "s"), ignored);
+        }
+
+        Integer integerValue = null;
+        boolean intUsed = false;
+        Site siteValue = null;
+        boolean siteUsed = false;
+
+        for (String arg : Arrays.copyOf(args,  2)) {
+            if (arg != null && arg.length() > 0) {
+                // Try as numeric
+                if (!intUsed) {
+                    try {
+                        integerValue = Integer.parseInt(arg);
+                        intUsed = true;
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+
+                // Try as Site ENUM
+                if (!siteUsed) {
+                    if (arg.equals(Site.CVA_SITE1.toString())) {
+                        siteValue = Site.CVA_SITE1;
+                        siteUsed = true;
+                    }
+                    if (arg.equals(Site.CVA_SITE2.toString())) {
+                        siteValue = Site.CVA_SITE2;
+                        siteUsed = true;
+                    }
+                }
+            }
+        }
+
+        return Tuple2.tuple2(integerValue, siteValue);
+    }
 }
