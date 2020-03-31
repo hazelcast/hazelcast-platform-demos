@@ -19,9 +19,6 @@ package com.hazelcast.platform.demos.banking.cva;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
 import com.hazelcast.client.config.YamlClientConfigBuilder;
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.jet.Jet;
-import com.hazelcast.jet.JetInstance;
 
 import java.util.List;
 
@@ -79,29 +76,4 @@ public class ApplicationConfig {
         return clientConfig;
     }
 
-    /**
-     * <p>Create a Jet instance that is a client of the
-     * cluster specified in the "{@code clientConfig}"
-     * and expose as a "{@code @Bean}"</p>
-     *
-     * @param clientConfig created above
-     * @return A Jet client
-     */
-    @Bean
-    public JetInstance jetInstance(ClientConfig clientConfig) {
-        return Jet.newJetClient(clientConfig);
-    }
-
-    /**
-     * <p>Clients that don't use Jet features may prefer to
-     * autowire a "{@code HazelcastInstance}" to make this clear.
-     * Expose the contained Hazelcast instance as a "{@code @Bean}".
-     *
-     * @param jetInstance created above
-     * @return The Hazelcast client that the Jet client extends.
-     */
-    @Bean
-    public HazelcastInstance hazelcastInstance(JetInstance jetInstance) {
-        return jetInstance.getHazelcastInstance();
-    }
 }

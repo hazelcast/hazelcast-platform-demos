@@ -26,12 +26,12 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-kubernetes</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.jet.contrib</groupId>
+			<artifactId>hazelcast-jet-spring-boot-starter</artifactId>
 		</dependency>
 	</dependencies>
 
