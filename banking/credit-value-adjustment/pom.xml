@@ -19,6 +19,7 @@
 
 	<properties>
 		<docker.image.prefix>cva</docker.image.prefix>
+		<javalin.version>3.7.0</javalin.version>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
 		<!-- Live, probably -->
 		<my.cluster1.name>CVA_SITE1</my.cluster1.name>
@@ -41,9 +42,7 @@
 		-->
 		<module>data-loader</module>
 		<module>jet-jobs</module>
-		<!--
 		<module>webapp</module>
-		-->
 	</modules>
 
 	<dependencies>
