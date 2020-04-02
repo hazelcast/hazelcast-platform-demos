@@ -21,13 +21,13 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 /**
- * <p>Load fixings data.</p>
+ * <p>Load counter-party CDS data.</p>
  * <p>We don't need "{@code @Order}" annotation, won't matter
  * if this is before or after other maps.
  * </p>
  */
 @Component
-public class FixingsLoader implements CommandLineRunner {
+public class CpCdsLoader implements CommandLineRunner {
 
     @Autowired
     private JsonLoaderService jsonLoaderService;
@@ -37,9 +37,9 @@ public class FixingsLoader implements CommandLineRunner {
      */
     @Override
     public void run(String... args) throws Exception {
-        String inputFileName = "fixings.json";
-        String keyFieldName = "curvename";
-        this.jsonLoaderService.load(MyConstants.IMAP_NAME_FIXINGS, inputFileName, keyFieldName);
+        String inputFileName = "cp_cds.json";
+        String keyFieldName = "ticker";
+        this.jsonLoaderService.load(MyConstants.IMAP_NAME_CP_CDS, inputFileName, keyFieldName);
     }
 
 }
