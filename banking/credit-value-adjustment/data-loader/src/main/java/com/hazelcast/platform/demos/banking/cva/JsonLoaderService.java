@@ -126,7 +126,12 @@ public class JsonLoaderService {
 
                         this.testDuplicate(iMap, key, line);
 
-                        if (this.threshold > 0 && this.written < this.threshold) {
+                        if (this.threshold > 0) {
+                            if (this.written < this.threshold) {
+                                iMap.set(key, value);
+                                this.written++;
+                            }
+                        } else {
                             iMap.set(key, value);
                             this.written++;
                         }
@@ -182,7 +187,12 @@ public class JsonLoaderService {
 
                                 this.testDuplicate(iMap, key, line);
 
-                                if (this.threshold > 0 && this.written < this.threshold) {
+                                if (this.threshold > 0) {
+                                    if (this.written < this.threshold) {
+                                        iMap.set(key, value);
+                                        this.written++;
+                                    }
+                                } else {
                                     iMap.set(key, value);
                                     this.written++;
                                 }
