@@ -57,6 +57,7 @@ public class JsonLoaderService {
     private int duplicates;
     private int errors;
     private int read;
+    private boolean stopEarly;
     private int threshold;
     private int written;
 
@@ -76,6 +77,7 @@ public class JsonLoaderService {
         this.duplicates = 0;
         this.errors = 0;
         this.read = 0;
+        this.stopEarly = false;
         this.written = 0;
 
         Resource resource = this.applicationContext.getResource("classpath:" + inputFileName);
@@ -114,8 +116,8 @@ public class JsonLoaderService {
         try (BufferedReader bufferedReader =
                 new BufferedReader(
                         new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
+            String line = bufferedReader.readLine();
+            while (line != null && !this.stopEarly) {
                 if (!line.startsWith("#")) {
                     try {
                         HazelcastJsonValue value = new HazelcastJsonValue(line);
@@ -130,6 +132,8 @@ public class JsonLoaderService {
                             if (this.written < this.threshold) {
                                 iMap.set(key, value);
                                 this.written++;
+                            } else {
+                                this.stopEarly = true;
                             }
                         } else {
                             iMap.set(key, value);
@@ -145,6 +149,7 @@ public class JsonLoaderService {
                 if (this.read % PERIODIC_PROGRESS_INTERVAL == 0) {
                     LOGGER.debug("Line {} of {} ... processing", this.read, inputFileName);
                 }
+                line = bufferedReader.readLine();
             }
         } catch (IOException e) {
             this.errors++;
@@ -172,7 +177,7 @@ public class JsonLoaderService {
             ZipEntry zipEntry = zipInputStream.getNextEntry();
             while (zipEntry != null) {
                     scanner = new Scanner(zipInputStream, StandardCharsets.UTF_8);
-                    while (scanner.hasNextLine()) {
+                    while (scanner.hasNextLine() && !this.stopEarly) {
                         if (scanner.ioException() != null) {
                             throw scanner.ioException();
                         }
@@ -191,6 +196,8 @@ public class JsonLoaderService {
                                     if (this.written < this.threshold) {
                                         iMap.set(key, value);
                                         this.written++;
+                                    } else {
+                                        this.stopEarly = true;
                                     }
                                 } else {
                                     iMap.set(key, value);
