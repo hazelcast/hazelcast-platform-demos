@@ -74,7 +74,7 @@ public class MtmToExposure {
 
                     // Format for output
                     StringBuilder stringBuilder = new StringBuilder();
-                    stringBuilder.append("{ ");
+                    stringBuilder.append("{");
                     stringBuilder.append(" \"tradeid\": \"" + mtm.f0() + "\"");
                     stringBuilder.append(", \"curvename\": \"" + mtm.f1() + "\"");
                     stringBuilder.append(", \"counterparty\": \"" + counterparty + "\"");
