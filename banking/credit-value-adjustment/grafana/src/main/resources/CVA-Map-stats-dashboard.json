@@ -53,7 +53,7 @@
   "rows": [
     {
       "collapse": false,
-      "height": 293,
+      "height": 350,
       "panels": [
         {
           "aliasColors": {},
@@ -61,7 +61,7 @@
           "dashLength": 10,
           "dashes": false,
           "datasource": "Local Graphite",
-          "description": "IMap \"ircurves\" in both clusters",
+          "description": "IMap \"trades\" in both clusters",
           "fill": 1,
           "id": 1,
           "legend": {
@@ -89,17 +89,17 @@
           "targets": [
             {
               "refId": "A",
-              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.ircurves.size"
+              "target": "alias(CVA_SITE1.GrafanaGlobalMetricsJob.map.trades.size, 'CVA_SITE1.size')"
             },
             {
               "refId": "B",
-              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.ircurves.size"
+              "target": "alias(CVA_SITE2.GrafanaGlobalMetricsJob.map.trades.size, 'CVA_SITE2.size')"
             }
           ],
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "\"ircurves\" map size",
+          "title": "\"trades\" map size",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -119,7 +119,7 @@
               "label": null,
               "logBase": 1,
               "max": null,
-              "min": null,
+              "min": "0",
               "show": true
             },
             {
@@ -127,7 +127,7 @@
               "label": null,
               "logBase": 1,
               "max": null,
-              "min": null,
+              "min": "0",
               "show": true
             }
           ]
@@ -166,17 +166,32 @@
           "targets": [
             {
               "refId": "A",
-              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.trades.size"
+              "target": "alias(CVA_SITE1.GrafanaGlobalMetricsJob.map.trades.reads, 'CVA_SITE1.reads')"
             },
             {
               "refId": "B",
-              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.trades.size"
-            }
+              "target": "alias(CVA_SITE1.GrafanaGlobalMetricsJob.map.trades.writes, 'CVA_SITE1.writes')"
+            },
+            {
+              "refId": "C",
+              "target": "alias(CVA_SITE1.GrafanaGlobalMetricsJob.map.trades.deletes, 'CVA_SITE1.deletes')"
+            },
+            {
+              "refId": "D",
+              "target": "alias(CVA_SITE2.GrafanaGlobalMetricsJob.map.trades.reads, 'CVA_SITE2.reads')"
+            },
+            {
+              "refId": "E",
+              "target": "alias(CVA_SITE2.GrafanaGlobalMetricsJob.map.trades.writes, 'CVA_SITE2.writes')"
+            },
+            {
+              "refId": "F",
+              "target": "alias(CVA_SITE2.GrafanaGlobalMetricsJob.map.trades.deletes, 'CVA_SITE2.deletes')"            }
           ],
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "\"trades\" map size",
+          "title": "\"trades\" map usage",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -196,7 +211,7 @@
               "label": null,
               "logBase": 1,
               "max": null,
-              "min": null,
+              "min": "0",
               "show": true
             },
             {
@@ -204,30 +219,18 @@
               "label": null,
               "logBase": 1,
               "max": null,
-              "min": null,
+              "min": "0",
               "show": true
             }
           ]
-        }
-      ],
-      "repeat": null,
-      "repeatIteration": null,
-      "repeatRowId": null,
-      "showTitle": false,
-      "title": "Dashboard Row",
-      "titleSize": "h6"
-    },
-    {
-      "collapse": false,
-      "height": 269,
-      "panels": [
+        },
         {
           "aliasColors": {},
           "bars": false,
           "dashLength": 10,
           "dashes": false,
           "datasource": "Local Graphite",
-          "description": "IMap \"ircurves\" in both clusters",
+          "description": "IMap \"trades\" in both clusters",
           "fill": 1,
           "id": 3,
           "legend": {
@@ -243,7 +246,7 @@
           "linewidth": 1,
           "links": [],
           "nullPointMode": "null",
-          "percentage": false,
+          "percentage": true,
           "pointradius": 5,
           "points": false,
           "renderer": "flot",
@@ -255,33 +258,17 @@
           "targets": [
             {
               "refId": "A",
-              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.ircurves.read"
+              "target": "alias(CVA_SITE1.GrafanaGlobalMetricsJob.map.trades.near_cache_percent, 'CVA_SITE1.near_cache_percent')"
             },
             {
               "refId": "B",
-              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.ircurves.write"
-            },
-            {
-              "refId": "C",
-              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.ircurves.delete"
-            },
-            {
-              "refId": "D",
-              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.ircurves.read"
-            },
-            {
-              "refId": "E",
-              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.ircurves.write"
-            },
-            {
-              "refId": "F",
-              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.ircurves.delete"
+              "target": "alias(CVA_SITE2.GrafanaGlobalMetricsJob.map.trades.near_cache_percent, 'CVA_SITE2.near_cache_percent')"
             }
           ],
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "\"ircurves\" map usage",
+          "title": "\"trades\" map near-cache %age",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -300,27 +287,39 @@
               "format": "short",
               "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
+              "max": "100",
+              "min": "0",
               "show": true
             },
             {
               "format": "short",
               "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
+              "max": "100",
+              "min": "0",
               "show": true
             }
           ]
-        },
+        }
+      ],
+      "repeat": null,
+      "repeatIteration": null,
+      "repeatRowId": null,
+      "showTitle": false,
+      "title": "IMap \"trades\"",
+      "titleSize": "h6"
+    },
+    {
+      "collapse": false,
+      "height": 350,
+      "panels": [
         {
           "aliasColors": {},
           "bars": false,
           "dashLength": 10,
           "dashes": false,
           "datasource": "Local Graphite",
-          "description": "IMap \"trades\" in both clusters",
+          "description": "IMap \"ircurves\" in both clusters",
           "fill": 1,
           "id": 4,
           "legend": {
@@ -348,33 +347,17 @@
           "targets": [
             {
               "refId": "A",
-              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.trades.read"
+              "target": "alias(CVA_SITE1.GrafanaGlobalMetricsJob.map.ircurves.size, 'CVA_SITE1.size')"
             },
             {
               "refId": "B",
-              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.trades.write"
-            },
-            {
-              "refId": "C",
-              "target": "CVA_SITE1.GrafanaGlobalMetricsJob.map.trades.delete"
-            },
-            {
-              "refId": "D",
-              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.trades.read"
-            },
-            {
-              "refId": "E",
-              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.trades.write"
-            },
-            {
-              "refId": "F",
-              "target": "CVA_SITE2.GrafanaGlobalMetricsJob.map.trades.delete"
+              "target": "alias(CVA_SITE2.GrafanaGlobalMetricsJob.map.ircurves.size, 'CVA_SITE2.size')"
             }
           ],
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "\"trades\" map usage",
+          "title": "\"ircurves\" map size",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -394,7 +377,7 @@
               "label": null,
               "logBase": 1,
               "max": null,
-              "min": null,
+              "min": "0",
               "show": true
             },
             {
@@ -402,7 +385,100 @@
               "label": null,
               "logBase": 1,
               "max": null,
-              "min": null,
+              "min": "0",
+              "show": true
+            }
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "Local Graphite",
+          "description": "IMap \"ircurves\" in both clusters",
+          "fill": 1,
+          "id": 5,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "span": 4,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "refId": "A",
+              "target": "alias(CVA_SITE1.GrafanaGlobalMetricsJob.map.ircurves.reads, 'CVA_SITE1.reads')"
+            },
+            {
+              "refId": "B",
+              "target": "alias(CVA_SITE1.GrafanaGlobalMetricsJob.map.ircurves.writes, 'CVA_SITE1.writes')"
+            },
+            {
+              "refId": "C",
+              "target": "alias(CVA_SITE1.GrafanaGlobalMetricsJob.map.ircurves.deletes, 'CVA_SITE1.deletes')"
+            },
+            {
+              "refId": "D",
+              "target": "alias(CVA_SITE2.GrafanaGlobalMetricsJob.map.ircurves.reads, 'CVA_SITE2.reads')"
+            },
+            {
+              "refId": "E",
+              "target": "alias(CVA_SITE2.GrafanaGlobalMetricsJob.map.ircurves.writes, 'CVA_SITE2.writes')"
+            },
+            {
+              "refId": "F",
+              "target": "alias(CVA_SITE2.GrafanaGlobalMetricsJob.map.ircurves.deletes, 'CVA_SITE2.deletes')"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "\"ircurves\" map usage",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
               "show": true
             }
           ]
@@ -412,7 +488,7 @@
       "repeatIteration": null,
       "repeatRowId": null,
       "showTitle": false,
-      "title": "Dashboard Row",
+      "title": "IMap \"ircurves\"",
       "titleSize": "h6"
     }
   ],

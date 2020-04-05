@@ -284,4 +284,30 @@ public class MyUtils {
 
         return timestampStr;
     }
+
+    /**
+     * <p>Create a single statistic to send to Graphite/Grafana in a bundle.
+     * </p>
+     *
+     * @param site "{@code CVA_SITE1}" or "{@code CVA_SITE2}"
+     * @param one First tier
+     * @param two Second tier
+     * @param three Third tier
+     * @param four Fourth tier
+     * @param valueStr Value are passed as strings
+     * @param when Timestamp
+     * @return A metric to send to Grafana
+     */
+    public static GraphiteMetric createGraphiteMetric4Tier(Site site, String one, String two, String three, String four,
+            String valueStr, long when) {
+        GraphiteMetric graphiteMetric = new GraphiteMetric(site);
+        graphiteMetric.setMetricName(one + MyConstants.GRAPHITE_SEPARATOR
+                + two + MyConstants.GRAPHITE_SEPARATOR
+                + three + MyConstants.GRAPHITE_SEPARATOR
+                + four);
+        graphiteMetric.setMetricValue(valueStr);
+        graphiteMetric.setTimestamp(when);
+        return graphiteMetric;
+    }
+
 }
