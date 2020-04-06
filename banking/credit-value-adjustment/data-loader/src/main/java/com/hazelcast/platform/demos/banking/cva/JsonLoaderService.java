@@ -45,7 +45,6 @@ import com.hazelcast.map.IMap;
 public class JsonLoaderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonLoaderService.class);
 
-    private static final int HALF_SCREEN_WIDTH = 66;
     private static final int MAX_DUPLICATES_TO_LOG = 10;
     private static final int PERIODIC_PROGRESS_INTERVAL = 50_000;
 
@@ -117,7 +116,7 @@ public class JsonLoaderService {
                 new BufferedReader(
                         new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
             String line = bufferedReader.readLine();
-            while (line != null && !this.stopEarly) {
+            while (!this.stopEarly && line != null) {
                 if (!line.startsWith("#")) {
                     try {
                         HazelcastJsonValue value = new HazelcastJsonValue(line);
@@ -149,7 +148,9 @@ public class JsonLoaderService {
                 if (this.read % PERIODIC_PROGRESS_INTERVAL == 0) {
                     LOGGER.debug("Line {} of {} ... processing", this.read, inputFileName);
                 }
-                line = bufferedReader.readLine();
+                if (!this.stopEarly) {
+                    line = bufferedReader.readLine();
+                }
             }
         } catch (IOException e) {
             this.errors++;
@@ -177,7 +178,7 @@ public class JsonLoaderService {
             ZipEntry zipEntry = zipInputStream.getNextEntry();
             while (zipEntry != null) {
                     scanner = new Scanner(zipInputStream, StandardCharsets.UTF_8);
-                    while (scanner.hasNextLine() && !this.stopEarly) {
+                    while (!this.stopEarly && scanner.hasNextLine()) {
                         if (scanner.ioException() != null) {
                             throw scanner.ioException();
                         }
@@ -239,9 +240,9 @@ public class JsonLoaderService {
         if (iMap.containsKey(key)) {
             this.duplicates++;
             if (this.duplicates <= MAX_DUPLICATES_TO_LOG) {
-                if (line.length() > HALF_SCREEN_WIDTH) {
+                if (line.length() > MyConstants.HALF_SCREEN_WIDTH) {
                     LOGGER.warn("Duplicate key '{}' on '{} ......", key,
-                            line.substring(0, HALF_SCREEN_WIDTH));
+                            line.substring(0, MyConstants.HALF_SCREEN_WIDTH));
                 } else {
                     LOGGER.warn("Duplicate key '{}' on '{}'", key, line);
                 }

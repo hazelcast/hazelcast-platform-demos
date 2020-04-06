@@ -44,4 +44,7 @@ public class MyConstants {
     public static final int GRAPHITE_COLLECTION_INTERVAL_SECONDS = 5;
     public static final int GRAPHITE_PORT = 2004;
     public static final char GRAPHITE_SEPARATOR = '.';
+
+    // For limiting the logging of long lines
+    public static final int HALF_SCREEN_WIDTH = 66;
 }
