@@ -21,15 +21,17 @@ import java.util.concurrent.Callable;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
+import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.map.IMap;
 import com.hazelcast.map.LocalMapStats;
+import com.hazelcast.nearcache.NearCacheStats;
 
 /**
  * <p>A task to run across all server nodes in a cluster, to return
  * the local counts from each for global summation.
  * </p>
  */
-public class MapStatsCallable implements Callable<MapStatsCallable.MyMapStats>, HazelcastInstanceAware, Serializable {
+public class MapStatsCallable implements Callable<HazelcastJsonValue>, HazelcastInstanceAware, Serializable {
 
     private static final long serialVersionUID = 1L;
     private final String mapName;
@@ -58,56 +60,30 @@ public class MapStatsCallable implements Callable<MapStatsCallable.MyMapStats>, 
      * <p>Find the count of selected operations for the given map.</p>
      */
     @Override
-    public MyMapStats call() throws Exception {
+    public HazelcastJsonValue call() throws Exception {
         IMap<?, ?> iMap = this.hazelcastInstance.getMap(mapName);
 
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("{ ");
+
         LocalMapStats localMapStats = iMap.getLocalMapStats();
-
         if (localMapStats != null) {
-            MyMapStats myMapStats = new MyMapStats();
+            stringBuilder.append(" \"reads\": " + localMapStats.getGetOperationCount());
+            stringBuilder.append(", \"writes\": " + (localMapStats.getPutOperationCount()
+                    + localMapStats.getSetOperationCount()));
+            stringBuilder.append(", \"deletes\": " + localMapStats.getRemoveOperationCount());
 
-            myMapStats.setRead(localMapStats.getGetOperationCount());
-            myMapStats.setWrite(localMapStats.getPutOperationCount() + localMapStats.getSetOperationCount());
-            myMapStats.setDelete(localMapStats.getRemoveOperationCount());
-
-            return myMapStats;
+            NearCacheStats nearCacheStats = localMapStats.getNearCacheStats();
+            if (nearCacheStats != null) {
+                stringBuilder.append(", \"near_cache\": {");
+                stringBuilder.append("  \"hits\": " + nearCacheStats.getHits());
+                stringBuilder.append(", \"misses\": " + nearCacheStats.getMisses());
+                stringBuilder.append(" }");
+            }
         }
 
-        return null;
-    }
-
-    /** <p>A convenience internal class for the return
-     * object.</p>
-     */
-    public static class MyMapStats {
-        private long read;
-        private long write;
-        private long delete;
-
-        /** <p>Generated</p> */
-        public long getRead() {
-            return read;
-        }
-        /** <p>Generated</p> */
-        public void setRead(long read) {
-            this.read = read;
-        }
-        /** <p>Generated</p> */
-        public long getWrite() {
-            return write;
-        }
-        /** <p>Generated</p> */
-        public void setWrite(long write) {
-            this.write = write;
-        }
-        /** <p>Generated</p> */
-        public long getDelete() {
-            return delete;
-        }
-        /** <p>Generated</p> */
-        public void setDelete(long delete) {
-            this.delete = delete;
-        }
+        stringBuilder.append(" }");
+        return new HazelcastJsonValue(stringBuilder.toString());
     }
 
 }

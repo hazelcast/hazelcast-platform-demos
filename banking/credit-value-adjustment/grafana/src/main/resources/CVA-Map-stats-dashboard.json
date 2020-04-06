@@ -230,7 +230,7 @@
           "dashLength": 10,
           "dashes": false,
           "datasource": "Local Graphite",
-          "description": "IMap \"trades\" in both clusters",
+          "description": "IMap \"cp_cds\" in both clusters",
           "fill": 1,
           "id": 3,
           "legend": {
@@ -258,17 +258,17 @@
           "targets": [
             {
               "refId": "A",
-              "target": "alias(CVA_SITE1.GrafanaGlobalMetricsJob.map.trades.near_cache_percent, 'CVA_SITE1.near_cache_percent')"
+              "target": "alias(CVA_SITE1.GrafanaGlobalMetricsJob.map.cp_cds.near_cache_percent, 'CVA_SITE1.near_cache_percent')"
             },
             {
               "refId": "B",
-              "target": "alias(CVA_SITE2.GrafanaGlobalMetricsJob.map.trades.near_cache_percent, 'CVA_SITE2.near_cache_percent')"
+              "target": "alias(CVA_SITE2.GrafanaGlobalMetricsJob.map.cp_cds.near_cache_percent, 'CVA_SITE2.near_cache_percent')"
             }
           ],
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "\"trades\" map near-cache %age",
+          "title": "\"cp_cds\" map near-cache %age",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -306,7 +306,7 @@
       "repeatIteration": null,
       "repeatRowId": null,
       "showTitle": false,
-      "title": "IMap \"trades\"",
+      "title": "IMap \"cp_cds\"",
       "titleSize": "h6"
     },
     {

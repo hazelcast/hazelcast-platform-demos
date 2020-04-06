@@ -73,24 +73,10 @@ public class MtmToExposure {
                     double[] exposures = calculateExposures(payerReceiverFlag, fixlegamount, fltlegamount);
 
                     // Format for output
-                    StringBuilder stringBuilder = new StringBuilder();
-                    stringBuilder.append("{");
-                    stringBuilder.append(" \"tradeid\": \"" + mtm.f0() + "\"");
-                    stringBuilder.append(", \"curvename\": \"" + mtm.f1() + "\"");
-                    stringBuilder.append(", \"counterparty\": \"" + counterparty + "\"");
-                    stringBuilder.append(", \"exposures\": [");
-                    for (int i = 0 ; i < exposures.length; i++) {
-                        if (i > 0) {
-                            stringBuilder.append(", ");
-                        }
-                        stringBuilder.append(exposures[i]);
-                    }
-                    stringBuilder.append("]");
-                    stringBuilder.append(", \"legfractions\": " + mtmJson.getJSONArray("legfractions"));
-                    stringBuilder.append(", \"discountfactors\": " + mtmJson.getJSONArray("discountvalues"));
-                    stringBuilder.append(" }");
+                    String exposureStr = CvaStpUtils.makeExposureStrFromJson(mtm.f0(), mtm.f1(), counterparty,
+                            exposures, mtmJson);
 
-                    return Tuple3.tuple3(mtm.f0(), mtm.f1(), stringBuilder.toString());
+                    return Tuple3.tuple3(mtm.f0(), mtm.f1(), exposureStr);
                 } catch (Exception e) {
                     LOGGER.error(mtm.f0() + "," + mtm.f1(), e);
                     return null;
