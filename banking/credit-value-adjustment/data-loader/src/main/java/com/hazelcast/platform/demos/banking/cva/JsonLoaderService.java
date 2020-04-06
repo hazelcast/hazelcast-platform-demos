@@ -116,6 +116,7 @@ public class JsonLoaderService {
                 new BufferedReader(
                         new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
             String line = bufferedReader.readLine();
+            this.read++;
             while (!this.stopEarly && line != null) {
                 if (!line.startsWith("#")) {
                     try {
@@ -126,30 +127,20 @@ public class JsonLoaderService {
                         String key = json.get(keyFieldName).toString();
 
                         this.testDuplicate(iMap, key, line);
+                        this.tryWrite(iMap, key, value);
 
-                        if (this.threshold > 0) {
-                            if (this.written < this.threshold) {
-                                iMap.set(key, value);
-                                this.written++;
-                            } else {
-                                this.stopEarly = true;
-                            }
-                        } else {
-                            iMap.set(key, value);
-                            this.written++;
-                        }
                     } catch (Exception exception) {
                         this.errors++;
                         LOGGER.error("Line {} of {}: '{}' for '{}'", this.read, inputFileName,
                                 exception.getMessage(), line);
                     }
                 }
-                this.read++;
-                if (this.read % PERIODIC_PROGRESS_INTERVAL == 0) {
-                    LOGGER.debug("Line {} of {} ... processing", this.read, inputFileName);
-                }
                 if (!this.stopEarly) {
                     line = bufferedReader.readLine();
+                    this.read++;
+                    if (this.read % PERIODIC_PROGRESS_INTERVAL == 0) {
+                        LOGGER.debug("Line {} of {} ... processing", this.read, inputFileName);
+                    }
                 }
             }
         } catch (IOException e) {
@@ -183,6 +174,7 @@ public class JsonLoaderService {
                             throw scanner.ioException();
                         }
                         String line = scanner.nextLine();
+                        this.read++;
                         if (!line.startsWith("#")) {
                             try {
                                 HazelcastJsonValue value = new HazelcastJsonValue(line);
@@ -192,25 +184,14 @@ public class JsonLoaderService {
                                 String key = json.get(keyFieldName).toString();
 
                                 this.testDuplicate(iMap, key, line);
+                                this.tryWrite(iMap, key, value);
 
-                                if (this.threshold > 0) {
-                                    if (this.written < this.threshold) {
-                                        iMap.set(key, value);
-                                        this.written++;
-                                    } else {
-                                        this.stopEarly = true;
-                                    }
-                                } else {
-                                    iMap.set(key, value);
-                                    this.written++;
-                                }
                             } catch (Exception exception) {
                                 this.errors++;
                                 LOGGER.error("Line {} of {}: '{}' for '{}'", this.read, inputFileName,
                                         exception.getMessage(), line);
                             }
                         }
-                        this.read++;
                         if (this.read % PERIODIC_PROGRESS_INTERVAL == 0) {
                             LOGGER.debug("Processing line {} of {} ...", this.read, inputFileName);
                         }
@@ -223,6 +204,28 @@ public class JsonLoaderService {
         } catch (IOException e) {
             this.errors++;
             LOGGER.error("Problem reading '" + inputFileName + "'", e);
+        }
+    }
+
+    /**
+     * <p>Write an entry unless we have hit any threshold defined.</p>
+     *
+     * @param iMap The Hazelcast map
+     * @param key Entry key
+     * @param value Entry value
+     */
+    private void tryWrite(IMap<String, HazelcastJsonValue> iMap, String key, HazelcastJsonValue value) {
+        if (this.threshold > 0) {
+            if (this.written < this.threshold) {
+                iMap.set(key, value);
+                this.written++;
+            }
+            if (this.written == this.threshold) {
+                this.stopEarly = true;
+            }
+        } else {
+            iMap.set(key, value);
+            this.written++;
         }
     }
 
