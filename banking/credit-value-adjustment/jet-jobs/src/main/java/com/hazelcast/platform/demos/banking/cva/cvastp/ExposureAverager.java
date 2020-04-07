@@ -39,7 +39,6 @@ public class ExposureAverager implements Serializable {
 
     private int count;
     private String counterparty;
-    private String curvename;
     private double[] exposures;
     private double[] discountfactors;
     private double[] legfractions;
@@ -77,7 +76,7 @@ public class ExposureAverager implements Serializable {
             JSONArray exposuresJson = exposure.getJSONArray("exposures");
 
             if (this.count == 0) {
-                this.firstTimeThis(tuple3.f0(), tuple3.f1(), exposure);
+                this.firstTimeThis(tuple3.f0(), exposure);
 
                 this.exposures = new double[exposuresJson.length()];
                 for (int i = 0 ; i < exposures.length ; i++) {
@@ -105,18 +104,17 @@ public class ExposureAverager implements Serializable {
      * @param arg0 Tuple3.f0()
      * @param arg1 Tuple3.f2()
      */
-    private void firstTimeThis(String arg0, String arg1, JSONObject arg2) throws JSONException {
+    private void firstTimeThis(String arg0, JSONObject arg1) throws JSONException {
         this.tradeid = arg0;
-        this.curvename = arg1;
-        this.counterparty = arg2.getString("counterparty");
+        this.counterparty = arg1.getString("counterparty");
 
-        JSONArray legfractionsJson = arg2.getJSONArray("legfractions");
+        JSONArray legfractionsJson = arg1.getJSONArray("legfractions");
         this.legfractions = new double[legfractionsJson.length()];
         for (int i = 0 ; i < legfractions.length ; i++) {
             legfractions[i] = legfractionsJson.getDouble(i);
         }
 
-        JSONArray discountfactorsJson = arg2.getJSONArray("discountfactors");
+        JSONArray discountfactorsJson = arg1.getJSONArray("discountfactors");
         this.discountfactors = new double[discountfactorsJson.length()];
         for (int i = 0 ; i < discountfactors.length ; i++) {
             discountfactors[i] = discountfactorsJson.getDouble(i);
@@ -133,7 +131,6 @@ public class ExposureAverager implements Serializable {
     private void firstTimeThat(ExposureAverager that) {
         this.count = that.getCount();
         this.counterparty = that.getCounterparty();
-        this.curvename = that.getCurvename();
         this.discountfactors = that.getDiscountfactors();
         this.exposures = that.getExposures();
         this.legfractions = that.getLegfractions();
@@ -185,10 +182,9 @@ public class ExposureAverager implements Serializable {
      */
     public String exportFinish() {
         if (count == 0) {
-            LOGGER.error("Count 0 for tradeid='" + this.tradeid + "',curvename='" + this.curvename + "'");
+            LOGGER.error("Count 0 for tradeid='" + this.tradeid + "'");
             this.tradeid = "";
             this.counterparty = "";
-            this.curvename = "";
             this.discountfactors = new double[0];
             this.exposures = new double[0];
             this.legfractions = new double[0];
@@ -198,7 +194,10 @@ public class ExposureAverager implements Serializable {
             }
         }
 
-        return CvaStpUtils.makeExposureStrFromJava(this.tradeid, this.curvename, this.counterparty,
+        // Curvename is not relevant as the average of all curves, set to empty string rather than omit
+        String curvename = "";
+
+        return CvaStpUtils.makeExposureStrFromJava(this.tradeid, curvename, this.counterparty,
                 this.exposures, this.legfractions, this.discountfactors);
     }
 
@@ -218,14 +217,6 @@ public class ExposureAverager implements Serializable {
      */
     public String getCounterparty() {
         return counterparty;
-    }
-
-    /**
-     * <p>Curvename, only needed for logging exceptions</p>
-     * @return A string
-     */
-    public String getCurvename() {
-        return curvename;
     }
 
     /**

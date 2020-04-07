@@ -116,7 +116,9 @@ public class JsonLoaderService {
                 new BufferedReader(
                         new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
             String line = bufferedReader.readLine();
-            this.read++;
+            if (line != null) {
+                this.read++;
+            }
             while (!this.stopEarly && line != null) {
                 if (!line.startsWith("#")) {
                     try {
@@ -137,7 +139,9 @@ public class JsonLoaderService {
                 }
                 if (!this.stopEarly) {
                     line = bufferedReader.readLine();
-                    this.read++;
+                    if (line != null) {
+                        this.read++;
+                    }
                     if (this.read % PERIODIC_PROGRESS_INTERVAL == 0) {
                         LOGGER.debug("Line {} of {} ... processing", this.read, inputFileName);
                     }
