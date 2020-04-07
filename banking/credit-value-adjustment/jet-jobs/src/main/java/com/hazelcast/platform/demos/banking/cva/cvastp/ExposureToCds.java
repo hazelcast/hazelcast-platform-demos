@@ -23,12 +23,13 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.function.BiFunctionEx;
 import com.hazelcast.function.FunctionEx;
-import com.hazelcast.jet.datamodel.Tuple3;
+import com.hazelcast.jet.datamodel.Tuple4;
 import com.hazelcast.platform.demos.banking.cva.MyConstants;
 
 /**
@@ -68,10 +69,10 @@ public class ExposureToCds {
      * </p>
      * <p>Try to keep the JSON processing and business logic separate.
      * </p>
-     * <p>The return object is trio of the Trade Id, the Counterparty code and the CDS.
+     * <p>The return object is quadruple of the Trade Id, the Counterparty code &amp; name, and the CDS.
      * </p>
      */
-    public static final BiFunctionEx<String, HazelcastJsonValue, Tuple3<String, String, String>> CONVERT =
+    public static final BiFunctionEx<String, HazelcastJsonValue, Tuple4<String, String, String, String>> CONVERT =
            (String exposure, HazelcastJsonValue cpCds) -> {
                try {
                    // Extract necessary fields
@@ -86,6 +87,7 @@ public class ExposureToCds {
                    JSONArray spreadsJson = cpCdsJson.getJSONArray("spreads");
                    JSONArray spreadPeriodsJson = cpCdsJson.getJSONArray("spread_periods");
                    double recoveryRate = cpCdsJson.getDouble("recovery");
+                   String shortname = cpCdsJson.getString("shortname");
 
                    // Convert from JSON
                    List<Double> discountFactors = new ArrayList<>();
@@ -133,8 +135,8 @@ public class ExposureToCds {
                    stringBuilder.append(formatDoubleArrayForJSON(",", "cvaexposurebyleg", cvaExposureByLeg));
                    stringBuilder.append(" }");
 
-                   return Tuple3.tuple3(tradeid, counterparty, stringBuilder.toString());
-               } catch (Exception e) {
+                   return Tuple4.tuple4(tradeid, counterparty, shortname, stringBuilder.toString());
+               } catch (RuntimeException | JSONException e) {
                    if (exposure.length() > MyConstants.HALF_SCREEN_WIDTH) {
                        if (cpCds.toString().length() > MyConstants.HALF_SCREEN_WIDTH) {
                            LOGGER.error("No counterparty field: " + exposure.substring(0, MyConstants.HALF_SCREEN_WIDTH)
@@ -146,7 +148,7 @@ public class ExposureToCds {
                    } else {
                        LOGGER.error("No counterparty field: " + exposure + "," + cpCds, e);
                    }
-                   return Tuple3.tuple3("", "", "");
+                   return Tuple4.tuple4("", "", "", "");
                }
             };
 

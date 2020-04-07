@@ -77,7 +77,7 @@ public class MtmToExposure {
                             exposures, mtmJson);
 
                     return Tuple3.tuple3(mtm.f0(), mtm.f1(), exposureStr);
-                } catch (Exception e) {
+                } catch (RuntimeException | JSONException e) {
                     LOGGER.error(mtm.f0() + "," + mtm.f1(), e);
                     return null;
                 }

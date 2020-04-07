@@ -29,6 +29,7 @@ import com.hazelcast.jet.aggregate.AggregateOperation1;
 import com.hazelcast.jet.core.AbstractProcessor;
 import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.datamodel.Tuple3;
+import com.hazelcast.jet.datamodel.Tuple4;
 import com.hazelcast.jet.pipeline.BatchStage;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.Sinks;
@@ -43,7 +44,8 @@ import com.hazelcast.platform.demos.banking.cva.MyConstants;
  * <p>
  * Code:
  * </p>
- * 
+ * <p>The job looks conceptually like this:
+ * </p>
  * <pre>
  *     +------( 1 )------+   +------( 2 )------+   +------( 3 )------+
  *     |  Map "fixings"  |   | Map "ircurves"  |   |  Map "trades"   |
@@ -166,9 +168,18 @@ import com.hazelcast.platform.demos.banking.cva.MyConstants;
  * XXX Is above complete?
  */
 public class CvaStpJob {
-     private static final Logger LOGGER = LoggerFactory.getLogger(CvaStpJob.class);
 
-    /**
+    public static final String JOB_NAME_PREFIX = CvaStpJob.class.getSimpleName();
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CvaStpJob.class);
+
+    private static final String STAGE_NAME_AVERAGE_EXPOSURE = "averageExposure";
+    private static final String STAGE_NAME_CVA_BY_COUNTERPARTY = "cvaByCounterparty";
+    private static final String STAGE_NAME_CVA_EXPOSURE = "cvaExposure";
+    private static final String STAGE_NAME_EXPOSURE = "exposure";
+    private static final String STAGE_NAME_TRADE_X_IRCURVES = "tradesXircurves";
+
+     /**
      * <p>
      * Creates the pipeline to execute.
      * </p>
@@ -202,12 +213,12 @@ public class CvaStpJob {
                 .setName(MyConstants.IMAP_NAME_IRCURVES + "-json");
 
         // Step XXX above
-        BatchStage<Tuple2<String, String>> tradesXircurves = 
-                trades.hashJoin(ircurves, 
+        BatchStage<Tuple2<String, String>> tradesXircurves =
+                trades.hashJoin(ircurves,
                         CvaStpUtils.cartesianProduct(),
-                        (trade, ircurve) -> Tuple2.tuple2(trade.toString(), ircurve.toString())
+                        (trade, ircurve) -> Tuple2.tuple2(trade, ircurve.toString())
                         )
-                .setName("tradesXircurves");
+                .setName(STAGE_NAME_TRADE_X_IRCURVES);
 
 
         //FIXME: Replace with C++, include Fixing as initialisation
@@ -223,7 +234,7 @@ public class CvaStpJob {
                 mtm
                 .groupingKey(Tuple3::f0)
                 .mapUsingIMap(MyConstants.IMAP_NAME_TRADES, MtmToExposure.CONVERT)
-                .setName("exposure");
+                .setName(STAGE_NAME_EXPOSURE);
 
         // Step XXX above
         AggregateOperation1<Tuple3<String, String, String>, ExposureAverager, String> exposureAggregator =
@@ -232,37 +243,80 @@ public class CvaStpJob {
                 exposure
                 .groupingKey(Tuple3::f0)
                 .aggregate(exposureAggregator)
-                .setName("averageExposure");
-                
-        averageExposure.writeTo(Sinks.logger());
-        
-        /* ---------------------------------------------
-         * Optional debugging steps, save output to maps
-         * ---------------------------------------------
-         * Use String keys as this makes entries easier to
-         * query from the Management Center.
-         */
+                .setName(STAGE_NAME_AVERAGE_EXPOSURE);
+
+        //TODO: Explain this does use near-cache
+        // Step XXX above
+        BatchStage<Tuple4<String, String, String, String>> cvaExposure =
+                averageExposure
+                .map(Entry::getValue)
+                .mapUsingIMap(
+                        MyConstants.IMAP_NAME_CP_CDS,
+                        ExposureToCds.GET_TICKER_FROM_EXPOSURE,
+                        ExposureToCds.CONVERT)
+                .setName(STAGE_NAME_CVA_EXPOSURE);
+
+        // Step XXX above
+        AggregateOperation1<Tuple4<String, String, String, String>, CvaByCounterpartyTotalizer, String>
+            cvaByCounterpartyAggregator =
+                CvaByCounterpartyTotalizer.buildCvaByCounterpartyAggregation();
+        BatchStage<Entry<String, String>> cvaByCounterparty =
+            cvaExposure
+            .groupingKey(tuple4 -> tuple4.f1())
+            .aggregate(cvaByCounterpartyAggregator)
+            .setName(STAGE_NAME_CVA_BY_COUNTERPARTY);
+
+        // Step XXX above
+        cvaByCounterparty
+            .writeTo(Sinks.map(JOB_NAME_PREFIX + "_" + timestampStr));
+
+        // Optional stages for debugging.
         if (debug) {
-            // Save MTMs. Watch out there could be billions
-            mtm
-            .map(tuple3 -> new SimpleImmutableEntry<String, String>(tuple3.f0() + "," + tuple3.f1(), tuple3.f2())).setName("reformat")
-            .writeTo(Sinks.map("debug_" + timestampStr + "_" + mtm.name()));
-            
-            // Save Exposures. Same count as MTMs.
-            exposure
-            .map(tuple3 -> new SimpleImmutableEntry<String, String>(tuple3.f0() + "," + tuple3.f1(), tuple3.f2())).setName("reformat")
-            .writeTo(Sinks.map("debug_" + timestampStr + "_" + exposure.name()));
-            
-            // Average Exposures. One per Trade
-            averageExposure
-            .writeTo(Sinks.map("debug_" + timestampStr + "_" + averageExposure.name()));
+            addDebugStages(pipeline, timestampStr, mtm, exposure, averageExposure, cvaExposure, cvaByCounterparty);
         }
-        
+
         return pipeline;
     }
 
+    /**
+     * <p>Optional debugging steps, saving intermediate results to maps.
+     * </p>
+     * <p>These use {@link java.lang.String} keys rather than
+     * {@link com.hazelcast.jet.datamodel.Tuple3} as it makes them
+     * easier to query from the Management Center.
+     * </p>
+     * <p>These maps may have many many entries.
+     * </p>
+     */
+    public static void addDebugStages(Pipeline pipeline, String timestampStr, BatchStage<Tuple3<String, String, String>> mtm,
+            BatchStage<Tuple3<String, String, String>> exposure, BatchStage<Entry<String, String>> averageExposure,
+            BatchStage<Tuple4<String, String, String, String>> cvaExposure, BatchStage<Entry<String, String>> cvaByCounterparty) {
+        // Save MTMs. Watch out there could be billions
+        // FIXME, Adjust stage name once C++ ready
+        mtm
+        .map(tuple3 -> new SimpleImmutableEntry<String, String>(tuple3.f0() + "," + tuple3.f1(), tuple3.f2())).setName("reformat")
+        .writeTo(Sinks.map("debug_" + timestampStr + "_TMP-MTM"));
 
-    /**TODO
+        // Save Exposures. Same count as MTMs.
+        exposure
+        .map(tuple3 -> new SimpleImmutableEntry<String, String>(tuple3.f0() + "," + tuple3.f1(), tuple3.f2())).setName("reformat")
+        .writeTo(Sinks.map("debug_" + timestampStr + "_" + STAGE_NAME_EXPOSURE));
+
+        // Average Exposures. One per Trade
+        averageExposure
+        .writeTo(Sinks.map("debug_" + timestampStr + "_" + STAGE_NAME_AVERAGE_EXPOSURE));
+
+        // CVA Exposures. One per Trade
+        cvaExposure
+        .map(tuple4 -> new SimpleImmutableEntry<String, String>(tuple4.f0() + "," + tuple4.f1(), tuple4.f2())).setName("reformat")
+        .writeTo(Sinks.map("debug_" + timestampStr + "_" + STAGE_NAME_CVA_EXPOSURE));
+
+        // CVA By Counterparty. One per Counterparty, to the log.
+        cvaByCounterparty
+        .writeTo(Sinks.logger(entry -> STAGE_NAME_CVA_BY_COUNTERPARTY + "," + entry));
+    }
+
+    /**TODO Remove this oncew C++ call available.
      * <p>Fake an MTM for now, until C++ calcs are slotted in.</p>
      * <p>Expected MTM looks something like:</p>
      * <pre>
@@ -283,9 +337,9 @@ public class CvaStpJob {
                 @SuppressWarnings("unchecked")
                 Tuple2<String, String> tuple2 =
                         (Tuple2<String, String>) item;
-                
+
                 StringBuilder stringBuilder = new StringBuilder();
-        
+
                 try {
                     String tradeId = new JSONObject(tuple2.f0()).getString("tradeid");
                     String curveName = new JSONObject(tuple2.f1()).getString("curvename");
@@ -305,7 +359,7 @@ public class CvaStpJob {
 
                     Tuple3<String, String, String> tuple3
                         = Tuple3.tuple3(tradeId, curveName, stringBuilder.toString());
-                    
+
                     return super.tryEmit(tuple3);
                 } catch (JSONException jsonException) {
                     LOGGER.error("JSONException: =>" + stringBuilder, jsonException);

@@ -48,12 +48,12 @@ public class CvaStpJobSubmitter {
         String timestampStr = MyUtils.timestampToISO8601(timestamp);
 
         Pipeline pipeline = CvaStpJob.buildPipeline(timestampStr, debug);
-        String jobNamePrefix = CvaStpJob.class.getSimpleName();
+        String jobNamePrefix = CvaStpJob.JOB_NAME_PREFIX;
 
         JobConfig jobConfig = new JobConfig();
         jobConfig.setName(jobNamePrefix + "-" + timestampStr);
         jobConfig.addClass(CvaStpJob.class);
-        
+
         Job job = MyUtils.findRunningJobsWithSamePrefix(jobNamePrefix, jetInstance);
         if (job != null) {
             String message = String.format("Previous job '%s' id=='{}' still at status '%s'",

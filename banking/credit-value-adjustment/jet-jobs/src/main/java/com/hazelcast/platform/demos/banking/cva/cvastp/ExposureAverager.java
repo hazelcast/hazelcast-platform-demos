@@ -17,6 +17,7 @@
 package com.hazelcast.platform.demos.banking.cva.cvastp;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +34,8 @@ import com.hazelcast.jet.datamodel.Tuple3;
  * the average exposure.
  * <p>
  */
-@SuppressWarnings("serial")
 public class ExposureAverager implements Serializable {
+    private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(ExposureAverager.class);
 
     private int count;
@@ -224,7 +225,7 @@ public class ExposureAverager implements Serializable {
      * @return Double Array, assume non-zero length
      */
     public double[] getDiscountfactors() {
-        return discountfactors;
+        return Arrays.copyOf(discountfactors, discountfactors.length);
     }
 
     /**
@@ -232,7 +233,7 @@ public class ExposureAverager implements Serializable {
      * @return Double Array, assume non-zero length
      */
     public double[] getExposures() {
-        return exposures;
+        return Arrays.copyOf(exposures, exposures.length);
     }
 
     /**
@@ -240,7 +241,7 @@ public class ExposureAverager implements Serializable {
      * @return Double Array, assume non-zero length
      */
     public double[] getLegfractions() {
-        return legfractions;
+        return Arrays.copyOf(legfractions, legfractions.length);
     }
 
     /**

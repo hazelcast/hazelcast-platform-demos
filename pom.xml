@@ -31,6 +31,7 @@
 		<!-- Version dependencies - ${project.version} should track Hazelcast version -->
 		<hazelcast.version>4.0</hazelcast.version>
 		<hazelcast-jet.version>4.0</hazelcast-jet.version>
+                <hazelcast-jet-spring-boot-starter.version>2.0.0-SNAPSHOT</hazelcast-jet-spring-boot-starter.version>
 		<hazelcast-kubernetes.version>2.0.1</hazelcast-kubernetes.version>
 		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
 		<jackson.version>2.10.2</jackson.version>
@@ -39,7 +40,7 @@
 		<jython.version>2.7.2rc1</jython.version>
 		<kafka-clients.version>2.4.0</kafka-clients.version>
 		<poi-ooxml.version>4.1.2</poi-ooxml.version>
-		<spring-boot.version>2.2.5.RELEASE</spring-boot.version>
+		<spring-boot.version>2.2.6.RELEASE</spring-boot.version>
 		<springfox-swagger.version>2.9.2</springfox-swagger.version>
 
 		<!-- Plugins -->
@@ -107,6 +108,11 @@
 				<groupId>com.hazelcast.jet</groupId>
 				<artifactId>hazelcast-jet-python</artifactId>
 				<version>${hazelcast-jet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.hazelcast.jet.contrib</groupId>
+				<artifactId>hazelcast-jet-spring-boot-starter</artifactId>
+				<version>${hazelcast-jet-spring-boot-starter.version}</version>
 			</dependency>
 
 			<dependency>

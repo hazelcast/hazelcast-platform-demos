@@ -53,6 +53,9 @@ import com.hazelcast.platform.demos.banking.cva.MyConstants.Site;
  * </p>
  */
 public class GrafanaGlobalMetricsJob {
+
+    public static final String JOB_NAME = GrafanaGlobalMetricsJob.class.getSimpleName();
+
     private static final String GRAFANA_HOSTNAME = "grafana";
     private static final Logger LOGGER = LoggerFactory.getLogger(GrafanaGlobalMetricsJob.class);
     private static final long LOG_THRESHOLD = 12L;
@@ -221,8 +224,6 @@ public class GrafanaGlobalMetricsJob {
                 String str = "";
                 try {
                     str = future.get().toString();
-                    //XXX Debug until Near-Cache of CDS shows
-                    System.out.println(str);
                     JSONObject jsonObject = new JSONObject(str);
                     reads.addAndGet(jsonObject.getLong("reads"));
                     writes.addAndGet(jsonObject.getLong("writes"));

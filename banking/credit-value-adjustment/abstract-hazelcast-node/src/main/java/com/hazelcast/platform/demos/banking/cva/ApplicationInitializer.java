@@ -83,7 +83,7 @@ public class ApplicationInitializer {
                 GrafanaGlobalMetricsJob.buildPipeline(this.myProperties.getSite());
 
         JobConfig jobConfigGrafanaGlobalMetrics = new JobConfig();
-        jobConfigGrafanaGlobalMetrics.setName(GrafanaGlobalMetricsJob.class.getSimpleName());
+        jobConfigGrafanaGlobalMetrics.setName(GrafanaGlobalMetricsJob.JOB_NAME);
 
         if (isLocalhost) {
             LOGGER.warn("Assuming localhost so no Grafana, skipping '{}', as '{}'=={} & '{}'=={}",
