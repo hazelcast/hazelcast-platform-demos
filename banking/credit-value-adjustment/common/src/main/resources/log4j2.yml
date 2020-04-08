@@ -2,10 +2,14 @@ Configuration:
 
   Appenders:
     Console:
-      - name: ConsoleBlue
+      - name: ConsoleBlueEmphasis
         target: SYSTEM_OUT
         PatternLayout:
-          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %blue{%msg%n}"
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %style{%msg%n}{underline,blue}"
+      - name: ConsoleCyan
+        target: SYSTEM_OUT
+        PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %cyan{%msg%n}"
       - name: ConsoleGreen
         target: SYSTEM_OUT
         PatternLayout:
@@ -21,7 +25,7 @@ Configuration:
           level: info
           additivity: false
           AppenderRef:
-            ref: ConsoleBlue
+            ref: ConsoleCyan
         - name: com.hazelcast.platform.demos
           level: trace
           additivity: false
@@ -33,6 +37,12 @@ Configuration:
           additivity: false
           AppenderRef:
             ref: ConsoleGreen
+        # Useful to see the selected web port in a different colour
+        - name: org.springframework.boot.web.embedded.tomcat.TomcatWebServer
+          level: info
+          additivity: false
+          AppenderRef:
+            ref: ConsoleBlueEmphasis
     Root:
       level: info
       AppenderRef:

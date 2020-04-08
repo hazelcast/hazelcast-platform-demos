@@ -86,7 +86,8 @@ public class ExposureToCds {
                    JSONObject cpCdsJson = new JSONObject(cpCds.toString());
                    JSONArray spreadsJson = cpCdsJson.getJSONArray("spreads");
                    JSONArray spreadPeriodsJson = cpCdsJson.getJSONArray("spread_periods");
-                   double recoveryRate = cpCdsJson.getDouble("recovery");
+                   float recovery = (float) cpCdsJson.getDouble("recovery");
+                   double recoveryRate = (double) recovery;
                    String shortname = cpCdsJson.getString("shortname");
 
                    // Convert from JSON
@@ -102,21 +103,21 @@ public class ExposureToCds {
                    for (int i = 0 ; i < legFractionsJson.length(); i++) {
                        legFractions.add(legFractionsJson.getDouble(i));
                    }
-                   List<Double> spreads = new ArrayList<>();
+                   List<Float> spreads = new ArrayList<>();
                    for (int i = 0 ; i < spreadsJson.length(); i++) {
-                       spreads.add(spreadsJson.getDouble(i));
+                       spreads.add((float) spreadsJson.getDouble(i));
                    }
-                   List<Double> spreadPeriods = new ArrayList<>();
+                   List<Float> spreadPeriods = new ArrayList<>();
                    for (int i = 0 ; i < spreadPeriodsJson.length(); i++) {
-                       spreadPeriods.add(spreadPeriodsJson.getDouble(i));
+                       spreadPeriods.add((float) spreadPeriodsJson.getDouble(i));
                    }
 
                    // Business logic
                    List<Double> spreadRates = getSpreadRates(spreads, spreadPeriods, legFractions);
-                   List<Double> hazardRates = getHazardRates(spreadRates, legFractions, recoveryRate);
+                   List<Double> hazardRates = getHazardRates(spreadRates, legFractions, recovery);
                    List<Double> defaultProbabilities = getDefaultProbabilities(hazardRates, legFractions);
                    List<Double> cvaExposureByLeg =
-                           getCvaExposureByLeg(defaultProbabilities, exposures, discountFactors, recoveryRate);
+                           getCvaExposureByLeg(defaultProbabilities, exposures, discountFactors, recovery);
                    double cvaExposure = getCvaExposureVal(cvaExposureByLeg);
 
                    // Format for output. Curvename is not used for this style of CDS
@@ -177,16 +178,16 @@ public class ExposureToCds {
      * @param legFractions
      * @return
      */
-    public static List<Double> getSpreadRates(List<Double> spreads, List<Double> spreadPeriods, List<Double> legFractions) {
+    public static List<Double> getSpreadRates(List<Float> spreads, List<Float> spreadPeriods, List<Double> legFractions) {
         /* CDS Spread and periods for the counterparty
          */
         List<Double> cdsPeriods = new ArrayList<>();
         for (int i = 0 ; i < spreadPeriods.size() ; i++) {
-            cdsPeriods.add(spreadPeriods.get(i));
+            cdsPeriods.add((double) spreadPeriods.get(i));
         }
         List<Double> cdsSpreads = new ArrayList<>();
         for (int i = 0 ; i < spreads.size() ; i++) {
-            cdsSpreads.add(spreads.get(i));
+            cdsSpreads.add((double) spreads.get(i));
         }
 
        /* Use left bisection to get cds rate for the leg fractions
