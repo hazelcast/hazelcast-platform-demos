@@ -31,7 +31,8 @@ import com.hazelcast.jet.datamodel.Tuple3;
 
 /**
  * <p>We wish to aggregate all Exposures for a Trade together, and calculate
- * the average exposure.
+ * the average exposure. Certain fields such as the Discount Fractions come
+ * from the first scenario alphabetically.
  * <p>
  */
 public class ExposureAverager implements Serializable {
@@ -40,6 +41,7 @@ public class ExposureAverager implements Serializable {
 
     private int count;
     private String counterparty;
+    private String curvename;
     private double[] exposures;
     private double[] discountfactors;
     private double[] legfractions;
@@ -57,13 +59,12 @@ public class ExposureAverager implements Serializable {
                 .andAccumulate((ExposureAverager exposureAverager, Tuple3<String, String, String> tuple3)
                         -> exposureAverager.accumulate(tuple3))
                 .andCombine(ExposureAverager::combine)
-                .andDeduct(ExposureAverager::deduct)
                 .andExportFinish(ExposureAverager::exportFinish);
     }
 
     /**
      * <p>Add one set of exposure values to the running total.
-     * If the first set of exposure values, capture values that
+     * If the earliest set of exposure values, capture values that
      * will be the same across all {@link #accumulate(Tuple3))} calls
      * for this class instance.
      * </p>
@@ -76,17 +77,16 @@ public class ExposureAverager implements Serializable {
             JSONObject exposure = new JSONObject(tuple3.f2());
             JSONArray exposuresJson = exposure.getJSONArray("exposures");
 
-            if (this.count == 0) {
-                this.firstTimeThis(tuple3.f0(), exposure);
+            if (this.count == 0 || this.curvename.compareTo(tuple3.f1()) > 0) {
+                this.lowestThis(tuple3.f0(), tuple3.f1(), exposure);
 
-                this.exposures = new double[exposuresJson.length()];
-                for (int i = 0 ; i < exposures.length ; i++) {
-                    exposures[i] = exposuresJson.getDouble(i);
+                if (this.count == 0) {
+                    this.exposures = new double[exposuresJson.length()];
                 }
-            } else {
-                for (int i = 0 ; i < exposures.length ; i++) {
-                    exposures[i] += exposuresJson.getDouble(i);
-                }
+            }
+
+            for (int i = 0 ; i < exposures.length ; i++) {
+                exposures[i] += exposuresJson.getDouble(i);
             }
 
             this.count++;
@@ -98,24 +98,29 @@ public class ExposureAverager implements Serializable {
     }
 
     /**
-     * <p>All items fed to this accumulator have the same common
-     * fields, only capture these once.
+     * <p>Input may arrive out of order. Keep "{@code legfractions}" and
+     * "{@code discountfactors}" from the one with the lowest collating
+     * sequence. Other fields such as "{@code counterparty}" are
+     * set the same, so it doesn't matter which input we take
+     * from for these.
      * </p>
      *
      * @param arg0 Tuple3.f0()
-     * @param arg1 Tuple3.f2()
+     * @param arg1 Tuple3.f1()
+     * @param arg2 Tuple3.f2()
      */
-    private void firstTimeThis(String arg0, JSONObject arg1) throws JSONException {
+    private void lowestThis(String arg0, String arg1, JSONObject arg2) throws JSONException {
         this.tradeid = arg0;
-        this.counterparty = arg1.getString("counterparty");
+        this.curvename = arg1;
+        this.counterparty = arg2.getString("counterparty");
 
-        JSONArray legfractionsJson = arg1.getJSONArray("legfractions");
+        JSONArray legfractionsJson = arg2.getJSONArray("legfractions");
         this.legfractions = new double[legfractionsJson.length()];
         for (int i = 0 ; i < legfractions.length ; i++) {
             legfractions[i] = legfractionsJson.getDouble(i);
         }
 
-        JSONArray discountfactorsJson = arg1.getJSONArray("discountfactors");
+        JSONArray discountfactorsJson = arg2.getJSONArray("discountfactors");
         this.discountfactors = new double[discountfactorsJson.length()];
         for (int i = 0 ; i < discountfactors.length ; i++) {
             discountfactors[i] = discountfactorsJson.getDouble(i);
@@ -123,15 +128,15 @@ public class ExposureAverager implements Serializable {
     }
 
     /**
-     * <p>Equivalent to {@link firstTimeThis} but take the fields
+     * <p>Equivalent to {@link lowestThis} but take the fields
      * from the incoming accumulator object.
      * </p>
      *
      * @param that An existing {@link ExposureAverager} instance
      */
-    private void firstTimeThat(ExposureAverager that) {
-        this.count = that.getCount();
+    private void lowestThat(ExposureAverager that) {
         this.counterparty = that.getCounterparty();
+        this.curvename = that.getCurvename();
         this.discountfactors = that.getDiscountfactors();
         this.exposures = that.getExposures();
         this.legfractions = that.getLegfractions();
@@ -146,31 +151,23 @@ public class ExposureAverager implements Serializable {
      * @return The combination updated.
      */
     public ExposureAverager combine(ExposureAverager that) {
-        if (this.count == 0) {
-            this.firstTimeThat(that);
-        } else {
-            this.count += that.getCount();
+        if (this.count == 0 || this.curvename.compareTo(that.getCurvename()) > 0) {
+            this.lowestThat(that);
 
+            if (this.count == 0) {
+                this.exposures = that.getExposures();
+            } else {
+                for (int i = 0 ; i < exposures.length ; i++) {
+                    exposures[i] += that.getExposures()[i];
+                }
+            }
+        } else {
             for (int i = 0 ; i < exposures.length ; i++) {
                 exposures[i] += that.getExposures()[i];
             }
         }
-        return this;
-    }
 
-    /**
-     * <p>Merge out another running total for the current key.
-     * </p>
-     *
-     * @param that Another instance of this class, tracking the same key
-     * @return The combination downdated.
-     */
-    public ExposureAverager deduct(ExposureAverager that) {
-        this.count -= that.count;
-
-        for (int i = 0 ; i < exposures.length ; i++) {
-            exposures[i] -= that.getExposures()[i];
-        }
+        this.count += that.getCount();
 
         return this;
     }
@@ -217,6 +214,14 @@ public class ExposureAverager implements Serializable {
      * @return A string
      */
     public String getCounterparty() {
+        return counterparty;
+    }
+
+    /**
+     * <p>Curvename</p>
+     * @return A string
+     */
+    public String getCurvename() {
         return counterparty;
     }
 
