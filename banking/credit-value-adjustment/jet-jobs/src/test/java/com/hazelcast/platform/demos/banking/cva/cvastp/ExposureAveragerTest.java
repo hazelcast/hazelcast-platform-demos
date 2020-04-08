@@ -24,7 +24,9 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import java.util.Arrays;
 
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 
@@ -60,6 +62,9 @@ public class ExposureAveragerTest {
     private static Tuple3<String, String, String> firstExposure;
     private static Tuple3<String, String, String> secondExposure;
 
+    @Rule
+    public TestName testName = new TestName();
+
     @BeforeClass
     public static void beforeClass() throws Exception {
         input1 = buildTestExposure(INPUT_DISCOUNTFACTORS1, INPUT_EXPOSURES1, INPUT_LEGFRACTIONS1);
@@ -85,12 +90,7 @@ public class ExposureAveragerTest {
     }
 
     /**
-     * <p>Main end-to-end test. Note some fields in the output come from the first
-     * exposure passed as input. The "{@code expectedOutput}" assumes "{@code input1}"
-     * then "{@code input2}".
-     * See {@link testEndToEndReverseOrderIgnoreLegfractionsAndDiscountfactors()} which
-     * tests what happens if the input is the other way round.
-     * </p>
+     * <p>Main end-to-end test.</p>
      *
      * @throws Exception
      */
@@ -101,65 +101,37 @@ public class ExposureAveragerTest {
         exposureAverager.accumulate(firstExposure);
         exposureAverager.accumulate(secondExposure);
 
-        String result = exposureAverager.exportFinish();
-
-        assertThat(result, notNullValue());
-
-        JSONObject resultJson = new JSONObject(result);
-        JSONArray resultFieldNames = resultJson.names();
-
-        assertThat("names()", expectedOutputJsonFieldNames.length(), equalTo(resultFieldNames.length()));
-
-        for (int i = 0 ; i < expectedOutputJsonFieldNames.length() ; i++) {
-            String fieldName = expectedOutputJsonFieldNames.getString(i);
-            assertThat("has " + fieldName, resultJson.has(fieldName));
-        }
-
-        for (int i = 0 ; i < expectedOutputJsonFieldNames.length() ; i++) {
-            String fieldName = expectedOutputJsonFieldNames.getString(i);
-            Object expectedField = expectedOutputJson.get(fieldName);
-            Object actualField = resultJson.get(fieldName);
-            if (expectedField instanceof JSONArray) {
-                assertThat(fieldName, actualField, instanceOf(JSONArray.class));
-                JSONArray expectedFieldArray = (JSONArray) expectedField;
-                JSONArray actualFieldArray = (JSONArray) actualField;
-                assertThat("length " + fieldName, actualFieldArray.length(), equalTo(expectedFieldArray.length()));
-                for (int j = 0 ; j < actualFieldArray.length() ; j++) {
-                    assertThat(fieldName + "[" + j + "]", actualFieldArray.get(j), equalTo(expectedFieldArray.get(j)));
-                }
-            } else {
-                assertThat(fieldName, actualField.toString(), equalTo(expectedField.toString()));
-            }
-        }
+        this.verifyEndToEnd(exposureAverager.exportFinish());
     }
 
     /**
-     * "{@code legfractions}" and "{@code discountfactors}" are taken from the first exposure passed
-     * to the accumulator, so if we reverse the order of input, we can no longer expect these two
-     * fields to give the expected answer.
-     * </p>
+     * <p>Repeat the end-to-end test, reverse order of input, but output must
+     * be same as values taking from input with lowest collating sequence.</p>
      *
      * @throws Exception
      */
     @Test
-    public void testEndToEndReverseOrderIgnoreLegfractionsAndDiscountfactors() throws Exception {
+    public void testEndToEndReverseOrder() throws Exception {
         ExposureAverager exposureAverager = new ExposureAverager();
 
         exposureAverager.accumulate(secondExposure);
         exposureAverager.accumulate(firstExposure);
 
-        String result = exposureAverager.exportFinish();
+        this.verifyEndToEnd(exposureAverager.exportFinish());
+    }
 
-        assertThat(result, notNullValue());
+    public void verifyEndToEnd(String result) throws Exception {
+        assertThat(this.testName.getMethodName(), result, notNullValue());
 
         JSONObject resultJson = new JSONObject(result);
         JSONArray resultFieldNames = resultJson.names();
 
-        assertThat("names()", expectedOutputJsonFieldNames.length(), equalTo(resultFieldNames.length()));
+        assertThat(this.testName.getMethodName() + ".names()",
+                expectedOutputJsonFieldNames.length(), equalTo(resultFieldNames.length()));
 
         for (int i = 0 ; i < expectedOutputJsonFieldNames.length() ; i++) {
             String fieldName = expectedOutputJsonFieldNames.getString(i);
-            assertThat("has " + fieldName, resultJson.has(fieldName));
+            assertThat(this.testName.getMethodName() + ".has " + fieldName, resultJson.has(fieldName));
         }
 
         for (int i = 0 ; i < expectedOutputJsonFieldNames.length() ; i++) {
@@ -167,17 +139,22 @@ public class ExposureAveragerTest {
             Object expectedField = expectedOutputJson.get(fieldName);
             Object actualField = resultJson.get(fieldName);
             if (expectedField instanceof JSONArray) {
-                assertThat(fieldName, actualField, instanceOf(JSONArray.class));
+                assertThat(this.testName.getMethodName() + "." + fieldName,
+                        actualField, instanceOf(JSONArray.class));
+
                 JSONArray expectedFieldArray = (JSONArray) expectedField;
                 JSONArray actualFieldArray = (JSONArray) actualField;
-                assertThat("length " + fieldName, actualFieldArray.length(), equalTo(expectedFieldArray.length()));
+
+                assertThat(this.testName.getMethodName() + ".length " + fieldName,
+                        actualFieldArray.length(), equalTo(expectedFieldArray.length()));
+
                 for (int j = 0 ; j < actualFieldArray.length() ; j++) {
-                    if (!fieldName.equals("discountfactors") && !fieldName.equals("legfractions")) {
-                        assertThat(fieldName + "[" + j + "]", actualFieldArray.get(j), equalTo(expectedFieldArray.get(j)));
-                    }
+                    assertThat(this.testName.getMethodName() + "." + fieldName + "[" + j + "]",
+                            actualFieldArray.get(j), equalTo(expectedFieldArray.get(j)));
                 }
             } else {
-                assertThat(fieldName, actualField.toString(), equalTo(expectedField.toString()));
+                assertThat(this.testName.getMethodName() + "." + fieldName,
+                        actualField.toString(), equalTo(expectedField.toString()));
             }
         }
     }
