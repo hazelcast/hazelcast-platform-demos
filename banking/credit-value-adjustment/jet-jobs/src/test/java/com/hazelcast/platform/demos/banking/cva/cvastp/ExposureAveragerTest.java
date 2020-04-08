@@ -38,13 +38,13 @@ import com.hazelcast.jet.datamodel.Tuple3;
  */
 public class ExposureAveragerTest {
 
-    private static final double[] INPUT_DISCOUNTFACTORS1 = {0.999752d, 0.997813523d, 0.994621098d, 0.991563857d};
-    private static final double[] INPUT_EXPOSURES1 = {1.870426486E7d, 2086160.313d, 1379230.19d, 449535.0804999999d};
-    private static final double[] INPUT_LEGFRACTIONS1 = {0.0597826093d, 0.307065219d, 0.554347813d, 0.809782624d};
+    private static final double[] INPUT1_DISCOUNTFACTORS = {0.999752d, 0.997813523d, 0.994621098d, 0.991563857d};
+    private static final double[] INPUT1_EXPOSURES = {1.870426486E7d, 2086160.313d, 1379230.19d, 449535.0804999999d};
+    private static final double[] INPUT1_LEGFRACTIONS = {0.0597826093d, 0.307065219d, 0.554347813d, 0.809782624d};
 
-    private static final double[] INPUT_DISCOUNTFACTORS2 = {0.999722064d, 0.997806072d, 0.995048642d, 0.991720557d};
-    private static final double[] INPUT_EXPOSURES2 = {1.8628882678E7d, 2015282.037d, 1400572.44d, 504064.5155d};
-    private static final double[] INPUT_LEGFRACTIONS2 = {0.0597826093d, 0.307065219d, 0.554347813d, 0.809782624d};
+    private static final double[] INPUT2_DISCOUNTFACTORS = {0.999722064d, 0.997806072d, 0.995048642d, 0.991720557d};
+    private static final double[] INPUT2_EXPOSURES = {1.8628882678E7d, 2015282.037d, 1400572.44d, 504064.5155d};
+    private static final double[] INPUT2_LEGFRACTIONS = {0.0597826093d, 0.307065219d, 0.554347813d, 0.809782624d};
 
     private static final double[] EXPECTED_DISCOUNTFACTORS = {0.999752d, 0.997813523d, 0.994621098d, 0.991563857d};
     private static final double[] EXPECTED_EXPOSURES = {1.8666573769E7d, 2050721.175d, 1389901.315d, 476799.79799999995d};
@@ -67,17 +67,17 @@ public class ExposureAveragerTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        String inputCurvename1 = CURVENAME + "1";
-        String inputCurvename2 = CURVENAME + "2";
-        input1 = buildTestExposure(INPUT_DISCOUNTFACTORS1, INPUT_EXPOSURES1, INPUT_LEGFRACTIONS1, inputCurvename1);
-        input2 = buildTestExposure(INPUT_DISCOUNTFACTORS2, INPUT_EXPOSURES2, INPUT_LEGFRACTIONS2, inputCurvename1);
+        String input1Curvename = CURVENAME + "1";
+        String input2Curvename = CURVENAME + "2";
+        input1 = buildTestExposure(INPUT1_DISCOUNTFACTORS, INPUT1_EXPOSURES, INPUT1_LEGFRACTIONS, input1Curvename);
+        input2 = buildTestExposure(INPUT2_DISCOUNTFACTORS, INPUT2_EXPOSURES, INPUT2_LEGFRACTIONS, input2Curvename);
         expectedOutput = buildTestExposure(EXPECTED_DISCOUNTFACTORS, EXPECTED_EXPOSURES, EXPECTED_LEGFRACTIONS, "");
 
         expectedOutputJson = new JSONObject(expectedOutput);
         expectedOutputJsonFieldNames = expectedOutputJson.names();
 
-        firstExposure = Tuple3.tuple3(TRADEID, inputCurvename1, input1);
-        secondExposure = Tuple3.tuple3(TRADEID, inputCurvename2, input2);
+        firstExposure = Tuple3.tuple3(TRADEID, input1Curvename, input1);
+        secondExposure = Tuple3.tuple3(TRADEID, input2Curvename, input2);
     }
 
     public static String buildTestExposure(double[] discountFactors, double[] exposures, double[] legFractions,

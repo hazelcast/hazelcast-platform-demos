@@ -53,7 +53,6 @@ public class CvaByCounterpartyTotalizer implements Serializable {
                         Tuple4<String, String, String, String> tuple4)
                         -> exposureAverager.accumulate(tuple4))
                 .andCombine(CvaByCounterpartyTotalizer::combine)
-                .andDeduct(CvaByCounterpartyTotalizer::deduct)
                 .andExportFinish(CvaByCounterpartyTotalizer::exportFinish);
     }
 
@@ -96,18 +95,6 @@ public class CvaByCounterpartyTotalizer implements Serializable {
             this.shortname = that.getShortname();
         }
 
-        return this;
-    }
-
-    /**
-     * <p>Merge out another running total for the current key.
-     * </p>
-     *
-     * @param that Another instance of this class, tracking the same key
-     * @return The combination downdated.
-     */
-    public CvaByCounterpartyTotalizer deduct(CvaByCounterpartyTotalizer that) {
-        this.cva -= that.getCva();
         return this;
     }
 
