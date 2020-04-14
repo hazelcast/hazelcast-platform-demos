@@ -193,9 +193,9 @@ public class ExposureAverager implements Serializable {
         }
 
         // Curvename is not relevant as the average of all curves, set to empty string rather than omit
-        String curvename = "";
+        String curvenameNull = "";
 
-        return CvaStpUtils.makeExposureStrFromJava(this.tradeid, curvename, this.counterparty,
+        return CvaStpUtils.makeExposureStrFromJava(this.tradeid, curvenameNull, this.counterparty,
                 this.exposures, this.legfractions, this.discountfactors);
     }
 
@@ -222,7 +222,7 @@ public class ExposureAverager implements Serializable {
      * @return A string
      */
     public String getCurvename() {
-        return counterparty;
+        return curvename;
     }
 
     /**
