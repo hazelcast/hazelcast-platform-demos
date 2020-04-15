@@ -27,6 +27,7 @@ import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 import com.hazelcast.jet.aggregate.AggregateOperation;
 import com.hazelcast.jet.aggregate.AggregateOperation1;
+import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.datamodel.Tuple3;
 
 /**
@@ -58,7 +59,7 @@ public class TradeExposureAggregator implements Serializable {
      *
      * @return
      */
-    public static AggregateOperation1<Tuple3<String, String, String>, TradeExposureAggregator, String>
+    public static AggregateOperation1<Tuple3<String, String, String>, TradeExposureAggregator, Tuple2<String, String>>
         buildTradeExposureAggregator() {
         return AggregateOperation
                 .withCreate(TradeExposureAggregator::new)
@@ -186,9 +187,9 @@ public class TradeExposureAggregator implements Serializable {
      * and output.
      * <p>
      *
-     * @return JSON to send on to the next job stage.
+     * @return Counterparty and JSON to send on to the next job stage.
      */
-    public String exportFinish() {
+    public Tuple2<String, String> exportFinish() {
         if (count == 0) {
             LOGGER.error("Count 0 for tradeid='" + this.tradeid + "'");
             this.tradeid = "";
@@ -208,10 +209,11 @@ public class TradeExposureAggregator implements Serializable {
 
         // Curvename is not relevant as the average of all curves, set to empty string rather than omit
         String curvenameNull = "";
-
-        return CvaStpUtils.makeTradeExposureStrFromJava(this.tradeid, curvenameNull, this.counterparty,
-                this.netCvaExposure, this.spreadrates, this.hazardrates, this.defaultprob,
+        String tradeExposure = CvaStpUtils.makeTradeExposureStrFromJava(this.tradeid, curvenameNull,
+                this.counterparty, this.netCvaExposure, this.spreadrates, this.hazardrates, this.defaultprob,
                 this.cvaexposurebyleg);
+
+        return Tuple2.tuple2(this.counterparty, tradeExposure);
     }
 
     // --- Getters, standard coding. Setters not needed ---
@@ -245,6 +247,9 @@ public class TradeExposureAggregator implements Serializable {
      * @return Double Array, assume non-zero length
      */
     public double[] getCvaexposurebyleg() {
+        if (this.cvaexposurebyleg.length == 0) {
+            return new double[0];
+        }
         return Arrays.copyOf(this.cvaexposurebyleg, this.cvaexposurebyleg.length);
     }
 
@@ -253,6 +258,9 @@ public class TradeExposureAggregator implements Serializable {
      * @return Double Array, assume non-zero length
      */
     public double[] getDefaultprob() {
+        if (this.defaultprob.length == 0) {
+            return new double[0];
+        }
         return Arrays.copyOf(this.defaultprob, this.defaultprob.length);
     }
 
@@ -261,6 +269,9 @@ public class TradeExposureAggregator implements Serializable {
      * @return Double Array, assume non-zero length
      */
     public double[] getHazardrates() {
+        if (this.hazardrates.length == 0) {
+            return new double[0];
+        }
         return Arrays.copyOf(this.hazardrates, this.hazardrates.length);
     }
 
@@ -277,6 +288,9 @@ public class TradeExposureAggregator implements Serializable {
      * @return Double Array, assume non-zero length
      */
     public double[] getSpreadrates() {
+        if (this.spreadrates.length == 0) {
+            return new double[0];
+        }
         return Arrays.copyOf(this.spreadrates, this.spreadrates.length);
     }
 

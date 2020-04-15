@@ -30,25 +30,48 @@ import org.junit.rules.TestName;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 
+import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.datamodel.Tuple3;
 
 /**
- * <p>Tests for {@link com.hazelcast.platform.demos.banking.cva.cvastp.ExposureAverager ExposureAverager}
+ * <p>Tests for {@link com.hazelcast.platform.demos.banking.cva.cvastp.TradeExposureAggregator TradeExposureAggregator}
  * </p>
  */
-public class ExposureAveragerTest {
+public class TradeExposureAggregatorTest {
 
-    private static final double[] INPUT1_DISCOUNTFACTORS = {0.999752d, 0.997813523d, 0.994621098d, 0.991563857d};
-    private static final double[] INPUT1_EXPOSURES = {1.870426486E7d, 2086160.313d, 1379230.19d, 449535.0804999999d};
-    private static final double[] INPUT1_LEGFRACTIONS = {0.0597826093d, 0.307065219d, 0.554347813d, 0.809782624d};
+    private static final double INPUT1_CVAEXPOSURE = 19209.61172209749d;
+    private static final double[] INPUT1_CVAEXPOSUREBYLEG =
+        {8828.033012861328d, 4056.664071149816d, 5076.934376801878d, 1247.9802612844665d};
+    private static final double[] INPUT1_DEFAULTPROBABILITIES =
+        {7.868279473475237E-4d, 0.003248035258050619d, 0.006168163564730267d, 0.0046662950266820324d};
+    private static final double[] INPUT1_HAZARDRATES =
+        {0.013166666161682865d, 0.013166666161682865d, 0.01849999980131785d, 0.01849999980131785d};
+    private static final double[] INPUT1_SPREADRATES =
+        {0.007899999618530273d, 0.007899999618530273d, 0.011099999770522118d, 0.011099999770522118d};
 
-    private static final double[] INPUT2_DISCOUNTFACTORS = {0.999722064d, 0.997806072d, 0.995048642d, 0.991720557d};
-    private static final double[] INPUT2_EXPOSURES = {1.8628882678E7d, 2015282.037d, 1400572.44d, 504064.5155d};
-    private static final double[] INPUT2_LEGFRACTIONS = {0.0597826093d, 0.307065219d, 0.554347813d, 0.809782624d};
+    private static final double INPUT2_CVAEXPOSURE = 19268.293471444358d;
+    private static final double[] INPUT2_CVAEXPOSUREBYLEG =
+        {8792.190878242684d, 3918.807741658891d, 5157.711135356547d, 1399.5837161862353d};
+    private static final double[] INPUT2_DEFAULTPROBABILITIES =
+        {7.868279473475237E-4d, 0.003248035258050619d, 0.006168163564730267d, 0.0046662950266820324d};
+    private static final double[] INPUT2_HAZARDRATES =
+        {0.013166666161682865d, 0.013166666161682865d, 0.01849999980131785d, 0.01849999980131785d};
+    private static final double[] INPUT2_SPREADRATES =
+        {0.007899999618530273d, 0.007899999618530273d, 0.011099999770522118d, 0.011099999770522118d};
 
-    private static final double[] EXPECTED_DISCOUNTFACTORS = {0.999752d, 0.997813523d, 0.994621098d, 0.991563857d};
-    private static final double[] EXPECTED_EXPOSURES = {1.8666573769E7d, 2050721.175d, 1389901.315d, 476799.79799999995d};
-    private static final double[] EXPECTED_LEGFRACTIONS = {0.0597826093d, 0.307065219d, 0.554347813d, 0.809782624d};
+    // Average of INPUT1_CVAEXPOSURE + INPUT2_CVAEXPOSURE
+    private static final double EXPECTED_CVAEXPOSURE = (INPUT1_CVAEXPOSURE + INPUT2_CVAEXPOSURE) / 2;
+    // Average of INPUT1_CVAEXPOSUREBYLEG + INPUT2_CVAEXPOSUREBYLEG
+    private static final double EXPECTED_CVAEXPOSUREBYLEG_0 = (INPUT1_CVAEXPOSUREBYLEG[0] + INPUT2_CVAEXPOSUREBYLEG[0]) / 2;
+    private static final double EXPECTED_CVAEXPOSUREBYLEG_1 = (INPUT1_CVAEXPOSUREBYLEG[1] + INPUT2_CVAEXPOSUREBYLEG[1]) / 2;
+    private static final double EXPECTED_CVAEXPOSUREBYLEG_2 = (INPUT1_CVAEXPOSUREBYLEG[2] + INPUT2_CVAEXPOSUREBYLEG[2]) / 2;
+    private static final double EXPECTED_CVAEXPOSUREBYLEG_3 = (INPUT1_CVAEXPOSUREBYLEG[3] + INPUT2_CVAEXPOSUREBYLEG[3]) / 2;
+    private static final double[] EXPECTED_CVAEXPOSUREBYLEG =
+        {EXPECTED_CVAEXPOSUREBYLEG_0, EXPECTED_CVAEXPOSUREBYLEG_1, EXPECTED_CVAEXPOSUREBYLEG_2, EXPECTED_CVAEXPOSUREBYLEG_3};
+    private static final double[] EXPECTED_DEFAULTPROBABILITIES = INPUT1_DEFAULTPROBABILITIES;
+    private static final double[] EXPECTED_HAZARDRATES = INPUT1_HAZARDRATES;
+    private static final double[] EXPECTED_SPREADRATES = INPUT1_SPREADRATES;
+
     private static final String COUNTERPARTY = "cp1";
     private static final String CURVENAME = "c";
     private static final String TRADEID = "t1";
@@ -69,9 +92,12 @@ public class ExposureAveragerTest {
     public static void beforeClass() throws Exception {
         String input1Curvename = CURVENAME + "1";
         String input2Curvename = CURVENAME + "2";
-        input1 = buildTestExposure(INPUT1_DISCOUNTFACTORS, INPUT1_EXPOSURES, INPUT1_LEGFRACTIONS, input1Curvename);
-        input2 = buildTestExposure(INPUT2_DISCOUNTFACTORS, INPUT2_EXPOSURES, INPUT2_LEGFRACTIONS, input2Curvename);
-        expectedOutput = buildTestExposure(EXPECTED_DISCOUNTFACTORS, EXPECTED_EXPOSURES, EXPECTED_LEGFRACTIONS, "");
+        input1 = buildTestExposure(input1Curvename, INPUT1_CVAEXPOSURE, INPUT1_SPREADRATES, INPUT1_HAZARDRATES,
+                INPUT1_DEFAULTPROBABILITIES, INPUT1_CVAEXPOSUREBYLEG);
+        input2 = buildTestExposure(input2Curvename, INPUT2_CVAEXPOSURE, INPUT2_SPREADRATES, INPUT2_HAZARDRATES,
+                INPUT2_DEFAULTPROBABILITIES, INPUT2_CVAEXPOSUREBYLEG);
+        expectedOutput = buildTestExposure("", EXPECTED_CVAEXPOSURE, EXPECTED_SPREADRATES, EXPECTED_HAZARDRATES,
+                EXPECTED_DEFAULTPROBABILITIES, EXPECTED_CVAEXPOSUREBYLEG);
 
         expectedOutputJson = new JSONObject(expectedOutput);
         expectedOutputJsonFieldNames = expectedOutputJson.names();
@@ -80,15 +106,17 @@ public class ExposureAveragerTest {
         secondExposure = Tuple3.tuple3(TRADEID, input2Curvename, input2);
     }
 
-    public static String buildTestExposure(double[] discountFactors, double[] exposures, double[] legFractions,
-            String curveName) {
+    public static String buildTestExposure(String curveName, double cvaExposure,
+            double[] spreadrates, double[] hazardrates, double[] defaultProbabilities, double[] cvaExposureByLeg) {
         return "{"
                 + " \"tradeid\": \"" + TRADEID + "\""
                 + ", \"curvename\": \"" + curveName + "\""
                 + ", \"counterparty\": \"" + COUNTERPARTY + "\""
-                + ", \"exposures\": " + Arrays.toString(exposures)
-                + ", \"legfractions\": " + Arrays.toString(legFractions)
-                + ", \"discountfactors\": " + Arrays.toString(discountFactors)
+                + ", \"cva\": " + cvaExposure
+                + ", \"spreadrates\": " + Arrays.toString(spreadrates)
+                + ", \"hazardrates\": " + Arrays.toString(hazardrates)
+                + ", \"defaultprob\": " + Arrays.toString(defaultProbabilities)
+                + ", \"cvaexposurebyleg\": " + Arrays.toString(cvaExposureByLeg)
                 + "}";
     }
 
@@ -99,12 +127,12 @@ public class ExposureAveragerTest {
      */
     @Test
     public void testEndToEnd() throws Exception {
-        ExposureAverager exposureAverager = new ExposureAverager();
+        TradeExposureAggregator tradeExposureAggregator = new TradeExposureAggregator();
 
-        exposureAverager.accumulate(firstExposure);
-        exposureAverager.accumulate(secondExposure);
+        tradeExposureAggregator.accumulate(firstExposure);
+        tradeExposureAggregator.accumulate(secondExposure);
 
-        this.verifyEndToEnd(exposureAverager.exportFinish());
+        this.verifyEndToEnd(tradeExposureAggregator.exportFinish());
     }
 
     /**
@@ -115,18 +143,21 @@ public class ExposureAveragerTest {
      */
     @Test
     public void testEndToEndReverseOrder() throws Exception {
-        ExposureAverager exposureAverager = new ExposureAverager();
+        TradeExposureAggregator tradeExposureAggregator = new TradeExposureAggregator();
 
-        exposureAverager.accumulate(secondExposure);
-        exposureAverager.accumulate(firstExposure);
+        tradeExposureAggregator.accumulate(secondExposure);
+        tradeExposureAggregator.accumulate(firstExposure);
 
-        this.verifyEndToEnd(exposureAverager.exportFinish());
+        this.verifyEndToEnd(tradeExposureAggregator.exportFinish());
     }
 
-    public void verifyEndToEnd(String result) throws Exception {
+    public void verifyEndToEnd(Tuple2<String, String> result) throws Exception {
         assertThat(this.testName.getMethodName(), result, notNullValue());
 
-        JSONObject resultJson = new JSONObject(result);
+        String resultCounterparty = result.f0();
+        assertThat(this.testName.getMethodName() + ".counterparty", resultCounterparty, equalTo(COUNTERPARTY));
+
+        JSONObject resultJson = new JSONObject(result.f1());
         JSONArray resultFieldNames = resultJson.names();
 
         assertThat(this.testName.getMethodName() + ".names()",

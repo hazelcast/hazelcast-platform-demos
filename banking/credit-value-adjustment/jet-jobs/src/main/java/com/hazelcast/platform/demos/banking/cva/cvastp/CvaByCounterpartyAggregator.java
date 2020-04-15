@@ -17,6 +17,7 @@
 package com.hazelcast.platform.demos.banking.cva.cvastp;
 
 import java.io.Serializable;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,19 +26,17 @@ import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 import com.hazelcast.jet.aggregate.AggregateOperation;
 import com.hazelcast.jet.aggregate.AggregateOperation1;
-import com.hazelcast.jet.datamodel.Tuple4;
+import com.hazelcast.jet.datamodel.Tuple2;
 
 /**
  * <p>Collate the CVA totals per counterparty.
  * </p>
  */
-public class CvaByCounterpartyTotalizer implements Serializable {
+public class CvaByCounterpartyAggregator implements Serializable {
     private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(CvaByCounterpartyTotalizer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CvaByCounterpartyAggregator.class);
 
     private double cva;
-    private String counterparty;
-    private String shortname;
 
     /**
      * <p>Helper function to build this class into an aggregate operation.
@@ -45,15 +44,15 @@ public class CvaByCounterpartyTotalizer implements Serializable {
      *
      * @return An {@code AggregateOperation1} that works on a single input source.
      */
-    public static AggregateOperation1<Tuple4<String, String, String, String>, CvaByCounterpartyTotalizer, String>
+    public static AggregateOperation1<Entry<String, Tuple2<String, String>>, CvaByCounterpartyAggregator, Double>
         buildCvaByCounterpartyAggregation() {
         return AggregateOperation
-                .withCreate(CvaByCounterpartyTotalizer::new)
-                .andAccumulate((CvaByCounterpartyTotalizer exposureAverager,
-                        Tuple4<String, String, String, String> tuple4)
-                        -> exposureAverager.accumulate(tuple4))
-                .andCombine(CvaByCounterpartyTotalizer::combine)
-                .andExportFinish(CvaByCounterpartyTotalizer::exportFinish);
+                .withCreate(CvaByCounterpartyAggregator::new)
+                .andAccumulate((CvaByCounterpartyAggregator cvaByCounterpartyAggregator,
+                        Entry<String, Tuple2<String, String>> entry)
+                        -> cvaByCounterpartyAggregator.accumulate(entry.getValue()))
+                .andCombine(CvaByCounterpartyAggregator::combine)
+                .andExportFinish(CvaByCounterpartyAggregator::exportFinish);
     }
 
     /**
@@ -62,18 +61,16 @@ public class CvaByCounterpartyTotalizer implements Serializable {
      * built-in.
      * </p>
      *
-     * @param tuple4 A quadruple of Trade, Counterparty code and name, and CDS
+     * @param tuple2 A pair of counterparty and exposure JSON
      * @return The current accumulator
      */
-    public CvaByCounterpartyTotalizer accumulate(Tuple4<String, String, String, String> tuple4) {
+    public CvaByCounterpartyAggregator accumulate(Tuple2<String, String> tuple2) {
         try {
-            JSONObject cds = new JSONObject(tuple4.f3());
+            JSONObject cds = new JSONObject(tuple2.f1());
             this.cva += cds.getDouble("cva");
-            this.counterparty = tuple4.f1();
-            this.shortname = tuple4.f2();
 
         } catch (JSONException e) {
-            LOGGER.error(tuple4.f0() + "," + tuple4.f1(), e);
+            LOGGER.error(tuple2.f0(), e);
         }
 
         return this;
@@ -86,15 +83,8 @@ public class CvaByCounterpartyTotalizer implements Serializable {
      * @param that Another instance of this class, tracking the same key
      * @return The combination updated.
      */
-    public CvaByCounterpartyTotalizer combine(CvaByCounterpartyTotalizer that) {
+    public CvaByCounterpartyAggregator combine(CvaByCounterpartyAggregator that) {
         this.cva += that.getCva();
-        if (this.counterparty == null) {
-            this.counterparty = that.getCounterparty();
-        }
-        if (this.shortname == null) {
-            this.shortname = that.getShortname();
-        }
-
         return this;
     }
 
@@ -102,21 +92,13 @@ public class CvaByCounterpartyTotalizer implements Serializable {
      * <p>Produce the total, all input exhausted.
      * </p>
      *
-     * @return CSV
+     * @return Counterparty and it's exposure
      */
-    public String exportFinish() {
-        return this.counterparty + "," + this.shortname + "," + this.cva;
+    public Double exportFinish() {
+        return this.cva;
     }
 
     // --- Getters, standard coding. Setters not needed ---
-
-    /**
-     * <p>Counterparty</p>
-     * @return A string
-     */
-    public String getCounterparty() {
-        return this.counterparty;
-    }
 
     /**
      * <p>CVA</p>
@@ -124,14 +106,6 @@ public class CvaByCounterpartyTotalizer implements Serializable {
      */
     public Double getCva() {
         return this.cva;
-    }
-
-    /**
-     * <p>Shortname</p>
-     * @return A string
-     */
-    public String getShortname() {
-        return this.shortname;
     }
 
 }
