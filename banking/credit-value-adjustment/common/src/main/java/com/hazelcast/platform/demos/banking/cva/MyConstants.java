@@ -24,6 +24,7 @@ import java.util.List;
  */
 public class MyConstants {
 
+    // Map names, for eager creation
     public static final String IMAP_NAME_CP_CDS  = "cp_cds";
     public static final String IMAP_NAME_CVA_CSV  = "cva_csv";
     public static final String IMAP_NAME_CVA_XLST  = "cva_xlst";
@@ -43,10 +44,14 @@ public class MyConstants {
         CVA_SITE2
     };
 
+    // For sending data to Grafana/Graphite
     public static final int GRAPHITE_COLLECTION_INTERVAL_SECONDS = 5;
     public static final int GRAPHITE_PORT = 2004;
     public static final char GRAPHITE_SEPARATOR = '.';
 
+    // For logging, prefix for important messages (see "log4j2.yml")
+    public static final String BANNER = "*** *** *** ***";
     // For limiting the logging of long lines
     public static final int HALF_SCREEN_WIDTH = 66;
+
 }

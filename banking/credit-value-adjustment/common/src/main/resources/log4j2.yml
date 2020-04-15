@@ -17,8 +17,26 @@ Configuration:
       - name: ConsoleMagenta
         target: SYSTEM_OUT
         PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} %magenta{%msg%n}"
+      # For "Sinks.logger()", if highlighting need not indicated, regex of 3 asterisks doesn't match
+      - name: ConsoleSinksLoggerNormal
+        target: SYSTEM_OUT
+        PatternLayout:
           Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %magenta{%msg%n}"
-
+        RegexFilter:
+          regex: "(?s).*\\*\\*\\*.*"
+          onMatch: "DENY"
+          onMismatch: "ACCEPT"
+      # For "Sinks.logger()", if highlighting need is indicated, regex of 3 asterisks match
+      - name: ConsoleSinksLoggerHighlight
+        target: SYSTEM_OUT
+        PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %style{%msg%n}{reverse,blue}"
+        RegexFilter:
+          regex: "(?s).*\\*\\*\\*.*"
+          onMatch: "ACCEPT"
+          onMismatch: "DENY"
+ 
   Loggers:
     logger:
         - name: com.hazelcast
@@ -31,6 +49,13 @@ Configuration:
           additivity: false
           AppenderRef:
             ref: ConsoleMagenta
+        # Special for "Sinks.logger()", only one of the appenders is used at a time
+        - name: com.hazelcast.jet.impl.connector.WriteLoggerP
+          level: trace
+          additivity: false
+          AppenderRef:
+            - ref: ConsoleSinksLoggerNormal
+            - ref: ConsoleSinksLoggerHighlight
         # Hide irrelevant warnings from Jython
         - name: org.python
           level: error
