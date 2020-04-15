@@ -32,9 +32,9 @@ import com.hazelcast.jet.datamodel.Tuple2;
  * <p>Collate the CVA totals per counterparty.
  * </p>
  */
-public class CvaByCounterpartyAggregator implements Serializable {
+public class CounterpartyAggregator implements Serializable {
     private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(CvaByCounterpartyAggregator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CounterpartyAggregator.class);
 
     private double cva;
 
@@ -44,15 +44,15 @@ public class CvaByCounterpartyAggregator implements Serializable {
      *
      * @return An {@code AggregateOperation1} that works on a single input source.
      */
-    public static AggregateOperation1<Entry<String, Tuple2<String, String>>, CvaByCounterpartyAggregator, Double>
-        buildCvaByCounterpartyAggregation() {
+    public static AggregateOperation1<Entry<String, Tuple2<String, String>>, CounterpartyAggregator, Double>
+        buildCounterpartyAggregation() {
         return AggregateOperation
-                .withCreate(CvaByCounterpartyAggregator::new)
-                .andAccumulate((CvaByCounterpartyAggregator cvaByCounterpartyAggregator,
+                .withCreate(CounterpartyAggregator::new)
+                .andAccumulate((CounterpartyAggregator cvaByCounterpartyAggregator,
                         Entry<String, Tuple2<String, String>> entry)
                         -> cvaByCounterpartyAggregator.accumulate(entry.getValue()))
-                .andCombine(CvaByCounterpartyAggregator::combine)
-                .andExportFinish(CvaByCounterpartyAggregator::exportFinish);
+                .andCombine(CounterpartyAggregator::combine)
+                .andExportFinish(CounterpartyAggregator::exportFinish);
     }
 
     /**
@@ -64,7 +64,7 @@ public class CvaByCounterpartyAggregator implements Serializable {
      * @param tuple2 A pair of counterparty and exposure JSON
      * @return The current accumulator
      */
-    public CvaByCounterpartyAggregator accumulate(Tuple2<String, String> tuple2) {
+    public CounterpartyAggregator accumulate(Tuple2<String, String> tuple2) {
         try {
             JSONObject cds = new JSONObject(tuple2.f1());
             this.cva += cds.getDouble("cva");
@@ -83,7 +83,7 @@ public class CvaByCounterpartyAggregator implements Serializable {
      * @param that Another instance of this class, tracking the same key
      * @return The combination updated.
      */
-    public CvaByCounterpartyAggregator combine(CvaByCounterpartyAggregator that) {
+    public CounterpartyAggregator combine(CounterpartyAggregator that) {
         this.cva += that.getCva();
         return this;
     }
