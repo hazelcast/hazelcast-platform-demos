@@ -33,10 +33,10 @@ import org.junit.rules.TestName;
 
 /**
  * <p>Tests for conversion part of
- * {@link com.hazelcast.platform.demos.banking.cva.cvastp.ExposureToCds ExposureToCds}
+ * {@link com.hazelcast.platform.demos.banking.cva.cvastp.ExposureToCvaExposure ExposureToCvaExposure}
  * </p>
  */
-public class ExposureToCdsConvertTest {
+public class ExposureToCvaExposureConvertTest {
 
     private static final float INPUT1_CDS_RECOVERY = 0.4f;
     private static final float[] INPUT1_CDS_SPREADS =
@@ -104,35 +104,35 @@ public class ExposureToCdsConvertTest {
 
     @Test
     public void testSpreadRates() {
-        List<Double> actual = ExposureToCds.getSpreadRates(input1CdsSpreadsList,
+        List<Double> actual = ExposureToCvaExposure.getSpreadRates(input1CdsSpreadsList,
                 input1CdsSpreadPeriodsList, input1ExposureLegFractionsList);
         this.verifyDoubleList(actual, expectedSpreadRatesList);
     }
 
     @Test
     public void testHazardRates() {
-        List<Double> actual = ExposureToCds.getHazardRates(expectedSpreadRatesList, input1ExposureLegFractionsList,
+        List<Double> actual = ExposureToCvaExposure.getHazardRates(expectedSpreadRatesList, input1ExposureLegFractionsList,
                 input1CdsRecoveryRate);
         this.verifyDoubleList(actual, expectedHazardRatesList);
     }
 
     @Test
     public void testDefaultProb() {
-        List<Double> actual = ExposureToCds.getDefaultProbabilities(expectedHazardRatesList,
+        List<Double> actual = ExposureToCvaExposure.getDefaultProbabilities(expectedHazardRatesList,
                 input1ExposureLegFractionsList);
         this.verifyDoubleList(actual, expectedDefaultProbList);
     }
 
     @Test
     public void testCvaExposureByLeg() {
-        List<Double> actual = ExposureToCds.getCvaExposureByLeg(expectedDefaultProbList,
+        List<Double> actual = ExposureToCvaExposure.getCvaExposureByLeg(expectedDefaultProbList,
                 input1ExposureExposuresList, input1ExposureDiscountFactorsList, input1CdsRecoveryRate);
         this.verifyDoubleList(actual, expectedCvaExposureByLegList);
     }
 
     @Test
     public void testCva() {
-        double actual = ExposureToCds.getCvaExposureVal(expectedCvaExposureByLegList);
+        double actual = ExposureToCvaExposure.getCvaExposureVal(expectedCvaExposureByLegList);
         assertThat(actual, equalTo(EXPECTED_CVA));
     }
 

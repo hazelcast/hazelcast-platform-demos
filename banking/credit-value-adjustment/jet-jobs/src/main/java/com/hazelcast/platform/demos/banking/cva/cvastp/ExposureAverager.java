@@ -30,7 +30,7 @@ import com.hazelcast.jet.aggregate.AggregateOperation1;
 import com.hazelcast.jet.datamodel.Tuple3;
 
 /**
- * <p>We wish to aggregate all Exposures for a Trade together, and calculate
+ * <p>We wish to aggregate all CVAExposures for a Trade together, and calculate
  * the average exposure. Certain fields such as the Discount Fractions come
  * from the first scenario alphabetically.
  * <p>
@@ -53,7 +53,8 @@ public class ExposureAverager implements Serializable {
      *
      * @return An {@code AggregateOperation1} that works on a single input source.
      */
-    public static AggregateOperation1<Tuple3<String, String, String>, ExposureAverager, String> buildExposureAggregation() {
+    public static AggregateOperation1<Tuple3<String, String, String>, ExposureAverager, String>
+        buildExposureAggregation() {
         return AggregateOperation
                 .withCreate(ExposureAverager::new)
                 .andAccumulate((ExposureAverager exposureAverager, Tuple3<String, String, String> tuple3)
@@ -69,7 +70,7 @@ public class ExposureAverager implements Serializable {
      * for this class instance.
      * </p>
      *
-     * @param tuple3 A trio of Trade, Curve and Exposure
+     * @param tuple3 A trio of Trade, Curve and CVAExposure
      * @return The current accumulator
      */
     public ExposureAverager accumulate(Tuple3<String, String, String> tuple3) {
@@ -85,8 +86,8 @@ public class ExposureAverager implements Serializable {
                 }
             }
 
-            for (int i = 0 ; i < exposures.length ; i++) {
-                exposures[i] += exposuresJson.getDouble(i);
+            for (int i = 0 ; i < this.exposures.length ; i++) {
+                this.exposures[i] += exposuresJson.getDouble(i);
             }
 
             this.count++;
@@ -105,9 +106,9 @@ public class ExposureAverager implements Serializable {
      * from for these.
      * </p>
      *
-     * @param arg0 Tuple3.f0()
-     * @param arg1 Tuple3.f1()
-     * @param arg2 Tuple3.f2()
+     * @param arg0 Tuple3.f0(), trade
+     * @param arg1 Tuple3.f1(), curve
+     * @param arg2 Tuple3.f2(), CVA exposure
      */
     private void lowestThis(String arg0, String arg1, JSONObject arg2) throws JSONException {
         this.tradeid = arg0;
@@ -116,14 +117,14 @@ public class ExposureAverager implements Serializable {
 
         JSONArray legfractionsJson = arg2.getJSONArray("legfractions");
         this.legfractions = new double[legfractionsJson.length()];
-        for (int i = 0 ; i < legfractions.length ; i++) {
-            legfractions[i] = legfractionsJson.getDouble(i);
+        for (int i = 0 ; i < this.legfractions.length ; i++) {
+            this.legfractions[i] = legfractionsJson.getDouble(i);
         }
 
         JSONArray discountfactorsJson = arg2.getJSONArray("discountfactors");
         this.discountfactors = new double[discountfactorsJson.length()];
-        for (int i = 0 ; i < discountfactors.length ; i++) {
-            discountfactors[i] = discountfactorsJson.getDouble(i);
+        for (int i = 0 ; i < this.discountfactors.length ; i++) {
+            this.discountfactors[i] = discountfactorsJson.getDouble(i);
         }
     }
 
@@ -157,13 +158,13 @@ public class ExposureAverager implements Serializable {
             if (this.count == 0) {
                 this.exposures = that.getExposures();
             } else {
-                for (int i = 0 ; i < exposures.length ; i++) {
-                    exposures[i] += that.getExposures()[i];
+                for (int i = 0 ; i < this.exposures.length ; i++) {
+                    this.exposures[i] += that.getExposures()[i];
                 }
             }
         } else {
-            for (int i = 0 ; i < exposures.length ; i++) {
-                exposures[i] += that.getExposures()[i];
+            for (int i = 0 ; i < this.exposures.length ; i++) {
+                this.exposures[i] += that.getExposures()[i];
             }
         }
 
@@ -188,7 +189,7 @@ public class ExposureAverager implements Serializable {
             this.legfractions = new double[0];
         } else {
             for (int i = 0; i < this.exposures.length; i++) {
-                exposures[i] = exposures[i] / ((double) this.count);
+                this.exposures[i] = this.exposures[i] / ((double) this.count);
             }
         }
 
@@ -206,7 +207,7 @@ public class ExposureAverager implements Serializable {
      * @return How many exposures accumulated
      */
     public int getCount() {
-        return count;
+        return this.count;
     }
 
     /**
@@ -214,7 +215,7 @@ public class ExposureAverager implements Serializable {
      * @return A string
      */
     public String getCounterparty() {
-        return counterparty;
+        return this.counterparty;
     }
 
     /**
@@ -222,7 +223,7 @@ public class ExposureAverager implements Serializable {
      * @return A string
      */
     public String getCurvename() {
-        return curvename;
+        return this.curvename;
     }
 
     /**
@@ -230,7 +231,7 @@ public class ExposureAverager implements Serializable {
      * @return Double Array, assume non-zero length
      */
     public double[] getDiscountfactors() {
-        return Arrays.copyOf(discountfactors, discountfactors.length);
+        return Arrays.copyOf(this.discountfactors, this.discountfactors.length);
     }
 
     /**
@@ -238,7 +239,7 @@ public class ExposureAverager implements Serializable {
      * @return Double Array, assume non-zero length
      */
     public double[] getExposures() {
-        return Arrays.copyOf(exposures, exposures.length);
+        return Arrays.copyOf(this.exposures, this.exposures.length);
     }
 
     /**
@@ -246,7 +247,7 @@ public class ExposureAverager implements Serializable {
      * @return Double Array, assume non-zero length
      */
     public double[] getLegfractions() {
-        return Arrays.copyOf(legfractions, legfractions.length);
+        return Arrays.copyOf(this.legfractions, this.legfractions.length);
     }
 
     /**
@@ -254,7 +255,7 @@ public class ExposureAverager implements Serializable {
      * @return A string
      */
     public String getTradeid() {
-        return tradeid;
+        return this.tradeid;
     }
 
 }

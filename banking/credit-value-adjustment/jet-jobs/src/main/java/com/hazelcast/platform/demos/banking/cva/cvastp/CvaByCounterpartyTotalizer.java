@@ -115,7 +115,7 @@ public class CvaByCounterpartyTotalizer implements Serializable {
      * @return A string
      */
     public String getCounterparty() {
-        return counterparty;
+        return this.counterparty;
     }
 
     /**
@@ -123,7 +123,7 @@ public class CvaByCounterpartyTotalizer implements Serializable {
      * @return A double
      */
     public Double getCva() {
-        return cva;
+        return this.cva;
     }
 
     /**
@@ -131,7 +131,7 @@ public class CvaByCounterpartyTotalizer implements Serializable {
      * @return A string
      */
     public String getShortname() {
-        return shortname;
+        return this.shortname;
     }
 
 }

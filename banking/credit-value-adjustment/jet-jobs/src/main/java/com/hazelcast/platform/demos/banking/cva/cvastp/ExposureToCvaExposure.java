@@ -29,17 +29,17 @@ import org.springframework.boot.configurationprocessor.json.JSONObject;
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.function.BiFunctionEx;
 import com.hazelcast.function.FunctionEx;
-import com.hazelcast.jet.datamodel.Tuple4;
+import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.platform.demos.banking.cva.MyConstants;
 
 /**
  * <p>Methods to take an Exposure object and Counterparty CDS to calculate
- * the resultant CDS.
+ * the resultant CVA Exposure.
  * </p>
  */
-public class ExposureToCds {
+public class ExposureToCvaExposure {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExposureToCds.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExposureToCvaExposure.class);
 
     /**
      * <p>Find the lookup key for the map "{@code cp_cds}". The field is
@@ -65,20 +65,21 @@ public class ExposureToCds {
      * <p>A {@link BiFunctionEx}, so takes two objects and returns a third.
      * </p>
      * <p>Take the Exposure (first argument) and the Counterparty CDS (second argument),
-     * and from this calculate the CDS.
+     * and turn this into a CVA Exposure.
      * </p>
      * <p>Try to keep the JSON processing and business logic separate.
      * </p>
-     * <p>The return object is quadruple of the Trade Id, the Counterparty code &amp; name, and the CDS.
+     * <p>The return object is trio of the Trade Id, Curve, and the CDS.
      * </p>
      */
-    public static final BiFunctionEx<String, HazelcastJsonValue, Tuple4<String, String, String, String>> CONVERT =
+    public static final BiFunctionEx<String, HazelcastJsonValue, Tuple3<String, String, String>> CONVERT =
            (String exposure, HazelcastJsonValue cpCds) -> {
                try {
                    // Extract necessary fields
                    JSONObject exposureJson = new JSONObject(exposure);
                    String tradeid = exposureJson.getString("tradeid");
                    String counterparty = exposureJson.getString("counterparty");
+                   String curvename = exposureJson.getString("curvename");
                    JSONArray exposuresJson = exposureJson.getJSONArray("exposures");
                    JSONArray discountFactorsJson = exposureJson.getJSONArray("discountfactors");
                    JSONArray legFractionsJson = exposureJson.getJSONArray("legfractions");
@@ -87,8 +88,6 @@ public class ExposureToCds {
                    JSONArray spreadsJson = cpCdsJson.getJSONArray("spreads");
                    JSONArray spreadPeriodsJson = cpCdsJson.getJSONArray("spread_periods");
                    float recovery = (float) cpCdsJson.getDouble("recovery");
-                   double recoveryRate = (double) recovery;
-                   String shortname = cpCdsJson.getString("shortname");
 
                    // Convert from JSON
                    List<Double> discountFactors = new ArrayList<>();
@@ -120,23 +119,20 @@ public class ExposureToCds {
                            getCvaExposureByLeg(defaultProbabilities, exposures, discountFactors, recovery);
                    double cvaExposure = getCvaExposureVal(cvaExposureByLeg);
 
-                   // Format for output. Curvename is not used for this style of CDS
-                   String curvename = "";
-
+                   // Format for output.
                    StringBuilder stringBuilder = new StringBuilder();
                    stringBuilder.append("{");
                    stringBuilder.append(" \"tradeid\": \"" + tradeid + "\"");
                    stringBuilder.append(", \"curvename\": \"" + curvename + "\"");
                    stringBuilder.append(", \"counterparty\": \"" + counterparty + "\"");
                    stringBuilder.append(", \"cva\": " + cvaExposure);
-                   stringBuilder.append(", \"recoveryrate\": " + recoveryRate);
                    stringBuilder.append(formatDoubleArrayForJSON(",", "spreadrates", spreadRates));
                    stringBuilder.append(formatDoubleArrayForJSON(",", "hazardrates", hazardRates));
                    stringBuilder.append(formatDoubleArrayForJSON(",", "defaultprob", defaultProbabilities));
                    stringBuilder.append(formatDoubleArrayForJSON(",", "cvaexposurebyleg", cvaExposureByLeg));
                    stringBuilder.append(" }");
 
-                   return Tuple4.tuple4(tradeid, counterparty, shortname, stringBuilder.toString());
+                   return Tuple3.tuple3(tradeid, curvename, stringBuilder.toString());
                } catch (RuntimeException | JSONException e) {
                    if (exposure.length() > MyConstants.HALF_SCREEN_WIDTH) {
                        if (cpCds.toString().length() > MyConstants.HALF_SCREEN_WIDTH) {
@@ -149,7 +145,7 @@ public class ExposureToCds {
                    } else {
                        LOGGER.error("No counterparty field: " + exposure + "," + cpCds, e);
                    }
-                   return Tuple4.tuple4("", "", "", "");
+                   return Tuple3.tuple3("", "", "");
                }
             };
 

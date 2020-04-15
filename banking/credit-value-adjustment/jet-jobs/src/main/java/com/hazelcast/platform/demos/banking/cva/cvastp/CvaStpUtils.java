@@ -131,4 +131,70 @@ public class CvaStpUtils {
         return makeExposureStrFromJava(tradeid, curvename, counterparty, exposures, legfractions, discountfactors);
     }
 
+    /**
+     * <p>Turn some fields into JSON.
+     * </p>
+     *
+     * @param tradeid A String
+     * @param curvename A String
+     * @param counterparty A String
+     * @param netCvaExposure Double
+     * @param spreadrates Array of doubles
+     * @param hazardrates Array of doubles
+     * @param defaultprob Array of doubles
+     * @param cvaexposurebyleg Array of doubles
+     * @return A string which can be directly turned into JSON
+     */
+    public static String makeTradeExposureStrFromJava(String tradeid, String curvename, String counterparty,
+            double netCvaExposure, double[] spreadrates, double[] hazardrates, double[] defaultprob,
+            double[] cvaexposurebyleg) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("{");
+        stringBuilder.append(" \"tradeid\": \"" + tradeid + "\"");
+        stringBuilder.append(", \"curvename\": \"" + curvename + "\"");
+        stringBuilder.append(", \"counterparty\": \"" + counterparty + "\"");
+        stringBuilder.append(", \"cva\": " + netCvaExposure);
+
+        stringBuilder.append(", \"spreadrates\": [");
+        for (int i = 0 ; i < spreadrates.length; i++) {
+            if (i > 0) {
+                stringBuilder.append(", ");
+            }
+            stringBuilder.append(spreadrates[i]);
+        }
+        stringBuilder.append("]");
+
+        stringBuilder.append(", \"hazardrates\": [");
+        for (int i = 0 ; i < hazardrates.length; i++) {
+            if (i > 0) {
+                stringBuilder.append(", ");
+            }
+            stringBuilder.append(hazardrates[i]);
+        }
+        stringBuilder.append("]");
+
+        stringBuilder.append(", \"defaultprob\": [");
+        for (int i = 0 ; i < defaultprob.length; i++) {
+            if (i > 0) {
+                stringBuilder.append(", ");
+            }
+            stringBuilder.append(defaultprob[i]);
+        }
+        stringBuilder.append("]");
+
+        stringBuilder.append(", \"cvaexposurebyleg\": [");
+        for (int i = 0 ; i < cvaexposurebyleg.length; i++) {
+            if (i > 0) {
+                stringBuilder.append(", ");
+            }
+            stringBuilder.append(cvaexposurebyleg[i]);
+        }
+        stringBuilder.append("]");
+
+        stringBuilder.append(" }");
+        return stringBuilder.toString();
+    }
+
 }
