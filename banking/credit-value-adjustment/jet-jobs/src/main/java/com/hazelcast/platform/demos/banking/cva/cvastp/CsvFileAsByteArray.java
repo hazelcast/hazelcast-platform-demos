@@ -22,7 +22,6 @@ import java.util.Map.Entry;
 
 import com.hazelcast.function.FunctionEx;
 import com.hazelcast.jet.datamodel.Tuple3;
-import com.hazelcast.platform.demos.banking.cva.MyConstants;
 
 /**
  * <p>Prepare job output as a CSV file to download
@@ -47,9 +46,7 @@ public class CsvFileAsByteArray {
             (Tuple3<String, Long, List<Entry<String, Double>>> tuple3) -> {
                 StringBuilder stringBuilder = new StringBuilder();
 
-                stringBuilder.append("#" + " " + MyConstants.BANNER + MyConstants.BANNER + MyConstants.BANNER
-                        + tuple3.f0() + " " + MyConstants.BANNER + MyConstants.BANNER + MyConstants.BANNER
-                        + NEWLINE);
+                stringBuilder.append("# " + tuple3.f0() + NEWLINE);
 
                 for (Entry<String, Double> entry : tuple3.f2()) {
                     stringBuilder.append(entry.getKey() + "," + entry.getValue() + NEWLINE);
