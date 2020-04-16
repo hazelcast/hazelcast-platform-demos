@@ -29,24 +29,28 @@ import com.hazelcast.jet.datamodel.Tuple3;
 public class CsvFileAsByteArray {
 
     /**
-     * This is the end of line character on the server-side, which will likely
+     * <p>This is the end of line character on the server-side, which will likely
      * be Linux. The client-side that downloads may be Windows.
-     * TODO: Should add a platform specific download formatter.
+     * </p>
+     * <p>TODO: Should add a platform specific download formatter.
+     * </p>
      */
     private static final String NEWLINE = System.lineSeparator();
 
     /**
      * <p>A function to convert a tuple3 of job name, timestamp, and
      * list of CVA pairs to a CSV file content (not the file itself).
-     * Timestamp is currently ignored.
+     * </p>
+     * <p>TODO: To be consistent with {@link XlstFileAsByteArray} we
+     * are passed the job name and timestamp as part of the tuple.
+     * These could perhaps be part of a "{@code # comment}" first
+     * line in the CSV, but then may break some CSV processors.
      * </p>
      */
     public static final FunctionEx<Tuple3<String, Long, List<Entry<String, Double>>>, byte[]>
         CONVERT_TUPLE3_TO_BYTE_ARRAY =
             (Tuple3<String, Long, List<Entry<String, Double>>> tuple3) -> {
                 StringBuilder stringBuilder = new StringBuilder();
-
-                stringBuilder.append("# " + tuple3.f0() + NEWLINE);
 
                 for (Entry<String, Double> entry : tuple3.f2()) {
                     stringBuilder.append(entry.getKey() + "," + entry.getValue() + NEWLINE);
