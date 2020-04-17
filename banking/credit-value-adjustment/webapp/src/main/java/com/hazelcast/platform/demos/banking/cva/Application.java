@@ -22,6 +22,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
+import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.platform.demos.banking.cva.MyConstants.Site;
 
 /**
@@ -33,6 +34,10 @@ import com.hazelcast.platform.demos.banking.cva.MyConstants.Site;
 public class Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
+    private static final int DEFAULT_PORT = 8080;
+
+    private static int port = DEFAULT_PORT;
+
     /**
      * <p>Start a client of the specified cluster, and as this is
      * a webapp, leave it running for users to connect.
@@ -41,19 +46,35 @@ public class Application {
     public static void main(String[] args) throws Exception {
         String siteStr = System.getProperty("my.site");
 
-        if (siteStr == null) {
-            if (args.length == 0) {
-                siteStr = Site.CVA_SITE1.toString();
-                LOGGER.info("No args, site=='{}'", siteStr);
-            } else {
-                siteStr = args[0].equals(Site.CVA_SITE1.toString()) ? Site.CVA_SITE1.toString() : Site.CVA_SITE2.toString();
-                LOGGER.info("Arg='{}', site=='{}'", args[0], siteStr);
-            }
+        Tuple2<Integer, Site> handledArgs = MyUtils.twoArgsIntSite(args, Application.class.getName());
 
-            System.setProperty("my.site", siteStr);
+        // Override port if specified and sensible
+        if (System.getProperty("server.port") != null) {
+            LOGGER.info("System.getProperty(\"server.port\")=={}",
+                    System.getProperty("server.port"));
+            port = Integer.parseInt(System.getProperty("server.port"));
+        } else {
+           if (handledArgs.f0() != null && handledArgs.f0() > 0) {
+               port = handledArgs.f0();
+           }
         }
 
-        SpringApplication.run(Application.class, args);
+        // Site, System property wins if specified twice
+        if (siteStr != null) {
+            siteStr = (siteStr.equals(Site.CVA_SITE2.toString()) ? Site.CVA_SITE2.toString() : Site.CVA_SITE1.toString());
+        } else {
+            if (handledArgs.f1() != null) {
+                siteStr = (handledArgs.f1() == Site.CVA_SITE2 ? Site.CVA_SITE2.toString() : Site.CVA_SITE1.toString());
+            } else {
+                siteStr = Site.CVA_SITE1.toString();
+            }
+        }
+
+        System.setProperty("my.site", siteStr);
+        System.setProperty("server.port", String.valueOf(port));
+        LOGGER.info("Selected port {}/site, site '{}'", port, siteStr);
+
+        SpringApplication.run(Application.class);
     }
 
 }

@@ -17,10 +17,13 @@
 	<properties>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 
+		<!-- For src/main/resources/templates/fragments.html -->
+		<my.webapp.title>${project.description}</my.webapp.title>
+
 		<!-- React.js app in src/main/app -->
-        <frontend.app.dir>${project.basedir}/src/main/app</frontend.app.dir>
-		<node.version>v12.16.1</node.version>
-		<yarn.version>v1.22.0</yarn.version>
+		<frontend.app.dir>${project.basedir}/src/main/app</frontend.app.dir>
+		<node.version>v12.16.2</node.version>
+		<npm.version>6.14.4</npm.version>
 	</properties>
 
 	<dependencies>
@@ -29,7 +32,7 @@
 			<artifactId>cva-abstract-hazelcast-client</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger2</artifactId>
@@ -37,6 +40,17 @@
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger-ui</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 
@@ -50,39 +64,62 @@
 
 		<plugins>
 			<plugin>
+				<!-- Remove previous node builds if "mvn clean" -->
+				<artifactId>maven-clean-plugin</artifactId>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>${frontend.app.dir}/node_modules</directory>
+							<includes>
+								<include>**</include>
+							</includes>
+						</fileset>
+						<fileset>
+							<directory>${frontend.app.dir}/static</directory>
+							<includes>
+								<include>**</include>
+							</includes>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
 				<configuration>
-					<nodeVersion>${node.version}</nodeVersion>
-					<yarnVersion>${yarn.version}</yarnVersion>
+					<!-- Find "package.json" and create "node_modules" -->
 					<workingDirectory>${frontend.app.dir}</workingDirectory>
+					<!-- Install to "target" -->
 					<installDirectory>${project.build.directory}</installDirectory>
+					<environmentVariables>
+						<SCARF_ANALYTICS>false</SCARF_ANALYTICS>
+					</environmentVariables>
 				</configuration>
 				<executions>
 					<execution>
-						<id>install-frontend-tools</id>
+						<id>install-node-and-npm</id>
 						<goals>
-							<goal>install-node-and-yarn</goal>
+							<goal>install-node-and-npm</goal>
 						</goals>
+						<configuration>
+							<nodeVersion>${node.version}</nodeVersion>
+							<npmVersion>${npm.version}</npmVersion>
+						</configuration>
 					</execution>
 					<execution>
-						<id>yarn-install</id>
+						<id>npm-install</id>
 						<goals>
-							<goal>yarn</goal>
+							<goal>npm</goal>
 						</goals>
 						<configuration>
 							<arguments>install</arguments>
 						</configuration>
 					</execution>
 					<execution>
-						<id>build-frontend</id>
-						<phase>prepare-package</phase>
+						<id>webpack-build</id>
 						<goals>
-							<goal>yarn</goal>
+							<goal>webpack</goal>
 						</goals>
-						<configuration>
-							<arguments>build</arguments>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -95,10 +132,10 @@
 						</goals>
 						<phase>prepare-package</phase>
 						<configuration>
-							<outputDirectory>${project.build.outputDirectory}/app</outputDirectory>
+							<outputDirectory>${project.build.outputDirectory}/static</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${frontend.app.dir}/build</directory>
+									<directory>${frontend.app.dir}/static</directory>
 									<filtering>true</filtering>
 								</resource>
 							</resources>
