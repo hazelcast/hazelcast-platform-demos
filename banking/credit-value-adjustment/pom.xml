@@ -116,6 +116,10 @@
 						<echo message="====================================" />
 						<echo message="TODO: YAML Use readinessGate for sequencing" />
 						<echo message="====================================" />
+						<echo message="TODO: BigDecimal instead of double" />
+						<echo message="====================================" />
+						<echo message="TODO: Protobuf3 instead of JSON" />
+						<echo message="====================================" />
 					</target>
 				</configuration>
 			</plugin>
