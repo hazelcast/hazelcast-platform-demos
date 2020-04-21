@@ -47,11 +47,13 @@ public class CvaStpJobSubmitter {
         long timestamp = System.currentTimeMillis();
         String timestampStr = MyUtils.timestampToISO8601(timestamp);
 
-        Pipeline pipeline = CvaStpJob.buildPipeline(timestampStr, debug);
         String jobNamePrefix = CvaStpJob.JOB_NAME_PREFIX;
+        String jobName = jobNamePrefix + "-" + timestampStr;
+
+        Pipeline pipeline = CvaStpJob.buildPipeline(jobName, timestamp, debug);
 
         JobConfig jobConfig = new JobConfig();
-        jobConfig.setName(jobNamePrefix + "-" + timestampStr);
+        jobConfig.setName(jobName);
         jobConfig.addClass(CvaStpJob.class);
 
         Job job = MyUtils.findRunningJobsWithSamePrefix(jobNamePrefix, jetInstance);
