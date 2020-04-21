@@ -36,6 +36,10 @@ Configuration:
           regex: "(?s).*\\*\\*\\*.*"
           onMatch: "ACCEPT"
           onMismatch: "DENY"
+      - name: ConsoleYellow
+        target: SYSTEM_OUT
+        PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} %yellow{%msg%n}"
  
   Loggers:
     logger:
@@ -49,6 +53,11 @@ Configuration:
           additivity: false
           AppenderRef:
             ref: ConsoleMagenta
+        - name: com.hazelcast.platform.demos.banking.cva.GrafanaGlobalMetricsJob
+          level: debug
+          additivity: false
+          AppenderRef:
+            ref: ConsoleYellow
         # Special for "Sinks.logger()", only one of the appenders is used at a time
         - name: com.hazelcast.jet.impl.connector.WriteLoggerP
           level: trace
