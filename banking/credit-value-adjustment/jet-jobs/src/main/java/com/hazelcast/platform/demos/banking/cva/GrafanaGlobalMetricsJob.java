@@ -60,6 +60,7 @@ public class GrafanaGlobalMetricsJob {
     private static final Logger LOGGER = LoggerFactory.getLogger(GrafanaGlobalMetricsJob.class);
     private static final long LOG_THRESHOLD = 12L;
     private static final String METRIC_PREFIX = GrafanaGlobalMetricsJob.class.getSimpleName();
+    private static final int PERCENT = 100;
 
     /**
      * <p>
@@ -70,7 +71,11 @@ public class GrafanaGlobalMetricsJob {
     private static BiPredicateEx<LongAccumulator, List<GraphiteMetric>> noopLoggerFilter = (counter, item) -> {
         counter.subtract(1);
         if (counter.get() <= 0) {
-            LOGGER.info("{} statistics collected", item.size());
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("{} statistics collected, {}", item.size(), item);
+            } else {
+                LOGGER.debug("{} statistics collected", item.size());
+            }
             counter.set(LOG_THRESHOLD);
         }
         return true;
@@ -191,12 +196,13 @@ public class GrafanaGlobalMetricsJob {
 
                 if (nearCacheStatsPresent.get() > 0) {
                     long nearCacheTotal = nearCacheHits.get() + nearCacheMisses.get();
-                    long ratio = 0;
+                    long percentage = 0;
                     if (nearCacheTotal > 0) {
-                        ratio = nearCacheHits.get() / nearCacheTotal;
+                        percentage = nearCacheHits.get() * PERCENT / nearCacheTotal;
                     }
+                    // TODO Percentage is a long, convert from whole number to rational number
                     result.add(MyUtils.createGraphiteMetric4Tier(site, METRIC_PREFIX, "map", mapName, "near_cache_percent",
-                            String.valueOf(ratio), now));
+                            String.valueOf(percentage), now));
                 }
             }
             buffer.add(result);
