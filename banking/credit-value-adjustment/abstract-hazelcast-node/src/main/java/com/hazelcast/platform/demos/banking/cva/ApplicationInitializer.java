@@ -70,6 +70,9 @@ public class ApplicationInitializer {
         for (String iMapName : MyConstants.IMAP_NAMES) {
             this.jetInstance.getHazelcastInstance().getMap(iMapName);
         }
+        for (String iTopicName : MyConstants.ITOPIC_NAMES) {
+            this.jetInstance.getHazelcastInstance().getTopic(iTopicName);
+        }
     }
 
     /**

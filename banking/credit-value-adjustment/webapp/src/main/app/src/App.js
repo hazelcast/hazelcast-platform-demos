@@ -1,9 +1,12 @@
 'use strict';
 
-const React = require('react');
+import React, { Component } from 'react';
+import Fixings from './components/fixings'
+import Jobs from './components/jobs'
+
 const ReactDOM = require('react-dom');
 
-class App extends React.Component {
+class App extends Component {
 
 	constructor(props) {
 		super(props);
@@ -11,14 +14,17 @@ class App extends React.Component {
 
 	render() {
 		return (
-			<div>
-				<p>Hello from App.js</p>
-			</div>
+				<div>
+					<Fixings />
+					<Jobs />
+				</div>
 		)
 	}
 }
 
+export default App;
+
 ReactDOM.render(
 	<App />,
-	document.getElementById('react')
+	document.getElementById('root')
 )

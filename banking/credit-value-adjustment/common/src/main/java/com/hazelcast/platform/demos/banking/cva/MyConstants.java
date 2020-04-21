@@ -36,6 +36,11 @@ public class MyConstants {
             List.of(IMAP_NAME_CP_CDS, IMAP_NAME_CVA_CSV, IMAP_NAME_CVA_XLSX,
                     IMAP_NAME_FIXINGS, IMAP_NAME_IRCURVES, IMAP_NAME_TRADES);
 
+    public static final String ITOPIC_NAME_JOB_STATE  = "job_state";
+
+    public static final List<String> ITOPIC_NAMES =
+            List.of(ITOPIC_NAME_JOB_STATE);
+
     /**
      * <p>Live and DR sites, but which is which depends on you.</p>
      */

@@ -296,30 +296,23 @@ public class CvaStpJob {
         if (!debug2) {
         // Step 1 above
         BatchStage<Entry<String, HazelcastJsonValue>> tradesSource =
-                pipeline
-                .readFrom(Sources.<String, HazelcastJsonValue>map(MyConstants.IMAP_NAME_TRADES));
+                pipeline.readFrom(Sources.<String, HazelcastJsonValue>map(MyConstants.IMAP_NAME_TRADES));
 
         // Step 2 above
         BatchStage<Entry<String, HazelcastJsonValue>> ircurvesSource =
-                pipeline
-                .readFrom(Sources.<String, HazelcastJsonValue>map(MyConstants.IMAP_NAME_IRCURVES));
+                pipeline.readFrom(Sources.<String, HazelcastJsonValue>map(MyConstants.IMAP_NAME_IRCURVES));
 
         // Step 5 above
         BatchStage<String> trades =
-                tradesSource.map(entry -> entry.getValue().toString())
-                .setName(MyConstants.IMAP_NAME_TRADES + "-json");
+                tradesSource.map(entry -> entry.getValue().toString()).setName(MyConstants.IMAP_NAME_TRADES + "-json");
 
         // Step 6 above
         BatchStage<String> ircurves =
-                ircurvesSource.map(entry -> entry.getValue().toString())
-                .setName(MyConstants.IMAP_NAME_IRCURVES + "-json");
+                ircurvesSource.map(entry -> entry.getValue().toString()).setName(MyConstants.IMAP_NAME_IRCURVES + "-json");
 
         // Step 7 above
         BatchStage<Tuple2<String, String>> tradesXircurves =
-                trades.hashJoin(ircurves,
-                        CvaStpUtils.cartesianProduct(),
-                        (trade, ircurve) -> Tuple2.tuple2(trade, ircurve.toString())
-                        )
+                trades.hashJoin(ircurves, CvaStpUtils.cartesianProduct(), (trade, ircurve) -> Tuple2.tuple2(trade, ircurve.toString()))
                 .setName(STAGE_NAME_TRADE_X_IRCURVES);
 
 
