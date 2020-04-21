@@ -417,8 +417,9 @@ public class CvaStpJob {
 
         // Optional stages for debugging.
         if (debug) {
-            addDebugStages(pipeline, timestampStr, jobName, mtm, exposure, cvaExposure,
-                    cvaExposureByTrade, cvaExposureByCounterparty, sortedCvaExposureByCounterparty);
+            addDebugSaveStages(timestampStr, mtm, exposure, cvaExposure,
+                    cvaExposureByTrade, cvaExposureByCounterparty);
+            addDebugLogStages(jobName, sortedCvaExposureByCounterparty);
         }
 
         return pipeline;
@@ -435,14 +436,12 @@ public class CvaStpJob {
      * <p>These maps may have many many entries.
      * </p>
      */
-    public static void addDebugStages(Pipeline pipeline, String timestampStr,
-            String jobName,
+    public static void addDebugSaveStages(String timestampStr,
             BatchStage<Tuple3<String, String, String>> mtm,
             BatchStage<Tuple3<String, String, String>> exposure,
             BatchStage<Tuple3<String, String, String>> cvaExposure,
             BatchStage<Entry<String, Tuple2<String, String>>> cvaExposureByTrade,
-            BatchStage<Entry<String, Double>> cvaExposureByCounterparty,
-            BatchStage<Tuple3<String, Long, List<Entry<String, Double>>>> sortedCvaExposureByCounterparty) {
+            BatchStage<Entry<String, Double>> cvaExposureByCounterparty) {
 
         /* (1) Save MTMs. Watch out there could be billions
          */
@@ -473,8 +472,17 @@ public class CvaStpJob {
          */
         cvaExposureByCounterparty
         .writeTo(Sinks.map("debug_" + timestampStr + "_" + STAGE_NAME_CVA_EXPOSURE_BY_COUNTERPARTY));
+    }
 
-        /* (6) A single sorted list of CVA Exposures by Counterparty. Log to console
+
+    /**
+     * <p>Optional debugging steps, logging to the console.
+     * </p>
+     */
+    public static void addDebugLogStages(String jobName,
+            BatchStage<Tuple3<String, Long, List<Entry<String, Double>>>> sortedCvaExposureByCounterparty) {
+
+        /* (1) A single sorted list of CVA Exposures by Counterparty. Log to console
          * as it is saved to a map already.
          */
         String delimiter =  MyConstants.BANNER + " " + jobName + " " + MyConstants.BANNER;
