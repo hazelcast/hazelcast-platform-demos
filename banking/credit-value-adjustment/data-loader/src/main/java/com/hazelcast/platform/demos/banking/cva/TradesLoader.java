@@ -18,6 +18,7 @@ package com.hazelcast.platform.demos.banking.cva;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Component;
  * </p>
  */
 @Component
+@Order(value = 4)
 public class TradesLoader implements CommandLineRunner {
 
     @Autowired
