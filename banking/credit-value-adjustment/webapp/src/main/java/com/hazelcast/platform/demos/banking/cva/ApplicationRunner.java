@@ -26,10 +26,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.Job;
 import com.hazelcast.jet.core.JobStatus;
 import com.hazelcast.jet.datamodel.Tuple2;
+import com.hazelcast.platform.demos.banking.cva.ws.MySocketJobListener;
 import com.hazelcast.topic.ITopic;
 
 /**
@@ -44,20 +46,24 @@ public class ApplicationRunner implements CommandLineRunner {
 
     @Autowired
     private JetInstance jetInstance;
+    @Autowired
+    private MySocketJobListener mySocketJobListener;
 
     /**
      * <p>Polls for changes to job state, and publishes to a topic to feed to a web socket.
      * </p>
      * <p>See also <a href="https://github.com/hazelcast/hazelcast-jet/issues/2206">Issue 2206</a>
-     * </p> 
+     * </p>
      *
      * @throws Exception
      */
     @Override
     public void run(String... args) throws Exception {
 
-        ITopic<Tuple2<Job, JobStatus>> jobStateTopic =
+        ITopic<Tuple2<HazelcastJsonValue, JobStatus>> jobStateTopic =
                 this.jetInstance.getHazelcastInstance().getTopic(MyConstants.ITOPIC_NAME_JOB_STATE);
+
+        jobStateTopic.addMessageListener(this.mySocketJobListener);
 
         Map<Long, JobStatus> currentState;
         Map<Long, JobStatus> previousState = new HashMap<>();
@@ -77,7 +83,8 @@ public class ApplicationRunner implements CommandLineRunner {
                     JobStatus newJobStatus = entry.getValue();
 
                     if (oldJobStatus == null || oldJobStatus != newJobStatus) {
-                        Tuple2<Job, JobStatus> message = Tuple2.tuple2(this.jetInstance.getJob(entry.getKey()), oldJobStatus);
+                        HazelcastJsonValue json = this.jobToJson(this.jetInstance.getJob(entry.getKey()));
+                        Tuple2<HazelcastJsonValue, JobStatus> message = Tuple2.tuple2(json, oldJobStatus);
                         jobStateTopic.publish(message);
                     }
 
@@ -87,7 +94,8 @@ public class ApplicationRunner implements CommandLineRunner {
 
                 // Dead jobs
                 for (Entry<Long, JobStatus> entry : previousState.entrySet()) {
-                    Tuple2<Job, JobStatus> message = Tuple2.tuple2(this.jetInstance.getJob(entry.getKey()), entry.getValue());
+                    HazelcastJsonValue json = this.jobToJson(this.jetInstance.getJob(entry.getKey()));
+                    Tuple2<HazelcastJsonValue, JobStatus> message = Tuple2.tuple2(json, entry.getValue());
                     jobStateTopic.publish(message);
                 }
 
@@ -97,6 +105,31 @@ public class ApplicationRunner implements CommandLineRunner {
                 break;
             }
         }
+    }
+
+    /**
+     * <p>Makes a JSON representation of a Job, for HTML display.
+     * Only select some fields.
+     * </p>
+     *
+     * @param job
+     * @return
+     */
+    private HazelcastJsonValue jobToJson(Job job) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("{ ");
+
+        if (job != null) {
+            stringBuilder.append("\"id\": \"" + job.getId() + "\"");
+            stringBuilder.append(", \"name\": \"" + (job.getName() == null ? "" : job.getName()) + "\"");
+            stringBuilder.append(", \"status\": \"" + job.getStatus() + "\"");
+            stringBuilder.append(", \"submission_time\": \"" + job.getSubmissionTime() + "\"");
+        }
+
+        stringBuilder.append(" }");
+
+        return new HazelcastJsonValue(stringBuilder.toString());
     }
 
 }
