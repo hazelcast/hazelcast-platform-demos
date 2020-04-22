@@ -14,7 +14,7 @@ const Styles = styled.div `
   padding: 1rem;
   table {
     border-spacing: 0;
-    border: 1px solid black;
+    border: 1px solid gray;
     width: 100%;
     tr {
       :last-child {
@@ -27,8 +27,8 @@ const Styles = styled.div `
     td {
       margin: 0;
       padding: 0.5rem;
-      border-bottom: 1px solid black;
-      border-right: 1px solid black;
+      border-bottom: 1px solid gray;
+      border-right: 1px solid gray;
       :last-child {
         border-right: 0;
       }
@@ -132,7 +132,7 @@ class Jobs extends Component {
     constructor(props) {
         super(props);
         this.state = {
-        		jobs: []
+//        		jobs: []
         };
         this.handleData = this.handleData.bind(this);
     }
@@ -142,7 +142,7 @@ class Jobs extends Component {
     }
     
     render() {
-    	const { jobs } = this.state;
+//    	const { jobs } = this.state;
 
         return (
         	<div class="minor_pane">
