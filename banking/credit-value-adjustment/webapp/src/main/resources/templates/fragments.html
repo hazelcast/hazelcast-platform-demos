@@ -10,6 +10,13 @@
 <body th:fragment="header">
 	<div class="headerfooter">
 		<h5>Build @maven.build.timestamp@</h5>
+		<div align="right">
+			<p>
+				<font size="-1">
+					<a th:target="_blank" th:href="@{/swagger-ui.html#/}">Swagger</a>
+			</font>
+			</p>
+		</div>
 		<hr class="headerfooterline"/>
 	</div>
 </body>
