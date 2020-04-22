@@ -4,8 +4,6 @@ import React, { Component } from 'react';
 import Fixings from './components/fixings'
 import Jobs from './components/jobs'
 
-const ReactDOM = require('react-dom');
-
 class App extends Component {
 
 	constructor(props) {
@@ -23,8 +21,3 @@ class App extends Component {
 }
 
 export default App;
-
-ReactDOM.render(
-	<App />,
-	document.getElementById('root')
-)

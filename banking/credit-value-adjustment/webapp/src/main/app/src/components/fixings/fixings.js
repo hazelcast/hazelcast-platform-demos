@@ -9,7 +9,9 @@ class Fixings extends Component {
 
     render() {
         return (
-        	<h3>fixings.js</h3>
+        	<div class="minor_pane">
+        		<h3>fixings.js</h3>
+        	</div>
         );
     }
 }

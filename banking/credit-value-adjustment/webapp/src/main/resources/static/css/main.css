@@ -9,7 +9,12 @@ body {
 	background: honeydew;
 }
 
-h1, h2, h3 {
+h1, h2 {
+	text-align: center;
+	color: var(--hazelcast-blue);
+}
+
+h3 {
 	color: silver;
 }
 
@@ -23,9 +28,14 @@ h1, h2, h3 {
 	color: var(--hazelcast-orange);
 }
 
-.mainpane {
+.major_pane {
 	border-size: 5px;
 	border-style: solid;
 	border-color: var(--hazelcast-blue-dark);
 	padding: 5px 5px 5px 5px;
+}
+
+.minor_pane {
+	border-top: 1px dashed;
+	border-color: var(--hazelcast-blue-light);
 }
