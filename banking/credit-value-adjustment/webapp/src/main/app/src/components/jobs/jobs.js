@@ -68,6 +68,19 @@ const columns = [
 			},
 		],
 	},
+	{
+		Header: 'Output',
+		columns: [
+			{
+				Header: 'CSV',
+				accessor: 'x6',
+			},
+			{
+				Header: 'XLS',
+				accessor: 'x7',
+			},
+		],
+	},
 ]
 
 //Table data
