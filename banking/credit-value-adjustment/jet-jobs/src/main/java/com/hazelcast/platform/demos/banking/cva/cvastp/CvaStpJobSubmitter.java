@@ -48,7 +48,7 @@ public class CvaStpJobSubmitter {
         String timestampStr = MyUtils.timestampToISO8601(timestamp);
 
         String jobNamePrefix = CvaStpJob.JOB_NAME_PREFIX;
-        String jobName = jobNamePrefix + "-" + timestampStr;
+        String jobName = jobNamePrefix + "@" + timestampStr;
 
         Pipeline pipeline = CvaStpJob.buildPipeline(jobName, timestamp, debug);
 
