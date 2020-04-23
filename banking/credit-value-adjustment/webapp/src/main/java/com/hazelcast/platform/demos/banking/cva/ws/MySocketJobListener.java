@@ -66,6 +66,8 @@ public class MySocketJobListener implements MessageListener<Tuple2<HazelcastJson
 
         Tuple2<HazelcastJsonValue, JobStatus> tuple2 = message.getMessageObject();
 
+        long now = System.currentTimeMillis();
+
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{ \"job\": ");
         stringBuilder.append(tuple2.f0());
@@ -74,6 +76,7 @@ public class MySocketJobListener implements MessageListener<Tuple2<HazelcastJson
         } else {
             stringBuilder.append(", \"previous_status\": \"" + tuple2.f1() + "\"");
         }
+        stringBuilder.append(", \"now\": \"" + now + "\"");
         stringBuilder.append(" }");
 
         String payload = stringBuilder.toString();
