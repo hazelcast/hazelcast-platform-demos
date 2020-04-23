@@ -2,14 +2,16 @@ import React, {Component} from 'react';
 import {useTable} from 'react-table';
 import SockJsClient from 'react-stomp';
 import styled from 'styled-components';
+import update from 'immutability-helper';
 
+const DOWNLOAD_URL = 'http://' + window.location.host + '/rest/download';
 // Note SockJsClient uses 'http' protocol not 'ws'
 // See https://github.com/lahsivjar/react-stomp/blob/HEAD/API/
 const WS_URL = 'http://' + window.location.host + '/hazelcast';
 const WS_TOPICS_PREFIX = '/topics';
 const WS_TOPICS = [ WS_TOPICS_PREFIX + "/job_state" ];
 
-// Styled-components
+// Styled-components. Could move to CSS
 const Styles = styled.div `
   padding: 1rem;
   table {
@@ -23,8 +25,18 @@ const Styles = styled.div `
         }
       }
     }
-    th,
+    th {
+  	  color: indigo;
+      margin: 0;
+      padding: 0.5rem;
+      border-bottom: 1px solid gray;
+      border-right: 1px solid gray;
+      :last-child {
+        border-right: 0;
+      }
+    }
     td {
+  	  color: var(--hazelcast-blue-light);
       margin: 0;
       padding: 0.5rem;
       border-bottom: 1px solid gray;
@@ -43,15 +55,11 @@ const columns = [
 		columns: [
 			{
 				Header: 'Id',
-				accessor: 'x1',
+				accessor: 'id',
 			},
 			{
 				Header: 'Name',
-				accessor: 'x2',
-			},
-			{
-				Header: 'Submitted',
-				accessor: 'x3',
+				accessor: 'name',
 			},
 		],
 	},
@@ -59,12 +67,20 @@ const columns = [
 		Header: 'Status',
 		columns: [
 			{
+				Header: 'Local Start Time',
+				accessor: 'submission_time',
+			},
+			{
+				Header: 'Last Change',
+				accessor: 'now',
+			},
+			{
 				Header: 'Previous',
-				accessor: 'x4',
+				accessor: 'previous_status',
 			},
 			{
 				Header: 'Current',
-				accessor: 'x5',
+				accessor: 'status',
 			},
 		],
 	},
@@ -73,18 +89,15 @@ const columns = [
 		columns: [
 			{
 				Header: 'CSV',
-				accessor: 'x6',
+				accessor: 'csv',
 			},
 			{
 				Header: 'XLS',
-				accessor: 'x7',
+				accessor: 'xls',
 			},
 		],
 	},
 ]
-
-//Table data
-const data = []
 
 // The '<Table/>' HTML element
 function Table({ columns, data }) {
@@ -99,8 +112,7 @@ function Table({ columns, data }) {
 	    columns,
 	    data,
 	  })
-
-	  // Render the UI for your table
+	  
 	  return (
 	    <table {...getTableProps()}>
 	      <thead>
@@ -128,22 +140,67 @@ function Table({ columns, data }) {
 	  )
 }
 
+// Format Java timestamp in milliseconds
+function myISO8601(longStr) {
+	var dateObj = new Date(Number(longStr));
+	return dateObj.toISOString().replace('T',' ').split('.')[0];
+}
+
 class Jobs extends Component {
     constructor(props) {
         super(props);
         this.state = {
-//        		jobs: []
+    		jobs: []
         };
         this.handleData = this.handleData.bind(this);
     }
-
+    
     handleData(message) {
-        console.log(message);
+    	//TMP
+    	console.log(message);
+    	
+    	//TODO link to download form
+    	var nowStr = myISO8601(message.now);
+    	var jobKey = message.job.name.split('@')[0];
+    	var outputKey = message.job.name.split('@')[1];
+    	var submissionTimeStr = myISO8601(message.job.submission_time);
+    	var csv = "N/a";
+    	var xls = "N/a";
+    	if (jobKey == 'CvaStpJob' && message.job.status == 'COMPLETED') {
+    		csv = "?";
+    		xls = "??";
+    	}
+
+        var job = {
+        		id: message.job.id,
+        		name: message.job.name,
+        		submission_time: submissionTimeStr,
+        		now: nowStr,
+        		previous_status: message.previous_status,
+        		status: message.job.status,
+        		csv: csv,
+        		xls: xls,
+        		output_key: outputKey,
+        };
+
+        // Append or replace
+    	var jobs = this.state.jobs;
+    	var row = -1;
+    	for (var i = 0; i < jobs.length; i++) { 
+    	    if (jobs[i].id == job.id) {
+    	    	row = i;
+    	    }
+    	}
+    	if (row < 0) {
+    		this.setState({
+    			jobs: update(this.state.jobs, {$push: [job]}) 
+    		})
+    	} else {
+    		console.log('row ', row, ' of ', this.state.jobs.length);//XXX
+    	}
     }
     
     render() {
-//    	const { jobs } = this.state;
-
         return (
         	<div class="minor_pane">
         		<SockJsClient 
@@ -153,7 +210,7 @@ class Jobs extends Component {
         			debug={false} />
         		<h2>Jet Jobs</h2>
         	    <Styles>
-        	      <Table columns={columns} data={data} />
+        	      <Table columns={columns} data={this.state.jobs} />
         	    </Styles>
             </div>
         );
