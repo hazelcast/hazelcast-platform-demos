@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
-import {useTable} from 'react-table';
+import {BrowserRouter as Router, Link} from 'react-router-dom';
 import SockJsClient from 'react-stomp';
+import {useTable} from 'react-table';
 import styled from 'styled-components';
 import update from 'immutability-helper';
 
@@ -209,6 +210,11 @@ class Jobs extends Component {
         			onMessage={this.handleData}
         			debug={false} />
         		<h2>Jet Jobs</h2>
+        		<h3>TEMP DOWNLOAD URL - BELOW</h3>
+        		<Router>
+        			<Link to="/rest/downloads">DOWNLOADS</Link>//XXX
+        		</Router>
+        		<h3>TEMP DOWNLOAD URL - ABOVE</h3>
         	    <Styles>
         	      <Table columns={columns} data={this.state.jobs} />
         	    </Styles>
