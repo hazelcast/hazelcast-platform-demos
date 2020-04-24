@@ -115,11 +115,9 @@ public class XlstFileAsByteArray {
                 byte[] bytes = null;
                 try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
                     workbook.write(byteArrayOutputStream);
-                    workbook.close();
                     bytes = byteArrayOutputStream.toByteArray();
-
-                    String s = new String(bytes);
-                    return s.getBytes(StandardCharsets.UTF_8);
+                    workbook.close();
+                    return bytes;
                 } catch (Exception e) {
                     LOGGER.error(jobName, e);
                     return "".getBytes(StandardCharsets.UTF_8);
