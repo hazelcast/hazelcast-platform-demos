@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * <p>An override for the standard error controller to pick up
  * faults in a cleaner manner.
  * </p>
+ * TODO This should log the original URL
  */
 @Controller
 public class MyErrorController implements ErrorController {
