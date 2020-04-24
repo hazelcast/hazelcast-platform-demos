@@ -16,14 +16,20 @@
 
 package com.hazelcast.platform.demos.banking.cva.controllers;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,11 +37,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.map.IMap;
@@ -190,4 +201,126 @@ public class MyRestController {
         innerStringBuilder.append(" ]");
     }
 
+    /**
+     * <p>List available files for download, as help for Swagger and direct REST debugging.
+     * Bakes in the URL expected by {@link fileDownload} below.
+     * </p>
+     *
+     * @return A possibly empty string
+     */
+    @GetMapping(value = "/downloads", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String availableDownloads(HttpServletRequest httpServletRequest) {
+        LOGGER.info("availableDownloads()");
+
+        //TODO Validate if these are correct for Kubernetes
+        String host = httpServletRequest.getServerName();
+        int port = httpServletRequest.getServerPort();
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("{ \"url_available_at\": \"" + new Date() + "\"");
+        stringBuilder.append(", \"urls\": [");
+
+        List<String> mapNames = List.of(MyConstants.IMAP_NAME_CVA_CSV, MyConstants.IMAP_NAME_CVA_XLSX);
+        int urlCount = 0;
+        for (String mapName : mapNames) {
+            IMap<String, ?> iMap =
+                this.hazelcastInstance.getMap(mapName);
+
+            for (String key : iMap.keySet()) {
+                if (urlCount > 0) {
+                    stringBuilder.append(", ");
+                }
+                String url = "http://" + host + ":" + port + "/rest/download/" + mapName;
+                stringBuilder.append("\"" + url + "?key=" + URLEncoder.encode(key, StandardCharsets.UTF_8) + "\"");
+                urlCount++;
+            }
+        }
+        stringBuilder.append("] }");
+
+        return stringBuilder.toString();
+    }
+
+    /**
+     * <p>A rest endpoint to look in a specific map (in the path) for a
+     * specific key (in the param), and return this as a CSV file, Excel
+     * spreadsheet or unknown download type.
+     * <p>
+     * <p>Call "{@code /rest/download/abc?key=def}" to try to find the
+     * key "{@code def}" in the map "{@code abc}".
+     * <p>
+     * <p>The key may contain characters that don't work in a path, hence
+     * why it is a param.
+     * </p>
+     *
+     * @param requestMapName Should exist, won't be created on demand
+     * @param requestKey Should exist, can't be created
+     * @return CSV, Excel or bytes
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @GetMapping(value = "/download/{map}")
+    public ResponseEntity fileDownload(
+            @PathVariable("map") String requestMapName,
+            @RequestParam("key") String requestKey) {
+        LOGGER.info("fileDownload('{}', '{}')", requestMapName, requestKey);
+
+        // Find mapout with doing lazy-evaluation create
+        IMap<String, Object> iMap = null;
+        for (DistributedObject distributedObject : this.hazelcastInstance.getDistributedObjects()) {
+            if (distributedObject instanceof IMap
+                    && distributedObject.getName().equalsIgnoreCase(requestMapName)) {
+                iMap = (IMap<String, Object>) distributedObject;
+            }
+        }
+        if (iMap == null) {
+            LOGGER.info("fileDownload('{}', '{}'), map not found", requestMapName, requestKey);
+            return null;
+        }
+
+        // Find first key match
+        Object value = iMap.get(requestKey);
+        if (value == null) {
+            LOGGER.error("fileDownloadCSV('{}'), key not found", requestKey);
+            return null;
+        }
+
+        try {
+            byte[] content;
+            MediaType mediaType;
+            String suggestedFilename;
+
+            switch (iMap.getName()) {
+                case MyConstants.IMAP_NAME_CVA_CSV:
+                    content = (byte[]) value;
+                    mediaType = new MediaType("text",
+                            "csv",
+                            StandardCharsets.UTF_8);
+                    suggestedFilename = requestKey + ".csv";
+                    break;
+                case MyConstants.IMAP_NAME_CVA_XLSX:
+                    content = (byte[]) value;
+                    mediaType = new MediaType("application",
+                            "vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            StandardCharsets.UTF_8);
+                    suggestedFilename = requestKey + ".xlsx";
+                    break;
+                default:
+                    LOGGER.warn("Unexpected map '{}', data type unknown", iMap.getName());
+                    content = value.toString().getBytes(StandardCharsets.UTF_8);
+                    mediaType = MediaType.APPLICATION_OCTET_STREAM;
+                    suggestedFilename = requestKey;
+            }
+
+            return ResponseEntity
+                    .ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + suggestedFilename)
+                    .contentLength(content.length)
+                    .contentType(mediaType)
+                    .body(content);
+
+        } catch (Exception e) {
+            String prefix = String.format("fileDownload('%s', '%s')", requestMapName, requestKey);
+            LOGGER.error(prefix, e);
+            return null;
+        }
+    }
 }
