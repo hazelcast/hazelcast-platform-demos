@@ -66,7 +66,7 @@ public class ApplicationConfig {
             int port = MyUtils.getLocalhostBasePort(myProperties.getSite());
 
             List<String> memberList = List.of(host + ":" + port,
-                    host + ":" + (port + 1), host + (port + 2));
+                    host + ":" + (port + 1), host + ":" + (port + 2));
             clientNetworkConfig.setAddresses(memberList);
 
             LOGGER.warn("Non-Kubernetes configuration: member-list: "
