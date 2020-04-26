@@ -80,7 +80,6 @@ public class MySocketJobListener implements MessageListener<Tuple2<HazelcastJson
         stringBuilder.append(" }");
 
         String payload = stringBuilder.toString();
-        LOGGER.debug("{}", payload);
 
         this.simpMessagingTemplate.convertAndSend(DESTINATION, payload);
     }

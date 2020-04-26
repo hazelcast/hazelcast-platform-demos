@@ -22,6 +22,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -42,6 +44,7 @@ import com.hazelcast.topic.ITopic;
 @Component
 public class ApplicationRunner implements CommandLineRunner {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationRunner.class);
     private static final long FIVE = 5L;
 
     @Autowired
@@ -82,11 +85,14 @@ public class ApplicationRunner implements CommandLineRunner {
                     JobStatus oldJobStatus = previousState.get(entry.getKey());
                     JobStatus newJobStatus = entry.getValue();
 
+                    HazelcastJsonValue json = this.jobToJson(this.jetInstance.getJob(entry.getKey()));
+                    Tuple2<HazelcastJsonValue, JobStatus> message = Tuple2.tuple2(json, oldJobStatus);
+
+                    // Only log delta but publish baseline
                     if (oldJobStatus == null || oldJobStatus != newJobStatus) {
-                        HazelcastJsonValue json = this.jobToJson(this.jetInstance.getJob(entry.getKey()));
-                        Tuple2<HazelcastJsonValue, JobStatus> message = Tuple2.tuple2(json, oldJobStatus);
-                        jobStateTopic.publish(message);
+                        LOGGER.trace("Job state change: '{}'", message);
                     }
+                    jobStateTopic.publish(message);
 
                     // Remove from previous state once examined
                     previousState.remove(entry.getKey());

@@ -157,8 +157,7 @@ class Jobs extends Component {
     }
     
     handleData(message) {
-    	//TMP
-    	console.log(message);
+    	//console.log(message);
     	
     	//TODO link to download form
     	var nowStr = myISO8601(message.now);
@@ -197,7 +196,11 @@ class Jobs extends Component {
     			jobs: update(this.state.jobs, {$push: [job]}) 
     		})
     	} else {
-    		console.log('row ', row, ' of ', this.state.jobs.length);//XXX
+    		if (this.state.jobs[row].status != job.status) {
+        		this.setState({
+        			jobs: update(this.state.jobs, {[row] : {$set: job}}) 
+        		})
+    		}
     	}
     }
     
@@ -214,7 +217,6 @@ class Jobs extends Component {
         		<Router>
         			<Link to="/rest/downloads">DOWNLOADS</Link>//XXX
         		</Router>
-        		<h3>TEMP DOWNLOAD URL - ABOVE</h3>
         	    <Styles>
         	      <Table columns={columns} data={this.state.jobs} />
         	    </Styles>
