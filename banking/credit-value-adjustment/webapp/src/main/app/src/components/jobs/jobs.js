@@ -102,7 +102,6 @@ const columns = [
 
 // The '<Table/>' HTML element
 function Table({ columns, data }) {
-	  // Use the state and functions returned from useTable to build your UI
 	  const {
 	    getTableProps,
 	    getTableBodyProps,
@@ -158,17 +157,19 @@ class Jobs extends Component {
     
     handleData(message) {
     	//console.log(message);
-    	
-    	//TODO link to download form
+
+    	let notAvailable = <div><i>"N/a"</i></div>;
     	var nowStr = myISO8601(message.now);
     	var jobKey = message.job.name.split('@')[0];
     	var outputKey = message.job.name.split('@')[1];
     	var submissionTimeStr = myISO8601(message.job.submission_time);
-    	var csv = "N/a";
-    	var xls = "N/a";
+    	var csv = notAvailable;
+    	var xls = notAvailable;
     	if (jobKey == 'CvaStpJob' && message.job.status == 'COMPLETED') {
-    		csv = "?";
-    		xls = "??";
+    		var csvUrl = "/rest/download/cva_csv?key=" + outputKey;
+    		var xlsUrl = "/rest/download/cva_xlsx?key=" + outputKey;
+    		csv = <a href={csvUrl} download>Download</a>;
+    		xls = <a href={xlsUrl} download>Download</a>;;
     	}
 
         var job = {
@@ -213,10 +214,6 @@ class Jobs extends Component {
         			onMessage={this.handleData}
         			debug={false} />
         		<h2>Jet Jobs</h2>
-        		<h3>TEMP DOWNLOAD URL - BELOW</h3>
-        		<Router>
-        			<Link to="/rest/downloads">DOWNLOADS</Link>//XXX
-        		</Router>
         	    <Styles>
         	      <Table columns={columns} data={this.state.jobs} />
         	    </Styles>
