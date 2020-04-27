@@ -11,6 +11,7 @@
     "react-stomp": "5.0.0",
     "react-table": "^7.0.4",
     "react-websocket": "^2.1.0",
+    "rest": "^2.0.0",
     "styled-components": "^5.1.0",
     "immutability-helper": "^3.0.2"
   },
