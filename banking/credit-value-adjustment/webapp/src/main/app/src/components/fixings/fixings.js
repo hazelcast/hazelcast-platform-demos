@@ -112,13 +112,77 @@ class Fixings extends Component {
         super(props);
         this.state = {
         		fixings: [],
-        		message: ""
+        		message: '...',
+            	message_style: {
+            		color: 'grey',
+            		fontWeight: 'bold'
+            	}
             };
         this.getFixings = this.getFixings.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    getFixings(){
+    handleSubmit(e) {
+		e.preventDefault();
         setTimeout(() => {
+	    	var client = rest.wrap(mime);
+	    	var self = this;
+	    	
+	    	client({path:'/rest/cva/fixing/?key='}).then(
+	    			function(response) {
+	    		console.log('response.entity', response.entity);
+	        	var payload = response.entity;
+	        	var text = '';
+	        	var text_style = {};
+
+	            var failure_message = payload.error_message;
+	        	var success_message = 'Job \"' + payload.name + '\" launched at '+  payload.date;
+	        	var failure_style = {
+            		color: 'red',
+            		fontWeight: 'bold'
+            	}
+	        	var success_style = {
+	        		color: 'var(--hazelcast-blue)',
+	            	fontWeight: 'lighter'
+	            }
+	        		            
+	        	console.log('SSS', success_message, 'FFF', failure_message);
+	            
+	        	if (payload.error == true) {
+	        		text = failure_message
+	        		text_style = failure_style
+	        	} else {
+	        		text = success_message
+	        		text_style = success_style
+	        	}
+	        	
+	        	self.setState({
+	        		message: update(self.state.message, {$set: text}) 
+	        	});
+	        	self.setState({
+	        		message_style: update(self.state.message_style, {$set: text_style}) 
+	        	});
+	    	});
+        }, 250)
+        setTimeout(() => {
+        	var self = this;
+        	var cleared = '...';
+        	var cleared_style = {
+            		color: 'grey',
+            		fontWeight: 'normal'
+            	}
+        	self.setState({
+        		message: update(self.state.message, {$set: cleared})
+        	});
+        	self.setState({
+        		message_style: update(self.state.message_style, {$set: cleared_style})
+        	});
+        }, 10000)
+		window.location = "#";
+    }
+    
+    getFixings(){
+        setImmediate(() => {
 	    	var client = rest.wrap(mime);
 	    	var self = this;
 	    	
@@ -126,12 +190,13 @@ class Fixings extends Component {
 	    			function(response) {
 	        	var fixingsResponse = response.entity.fixings;
 	        	for (var i = 0; i < fixingsResponse.length; i++) {
-	        		// Submit action needs to be background launch
-	        		var cvaUrl = "/rest/cva/fixing/?key=" + i;
 	        		var fixing = {
 	        				select: i,
 	        				curvename: fixingsResponse[i].curvename,
-	        				action: <a href={cvaUrl}>Run</a>,
+	        				action: <form>
+	        							<input type="hidden" name="key" value={i} />
+	        							<button onClick={self.handleSubmit}>Submit</button>
+	        						</form>,
 	        				fixing_dates: "TODO",
 	        				fixing_rates: "TODO",
 	        		};
@@ -141,7 +206,7 @@ class Fixings extends Component {
 	        			});
 	        	}
 	    	});
-        }, 1000)
+        })
       }
 
     componentDidMount(){
@@ -155,7 +220,7 @@ class Fixings extends Component {
     	      <Styles>
     	        <Table columns={columns} data={this.state.fixings} />
     	      </Styles>
-    	      <p>{this.state.message}</p>
+    	      <p style={this.state.message_style}>{this.state.message}</p>
     	    </div>
         );
     }

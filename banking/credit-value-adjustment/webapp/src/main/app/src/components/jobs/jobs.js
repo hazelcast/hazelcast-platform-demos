@@ -169,7 +169,7 @@ class Jobs extends Component {
     		var csvUrl = "/rest/download/cva_csv?key=" + outputKey;
     		var xlsUrl = "/rest/download/cva_xlsx?key=" + outputKey;
     		csv = <a href={csvUrl} download>Download</a>;
-    		xls = <a href={xlsUrl} download>Download</a>;;
+    		xls = <a href={xlsUrl} download>Download</a>;
     	}
 
         var job = {

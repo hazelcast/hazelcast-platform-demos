@@ -231,7 +231,6 @@ public class MyRestController {
             stringBuilder.append(", \"error\": " + false + "");
             stringBuilder.append(", \"error_message\": \"\"");
         } catch (Exception e) {
-            LOGGER.error(requestKey, e);
             stringBuilder.append(", \"id\": \"\"");
             stringBuilder.append(", \"name\": \"\"");
             stringBuilder.append(", \"error\": " + true + "");
