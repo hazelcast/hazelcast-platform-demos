@@ -39,3 +39,39 @@ h3 {
 	border-top: 1px dashed;
 	border-color: var(--hazelcast-blue-light);
 }
+
+.three_row_scrollbar {
+	line-height: 1em;
+	max-height: 3em;
+	overflow-y: scroll;
+}
+.three_row_scrollbar::-webkit-scrollbar {
+    -webkit-appearance: none;
+}
+.three_row_scrollbar::-webkit-scrollbar:vertical {
+    width: 10px;
+}
+.three_row_scrollbar::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    border: 2px solid blue;
+    background-color: rgba(255,0,0,0.5);
+    color: var(--hazelcast-blue-dark);
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.8); 
+}
+.three_row_scrollbar::-webkit-scrollbar-thumb:window-inactive {
+    border-radius: 8px;
+    border: 2px solid blue;
+    background-color: rgba(255,0,0,0.8);
+    color: var(--hazelcast-blue-dark);
+}
+.three_row_scrollbar::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    border-radius: 10px;
+    background-color: rgba(0,255,0,0.8);
+    color: var(--hazelcast-orange);
+}
+.three_row_scrollbar::-webkit-scrollbar-track-piece {
+    background-color: rgba(0,0,255,0.8);
+    color: var(--hazelcast-blue-light);
+}
+

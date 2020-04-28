@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import {Collapse} from 'react-collapse';
+import {Scroll} from 'react-scroll';
 import {useTable} from 'react-table';
 import styled from 'styled-components';
 import update from 'immutability-helper';
@@ -145,8 +147,6 @@ class Fixings extends Component {
 	        		color: 'var(--hazelcast-blue)',
 	            	fontWeight: 'lighter'
 	            }
-	        		            
-	        	console.log('SSS', success_message, 'FFF', failure_message);
 	            
 	        	if (payload.error == true) {
 	        		text = failure_message
@@ -190,6 +190,23 @@ class Fixings extends Component {
 	    			function(response) {
 	        	var fixingsResponse = response.entity.fixings;
 	        	for (var i = 0; i < fixingsResponse.length; i++) {
+	        		
+	        		var fixing_dates = fixingsResponse[i].fixing_dates_ccyymmdd;
+	        		var fixing_rates = fixingsResponse[i].fixing_rates;
+	        		
+	        		const dates_p = [];
+	        		const rates_p = [];
+	        		
+	        		for (var j = 0; j < fixing_dates.length; j++) {
+	        			dates_p.push(<p>{fixing_dates[j]}</p>)
+	        		}
+	        		for (var j = 0; j < fixing_rates.length; j++) {
+	        			rates_p.push(<p>{fixing_rates[j]}</p>)
+	        		}
+	        		
+	        		var fixing_dates_div = <div class="three_row_scrollbar">{dates_p}</div>;
+		        	var fixing_rates_div = <div class="three_row_scrollbar">{rates_p}</div>;
+		        	
 	        		var fixing = {
 	        				select: i,
 	        				curvename: fixingsResponse[i].curvename,
@@ -197,8 +214,8 @@ class Fixings extends Component {
 	        							<input type="hidden" name="key" value={i} />
 	        							<button onClick={self.handleSubmit}>Submit</button>
 	        						</form>,
-	        				fixing_dates: "TODO",
-	        				fixing_rates: "TODO",
+	        				fixing_dates: fixing_dates_div,
+	        				fixing_rates: fixing_rates_div,
 	        		};
 
 	        		self.setState({
