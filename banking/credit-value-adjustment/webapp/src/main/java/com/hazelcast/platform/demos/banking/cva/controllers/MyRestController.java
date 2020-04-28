@@ -49,8 +49,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
+import com.hazelcast.jet.JetInstance;
+import com.hazelcast.jet.Job;
 import com.hazelcast.map.IMap;
 import com.hazelcast.platform.demos.banking.cva.MyConstants;
+import com.hazelcast.platform.demos.banking.cva.cvastp.CvaStpJobSubmitter;
 
 /**
  * <p>A controller for vending out REST requests, all of which
@@ -65,6 +68,8 @@ public class MyRestController {
 
     @Autowired
     private HazelcastInstance hazelcastInstance;
+    @Autowired
+    private JetInstance jetInstance;
 
     /**
      * <p>List the keys of the counterparty CDS map.
@@ -199,6 +204,42 @@ public class MyRestController {
             }
         }
         innerStringBuilder.append(" ]");
+    }
+
+
+    /**
+     * <p>Launch the CVA run for the specified fixing.
+     * <p>
+     *
+     * @return A String which Spring converts into JSON.
+     */
+    @GetMapping(value = "/cva/fixing", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String cvaFixing(@RequestParam("key") String requestKey) {
+        LOGGER.info("cvaFixing('{}')", requestKey);
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("{ \"date\": \"" + new Date() + "\"");
+        stringBuilder.append(", \"key\": \"" + requestKey + "\"");
+        stringBuilder.append(", \"key\": \"" + requestKey + "\"");
+
+        try {
+            //TODO requestKey is currently ignored
+            Job job = CvaStpJobSubmitter.submitCvaStpJob(false, this.jetInstance);
+
+            stringBuilder.append(", \"id\": \"" + job.getId() + "\"");
+            stringBuilder.append(", \"name\": \"" + job.getName() + "\"");
+            stringBuilder.append(", \"error\": " + false + "");
+            stringBuilder.append(", \"error_message\": \"\"");
+        } catch (Exception e) {
+            LOGGER.error(requestKey, e);
+            stringBuilder.append(", \"id\": \"\"");
+            stringBuilder.append(", \"name\": \"\"");
+            stringBuilder.append(", \"error\": " + true + "");
+            stringBuilder.append(", \"error_message\": \"" + e.getMessage() + "\"");
+        }
+
+        stringBuilder.append(" }");
+        return stringBuilder.toString();
     }
 
     /**

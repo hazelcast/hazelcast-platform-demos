@@ -111,36 +111,43 @@ class Fixings extends Component {
     constructor(props) {
         super(props);
         this.state = {
-    		fixings: []
-        };
+        		fixings: [],
+        		message: ""
+            };
+        this.getFixings = this.getFixings.bind(this);
     }
 
-    componentDidMount() { 
-    	var client = rest.wrap(mime);
+    getFixings(){
+        setTimeout(() => {
+	    	var client = rest.wrap(mime);
+	    	var self = this;
+	    	
+	    	client({path:'/rest/fixings'}).then(
+	    			function(response) {
+	        	var fixingsResponse = response.entity.fixings;
+	        	for (var i = 0; i < fixingsResponse.length; i++) {
+	        		// Submit action needs to be background launch
+	        		var cvaUrl = "/rest/cva/fixing/?key=" + i;
+	        		var fixing = {
+	        				select: i,
+	        				curvename: fixingsResponse[i].curvename,
+	        				action: <a href={cvaUrl}>Run</a>,
+	        				fixing_dates: "TODO",
+	        				fixing_rates: "TODO",
+	        		};
 
-    	client({path:'/rest/fixings'}).then(function(response) {
-    		//console.log('response.entity', response.entity);
-        	var fixingsResponse = response.entity.fixings;
-        	for (var i = 0; i < fixingsResponse.length; i++) {
-        		//var cvaUrl = "/rest/cva/fixing/?key=" + i;
-        		//cva = <a href={cvaUrl}>Run</a>;
-        		
-        		// Submit action needs to be background launch
-        		var fixing = {
-        				select: i,
-        				curvename: fixingsResponse[i].curvename,
-        				action: "TODO",
-        				fixing_dates: "TODO",
-        				fixing_rates: "TODO",
-        		};
-            	//var fixings = this.state.fixings;
-          		//this.setState({
-        		//	fixings: update(this.state.fixings, {$push: [fixing]}) 
-        		//	});
-        	}
-    	});
+	        		self.setState({
+	        			fixings: update(self.state.fixings, {$push: [fixing]}) 
+	        			});
+	        	}
+	    	});
+        }, 1000)
+      }
+
+    componentDidMount(){
+        this.getFixings();
     }
-	    
+
 	render() {
         return (
         	<div class="minor_pane">
@@ -148,6 +155,7 @@ class Fixings extends Component {
     	      <Styles>
     	        <Table columns={columns} data={this.state.fixings} />
     	      </Styles>
+    	      <p>{this.state.message}</p>
     	    </div>
         );
     }
