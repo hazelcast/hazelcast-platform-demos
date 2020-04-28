@@ -58,7 +58,7 @@ public class CvaStpJobSubmitter {
 
         Job job = MyUtils.findRunningJobsWithSamePrefix(jobNamePrefix, jetInstance);
         if (job != null) {
-            String message = String.format("Previous job '%s' id=='{}' still at status '%s'",
+            String message = String.format("Previous job '%s' id=='%d' still at status '%s'",
                     job.getName(), job.getId(), job.getStatus());
             throw new RuntimeException(message);
         } else {
