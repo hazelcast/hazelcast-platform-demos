@@ -27,13 +27,14 @@ public class MyConstants {
     // Map names, for eager creation
     public static final String IMAP_NAME_CP_CDS  = "cva_cp_cds";
     public static final String IMAP_NAME_CVA_CSV  = "cva_csv";
+    public static final String IMAP_NAME_CVA_DATA  = "cva_data";
     public static final String IMAP_NAME_CVA_XLSX  = "cva_xlsx";
     public static final String IMAP_NAME_IRCURVES  = "cva_ircurves";
     public static final String IMAP_NAME_FIXINGS = "cva_fixings";
     public static final String IMAP_NAME_TRADES  = "cva_trades";
 
     public static final List<String> IMAP_NAMES =
-            List.of(IMAP_NAME_CP_CDS, IMAP_NAME_CVA_CSV, IMAP_NAME_CVA_XLSX,
+            List.of(IMAP_NAME_CP_CDS, IMAP_NAME_CVA_CSV, IMAP_NAME_CVA_DATA, IMAP_NAME_CVA_XLSX,
                     IMAP_NAME_FIXINGS, IMAP_NAME_IRCURVES, IMAP_NAME_TRADES);
 
     public static final String ITOPIC_NAME_JOB_STATE  = "job_state";

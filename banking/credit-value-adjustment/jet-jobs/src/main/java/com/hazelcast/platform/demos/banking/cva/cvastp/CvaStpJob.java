@@ -104,8 +104,14 @@ import com.hazelcast.platform.demos.banking.cva.MyUtils;
  *                         |       +-----------------------------------------+    |
  *                         |                                                 |    |
  *                +------( 16)------+                                    +------( 17)------+
- *                |    CSV File     |                                    |  MS Excel File  |
+ *                |    CSV File     |                                    | MS Excel Prepare|
  *                +-----------------+                                    +-----------------+
+ *                                                                                |
+ *                                                +-------------------------------+
+ *                                                |                               |
+ *                                      +------( 18)------+              +------( 19)------+
+ *                                      |  MS Excel Live  |              |  MS Excel File  |
+ *                                      +-----------------+              +-----------------+
  * </pre>
  * <p>
  * The steps:
@@ -242,11 +248,28 @@ import com.hazelcast.platform.demos.banking.cva.MyUtils;
  * </li>
  * <li>
  * <p>
+ * Create Excel File content.
+ * </p>
+ * <p>This step is the same in concept as the previous, but instead of a CSV file it's
+ * an array of array representing the rows and columns that will go in an Excel spreadsheet.
+ * The columns in the spreadsheet come both from the calculated CVAs and by a looking to the
+ * CP CDS information.
+ * </p>
+ * </li>
+ * <li>
+ * <p>
+ * Store Excel File content for Excel Live Connect.
+ * </p>
+ * <p>This step saves the Excel content, an array of arrays, into an IMap. Logically
+ * this is close the CSV format, except there are different (extra) columns.
+ * </p>
+ * </li>
+ * <li>
+ * <p>
  * Create a Excel File to download.
  * </p>
- * <p>This step is the same in concept as the previous, but instead of a CSV file it's an
- * Excel spreadsheet that is produced. The columns in the spreadsheet come both
- * from the calculated CVAs and by a looking to the CP CDS information.
+ * <p>Turn the array of array of data into an actual Excel spreadsheet, and store
+ * this in binary form in an IMap.
  * </p>
  * </li>
  * </ol>
@@ -268,6 +291,7 @@ public class CvaStpJob {
     private static final String STAGE_NAME_CVA_EXPOSURE_BY_COUNTERPARTY = "cvaExposureByCounterparty";
     private static final String STAGE_NAME_CVA_EXPOSURE_BY_TRADE = "cvaExposureByTrade";
     private static final String STAGE_NAME_EXPOSURE = "exposure";
+    private static final String STAGE_NAME_OBJECT_ARRAY_ARRAY = "Object[][]";
     private static final String STAGE_NAME_SORTED_CP_CDS = "sortedCpCds";
     private static final String STAGE_NAME_SORTED_CVA_EXPOSURE_BY_COUNTERPARTY = "sortedCvaExposureByCounterparty";
     private static final String STAGE_NAME_TRADE_X_IRCURVES = "tradesXircurves";
@@ -396,14 +420,26 @@ public class CvaStpJob {
         .writeTo(Sinks.map(MyConstants.IMAP_NAME_CVA_CSV));
 
         // Step 17 above
-        sortedCvaExposureByCounterparty
-        .hashJoin(cpCdsEntryList,
-                CvaStpUtils.cartesianProduct(),
-                (sortedCvaExposures, cpCdsEntries) ->
-                    Tuple4.tuple4(sortedCvaExposures.f0(), sortedCvaExposures.f1(), sortedCvaExposures.f2(),
-                            (List<Entry<String, HazelcastJsonValue>>) cpCdsEntries)
-                )
-        .map(XlstFileAsByteArray.CONVERT_TUPLES_TO_BYTE_ARRAY)
+        BatchStage<Object[][]> excelDataContent =
+                sortedCvaExposureByCounterparty
+                .hashJoin(cpCdsEntryList,
+                        CvaStpUtils.cartesianProduct(),
+                        (sortedCvaExposures, cpCdsEntries) ->
+                            Tuple4.tuple4(sortedCvaExposures.f0(), sortedCvaExposures.f1(), sortedCvaExposures.f2(),
+                                    (List<Entry<String, HazelcastJsonValue>>) cpCdsEntries)
+                        )
+                .map(XlstDataAsObjectArrayArray.CONVERT_TUPLES_TO_STRING_ARRAY_ARRAY)
+                .setName(STAGE_NAME_OBJECT_ARRAY_ARRAY);
+
+        // Step 18 above
+        excelDataContent
+        .map(bytes -> new SimpleImmutableEntry<String, Object[][]>(timestampStr, bytes))
+        .writeTo(Sinks.map(MyConstants.IMAP_NAME_CVA_DATA));
+
+        // Step 19 above
+        excelDataContent
+        .map(objectArrayArray -> Tuple3.tuple3(jobName, timestamp, objectArrayArray))
+        .map(XlstFileAsByteArray.CONVERT_TUPLE3_TO_BYTE_ARRAY)
         .map(bytes -> new SimpleImmutableEntry<String, byte[]>(timestampStr, bytes))
         .writeTo(Sinks.map(MyConstants.IMAP_NAME_CVA_XLSX))
         ;
