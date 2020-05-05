@@ -160,8 +160,8 @@ class Jobs extends Component {
 
     	let notAvailable = <div><i>"N/a"</i></div>;
     	var nowStr = myISO8601(message.now);
-    	var jobKey = message.job.name.split('@')[0];
-    	var outputKey = message.job.name.split('@')[1];
+    	var jobKey = message.job.name.split('$')[0];
+    	var outputKey = message.job.name.split('$')[1];
     	var submissionTimeStr = myISO8601(message.job.submission_time);
     	var csv = notAvailable;
     	var xls = notAvailable;

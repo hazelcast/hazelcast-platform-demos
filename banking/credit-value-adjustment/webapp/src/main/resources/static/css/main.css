@@ -42,7 +42,7 @@ h3 {
 
 .three_row_scrollbar {
 	line-height: 1em;
-	max-height: 3em;
+	max-height: 5em;
 	overflow-y: scroll;
 }
 .three_row_scrollbar::-webkit-scrollbar {

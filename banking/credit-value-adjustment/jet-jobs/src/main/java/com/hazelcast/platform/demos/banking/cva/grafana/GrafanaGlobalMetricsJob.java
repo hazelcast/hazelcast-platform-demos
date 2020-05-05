@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.hazelcast.platform.demos.banking.cva;
+package com.hazelcast.platform.demos.banking.cva.grafana;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,11 @@ import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.SourceBuilder;
 import com.hazelcast.jet.pipeline.StreamSource;
 import com.hazelcast.map.IMap;
+import com.hazelcast.platform.demos.banking.cva.GraphiteMetric;
+import com.hazelcast.platform.demos.banking.cva.MapStatsCallable;
+import com.hazelcast.platform.demos.banking.cva.MyConstants;
 import com.hazelcast.platform.demos.banking.cva.MyConstants.Site;
+import com.hazelcast.platform.demos.banking.cva.MyUtils;
 
 /**
  * <p>

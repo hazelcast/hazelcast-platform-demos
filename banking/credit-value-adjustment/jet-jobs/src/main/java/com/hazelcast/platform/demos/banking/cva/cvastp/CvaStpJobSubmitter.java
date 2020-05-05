@@ -43,14 +43,14 @@ public class CvaStpJobSubmitter {
      * @return The job if submitted
      * @throws Exception If the job is rejected as a duplicate is still running
      */
-    public static Job submitCvaStpJob(boolean debug, JetInstance jetInstance) throws Exception {
+    public static Job submitCvaStpJob(boolean debug, boolean cpp, JetInstance jetInstance) throws Exception {
         long timestamp = System.currentTimeMillis();
         String timestampStr = MyUtils.timestampToISO8601(timestamp);
 
         String jobNamePrefix = CvaStpJob.JOB_NAME_PREFIX;
         String jobName = jobNamePrefix + "@" + timestampStr;
 
-        Pipeline pipeline = CvaStpJob.buildPipeline(jobName, timestamp, debug);
+        Pipeline pipeline = CvaStpJob.buildPipeline(jobName, timestamp, debug, cpp);
 
         JobConfig jobConfig = new JobConfig();
         jobConfig.setName(jobName);

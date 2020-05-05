@@ -1,4 +1,4 @@
-FROM amd64/ubuntu:18.04
+FROM amd64/ubuntu:20.04
 
 # Add and confirm Java installed
 RUN apt update

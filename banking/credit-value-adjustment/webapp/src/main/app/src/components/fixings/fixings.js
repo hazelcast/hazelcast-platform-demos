@@ -48,24 +48,12 @@ const Styles = styled.div `
 // Table columns
 const columns = [
 	{
-		Header: 'Select',
-		accessor: 'select',
-	},
-	{
 		Header: 'Curve Name',
 		accessor: 'curvename',
 	},
 	{
-		Header: 'Action',
-		accessor: 'action',
-	},
-	{
-		Header: 'Fixing Dates',
-		accessor: 'fixing_dates',
-	},
-	{
-		Header: 'Fixing Rates',
-		accessor: 'fixing_rates',
+		Header: 'Fixing Dates And Rates',
+		accessor: 'fixing_dates_and_rates',
 	},
 ]
 
@@ -113,6 +101,7 @@ class Fixings extends Component {
     constructor(props) {
         super(props);
         this.state = {
+        		calc_date: '2016-01-07',
         		fixings: [],
         		message: '...',
             	message_style: {
@@ -130,7 +119,9 @@ class Fixings extends Component {
 	    	var client = rest.wrap(mime);
 	    	var self = this;
 	    	
-	    	client({path:'/rest/cva/fixing/?key='}).then(
+	    	var restURL = '/rest/cva/run/?key=' + this.state.calc_date;
+	    	
+	    	client({path:restURL}).then(
 	    			function(response) {
 	    		console.log('response.entity', response.entity);
 	        	var payload = response.entity;
@@ -194,28 +185,18 @@ class Fixings extends Component {
 	        		var fixing_dates = fixingsResponse[i].fixing_dates_ccyymmdd;
 	        		var fixing_rates = fixingsResponse[i].fixing_rates;
 	        		
-	        		const dates_p = [];
-	        		const rates_p = [];
+	        		const dates_and_rates_p = [];
 	        		
 	        		for (var j = 0; j < fixing_dates.length; j++) {
-	        			dates_p.push(<p>{fixing_dates[j]}</p>)
-	        		}
-	        		for (var j = 0; j < fixing_rates.length; j++) {
-	        			rates_p.push(<p>{fixing_rates[j]}</p>)
+	        			var pair = fixing_dates[j] + ' - ' + fixing_rates[j];
+	        			dates_and_rates_p.push(<p>{pair}</p>);
 	        		}
 	        		
-	        		var fixing_dates_div = <div class="three_row_scrollbar">{dates_p}</div>;
-		        	var fixing_rates_div = <div class="three_row_scrollbar">{rates_p}</div>;
+		        	var fixing_dates_and_rates_div = <div class="three_row_scrollbar">{dates_and_rates_p}</div>;
 		        	
 	        		var fixing = {
-	        				select: i,
 	        				curvename: fixingsResponse[i].curvename,
-	        				action: <form>
-	        							<input type="hidden" name="key" value={i} />
-	        							<button onClick={self.handleSubmit}>Submit</button>
-	        						</form>,
-	        				fixing_dates: fixing_dates_div,
-	        				fixing_rates: fixing_rates_div,
+	        				fixing_dates_and_rates: fixing_dates_and_rates_div,
 	        		};
 
 	        		self.setState({
@@ -237,6 +218,11 @@ class Fixings extends Component {
     	      <Styles>
     	        <Table columns={columns} data={this.state.fixings} />
     	      </Styles>
+			  <form>
+			  	<label for="calc_date">Calc Date:</label>
+			  	<input type="text" id="calc_date" name="calc_date" value={this.state.calc_date} readonly/>
+				<button onClick={this.handleSubmit}>Submit</button>
+			  </form>
     	      <p style={this.state.message_style}>{this.state.message}</p>
     	    </div>
         );

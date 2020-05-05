@@ -307,15 +307,26 @@ public class CvaStpJob {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static Pipeline buildPipeline(String jobName, long timestamp, boolean debug) {
+    public static Pipeline buildPipeline(String jobName, long timestamp, boolean debug, boolean cpp/*FIXME*/) {
         String timestampStr = MyUtils.timestampToISO8601(timestamp);
 
         Pipeline pipeline = Pipeline.create();
 
         boolean debug2 = debug;
-
-        //XXX Temporary test use, use test MTM data.
-
+        if (cpp) {
+            System.out.println("@@@@@@@@@@@@");
+            System.out.println("@@@@@@@@@@@@");
+            System.out.println("Call C++");//FIXME
+            System.out.println("@@@@@@@@@@@@");
+            System.out.println("@@@@@@@@@@@@");
+        } else {
+            System.out.println("@@@@@@@@@@@@");
+            System.out.println("@@@@@@@@@@@@");
+            System.out.println("Stub C++");//FIXME
+            System.out.println("@@@@@@@@@@@@");
+            System.out.println("@@@@@@@@@@@@");
+        }
+        
         BatchStage<Tuple3<String, String, String>> mtm = null;
         if (!debug2) {
         // Step 1 above
@@ -342,9 +353,18 @@ public class CvaStpJob {
 
         //FIXME: Replace with C++, include Fixing as initialisation
         // Step 9 above
-            mtm =
-                tradesXircurves
-                .customTransform("TMP-MTM", CvaStpJob.DummyMTMCalc::new);
+            if (cpp) {
+                //FIXME
+                System.out.println("??");
+                        mtm =
+                        tradesXircurves
+                        .customTransform("TMP-MTM", CvaStpJob.DummyMTMCalc::new);
+
+            } else {
+                mtm =
+                        tradesXircurves
+                        .customTransform("TMP-MTM", CvaStpJob.DummyMTMCalc::new);
+            }
         } else {
             mtm =
                     pipeline

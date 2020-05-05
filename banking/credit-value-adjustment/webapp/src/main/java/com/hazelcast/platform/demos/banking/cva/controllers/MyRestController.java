@@ -108,7 +108,7 @@ public class MyRestController {
     }
 
     /**
-     * <p>Return all fixings.
+     * <p>Return all fixing dates and rates.
      * <p>
      *
      * @return A String which Spring converts into JSON.
@@ -208,23 +208,24 @@ public class MyRestController {
 
 
     /**
-     * <p>Launch the CVA run for the specified fixing.
+     * <p>Launch the CVA run for the given calculation date.
      * <p>
      *
      * @return A String which Spring converts into JSON.
      */
-    @GetMapping(value = "/cva/fixing", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String cvaFixing(@RequestParam("key") String requestKey) {
-        LOGGER.info("cvaFixing('{}')", requestKey);
+    @GetMapping(value = "/cva/run", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String cvaRun(@RequestParam("key") String requestKey) {
+        LOGGER.info("cvaRun('{}')", requestKey);
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{ \"date\": \"" + new Date() + "\"");
         stringBuilder.append(", \"key\": \"" + requestKey + "\"");
-        stringBuilder.append(", \"key\": \"" + requestKey + "\"");
 
         try {
-            //TODO requestKey is currently ignored
-            Job job = CvaStpJobSubmitter.submitCvaStpJob(false, this.jetInstance);
+            LocalDate calcDate = LocalDate.parse(requestKey);
+            boolean debug = false;
+            boolean cpp = false;
+            Job job = CvaStpJobSubmitter.submitCvaStpJob(debug, cpp, calcDate, this.jetInstance);
 
             stringBuilder.append(", \"id\": \"" + job.getId() + "\"");
             stringBuilder.append(", \"name\": \"" + job.getName() + "\"");

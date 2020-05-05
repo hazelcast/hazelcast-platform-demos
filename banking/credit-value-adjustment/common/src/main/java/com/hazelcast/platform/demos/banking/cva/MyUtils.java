@@ -114,7 +114,7 @@ public class MyUtils {
      * @param host The location of Graphite/Grafana, port 2004 assumed
      * @return A sink to save to that location.
      */
-    protected static Sink<List<GraphiteMetric>> buildGraphiteSinkMultiple(String host) {
+    public static Sink<List<GraphiteMetric>> buildGraphiteSinkMultiple(String host) {
         return SinkBuilder.sinkBuilder(
                         "graphite",
                         context -> {

@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Configuration;
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.pipeline.Pipeline;
+import com.hazelcast.platform.demos.banking.cva.grafana.GrafanaGlobalMetricsJob;
 
 /**
  * <p>Ensure the server is in a ready state, by requesting all the
