@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.banking.cva.cvastp;
 
+import java.time.LocalDate;
+
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.Job;
 import com.hazelcast.jet.config.JobConfig;
@@ -43,14 +45,14 @@ public class CvaStpJobSubmitter {
      * @return The job if submitted
      * @throws Exception If the job is rejected as a duplicate is still running
      */
-    public static Job submitCvaStpJob(boolean debug, boolean cpp, JetInstance jetInstance) throws Exception {
+    public static Job submitCvaStpJob(boolean debug, boolean cpp, LocalDate calcDate, JetInstance jetInstance) throws Exception {
         long timestamp = System.currentTimeMillis();
         String timestampStr = MyUtils.timestampToISO8601(timestamp);
 
         String jobNamePrefix = CvaStpJob.JOB_NAME_PREFIX;
-        String jobName = jobNamePrefix + "@" + timestampStr;
+        String jobName = jobNamePrefix + "$" + calcDate + "@" + timestampStr;
 
-        Pipeline pipeline = CvaStpJob.buildPipeline(jobName, timestamp, debug, cpp);
+        Pipeline pipeline = CvaStpJob.buildPipeline(jobName, timestamp, calcDate, debug, cpp);
 
         JobConfig jobConfig = new JobConfig();
         jobConfig.setName(jobName);

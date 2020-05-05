@@ -18,6 +18,7 @@ package com.hazelcast.platform.demos.banking.cva.cvastp;
 
 import java.util.List;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map.Entry;
 
@@ -303,11 +304,13 @@ public class CvaStpJob {
      *
      * @param jobName      For debug logging
      * @param timestamp    Job submit time
+     * @param calcDate     For C++
      * @param debug        For development, save intermediate results
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static Pipeline buildPipeline(String jobName, long timestamp, boolean debug, boolean cpp/*FIXME*/) {
+    public static Pipeline buildPipeline(String jobName, long timestamp, LocalDate calcDate,
+            boolean debug, boolean cpp/*FIXME*/) {
         String timestampStr = MyUtils.timestampToISO8601(timestamp);
 
         Pipeline pipeline = Pipeline.create();
@@ -316,7 +319,7 @@ public class CvaStpJob {
         if (cpp) {
             System.out.println("@@@@@@@@@@@@");
             System.out.println("@@@@@@@@@@@@");
-            System.out.println("Call C++");//FIXME
+            System.out.println("Call C++ " + calcDate);//FIXME
             System.out.println("@@@@@@@@@@@@");
             System.out.println("@@@@@@@@@@@@");
         } else {
@@ -436,7 +439,7 @@ public class CvaStpJob {
         // Step 16 above, tuple3 is jobname, timestamp, list of cp,cva
         sortedCvaExposureByCounterparty
         .map(CsvFileAsByteArray.CONVERT_TUPLE3_TO_BYTE_ARRAY)
-        .map(bytes -> new SimpleImmutableEntry<String, byte[]>(timestampStr, bytes))
+        .map(bytes -> new SimpleImmutableEntry<String, byte[]>(calcDate + "@" + timestampStr, bytes))
         .writeTo(Sinks.map(MyConstants.IMAP_NAME_CVA_CSV));
 
         // Step 17 above
@@ -453,20 +456,20 @@ public class CvaStpJob {
 
         // Step 18 above
         excelDataContent
-        .map(bytes -> new SimpleImmutableEntry<String, Object[][]>(timestampStr, bytes))
+        .map(bytes -> new SimpleImmutableEntry<String, Object[][]>(calcDate + "@" + timestampStr, bytes))
         .writeTo(Sinks.map(MyConstants.IMAP_NAME_CVA_DATA));
 
         // Step 19 above
         excelDataContent
         .map(objectArrayArray -> Tuple3.tuple3(jobName, timestamp, objectArrayArray))
         .map(XlstFileAsByteArray.CONVERT_TUPLE3_TO_BYTE_ARRAY)
-        .map(bytes -> new SimpleImmutableEntry<String, byte[]>(timestampStr, bytes))
+        .map(bytes -> new SimpleImmutableEntry<String, byte[]>(calcDate + "@" + timestampStr, bytes))
         .writeTo(Sinks.map(MyConstants.IMAP_NAME_CVA_XLSX))
         ;
 
         // Optional stages for debugging.
         if (debug) {
-            addDebugSaveStages(timestampStr, mtm, exposure, cvaExposure,
+            addDebugSaveStages(calcDate, timestampStr, mtm, exposure, cvaExposure,
                     cvaExposureByTrade, cvaExposureByCounterparty);
             addDebugLogStages(jobName, sortedCvaExposureByCounterparty);
         }
@@ -485,42 +488,44 @@ public class CvaStpJob {
      * <p>These maps may have many many entries.
      * </p>
      */
-    public static void addDebugSaveStages(String timestampStr,
+    public static void addDebugSaveStages(LocalDate calcDate, String timestampStr,
             BatchStage<Tuple3<String, String, String>> mtm,
             BatchStage<Tuple3<String, String, String>> exposure,
             BatchStage<Tuple3<String, String, String>> cvaExposure,
             BatchStage<Entry<String, Tuple2<String, String>>> cvaExposureByTrade,
             BatchStage<Entry<String, Double>> cvaExposureByCounterparty) {
 
+        String prefix = "debug_" + calcDate + "@" +  timestampStr;
+
         /* (1) Save MTMs. Watch out there could be billions
          */
         mtm
         .map(tuple3 -> new SimpleImmutableEntry<String, String>(tuple3.f0() + "," + tuple3.f1(), tuple3.f2())).setName("reformat")
         // FIXME, Adjust stage name once C++ ready
-        .writeTo(Sinks.map("debug_" + timestampStr + "_TMP-MTM"));
+        .writeTo(Sinks.map(prefix + "_TMP-MTM"));
 
         /* (2) Save Exposures. Same count as MTMs.
          */
         exposure
         .map(tuple3 -> new SimpleImmutableEntry<String, String>(tuple3.f0() + "," + tuple3.f1(), tuple3.f2())).setName("reformat")
-        .writeTo(Sinks.map("debug_" + timestampStr + "_" + STAGE_NAME_EXPOSURE));
+        .writeTo(Sinks.map(prefix + STAGE_NAME_EXPOSURE));
 
         /* (3) Save CVA Exposures. Same count as MTMs.
          */
         cvaExposure
         .map(tuple3 -> new SimpleImmutableEntry<String, String>(tuple3.f0() + "," + tuple3.f1(), tuple3.f2())).setName("reformat")
-        .writeTo(Sinks.map("debug_" + timestampStr + "_" + STAGE_NAME_CVA_EXPOSURE));
+        .writeTo(Sinks.map(prefix + STAGE_NAME_CVA_EXPOSURE));
 
         /* (4) Save CVA Exposures by Trade. Same count as trades.
          */
         cvaExposureByTrade
         .map(entry -> new SimpleImmutableEntry<String, String>(entry.getKey(), entry.getValue().f1())).setName("reformat")
-        .writeTo(Sinks.map("debug_" + timestampStr + "_" + STAGE_NAME_CVA_EXPOSURE_BY_TRADE));
+        .writeTo(Sinks.map(prefix + STAGE_NAME_CVA_EXPOSURE_BY_TRADE));
 
         /* (5) Save CVA Exposures by Counterparty. Same count as counterparties.
          */
         cvaExposureByCounterparty
-        .writeTo(Sinks.map("debug_" + timestampStr + "_" + STAGE_NAME_CVA_EXPOSURE_BY_COUNTERPARTY));
+        .writeTo(Sinks.map(prefix + STAGE_NAME_CVA_EXPOSURE_BY_COUNTERPARTY));
     }
 
 
