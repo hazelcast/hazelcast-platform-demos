@@ -1,12 +1,12 @@
 #include <iostream>
 #include "../include/JsonHandler.h"
 #include "../include/Pricer.h"
-#include "../include/JetToPython.grpc.pb.h"
+#include "../include/JetToCpp.grpc.pb.h"
 #include <grpcpp/grpcpp.h>
 using namespace std;
 using namespace QuantLib;
 using namespace FlumaionQL;
-using namespace jet_to_python;
+using namespace com_hazelcast_platform_demos_banking_cva;
 using namespace grpc;
 
 void getMTM(string jsonBundle, string* mtmjson) {
@@ -56,7 +56,7 @@ void getMTM(string jsonBundle, string* mtmjson) {
     jsonHandler.MtmToJson(mtm, mtmjson);
 }
 
-class JetToPythonServiceImpl final : public JetToPython::Service {
+class JetToCppServiceImpl final : public JetToCpp::Service {
     Status streamingCall(ServerContext* context,
                          ServerReaderWriter<OutputMessage, InputMessage>* stream) override {
         InputMessage request;
@@ -73,7 +73,7 @@ class JetToPythonServiceImpl final : public JetToPython::Service {
     }
 };
 void RunServer(string server_address) {
-    JetToPythonServiceImpl service;
+    JetToCppServiceImpl service;
     ServerBuilder builder;
     // Listen on the given address without any authentication mechanism.
     builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
