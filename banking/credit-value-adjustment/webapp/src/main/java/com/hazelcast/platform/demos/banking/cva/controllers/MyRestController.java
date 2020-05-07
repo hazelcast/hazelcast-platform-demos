@@ -223,9 +223,7 @@ public class MyRestController {
 
         try {
             LocalDate calcDate = LocalDate.parse(requestKey);
-            boolean debug = false;
-            boolean cpp = false;
-            Job job = CvaStpJobSubmitter.submitCvaStpJob(debug, cpp, calcDate, this.jetInstance);
+            Job job = CvaStpJobSubmitter.submitCvaStpJob(this.jetInstance, calcDate);
 
             stringBuilder.append(", \"id\": \"" + job.getId() + "\"");
             stringBuilder.append(", \"name\": \"" + job.getName() + "\"");

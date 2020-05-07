@@ -197,4 +197,16 @@ public class CvaStpUtils {
         return stringBuilder.toString();
     }
 
+
+    /**
+     * <p>Escape <em>escaped</em> double quotes in strings.
+     * </p>
+     *
+     * @param s Any old string
+     * @return
+     */
+    public static String escapeQuotes(String s) {
+        return s.replace("\"", "\\\"");
+    }
+
 }

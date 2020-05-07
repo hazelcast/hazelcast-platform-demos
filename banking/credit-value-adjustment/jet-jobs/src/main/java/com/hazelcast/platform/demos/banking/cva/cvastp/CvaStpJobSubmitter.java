@@ -30,6 +30,30 @@ import com.hazelcast.platform.demos.banking.cva.MyUtils;
  */
 public class CvaStpJobSubmitter {
 
+    //FIXME Replace from Kubernetes
+    private static final String LOAD_BALANCER = "127.0.0.1";
+    private static final int PORT = 50001;
+
+    /**
+     * <p>Try to submit the {@link CvaStpJob}, allowing only one to be running
+     * per calculation date.
+     * </p>
+     * <p>Call through to the customer invoker which takes an extra argument
+     * for whether to run intermediate debugging stages. These extra stages
+     * save output to maps, so slow the job down and the map content could
+     * be huge.
+     * </p>
+     *
+     * @param jetInstance Used to find similar named jobs
+     * @param calcDate Calculation date to use
+     * @return The job if submitted
+     * @throws Exception If the job is rejected as a duplicate is still running
+     */
+    public static Job submitCvaStpJob(JetInstance jetInstance, LocalDate calcDate) throws Exception {
+        boolean debug = false;
+        return CvaStpJobSubmitter.submitCvaStpJob(jetInstance, calcDate, debug);
+    }
+
     /**
      * <p>Submit the {@link CvaStpJob} so that one is running.
      * </p>
@@ -40,19 +64,20 @@ public class CvaStpJobSubmitter {
      * a suffix.
      * </p>
      *
-     * @param debug If debug job steps are required
      * @param jetInstance Used to find similar named jobs
+     * @param calcDate Calculation date to use
+     * @param debug If debug job steps are required
      * @return The job if submitted
      * @throws Exception If the job is rejected as a duplicate is still running
      */
-    public static Job submitCvaStpJob(boolean debug, boolean cpp, LocalDate calcDate, JetInstance jetInstance) throws Exception {
+    public static Job submitCvaStpJob(JetInstance jetInstance, LocalDate calcDate, boolean debug) throws Exception {
         long timestamp = System.currentTimeMillis();
         String timestampStr = MyUtils.timestampToISO8601(timestamp);
 
         String jobNamePrefix = CvaStpJob.JOB_NAME_PREFIX;
         String jobName = jobNamePrefix + "$" + calcDate + "@" + timestampStr;
 
-        Pipeline pipeline = CvaStpJob.buildPipeline(jobName, timestamp, calcDate, debug, cpp);
+        Pipeline pipeline = CvaStpJob.buildPipeline(jobName, timestamp, calcDate, LOAD_BALANCER, PORT, debug);
 
         JobConfig jobConfig = new JobConfig();
         jobConfig.setName(jobName);

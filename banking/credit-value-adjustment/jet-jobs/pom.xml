@@ -36,6 +36,11 @@
 			<artifactId>hazelcast-jet</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet-grpc</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 </project>
