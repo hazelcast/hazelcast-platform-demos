@@ -70,7 +70,8 @@ public class JsonLoaderService {
      * </p>
      * <p>If the file is a Zip, look for the files inside and process them.</p>
      */
-    public boolean load(String mapName, String inputFileName, String keyFieldName) {
+    public boolean load(String mapName, String inputFileName, String keyFieldName,
+            boolean okIfPartial) {
         IMap<String, HazelcastJsonValue> iMap = this.hazelcastInstance.getMap(mapName);
 
         this.duplicates = 0;
@@ -95,6 +96,13 @@ public class JsonLoaderService {
                     inputFileName, this.read, this.written, iMap.getName(),
                     this.duplicates, this.errors);
         }
+
+        if (this.stopEarly && !okIfPartial) {
+            LOGGER.warn("Partial load for '{}' map may cause issues, "
+                    + "eg. for 'stage.mapUsingIMap(\"{}\", etc)'",
+                    inputFileName, iMap.getName());
+        }
+
         return (this.errors == 0);
     }
 

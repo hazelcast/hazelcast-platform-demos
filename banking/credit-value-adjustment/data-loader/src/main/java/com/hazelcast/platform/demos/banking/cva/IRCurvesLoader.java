@@ -31,6 +31,8 @@ import org.springframework.stereotype.Component;
 @Order(value = 3)
 public class IRCurvesLoader implements CommandLineRunner {
 
+    private static final boolean PARTIAL_OK = true;
+
     @Autowired
     private JsonLoaderService jsonLoaderService;
 
@@ -41,7 +43,7 @@ public class IRCurvesLoader implements CommandLineRunner {
     public void run(String... args) throws Exception {
         String inputFileName = "ircurves.json";
         String keyFieldName = "curvename";
-        this.jsonLoaderService.load(MyConstants.IMAP_NAME_IRCURVES, inputFileName, keyFieldName);
+        this.jsonLoaderService.load(MyConstants.IMAP_NAME_IRCURVES, inputFileName, keyFieldName, PARTIAL_OK);
     }
 
 }

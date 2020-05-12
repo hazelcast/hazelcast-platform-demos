@@ -90,7 +90,7 @@ public class XlstDataAsObjectArrayArray {
                 result[0] = COLUMNS_LABELS.toArray();
 
                 for (int i = 0; i < cvaList.size(); i++) {
-                    result[i + 1] = getFields(cvaList.get(i), cpCdsList.get(i));
+                    result[i + 1] = getFields(cvaList.get(i), cpCdsList);
                 }
 
                 return result;
@@ -101,30 +101,41 @@ public class XlstDataAsObjectArrayArray {
      * <p>Extract the required data fields. For the CVA entry, it's both fields.
      * For the Counterparty CDS, it's the named fields in the JSON Object.
      * </p>
+     * <p>Not all counterparties may be used by the CVA entry, so have to find
+     * the match in the Counterparty list.
+     * </p>
      *
      * @param cvaEntry Counterparty code and amount pair
-     * @param cpCdsEntry Counterparty code and JSON
+     * @param cpCdsEntries Counterparty codes and JSON
      * @return
      */
-    private static Object[] getFields(Entry<String, Double> cvaEntry, Entry<String, HazelcastJsonValue> cpCdsEntry) {
+    private static Object[] getFields(Entry<String, Double> cvaEntry,
+            List<Entry<String, HazelcastJsonValue>> cpCdsEntries) {
 
         List<Object> result = new ArrayList<>();
         result.add(cvaEntry.getKey());
         result.add(cvaEntry.getValue());
 
-        if (!cvaEntry.getKey().equals(cpCdsEntry.getKey())) {
-            // Should never occur unless someone changes the sort ordering
-            LOGGER.error("Key mismatch, '{}'!='{}'", cvaEntry.getKey(), cpCdsEntry.getKey());
+        String jsonStr = null;
+
+        // Find match
+        for (Entry<String, HazelcastJsonValue> cpCdsEntry : cpCdsEntries) {
+            if (cvaEntry.getKey().equals(cpCdsEntry.getKey())) {
+                jsonStr = cpCdsEntry.getValue().toString();
+            }
+        }
+        if (jsonStr == null) {
+            // Should never occur, ket from trade should be in CDS
+            LOGGER.error("Key '{}' not found", cvaEntry.getKey());
             return result.toArray();
         }
 
         // For easier field lookup
-        String jsonStr = cpCdsEntry.getValue().toString();
         JSONObject json = null;
         try {
             json = new JSONObject(jsonStr);
         } catch (JSONException e) {
-            LOGGER.error(cpCdsEntry.getKey(), e);
+            LOGGER.error(cvaEntry.getKey(), e);
             for (int i = 0 ; i < CP_CDS_COLUMNS.size(); i++) {
                 result.add("?");
             }
@@ -138,10 +149,10 @@ public class XlstDataAsObjectArrayArray {
                 if (field instanceof String) {
                     result.add(field);
                 } else {
-                    LOGGER.error("{},{} field type {} not handled", cpCdsEntry.getKey(), fieldName, field.getClass());
+                    LOGGER.error("{},{} field type {} not handled", cvaEntry.getKey(), fieldName, field.getClass());
                 }
             } catch (JSONException e) {
-                LOGGER.error(cpCdsEntry.getKey() + "," + fieldName, e);
+                LOGGER.error(cvaEntry.getKey() + "," + fieldName, e);
                 result.add("?");
             }
         }

@@ -31,6 +31,8 @@ import org.springframework.stereotype.Component;
 @Order(value = 2)
 public class FixingsLoader implements CommandLineRunner {
 
+    private static final boolean PARTIAL_OK = true;
+
     @Autowired
     private JsonLoaderService jsonLoaderService;
 
@@ -41,7 +43,7 @@ public class FixingsLoader implements CommandLineRunner {
     public void run(String... args) throws Exception {
         String inputFileName = "fixings.json";
         String keyFieldName = "curvename";
-        this.jsonLoaderService.load(MyConstants.IMAP_NAME_FIXINGS, inputFileName, keyFieldName);
+        this.jsonLoaderService.load(MyConstants.IMAP_NAME_FIXINGS, inputFileName, keyFieldName, PARTIAL_OK);
     }
 
 }

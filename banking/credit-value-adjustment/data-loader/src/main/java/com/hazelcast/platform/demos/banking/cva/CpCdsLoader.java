@@ -31,6 +31,8 @@ import org.springframework.stereotype.Component;
 @Order(value = 1)
 public class CpCdsLoader implements CommandLineRunner {
 
+    private static final boolean PARTIAL_NOT_IDEAL = false;
+
     @Autowired
     private JsonLoaderService jsonLoaderService;
 
@@ -41,7 +43,7 @@ public class CpCdsLoader implements CommandLineRunner {
     public void run(String... args) throws Exception {
         String inputFileName = "cp_cds.json";
         String keyFieldName = "ticker";
-        this.jsonLoaderService.load(MyConstants.IMAP_NAME_CP_CDS, inputFileName, keyFieldName);
+        this.jsonLoaderService.load(MyConstants.IMAP_NAME_CP_CDS, inputFileName, keyFieldName, PARTIAL_NOT_IDEAL);
     }
 
 }

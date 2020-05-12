@@ -24,7 +24,6 @@ import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 import com.hazelcast.core.HazelcastJsonValue;
@@ -32,16 +31,23 @@ import com.hazelcast.function.ComparatorEx;
 import com.hazelcast.function.Functions;
 import com.hazelcast.jet.aggregate.AggregateOperation1;
 import com.hazelcast.jet.aggregate.AggregateOperations;
-import com.hazelcast.jet.core.AbstractProcessor;
 import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.jet.datamodel.Tuple4;
+import com.hazelcast.jet.grpc.GrpcService;
+import com.hazelcast.jet.grpc.GrpcServices;
 import com.hazelcast.jet.pipeline.BatchStage;
 import com.hazelcast.jet.pipeline.Pipeline;
+import com.hazelcast.jet.pipeline.ServiceFactory;
 import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.pipeline.Sources;
+import com.hazelcast.platform.demos.banking.cva.InputMessage;
+import com.hazelcast.platform.demos.banking.cva.JetToCppGrpc;
 import com.hazelcast.platform.demos.banking.cva.MyConstants;
 import com.hazelcast.platform.demos.banking.cva.MyUtils;
+import com.hazelcast.platform.demos.banking.cva.OutputMessage;
+
+import io.grpc.ManagedChannelBuilder;
 
 /**
  * <p>
@@ -56,15 +62,15 @@ import com.hazelcast.platform.demos.banking.cva.MyUtils;
  *              |                     |                     |                     |
  *              |                     |                     |                     |
  *              |                     |                     |                     |
- *     +------( 5 )------+   +------( 6 )------+            |                     |
- *     |    "trades"     |   |    "ircurves"   |            |                     |
- *     +-----------------+   +-----------------+            |                     |
+ *     +------( 5 )------+   +------( 6 )------+   +------( 7 )------+            |
+ *     |    "trades"     |   |    "ircurves"   |   |    "fixings"    |            |
+ *     +-----------------+   +-----------------+   +-----------------+            |
  *               \                   /                      |                     |
  *                \                 /                       |                     |
  *                 \               /                        |                     |
- *                +------( 7 )------+              +------( 8 )------+            |
- *                |  Trade x Curve  |              |    "fixings"    |            |
- *                +-----------------+              +-----------------+            |
+ *                +------( 8 )------+                       |                     |
+ *                |  Trade x Curve  |                       |                     |
+ *                +-----------------+                       |                     |
  *                         |                                |                     |
  *                         |      +-------------------------+                     |
  *                         |      |                                               |
@@ -166,17 +172,17 @@ import com.hazelcast.platform.demos.banking.cva.MyUtils;
  * </li>
  * <li>
  * <p>
- * Combine trades with curves.
+ * Reformatted fixings.
  * </p>
- * <p>Produce the cartesian product, joining all trades with all curves. For
- * 600,000 trades and 5,000 curves this means 3,000,000,000 combinations.
+ * <p>Extract the fields we want from the fixings {@link java.util.Map.Entry}
  * </p>
  * </li>
  * <li>
  * <p>
- * Reformatted fixings.
+ * Combine trades with curves.
  * </p>
- * <p>Extract the fields we want from the fixings {@link java.util.Map.Entry}
+ * <p>Produce the cartesian product, joining all trades with all curves. For
+ * 600,000 trades and 5,000 curves this means 3,000,000,000 combinations.
  * </p>
  * </li>
  * <li>
@@ -281,6 +287,11 @@ import com.hazelcast.platform.demos.banking.cva.MyUtils;
  * <a href="https://developers.google.com/protocol-buffers">Protobuf</a> instead
  * of JSON.
  * </p>
+ * <p>TODO Move fixings to initialisation of C++.
+ * </p>
+ * <p>TODO Change C++ calc to {@link mapUsingServiceAsyncBatched}.
+ * TODO With change to batching, determine batch size.
+ * </p>
  */
 public class CvaStpJob {
 
@@ -292,6 +303,7 @@ public class CvaStpJob {
     private static final String STAGE_NAME_CVA_EXPOSURE_BY_COUNTERPARTY = "cvaExposureByCounterparty";
     private static final String STAGE_NAME_CVA_EXPOSURE_BY_TRADE = "cvaExposureByTrade";
     private static final String STAGE_NAME_EXPOSURE = "exposure";
+    private static final String STAGE_NAME_MTM = "mtm-cpp";
     private static final String STAGE_NAME_OBJECT_ARRAY_ARRAY = "Object[][]";
     private static final String STAGE_NAME_SORTED_CP_CDS = "sortedCpCds";
     private static final String STAGE_NAME_SORTED_CVA_EXPOSURE_BY_COUNTERPARTY = "sortedCvaExposureByCounterparty";
@@ -305,146 +317,340 @@ public class CvaStpJob {
      * @param jobName      For debug logging
      * @param timestamp    Job submit time
      * @param calcDate     For C++
+     * @param loadBalancer Front for C++ servers
+     * @param port         For C++ servers
      * @param debug        For development, save intermediate results
      * @return
      */
     @SuppressWarnings("unchecked")
     public static Pipeline buildPipeline(String jobName, long timestamp, LocalDate calcDate,
-            boolean debug, boolean cpp/*FIXME*/) {
+            String loadBalancer, int port, boolean debug) {
         String timestampStr = MyUtils.timestampToISO8601(timestamp);
+        String calcDateStr = CvaStpUtils.escapeQuotes("{\"calc_date\":\"" + calcDate + "\"}");
 
         Pipeline pipeline = Pipeline.create();
 
-        boolean debug2 = debug;
-        if (cpp) {
-            System.out.println("@@@@@@@@@@@@");
-            System.out.println("@@@@@@@@@@@@");
-            System.out.println("Call C++ " + calcDate);//FIXME
-            System.out.println("@@@@@@@@@@@@");
-            System.out.println("@@@@@@@@@@@@");
-        } else {
-            System.out.println("@@@@@@@@@@@@");
-            System.out.println("@@@@@@@@@@@@");
-            System.out.println("Stub C++");//FIXME
-            System.out.println("@@@@@@@@@@@@");
-            System.out.println("@@@@@@@@@@@@");
-        }
-        
-        BatchStage<Tuple3<String, String, String>> mtm = null;
-        if (!debug2) {
-        // Step 1 above
+        // Step 1 above, provides map entries for trades
         BatchStage<Entry<String, HazelcastJsonValue>> tradesSource =
                 pipeline.readFrom(Sources.<String, HazelcastJsonValue>map(MyConstants.IMAP_NAME_TRADES));
 
-        // Step 2 above
+        // Step 2 above, provides map entries for curves
         BatchStage<Entry<String, HazelcastJsonValue>> ircurvesSource =
                 pipeline.readFrom(Sources.<String, HazelcastJsonValue>map(MyConstants.IMAP_NAME_IRCURVES));
 
-        // Step 5 above
+        // Step 3 above, provides map entries for fixings
+        BatchStage<Entry<String, HazelcastJsonValue>> fixingsSource =
+                pipeline.readFrom(Sources.<String, HazelcastJsonValue>map(MyConstants.IMAP_NAME_FIXINGS));
+
+        // Step 4 above, provides map entries for counterparty credit default swaps
+        BatchStage<Entry<String, HazelcastJsonValue>> cpCdsSource =
+                pipeline.readFrom(Sources.<String, HazelcastJsonValue>map(MyConstants.IMAP_NAME_CP_CDS));
+
+        // Step 5 above, provides JSON trades as unsorted strings
         BatchStage<String> trades =
-                tradesSource.map(entry -> entry.getValue().toString()).setName(MyConstants.IMAP_NAME_TRADES + "-json");
+                tradesSource.map(entry -> entry.getValue().toString())
+                .setName(MyConstants.IMAP_NAME_TRADES + "-json");
 
-        // Step 6 above
+        // Step 6 above, provides JSON curves as unsorted strings
         BatchStage<String> ircurves =
-                ircurvesSource.map(entry -> entry.getValue().toString()).setName(MyConstants.IMAP_NAME_IRCURVES + "-json");
+                ircurvesSource.map(entry -> entry.getValue().toString())
+                .setName(MyConstants.IMAP_NAME_IRCURVES + "-json");
 
-        // Step 7 above
+        // Step 7 above, provides JSON fixings as unsorted strings
+        BatchStage<String> fixings =
+                fixingsSource.map(entry -> entry.getValue().toString())
+                .setName(MyConstants.IMAP_NAME_FIXINGS + "-json");
+
+        // Step 8 above, join 5 & 6, provides all pairs of trades joined to curves
         BatchStage<Tuple2<String, String>> tradesXircurves =
-                trades.hashJoin(ircurves, CvaStpUtils.cartesianProduct(), (trade, ircurve) -> Tuple2.tuple2(trade, ircurve.toString()))
+                trades.hashJoin(ircurves, CvaStpUtils.cartesianProduct(),
+                        (trade, ircurve) -> Tuple2.tuple2(trade, ircurve.toString()))
                 .setName(STAGE_NAME_TRADE_X_IRCURVES);
 
+        // Step 9 above, provides trio of trade, curve and MTM
+        BatchStage<Tuple3<String, String, String>> mtm =
+                callCppForMtm(loadBalancer, port, tradesXircurves, fixings, calcDateStr);
 
-        //FIXME: Replace with C++, include Fixing as initialisation
-        // Step 9 above
-            if (cpp) {
-                //FIXME
-                System.out.println("??");
-                        mtm =
-                        tradesXircurves
-                        .customTransform("TMP-MTM", CvaStpJob.DummyMTMCalc::new);
+        // Step 10 above, provides trio of trade, curve, exposure
+        BatchStage<Tuple3<String, String, String>> exposure =
+                convertMtmToExposure(mtm);
 
-            } else {
-                mtm =
-                        tradesXircurves
-                        .customTransform("TMP-MTM", CvaStpJob.DummyMTMCalc::new);
-            }
-        } else {
-            mtm =
-                    pipeline
-                    .readFrom(Sources.<Tuple2<String, String>, HazelcastJsonValue>map("mtms"))
-                    .map(entry -> Tuple3.tuple3(entry.getKey().f0(), entry.getKey().f1(), entry.getValue().toString()))
-                    ;
+        // Step 11 above, provides trio of trade, curve, CVA exposure
+        BatchStage<Tuple3<String, String, String>> cvaExposure =
+                convertExposureToCvaExposure(exposure);
+
+        // Step 12 above, provides counterparty and exposure sum per trade
+        BatchStage<Entry<String, Tuple2<String, String>>> cvaExposureByTrade =
+                convertCvaExposureToCvaExposureByTrade(cvaExposure);
+
+        // Step 13 above, provides counterparty and total exposure per counterparty
+        BatchStage<Entry<String, Double>> cvaExposureByCounterparty =
+                sumCvaExposoreByTradeByCounterparty(cvaExposureByTrade);
+
+        // Step 14 above, collect all counterparty exposures into a single list
+        BatchStage<Tuple3<String, Long, List<Entry<String, Double>>>> sortedCvaExposureByCounterparty =
+                collateCvaExposoreByTradeByCounterparty(jobName, timestamp, cvaExposureByCounterparty);
+
+        // Step 15 above, collects all counterparty CDS into a single list
+        BatchStage<List<Entry<String, HazelcastJsonValue>>> cpCdsEntryList =
+                collateCpCds(cpCdsSource);
+
+        // Step 16 above, saves the counterparty exposures into a CSV file for download
+        saveAsCsvForLaterDownload(sortedCvaExposureByCounterparty, calcDate, timestampStr);
+
+        // Step 17 above, provides a 2-dimensional array ready for Excel usage
+        BatchStage<Object[][]> excelDataContent =
+                makeObjectForExcel(sortedCvaExposureByCounterparty, cpCdsEntryList);
+
+        // Step 18 above, provides Excel live connect value
+        excelDataContent
+        .map(bytes -> new SimpleImmutableEntry<String, Object[][]>(calcDate + "@" + timestampStr, bytes))
+        .writeTo(Sinks.map(MyConstants.IMAP_NAME_CVA_DATA));
+
+        // Step 19 above, provides Excel spreadsheet for download
+        saveAsExcelForLaterDownload(excelDataContent, jobName, timestamp, timestampStr, calcDate);
+
+        // Optional stages for debugging, impacting performance and memory usage
+        if (debug) {
+            addDebugSaveStages(calcDate, timestampStr, mtm, exposure, cvaExposure,
+                    cvaExposureByTrade, cvaExposureByCounterparty);
+            addDebugLogStages(jobName, sortedCvaExposureByCounterparty);
         }
 
-        // Step 10 above
-        BatchStage<Tuple3<String, String, String>> exposure =
-                mtm
+        return pipeline;
+    }
+
+
+    /**
+     * <p>Push a quadruple of calculation date, fixing dates &amp; rates, trade and interest
+     * rate curve to the <b>C++</b> calculation, which will return the <i>mark-to-market</i>
+     * for the curve scenario.
+     * </p>
+     * <p>As in, pass a 4-field JSON object through a GRPC connection to a C++ server which
+     * returns something, which happens to be the result of the MTM calculations.
+     * </p>
+     *
+     * @param host A load balancer fronting the C++ calculation processes
+     * @param port Expect all C++ calculation processes to use the same port
+     * @param tradesXircurves A pair of trade and interest rate curve
+     * @param fixings The fixing date/rate to use
+     * @param calcDateStr The date for the calculation
+     * @return The answer from C++
+     *
+     * <p>TODO: See general improvements. Calculation date is the same for all invocations
+     * so should be used as initialisation. Batching would be more efficient.
+     * </p>
+     */
+    private static BatchStage<Tuple3<String, String, String>> callCppForMtm(String host, int port,
+            BatchStage<Tuple2<String, String>> tradesXircurves, BatchStage<String> fixings, String calcDateStr) {
+
+        /* A service factory to provide a BiDirectional connection to a C++ server,
+         * using the provided channel builder and invoking function.
+         */
+        @SuppressWarnings("unchecked")
+        ServiceFactory<?, ? extends GrpcService<InputMessage, OutputMessage>> cppService =
+                GrpcServices.bidirectionalStreamingService(
+                        () -> ManagedChannelBuilder.forAddress(host, port).usePlaintext(),
+                        channel -> JetToCppGrpc.newStub(channel)::streamingCall
+                );
+
+
+        /* Make the input to C++ for the service call, and extract the output
+         * from the result.
+         */
+        BatchStage<Tuple3<String, String, String>> mtm =
+                tradesXircurves.hashJoin(fixings, CvaStpUtils.cartesianProduct(),
+                        (tuple2, fixing) -> Tuple3.tuple3(tuple2.f0(), tuple2.f1(), fixing))
+                .mapUsingServiceAsync(cppService,
+                        (service, tuple3) -> {
+                            String tradeId = new JSONObject(tuple3.f0()).getString("tradeid");
+                            String curveName = new JSONObject(tuple3.f1()).getString("curvename");
+
+                            StringBuilder stringBuilder = new StringBuilder();
+
+                            stringBuilder.append("{");
+                            stringBuilder.append(" \"calcdate\": \""
+                                    + calcDateStr + "\"");
+                            stringBuilder.append(", \"trade\": \""
+                                    + CvaStpUtils.escapeQuotes(tuple3.f0()) + "\"");
+                            stringBuilder.append(", \"curve\": \""
+                                    + CvaStpUtils.escapeQuotes(tuple3.f1()) + "\"");
+                            stringBuilder.append(", \"fixing\": \""
+                                    + CvaStpUtils.escapeQuotes(tuple3.f2().toString()) + "\"");
+                            stringBuilder.append("}");
+
+                            InputMessage request =
+                                    InputMessage.newBuilder().addInputValue(stringBuilder.toString()).build();
+
+                            return service.call(request).thenApply(result -> {
+                               return Tuple3.tuple3(tradeId, curveName, result.getOutputValue(0));
+                            });
+                        })
+                .setLocalParallelism(1)
+                .setName(STAGE_NAME_MTM);
+
+        return mtm;
+    }
+
+
+    /**
+     * <p>Convert the Mark-To-Market value into an Exposure, using
+     * {@link com.hazelcast.platform.demos.banking.cva.cvastp.MtmToExposure}
+     * to do the work.
+     * </p>
+     *
+     * @param mtm A trio of trade key, curve key and MTM from C++
+     * @return A trio of trade key, curve key and Exposure
+     */
+    private static BatchStage<Tuple3<String, String, String>> convertMtmToExposure(
+            BatchStage<Tuple3<String, String, String>> mtm) {
+        return mtm
                 .groupingKey(Tuple3::f0)
                 .mapUsingIMap(MyConstants.IMAP_NAME_TRADES, MtmToExposure.CONVERT)
                 .setName(STAGE_NAME_EXPOSURE);
+    }
 
-        // Step 11 above
-        BatchStage<Tuple3<String, String, String>> cvaExposure =
-                exposure
+
+    /**
+     * <p>Convert the exposure to be the CVA exposure, using
+     * {@link com.hazelcast.platform.demos.banking.cva.cvastp.ExposureToCvaExposure}.
+     * to do the conversion.
+     * </p>
+     *
+     * @param exposure A trio of trade (ignored), curve (ignored) and exposure.
+     * @return A trio of trade id (key), curve name (key) and CVA exposure
+     */
+    private static BatchStage<Tuple3<String, String, String>> convertExposureToCvaExposure(
+            BatchStage<Tuple3<String, String, String>> exposure) {
+        return exposure
                 .map(Tuple3::f2)
                 .mapUsingIMap(
                         MyConstants.IMAP_NAME_CP_CDS,
                         ExposureToCvaExposure.GET_TICKER_FROM_EXPOSURE,
                         ExposureToCvaExposure.CONVERT)
                 .setName(STAGE_NAME_CVA_EXPOSURE);
+    }
 
-        // Step 12 above
+
+    /**
+     * <p>Aggregate (summing) CVA Exposures by Trade Id.
+     * </p>
+     *
+     * @param cvaExposure A trio of trade id (key), curve name (key) and CVA exposure
+     * @return
+     */
+    private static BatchStage<Entry<String, Tuple2<String, String>>>
+        convertCvaExposureToCvaExposureByTrade(
+            BatchStage<Tuple3<String, String, String>> cvaExposure) {
+
         AggregateOperation1<Tuple3<String, String, String>, TradeExposureAggregator, Tuple2<String, String>>
-            tradeExposureAggregator =
-            TradeExposureAggregator.buildTradeExposureAggregator();
+        tradeExposureAggregator =
+        TradeExposureAggregator.buildTradeExposureAggregator();
 
-        BatchStage<Entry<String, Tuple2<String, String>>> cvaExposureByTrade =
-            cvaExposure
-            .groupingKey(Tuple3::f0)
-            .aggregate(tradeExposureAggregator)
-            .setName(STAGE_NAME_CVA_EXPOSURE_BY_TRADE);
+        return cvaExposure
+                .groupingKey(Tuple3::f0)
+                .aggregate(tradeExposureAggregator)
+                .setName(STAGE_NAME_CVA_EXPOSURE_BY_TRADE);
+    }
 
-        // Step 13 above
-        AggregateOperation1<Entry<String, Tuple2<String, String>>, CounterpartyAggregator, Double>
-            counterpartyAggregator =
-                CounterpartyAggregator.buildCounterpartyAggregation();
 
-        BatchStage<Entry<String, Double>> cvaExposureByCounterparty =
-            cvaExposureByTrade
-            .groupingKey(entry -> entry.getValue().f0())
-            .aggregate(counterpartyAggregator)
-            .setName(STAGE_NAME_CVA_EXPOSURE_BY_COUNTERPARTY);
+    /**
+     * <p>Take the list of CVA exposure per trade, and group this per counterparty
+     * to find the exposure for that counterparty. This should be a large reduction,
+     * there are hundreds of thousands of CVA exposures (one per trade, for which
+     * there are hundreds of thousands), but only 20 counterparties in this demo.
+     * </p>
+     *
+     * @param cvaExposureByTrade A counterparty and exposure per trade
+     * @return The counterparty and it's total exposure
+     */
+    private static BatchStage<Entry<String, Double>> sumCvaExposoreByTradeByCounterparty(
+              BatchStage<Entry<String, Tuple2<String, String>>> cvaExposureByTrade) {
+          AggregateOperation1<Entry<String, Tuple2<String, String>>, CounterpartyAggregator, Double>
+          counterpartyAggregator =
+              CounterpartyAggregator.buildCounterpartyAggregation();
 
-        // Step 14 above, tuple3 is jobname, timestamp, list of cp,cva
-        BatchStage<Tuple3<String, Long, List<Entry<String, Double>>>> sortedCvaExposureByCounterparty =
-                cvaExposureByCounterparty
+          return cvaExposureByTrade
+          .groupingKey(entry -> entry.getValue().f0())
+          .aggregate(counterpartyAggregator)
+          .setName(STAGE_NAME_CVA_EXPOSURE_BY_COUNTERPARTY);
+    }
+
+
+    /**
+     * <p>Collate the counterparty exposures into a single list.
+     * </p>
+     *
+     * @param jobName Not part of the collate, useful for the next stage
+     * @param timestamp Not part of the collate, useful for the next stage.
+     * @param cvaExposureByCounterparty
+     * @return A trio of jobname, timestamp and list
+     */
+    private static BatchStage<Tuple3<String, Long, List<Entry<String, Double>>>> collateCvaExposoreByTradeByCounterparty(
+            String jobName, long timestamp,
+            BatchStage<Entry<String, Double>> cvaExposureByCounterparty) {
+        return cvaExposureByCounterparty
                 .aggregate(AggregateOperations.mapping(Functions.wholeItem(),
                         AggregateOperations.sorting(new CvaStpJob.MapKeyComparator())))
                 .map(list -> Tuple3.tuple3(jobName, timestamp, list))
                 .setName(STAGE_NAME_SORTED_CVA_EXPOSURE_BY_COUNTERPARTY);
+    }
 
-        //XXX Move to top with other map sources
-        // Step 4 above
-        BatchStage<Entry<String, HazelcastJsonValue>> cpCdsSource =
-                pipeline
-                .readFrom(Sources.<String, HazelcastJsonValue>map(MyConstants.IMAP_NAME_CP_CDS));
 
-        // Step 15 above
-        BatchStage<List<Entry<String, HazelcastJsonValue>>> cpCdsEntryList =
-            cpCdsSource
-            .aggregate(AggregateOperations.mapping(Functions.wholeItem(),
-                AggregateOperations.sorting(new CvaStpJob.MapKeyComparator())))
-            .setName(STAGE_NAME_SORTED_CP_CDS);
+    /**
+     * <p>Collate the Counterparty CDS into a single list.
+     * </p>
+     *
+     * @param cpCdsSource Unsorted content from an {@link com.hazelcast.map.IMap}
+     * @return A sorted list
+     */
+    private static BatchStage<List<Entry<String, HazelcastJsonValue>>> collateCpCds(
+            BatchStage<Entry<String, HazelcastJsonValue>> cpCdsSource) {
+        return cpCdsSource
+                .aggregate(AggregateOperations.mapping(Functions.wholeItem(),
+                        AggregateOperations.sorting(new CvaStpJob.MapKeyComparator())))
+                    .setName(STAGE_NAME_SORTED_CP_CDS);
+    }
 
-        // Step 16 above, tuple3 is jobname, timestamp, list of cp,cva
+
+    /**
+     * <p>Turn the counterparty exposures it a CSV file and store it in an
+     * {@link com.hazelcast.map.IMap} for later download.
+     * <p>
+     *
+     * @param sortedCvaExposureByCounterparty Data for the CSV
+     * @param calcDate For the entry key
+     * @param timestampStr For the entry key
+     */
+    private static void saveAsCsvForLaterDownload(
+            BatchStage<Tuple3<String, Long, List<Entry<String, Double>>>> sortedCvaExposureByCounterparty,
+            LocalDate calcDate, String timestampStr) {
         sortedCvaExposureByCounterparty
         .map(CsvFileAsByteArray.CONVERT_TUPLE3_TO_BYTE_ARRAY)
         .map(bytes -> new SimpleImmutableEntry<String, byte[]>(calcDate + "@" + timestampStr, bytes))
         .writeTo(Sinks.map(MyConstants.IMAP_NAME_CVA_CSV));
+    }
 
-        // Step 17 above
-        BatchStage<Object[][]> excelDataContent =
-                sortedCvaExposureByCounterparty
+
+    /**
+     * <p>Join the counterparty exposures with the counterparty CDS details to form
+     * the content to put in an Excel spreadsheet.
+     * </p>
+     * <p>Depending on the data, more counterparties may exist that be used,
+     * so "{@code sortedCvaExposureByCounterparty}" may be less than
+     * "{@code cpCdsEntryList}".
+     * </p>
+     *
+     * @param sortedCvaExposureByCounterparty All calculated counterparty exposures
+     * @param cpCdsEntryList All stored counterparties.
+     * @return A single 2-dimensional object array
+     */
+    @SuppressWarnings("unchecked")
+    private static BatchStage<Object[][]> makeObjectForExcel(
+            BatchStage<Tuple3<String, Long, List<Entry<String, Double>>>> sortedCvaExposureByCounterparty,
+            BatchStage<List<Entry<String, HazelcastJsonValue>>> cpCdsEntryList
+            ) {
+        return sortedCvaExposureByCounterparty
                 .hashJoin(cpCdsEntryList,
                         CvaStpUtils.cartesianProduct(),
                         (sortedCvaExposures, cpCdsEntries) ->
@@ -453,28 +659,28 @@ public class CvaStpJob {
                         )
                 .map(XlstDataAsObjectArrayArray.CONVERT_TUPLES_TO_STRING_ARRAY_ARRAY)
                 .setName(STAGE_NAME_OBJECT_ARRAY_ARRAY);
+    }
 
-        // Step 18 above
-        excelDataContent
-        .map(bytes -> new SimpleImmutableEntry<String, Object[][]>(calcDate + "@" + timestampStr, bytes))
-        .writeTo(Sinks.map(MyConstants.IMAP_NAME_CVA_DATA));
 
-        // Step 19 above
+    /**
+     * <p>Turn the 2-dimensional array of counterparty exposures into an Excel spreadsheet,
+     * save in {@link com.hazelcasrt.map.IMap} for later download.
+     * </p>
+     *
+     * @param excelDataContent A 2-dimensional array
+     * @param jobName For the spreadsheet name
+     * @param timestamp For the spreadsheet name
+     * @param timestampStr For the map key
+     * @param calcDate For the map key
+     */
+    private static void saveAsExcelForLaterDownload(BatchStage<Object[][]> excelDataContent, String jobName,
+            long timestamp, String timestampStr, LocalDate calcDate) {
         excelDataContent
         .map(objectArrayArray -> Tuple3.tuple3(jobName, timestamp, objectArrayArray))
         .map(XlstFileAsByteArray.CONVERT_TUPLE3_TO_BYTE_ARRAY)
         .map(bytes -> new SimpleImmutableEntry<String, byte[]>(calcDate + "@" + timestampStr, bytes))
         .writeTo(Sinks.map(MyConstants.IMAP_NAME_CVA_XLSX))
         ;
-
-        // Optional stages for debugging.
-        if (debug) {
-            addDebugSaveStages(calcDate, timestampStr, mtm, exposure, cvaExposure,
-                    cvaExposureByTrade, cvaExposureByCounterparty);
-            addDebugLogStages(jobName, sortedCvaExposureByCounterparty);
-        }
-
-        return pipeline;
     }
 
 
@@ -495,37 +701,37 @@ public class CvaStpJob {
             BatchStage<Entry<String, Tuple2<String, String>>> cvaExposureByTrade,
             BatchStage<Entry<String, Double>> cvaExposureByCounterparty) {
 
-        String prefix = "debug_" + calcDate + "@" +  timestampStr;
+        String prefix = "debug_";
+        String suffix = "_" + calcDate + "@" +  timestampStr;
 
         /* (1) Save MTMs. Watch out there could be billions
          */
         mtm
         .map(tuple3 -> new SimpleImmutableEntry<String, String>(tuple3.f0() + "," + tuple3.f1(), tuple3.f2())).setName("reformat")
-        // FIXME, Adjust stage name once C++ ready
-        .writeTo(Sinks.map(prefix + "_TMP-MTM"));
+        .writeTo(Sinks.map(prefix + STAGE_NAME_MTM + suffix));
 
         /* (2) Save Exposures. Same count as MTMs.
          */
         exposure
         .map(tuple3 -> new SimpleImmutableEntry<String, String>(tuple3.f0() + "," + tuple3.f1(), tuple3.f2())).setName("reformat")
-        .writeTo(Sinks.map(prefix + STAGE_NAME_EXPOSURE));
+        .writeTo(Sinks.map(prefix + STAGE_NAME_EXPOSURE + suffix));
 
         /* (3) Save CVA Exposures. Same count as MTMs.
          */
         cvaExposure
         .map(tuple3 -> new SimpleImmutableEntry<String, String>(tuple3.f0() + "," + tuple3.f1(), tuple3.f2())).setName("reformat")
-        .writeTo(Sinks.map(prefix + STAGE_NAME_CVA_EXPOSURE));
+        .writeTo(Sinks.map(prefix + STAGE_NAME_CVA_EXPOSURE + suffix));
 
         /* (4) Save CVA Exposures by Trade. Same count as trades.
          */
         cvaExposureByTrade
         .map(entry -> new SimpleImmutableEntry<String, String>(entry.getKey(), entry.getValue().f1())).setName("reformat")
-        .writeTo(Sinks.map(prefix + STAGE_NAME_CVA_EXPOSURE_BY_TRADE));
+        .writeTo(Sinks.map(prefix + STAGE_NAME_CVA_EXPOSURE_BY_TRADE + suffix));
 
         /* (5) Save CVA Exposures by Counterparty. Same count as counterparties.
          */
         cvaExposureByCounterparty
-        .writeTo(Sinks.map(prefix + STAGE_NAME_CVA_EXPOSURE_BY_COUNTERPARTY));
+        .writeTo(Sinks.map(prefix + STAGE_NAME_CVA_EXPOSURE_BY_COUNTERPARTY + suffix));
     }
 
 
@@ -543,59 +749,6 @@ public class CvaStpJob {
         sortedCvaExposureByCounterparty
         .map(Tuple3::f2)
         .writeTo(Sinks.logger(list -> String.format("%n%s%n%s%n%s%n", delimiter, list, delimiter)));
-    }
-
-
-    /**FIXME Remove this once C++ call available.
-     * <p>Fake an MTM for now, until C++ calcs are slotted in.</p>
-     * <p>Expected MTM looks something like:</p>
-     * <pre>
-     * {"tradeid":"t000000","curvename":"curvescenario0000",
-     * "fixlegdates":["1454025600","1461884400","1469746800","1477872000"],
-     * "fixlegamount":[327111.094,323555.562,323555.562,334222.219],
-     * "fltlegdates":["1454025600","1461884400","1469746800","1477872000"],
-     * "fltlegamount":[33109780,777095.75,1283875.62,1233292.38],
-     * "discountvalues":[0.999752,0.997813523,0.994621098,0.991563857],
-     * "legfractions":[0.0597826093,0.307065219,0.554347813,0.809782624],
-     * "haserrored":false,"error":"","computetimemicros":"0"}
-     * </pre>
-     */
-    public static class DummyMTMCalc extends AbstractProcessor {
-
-        @Override
-        protected boolean tryProcess(int ordinal, Object item) {
-                @SuppressWarnings("unchecked")
-                Tuple2<String, String> tuple2 =
-                        (Tuple2<String, String>) item;
-
-                StringBuilder stringBuilder = new StringBuilder();
-
-                try {
-                    String tradeId = new JSONObject(tuple2.f0()).getString("tradeid");
-                    String curveName = new JSONObject(tuple2.f1()).getString("curvename");
-
-                    stringBuilder.append("{");
-                    stringBuilder.append(" \"tradeid\": \"" + tradeId + "\"");
-                    stringBuilder.append(", \"curvename\": \"" + curveName + "\"");
-                    stringBuilder.append(", \"fixlegdates\": [\"1454025600\",\"1461884400\",\"1469746800\",\"1477872000\"]");
-                    stringBuilder.append(", \"fixlegamount\": [327111.094,323555.562,323555.562,334222.219]");
-                    stringBuilder.append(", \"fltlegdates\": [\"1454025600\",\"1461884400\",\"1469746800\",\"1477872000\"]");
-                    stringBuilder.append(", \"fltlegamount\": [33109780,777095.75,1283875.62,1233292.38]");
-                    stringBuilder.append(", \"discountvalues\": [0.999752,0.997813523,0.994621098,0.991563857]");
-                    stringBuilder.append(", \"legfractions\": [0.0597826093,0.307065219,0.554347813,0.809782624]");
-                    stringBuilder.append(", \"haserrored\":false");
-                    stringBuilder.append(", \"computetimemicros\":\"0\"");
-                    stringBuilder.append(" }");
-
-                    Tuple3<String, String, String> tuple3
-                        = Tuple3.tuple3(tradeId, curveName, stringBuilder.toString());
-
-                    return super.tryEmit(tuple3);
-                } catch (JSONException jsonException) {
-                    LOGGER.error("JSONException: =>" + stringBuilder, jsonException);
-                    return true;
-                }
-        }
     }
 
 

@@ -31,6 +31,8 @@ import org.springframework.stereotype.Component;
 @Order(value = 4)
 public class TradesLoader implements CommandLineRunner {
 
+    private static final boolean PARTIAL_OK = true;
+
     @Autowired
     private JsonLoaderService jsonLoaderService;
 
@@ -41,7 +43,7 @@ public class TradesLoader implements CommandLineRunner {
     public void run(String... args) throws Exception {
         String inputFileName = "trades.json.zip";
         String keyFieldName = "tradeid";
-        this.jsonLoaderService.load(MyConstants.IMAP_NAME_TRADES, inputFileName, keyFieldName);
+        this.jsonLoaderService.load(MyConstants.IMAP_NAME_TRADES, inputFileName, keyFieldName, PARTIAL_OK);
     }
 
 }
