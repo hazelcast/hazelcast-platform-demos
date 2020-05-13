@@ -17,6 +17,7 @@
 package com.hazelcast.platform.demos.banking.cva;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * <p>Utility constants shared across the modules.
@@ -44,10 +45,16 @@ public class MyConstants {
 
     /**
      * <p>Live and DR sites, but which is which depends on you.</p>
+     * <p>An ENUM in Java, but Kubernetes prefers lower case.</p>
      */
     public enum Site {
-        CVA_SITE1,
-        CVA_SITE2
+        SITE1,
+        SITE2;
+
+        @Override
+        public String toString() {
+            return this.name().toLowerCase(Locale.ROOT);
+        }
     };
 
     // For sending data to Grafana/Graphite

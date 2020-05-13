@@ -64,10 +64,10 @@ public class MyProperties {
     }
     public void setSite(Site site) {
         this.site = site;
-        if (this.site == Site.CVA_SITE1) {
-            this.remoteSite = Site.CVA_SITE2;
+        if (this.site == Site.SITE1) {
+            this.remoteSite = Site.SITE2;
         } else {
-            this.remoteSite = Site.CVA_SITE1;
+            this.remoteSite = Site.SITE1;
         }
         LOGGER.info("myProperties.site=='{}'", this.site);
         LOGGER.info("myProperties.remoteSite=='{}'", this.remoteSite);

@@ -89,11 +89,11 @@
           "targets": [
             {
               "refId": "A",
-              "target": "alias(CVA_SITE1.GrafanaGlobalMetricsJob.map.cva_trades.size, 'CVA_SITE1.size')"
+              "target": "alias(site1.GrafanaGlobalMetricsJob.map.cva_trades.size, 'site1.size')"
             },
             {
               "refId": "B",
-              "target": "alias(CVA_SITE2.GrafanaGlobalMetricsJob.map.cva_trades.size, 'CVA_SITE2.size')"
+              "target": "alias(site2.GrafanaGlobalMetricsJob.map.cva_trades.size, 'site2.size')"
             }
           ],
           "thresholds": [],
@@ -166,27 +166,27 @@
           "targets": [
             {
               "refId": "A",
-              "target": "alias(CVA_SITE1.GrafanaGlobalMetricsJob.map.cva_trades.reads, 'CVA_SITE1.reads')"
+              "target": "alias(site1.GrafanaGlobalMetricsJob.map.cva_trades.reads, 'site1.reads')"
             },
             {
               "refId": "B",
-              "target": "alias(CVA_SITE1.GrafanaGlobalMetricsJob.map.cva_trades.writes, 'CVA_SITE1.writes')"
+              "target": "alias(site1.GrafanaGlobalMetricsJob.map.cva_trades.writes, 'site1.writes')"
             },
             {
               "refId": "C",
-              "target": "alias(CVA_SITE1.GrafanaGlobalMetricsJob.map.cva_trades.deletes, 'CVA_SITE1.deletes')"
+              "target": "alias(site1.GrafanaGlobalMetricsJob.map.cva_trades.deletes, 'site1.deletes')"
             },
             {
               "refId": "D",
-              "target": "alias(CVA_SITE2.GrafanaGlobalMetricsJob.map.cva_trades.reads, 'CVA_SITE2.reads')"
+              "target": "alias(site2.GrafanaGlobalMetricsJob.map.cva_trades.reads, 'site2.reads')"
             },
             {
               "refId": "E",
-              "target": "alias(CVA_SITE2.GrafanaGlobalMetricsJob.map.cva_trades.writes, 'CVA_SITE2.writes')"
+              "target": "alias(site2.GrafanaGlobalMetricsJob.map.cva_trades.writes, 'site2.writes')"
             },
             {
               "refId": "F",
-              "target": "alias(CVA_SITE2.GrafanaGlobalMetricsJob.map.cva_trades.deletes, 'CVA_SITE2.deletes')"            }
+              "target": "alias(site2.GrafanaGlobalMetricsJob.map.cva_trades.deletes, 'site2.deletes')"            }
           ],
           "thresholds": [],
           "timeFrom": null,
@@ -258,11 +258,11 @@
           "targets": [
             {
               "refId": "A",
-              "target": "alias(CVA_SITE1.GrafanaGlobalMetricsJob.map.cva_cp_cds.near_cache_percent, 'CVA_SITE1.near_cache_percent')"
+              "target": "alias(site1.GrafanaGlobalMetricsJob.map.cva_cp_cds.near_cache_percent, 'site1.near_cache_percent')"
             },
             {
               "refId": "B",
-              "target": "alias(CVA_SITE2.GrafanaGlobalMetricsJob.map.cva_cp_cds.near_cache_percent, 'CVA_SITE2.near_cache_percent')"
+              "target": "alias(site2.GrafanaGlobalMetricsJob.map.cva_cp_cds.near_cache_percent, 'site2.near_cache_percent')"
             }
           ],
           "thresholds": [],
@@ -347,11 +347,11 @@
           "targets": [
             {
               "refId": "A",
-              "target": "alias(CVA_SITE1.GrafanaGlobalMetricsJob.map.cva_ircurves.size, 'CVA_SITE1.size')"
+              "target": "alias(site1.GrafanaGlobalMetricsJob.map.cva_ircurves.size, 'site1.size')"
             },
             {
               "refId": "B",
-              "target": "alias(CVA_SITE2.GrafanaGlobalMetricsJob.map.cva_ircurves.size, 'CVA_SITE2.size')"
+              "target": "alias(site2.GrafanaGlobalMetricsJob.map.cva_ircurves.size, 'site2.size')"
             }
           ],
           "thresholds": [],
@@ -424,27 +424,27 @@
           "targets": [
             {
               "refId": "A",
-              "target": "alias(CVA_SITE1.GrafanaGlobalMetricsJob.map.cva_ircurves.reads, 'CVA_SITE1.reads')"
+              "target": "alias(site1.GrafanaGlobalMetricsJob.map.cva_ircurves.reads, 'site1.reads')"
             },
             {
               "refId": "B",
-              "target": "alias(CVA_SITE1.GrafanaGlobalMetricsJob.map.cva_ircurves.writes, 'CVA_SITE1.writes')"
+              "target": "alias(site1.GrafanaGlobalMetricsJob.map.cva_ircurves.writes, 'site1.writes')"
             },
             {
               "refId": "C",
-              "target": "alias(CVA_SITE1.GrafanaGlobalMetricsJob.map.cva_ircurves.deletes, 'CVA_SITE1.deletes')"
+              "target": "alias(site1.GrafanaGlobalMetricsJob.map.cva_ircurves.deletes, 'site1.deletes')"
             },
             {
               "refId": "D",
-              "target": "alias(CVA_SITE2.GrafanaGlobalMetricsJob.map.cva_ircurves.reads, 'CVA_SITE2.reads')"
+              "target": "alias(site2.GrafanaGlobalMetricsJob.map.cva_ircurves.reads, 'site2.reads')"
             },
             {
               "refId": "E",
-              "target": "alias(CVA_SITE2.GrafanaGlobalMetricsJob.map.cva_ircurves.writes, 'CVA_SITE2.writes')"
+              "target": "alias(site2.GrafanaGlobalMetricsJob.map.cva_ircurves.writes, 'site2.writes')"
             },
             {
               "refId": "F",
-              "target": "alias(CVA_SITE2.GrafanaGlobalMetricsJob.map.cva_ircurves.deletes, 'CVA_SITE2.deletes')"
+              "target": "alias(site2.GrafanaGlobalMetricsJob.map.cva_ircurves.deletes, 'site2.deletes')"
             }
           ],
           "thresholds": [],

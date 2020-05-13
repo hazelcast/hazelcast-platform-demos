@@ -19,7 +19,7 @@
 		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 		<my.cluster.name>${my.cluster2.name}</my.cluster.name>
-		<my.site>CVA_SITE2</my.site>
+		<my.site>site2</my.site>
 	</properties>
 
 	<dependencies>

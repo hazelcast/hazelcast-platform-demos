@@ -114,7 +114,7 @@ public class GrafanaGlobalMetricsJob {
      * Graphite for display on Grafana.
      * </p>
      *
-     * @param site Are we "{@code CVA_SITE1}" or "{@code CVA_SITE2}"
+     * @param site Are we "{@code site1}" or "{@code site2}"
      * @return
      */
     static StreamSource<List<GraphiteMetric>> mySource(Site site) {

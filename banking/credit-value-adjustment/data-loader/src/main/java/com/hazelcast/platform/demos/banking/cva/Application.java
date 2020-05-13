@@ -28,7 +28,7 @@ import com.hazelcast.platform.demos.banking.cva.MyConstants.Site;
 /**
  * <p>Entry point, "{@code main()}" method. Takes an
  * optional command line or Java system property to determine
- * whether to connect to "{@code CVA_SITE1}" or "{@code CVA_SITE2}".
+ * whether to connect to "{@code SITE1}" or "{@code SITE2}".
  * </p>
  */
 @SpringBootApplication
@@ -44,7 +44,7 @@ public class Application {
      * </p>
      * <p>Has two arguments, both optional in any order, one text one numeric:</p>
      * <ul>
-     * <li><b>site</b> Select "{@code CVA_SITE1}" "{@code CVA_SITE2}", default "{@code CVA_SITE1}"
+     * <li><b>site</b> Select "{@code SITE1}" "{@code SITE2}", default "{@code SITE1}"
      * <li><b>threshold</b> Record limit per map for upload, default unlimited
      * </ul>
      */
@@ -60,12 +60,12 @@ public class Application {
 
         // Site, System property wins if specified twice
         if (siteStr != null) {
-            siteStr = (siteStr.equals(Site.CVA_SITE2.toString()) ? Site.CVA_SITE2.toString() : Site.CVA_SITE1.toString());
+            siteStr = (siteStr.equals(Site.SITE2.toString()) ? Site.SITE2.toString() : Site.SITE1.toString());
         } else {
             if (handledArgs.f1() != null) {
-                siteStr = (handledArgs.f1() == Site.CVA_SITE2 ? Site.CVA_SITE2.toString() : Site.CVA_SITE1.toString());
+                siteStr = (handledArgs.f1() == Site.SITE2 ? Site.SITE2.toString() : Site.SITE1.toString());
             } else {
-                siteStr = Site.CVA_SITE1.toString();
+                siteStr = Site.SITE1.toString();
             }
         }
 

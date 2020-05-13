@@ -26,7 +26,7 @@ import com.hazelcast.spi.discovery.DiscoveryStrategy;
 import com.hazelcast.spi.partitiongroup.PartitionGroupStrategy;
 
 /**
- * <p>How "{@code CVA_SITE1}" finds "{@code CVA_SITE2}" and vice
+ * <p>How "{@code site1}" finds "{@code site2}" and vice
  * versa.
  * </p>
  * <p>When this is invoked periodically, it is expected to return

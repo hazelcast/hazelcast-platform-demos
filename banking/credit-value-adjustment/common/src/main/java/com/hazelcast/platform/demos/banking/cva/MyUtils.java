@@ -169,11 +169,11 @@ public class MyUtils {
      * it easy for Management Center to connect.
      * </p>
      *
-     * @param site "{@code CVA_SITE1}" or "{@code CVA_SITE2}"
+     * @param site "{@code SITE1}" or "{@code SITE2}"
      * @return 5701 or 6701.
      */
     public static int getLocalhostBasePort(Site site) {
-        int multiplier = (site == Site.CVA_SITE1) ? 0 : 1;
+        int multiplier = (site == Site.SITE1) ? 0 : 1;
         return NetworkConfig.DEFAULT_PORT + multiplier * PORT_RANGE;
     }
 
@@ -212,12 +212,12 @@ public class MyUtils {
 
                 // Try as Site ENUM
                 if (!siteUsed) {
-                    if (arg.equals(Site.CVA_SITE1.toString())) {
-                        siteValue = Site.CVA_SITE1;
+                    if (arg.equals(Site.SITE1.toString())) {
+                        siteValue = Site.SITE1;
                         siteUsed = true;
                     }
-                    if (arg.equals(Site.CVA_SITE2.toString())) {
-                        siteValue = Site.CVA_SITE2;
+                    if (arg.equals(Site.SITE2.toString())) {
+                        siteValue = Site.SITE2;
                         siteUsed = true;
                     }
                 }
@@ -289,7 +289,7 @@ public class MyUtils {
      * <p>Create a single statistic to send to Graphite/Grafana in a bundle.
      * </p>
      *
-     * @param site "{@code CVA_SITE1}" or "{@code CVA_SITE2}"
+     * @param site "{@code CVA-SITE1}" or "{@code CVA-SITE2}"
      * @param one First tier
      * @param two Second tier
      * @param three Third tier
