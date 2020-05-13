@@ -61,12 +61,12 @@ public class Application {
 
         // Site, System property wins if specified twice
         if (siteStr != null) {
-            siteStr = (siteStr.equals(Site.CVA_SITE2.toString()) ? Site.CVA_SITE2.toString() : Site.CVA_SITE1.toString());
+            siteStr = (siteStr.equals(Site.SITE2.toString()) ? Site.SITE2.toString() : Site.SITE1.toString());
         } else {
             if (handledArgs.f1() != null) {
-                siteStr = (handledArgs.f1() == Site.CVA_SITE2 ? Site.CVA_SITE2.toString() : Site.CVA_SITE1.toString());
+                siteStr = (handledArgs.f1() == Site.SITE2 ? Site.SITE2.toString() : Site.SITE1.toString());
             } else {
-                siteStr = Site.CVA_SITE1.toString();
+                siteStr = Site.SITE1.toString();
             }
         }
 
