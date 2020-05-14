@@ -19,6 +19,7 @@ kind: StatefulSet
 metadata:
   name: cva-hazelcast-node-site1
 spec:
+  # Not more than the number of CPP pods
   replicas: 2
   serviceName: site1-service
   selector:

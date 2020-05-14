@@ -130,11 +130,6 @@ public class CvaStpJobSubmitter {
             }
         }
 
-        //XXX
-        LOGGER.error("Derived C++ service host: '{}'", cppService);
-        LOGGER.error("Derived C++ service host: '{}'", cppService);
-        LOGGER.error("Derived C++ service host: '{}'", cppService);
-        LOGGER.trace("Derived C++ service host: '{}'", cppService);
         return cppService;
     }
 

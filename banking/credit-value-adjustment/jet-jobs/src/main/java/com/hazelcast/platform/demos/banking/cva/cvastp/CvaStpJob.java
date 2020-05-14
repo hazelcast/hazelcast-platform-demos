@@ -290,7 +290,11 @@ import io.grpc.ManagedChannelBuilder;
  * <p>TODO Move fixings to initialisation of C++.
  * </p>
  * <p>TODO Change C++ calc to {@link mapUsingServiceAsyncBatched}.
- * TODO With change to batching, determine batch size.
+ * </p>
+ * <p>TODO With change to batching, determine batch size.
+ * </p>
+ * <p>TODO Local parallelism on C++ assumes same number of C++ as Jet. Should allow
+ * this to vary.
  * </p>
  */
 public class CvaStpJob {
@@ -486,6 +490,7 @@ public class CvaStpJob {
                                return Tuple3.tuple3(tradeId, curveName, result.getOutputValue(0));
                             });
                         })
+                //TODO Make parameter, see job comments
                 .setLocalParallelism(1)
                 .setName(STAGE_NAME_MTM);
 
