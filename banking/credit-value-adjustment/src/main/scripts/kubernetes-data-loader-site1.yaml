@@ -5,14 +5,14 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   labels:
-    app: job-data-loader-site1
-  name: job-data-loader-site1
+    app: cva-data-loader-site1
+  name: cva-data-loader-site1
 spec:
   backoffLimit: 0
   template:
     metadata:
       labels:
-        app: job-data-loader-site1
+        app: cva-data-loader-site1
     spec:
       containers:
         - env:
