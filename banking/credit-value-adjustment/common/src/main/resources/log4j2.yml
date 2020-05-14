@@ -53,7 +53,7 @@ Configuration:
           additivity: false
           AppenderRef:
             ref: ConsoleMagenta
-        - name: com.hazelcast.platform.demos.banking.cva.GrafanaGlobalMetricsJob
+        - name: com.hazelcast.platform.demos.banking.cva.grafana.GrafanaGlobalMetricsJob
           level: debug
           additivity: false
           AppenderRef:
