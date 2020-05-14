@@ -1,0 +1,27 @@
+---
+# Data loader, set arg for threshold (make it at least 20)
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: job-data-loader-site1
+  name: job-data-loader-site1
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: job-data-loader-site1
+    spec:
+      containers:
+        - env:
+          - name: "MY_SITE"
+            value: "site1"
+          - name: "MY_THRESHOLD"
+            value: "500"
+          image: "hazelcast-cva/data-loader"
+          imagePullPolicy: Never
+          name: container-data-loader-site1
+      restartPolicy: Never
+---

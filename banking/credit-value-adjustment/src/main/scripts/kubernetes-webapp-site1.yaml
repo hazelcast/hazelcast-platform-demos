@@ -1,0 +1,49 @@
+---
+# Service DNS will be "site1-webapp.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: site1-webapp
+spec:
+  selector:
+    app: cva-webapp-site1
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: LoadBalancer
+---
+# Only need 1 webapp
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cva-webapp-site1
+spec:
+  selector:
+    matchLabels:
+      app: cva-webapp-site1
+  template:
+    metadata:
+      labels:
+        app: cva-webapp-site1
+    spec:
+      containers:
+        - env:
+          - name: "MY_CPP_SERVICE"
+            value: "cpp-service.default.svc.cluster.local"
+          - name: "MY_SITE"
+            value: "site1"
+          image: "hazelcast-cva/webapp"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+          name: webapp-site1-container
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 30

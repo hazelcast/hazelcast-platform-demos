@@ -50,12 +50,17 @@ public class Application {
      */
     public static void main(String[] args) throws Exception {
         String siteStr = System.getProperty("my.site");
+        String thresholdStr = System.getProperty("my.threshold", "");
 
         Tuple2<Integer, Site> handledArgs = MyUtils.twoArgsIntSite(args, Application.class.getName());
 
         // Override threshold if specified and sensible
-        if (handledArgs.f0() != null && handledArgs.f0() > 0) {
-            threshold = handledArgs.f0();
+        if (thresholdStr.length() == 0) {
+            if (handledArgs.f0() != null && handledArgs.f0() > 0) {
+                threshold = handledArgs.f0();
+            }
+        } else {
+            threshold = Integer.parseInt(thresholdStr);
         }
 
         // Site, System property wins if specified twice

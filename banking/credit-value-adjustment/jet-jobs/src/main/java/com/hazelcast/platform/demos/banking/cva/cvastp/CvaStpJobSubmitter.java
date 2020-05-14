@@ -18,6 +18,9 @@ package com.hazelcast.platform.demos.banking.cva.cvastp;
 
 import java.time.LocalDate;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.Job;
 import com.hazelcast.jet.config.JobConfig;
@@ -29,9 +32,11 @@ import com.hazelcast.platform.demos.banking.cva.MyUtils;
  * </p>
  */
 public class CvaStpJobSubmitter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CvaStpJobSubmitter.class);
 
-    //FIXME Replace from Kubernetes
-    private static final String LOAD_BALANCER = "127.0.0.1";
+    private static final String CPP_DOCKER = "cpp";
+    private static final String CPP_KUBERNETES = "cpp-service";
+    private static final String CPP_LOCALHOST = "127.0.0.1";
     private static final int PORT = 50001;
 
     /**
@@ -76,8 +81,9 @@ public class CvaStpJobSubmitter {
 
         String jobNamePrefix = CvaStpJob.JOB_NAME_PREFIX;
         String jobName = jobNamePrefix + "$" + calcDate + "@" + timestampStr;
+        String cppLoadBalancer = getLoadBalancer();
 
-        Pipeline pipeline = CvaStpJob.buildPipeline(jobName, timestamp, calcDate, LOAD_BALANCER, PORT, debug);
+        Pipeline pipeline = CvaStpJob.buildPipeline(jobName, timestamp, calcDate, cppLoadBalancer, PORT, debug);
 
         JobConfig jobConfig = new JobConfig();
         jobConfig.setName(jobName);
@@ -90,6 +96,67 @@ public class CvaStpJobSubmitter {
             throw new RuntimeException(message);
         } else {
             return jetInstance.newJobIfAbsent(pipeline, jobConfig);
+        }
+    }
+
+
+    /**
+     * <p>Find the Load Balancer to use to access C++, based on
+     * system properties and derivation.
+     * </p>
+     *
+     * @return Hostname, no port.
+     */
+    private static String getLoadBalancer() {
+        String cppService = System.getProperty("my.cpp.service", "");
+        boolean dockerEnabled =
+                System.getProperty("my.docker.enabled", "false").equalsIgnoreCase(Boolean.TRUE.toString());
+        boolean kubernetesEnabled =
+                System.getProperty("my.kubernetes.enabled", "false").equalsIgnoreCase(Boolean.TRUE.toString());
+
+        // If set, validate but don't reject
+        if (cppService.length() > 0) {
+            validate(dockerEnabled, kubernetesEnabled, cppService);
+        } else {
+            // Unset, so guess
+            if (!dockerEnabled && !kubernetesEnabled) {
+                cppService = CPP_LOCALHOST;
+            }
+            if (dockerEnabled && !kubernetesEnabled) {
+                cppService = CPP_DOCKER;
+            }
+            if (kubernetesEnabled) {
+                cppService = CPP_KUBERNETES;
+            }
+        }
+
+        //XXX
+        LOGGER.error("Derived C++ service host: '{}'", cppService);
+        LOGGER.error("Derived C++ service host: '{}'", cppService);
+        LOGGER.error("Derived C++ service host: '{}'", cppService);
+        LOGGER.trace("Derived C++ service host: '{}'", cppService);
+        return cppService;
+    }
+
+
+    /**
+     * <p>Validate how the C++ service is set, compared to localhost,
+     * Docker or Kubernetes running.
+     * </p>
+     *
+     * @param dockerEnabled False means localhost
+     * @param kubernetesEnabled False means Docker or localhost
+     * @param cppService The service URL
+     */
+    private static void validate(boolean dockerEnabled, boolean kubernetesEnabled, String cppService) {
+        if (!dockerEnabled && !kubernetesEnabled && !cppService.equals(CPP_LOCALHOST)) {
+            LOGGER.warn("localhost, but 'my.cpp.service'=='{}'", cppService);
+        }
+        if (dockerEnabled && !kubernetesEnabled && !cppService.equals(CPP_DOCKER)) {
+            LOGGER.warn("Docker, but 'my.cpp.service'=='{}'", cppService);
+        }
+        if (kubernetesEnabled && !cppService.equals(CPP_KUBERNETES)) {
+            LOGGER.warn("Kubernetes, but 'my.cpp.service'=='{}'", cppService);
         }
     }
 

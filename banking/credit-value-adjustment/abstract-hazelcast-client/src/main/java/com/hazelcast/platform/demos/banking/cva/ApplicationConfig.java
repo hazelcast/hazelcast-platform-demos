@@ -19,6 +19,7 @@ package com.hazelcast.platform.demos.banking.cva;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
 import com.hazelcast.client.config.YamlClientConfigBuilder;
+import com.hazelcast.config.KubernetesConfig;
 
 import java.util.List;
 
@@ -57,6 +58,14 @@ public class ApplicationConfig {
         ClientNetworkConfig clientNetworkConfig = clientConfig.getNetworkConfig();
 
         if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
+            KubernetesConfig kubernetesConfig = new KubernetesConfig();
+
+            kubernetesConfig.setEnabled(true);
+            kubernetesConfig.setProperty("service-dns",
+                    System.getProperty("my.site") + "-service.default.svc.cluster.local");
+
+            clientNetworkConfig.setKubernetesConfig(kubernetesConfig);
+
             LOGGER.warn("Kubernetes configuration: service-dns: "
                     + clientNetworkConfig.getKubernetesConfig().getProperty("service-dns"));
         } else {
