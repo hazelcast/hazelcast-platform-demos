@@ -60,7 +60,6 @@ public class GrafanaGlobalMetricsJob {
 
     public static final String JOB_NAME = GrafanaGlobalMetricsJob.class.getSimpleName();
 
-    private static final String GRAFANA_HOSTNAME = "grafana";
     private static final Logger LOGGER = LoggerFactory.getLogger(GrafanaGlobalMetricsJob.class);
     private static final long LOG_THRESHOLD = 12L;
     private static final String METRIC_PREFIX = GrafanaGlobalMetricsJob.class.getSimpleName();
@@ -95,15 +94,14 @@ public class GrafanaGlobalMetricsJob {
      * something.
      * </p>
      */
-    public static Pipeline buildPipeline(Site site) {
+    public static Pipeline buildPipeline(Site site, String grafanaURL) {
 
         Pipeline pipeline = Pipeline.create();
 
         pipeline.readFrom(GrafanaGlobalMetricsJob.mySource(site)).withoutTimestamps()
                 // TODO Make this once per node not once per job
                 .filterStateful(LongAccumulator::new, noopLoggerFilter)
-                // FIXME Replace with Service K8S or Hostname Docker
-                .writeTo(MyUtils.buildGraphiteSinkMultiple(GRAFANA_HOSTNAME));
+                .writeTo(MyUtils.buildGraphiteSinkMultiple(grafanaURL));
 
         return pipeline;
     }

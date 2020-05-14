@@ -83,8 +83,10 @@ public class ApplicationInitializer {
      */
     private void launchNeededJobs(boolean isLocalhost) {
 
+        String grafanaURL = System.getProperty("my.grafana.service", "");
+
         Pipeline pipelineGrafanaGlobalMetrics =
-                GrafanaGlobalMetricsJob.buildPipeline(this.myProperties.getSite());
+                GrafanaGlobalMetricsJob.buildPipeline(this.myProperties.getSite(), grafanaURL);
 
         JobConfig jobConfigGrafanaGlobalMetrics = new JobConfig();
         jobConfigGrafanaGlobalMetrics.setName(GrafanaGlobalMetricsJob.JOB_NAME);
@@ -95,7 +97,15 @@ public class ApplicationInitializer {
                 "my.docker.enabled", System.getProperty("my.docker.enabled"),
                 "my.kubernetes.enabled", System.getProperty("my.kubernetes.enabled"));
         } else {
-            this.jetInstance.newJobIfAbsent(pipelineGrafanaGlobalMetrics, jobConfigGrafanaGlobalMetrics);
+            if (grafanaURL.length() == 0) {
+                LOGGER.error("Grafana URL missing, skipping '{}', as '{}'=={} & '{}'=={}",
+                        jobConfigGrafanaGlobalMetrics.getName(),
+                        "my.docker.enabled", System.getProperty("my.docker.enabled"),
+                        "my.kubernetes.enabled", System.getProperty("my.kubernetes.enabled"));
+            } else {
+                this.jetInstance.newJobIfAbsent(pipelineGrafanaGlobalMetrics,
+                        jobConfigGrafanaGlobalMetrics);
+            }
         }
 
     }
