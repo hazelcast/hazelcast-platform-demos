@@ -1,3 +1,4 @@
+#include <ctime>
 #include <iostream>
 #include "../include/JsonHandler.h"
 #include "../include/Pricer.h"
@@ -60,6 +61,7 @@ class JetToCppServiceImpl final : public JetToCpp::Service {
     Status streamingCall(ServerContext* context,
                          ServerReaderWriter<OutputMessage, InputMessage>* stream) override {
         InputMessage request;
+        std::time_t now;
         long count = 0;
         long threshold = 100;
         while (stream->Read(&request)) {
@@ -72,7 +74,8 @@ class JetToCppServiceImpl final : public JetToCpp::Service {
             stream->Write(response);
             // Includes first run as zero, then at 100, 200, 400 .. until every 12800
             if ((count % threshold) == 0) {
-                std::cout << "Stream count " << count << std::endl;
+                now = std::time(NULL);
+                std::cout << "Stream count " << count << " @ " << std::put_time(std::localtime(&now), "%FT%T") << std::endl;
                 if (threshold < 10000) {
                     threshold += threshold;
                 }
