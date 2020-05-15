@@ -72,14 +72,12 @@ class JetToCppServiceImpl final : public JetToCpp::Service {
             stream->Write(response);
             // Includes first run as zero, then at 100, 200, 400 .. until every 12800
             if ((count % threshold) == 0) {
-                count++;
                 std::cout << "Stream count " << count << std::endl;
                 if (threshold < 10000) {
                     threshold += threshold;
                 }
-            } else {
-                count++;
             }
+            count++;
         }
         return Status::OK;
     }
