@@ -74,6 +74,8 @@ public class ApplicationConfig {
     @Bean
     public JetConfig jetConfig() {
         JetConfig jetConfig = new YamlJetConfigBuilder().build();
+        LOGGER.info("Runtime.getRuntime().availableProcessors()=={}",
+                Runtime.getRuntime().availableProcessors());
 
         this.addWanConfig(jetConfig.getHazelcastConfig().getWanReplicationConfigs());
 
