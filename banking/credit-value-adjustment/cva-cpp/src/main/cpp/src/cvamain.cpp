@@ -10,6 +10,10 @@ using namespace FlumaionQL;
 using namespace com_hazelcast_platform_demos_banking_cva;
 using namespace grpc;
 
+// Record the last member, should be one per C++ module.
+string jetMember = "";
+long jetMemberChanges = 0;
+
 void getMTM(string jsonBundle, string* mtmjson) {
     JsonHandler jsonHandler;
     QLUtils qlutils;
@@ -50,6 +54,18 @@ void getMTM(string jsonBundle, string* mtmjson) {
     Value& fixing = d["fixing"];
     boost::shared_ptr<Fixing> fixings = jsonHandler.jsonToFixing(fixing.GetString());
     /**
+     * Track if calling member changes
+     */
+    Value& debug = d["debug"]; 
+    if (jetMember.size() == 0) {
+        jetMember = debug.GetString();
+    } else {
+        if (jetMember.compare(debug.GetString()) != 0) {
+            jetMember = debug.GetString();
+            jetMemberChanges++;
+        }
+    }
+    /**
      * Get MtM
      */
     Pricer pricer;
@@ -75,7 +91,10 @@ class JetToCppServiceImpl final : public JetToCpp::Service {
             // Includes first run as zero, then at 100, 200, 400 .. until every 12800
             if ((count % threshold) == 0) {
                 now = std::time(NULL);
-                std::cout << "Stream count " << count << " @ " << std::put_time(std::localtime(&now), "%FT%T") << ", size " << total << std::endl;
+                std::cout << "Stream count " << count << " @ " << std::put_time(std::localtime(&now), "%FT%T")
+                    << ", batch size " << total 
+                    << ", member " << jetMember << " (changes: " << jetMemberChanges << ")"
+                    << std::endl;
                 if (threshold < 10000) {
                     threshold += threshold;
                 }

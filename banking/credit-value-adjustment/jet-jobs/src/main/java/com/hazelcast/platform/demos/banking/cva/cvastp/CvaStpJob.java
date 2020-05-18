@@ -26,6 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 
+import com.hazelcast.cluster.Cluster;
+import com.hazelcast.cluster.Member;
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.function.ComparatorEx;
 import com.hazelcast.function.Functions;
@@ -38,6 +40,7 @@ import com.hazelcast.jet.grpc.GrpcService;
 import com.hazelcast.jet.grpc.GrpcServices;
 import com.hazelcast.jet.pipeline.BatchStage;
 import com.hazelcast.jet.pipeline.Pipeline;
+import com.hazelcast.jet.pipeline.ServiceFactories;
 import com.hazelcast.jet.pipeline.ServiceFactory;
 import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.pipeline.Sources;
@@ -448,6 +451,11 @@ public class CvaStpJob {
     private static BatchStage<Tuple3<String, String, String>> callCppForMtm(String host, int port,
             BatchStage<Tuple2<String, String>> tradesXircurves, BatchStage<String> fixings, String calcDateStr) {
 
+        /* A diagnostic service factory to get the calling member to pass to C++.
+         */
+        ServiceFactory<?, Cluster> clusterService =
+                ServiceFactories.sharedService(ctx -> ctx.jetInstance().getCluster());
+
         /* A service factory to provide a BiDirectional connection to a C++ server,
          * using the provided channel builder and invoking function.
          */
@@ -458,29 +466,40 @@ public class CvaStpJob {
                         channel -> JetToCppGrpc.newStub(channel)::streamingCall
                 );
 
-
         /* Make the input to C++ for the service call, and extract the output
          * from the result.
          */
         BatchStage<Tuple3<String, String, String>> mtm =
                 tradesXircurves.hashJoin(fixings, CvaStpUtils.cartesianProduct(),
                         (tuple2, fixing) -> Tuple3.tuple3(tuple2.f0(), tuple2.f1(), fixing))
-                .mapUsingServiceAsync(cppService,
+                .mapUsingService(clusterService,
                         (service, tuple3) -> {
-                            String tradeId = new JSONObject(tuple3.f0()).getString("tradeid");
-                            String curveName = new JSONObject(tuple3.f1()).getString("curvename");
+                            Member member = service.getLocalMember();
+
+                            String source = member.getAddress().getHost() + ":"
+                                    + member.getAddress().getPort();
+
+                            return Tuple4.tuple4(tuple3.f0(), tuple3.f1(), tuple3.f2(), source);
+                        })
+                .mapUsingServiceAsync(cppService,
+                        (service, tuple4) -> {
+                            String tradeId = new JSONObject(tuple4.f0()).getString("tradeid");
+                            String curveName = new JSONObject(tuple4.f1()).getString("curvename");
 
                             StringBuilder stringBuilder = new StringBuilder();
 
                             stringBuilder.append("{");
+                            //FIXME and batching
                             stringBuilder.append(" \"calcdate\": \""
                                     + calcDateStr + "\"");
+                            stringBuilder.append(", \"debug\": \""
+                                    + CvaStpUtils.escapeQuotes(tuple4.f3()) + "\"");
                             stringBuilder.append(", \"trade\": \""
-                                    + CvaStpUtils.escapeQuotes(tuple3.f0()) + "\"");
+                                    + CvaStpUtils.escapeQuotes(tuple4.f0()) + "\"");
                             stringBuilder.append(", \"curve\": \""
-                                    + CvaStpUtils.escapeQuotes(tuple3.f1()) + "\"");
+                                    + CvaStpUtils.escapeQuotes(tuple4.f1()) + "\"");
                             stringBuilder.append(", \"fixing\": \""
-                                    + CvaStpUtils.escapeQuotes(tuple3.f2().toString()) + "\"");
+                                    + CvaStpUtils.escapeQuotes(tuple4.f2().toString()) + "\"");
                             stringBuilder.append("}");
 
                             InputMessage request =
