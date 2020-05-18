@@ -16,9 +16,10 @@
 
 package com.hazelcast.platform.demos.banking.cva;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -69,7 +70,7 @@ public class ApplicationRunner implements CommandLineRunner {
         jobStateTopic.addMessageListener(this.mySocketJobListener);
 
         Map<Long, JobStatus> currentState;
-        Map<Long, JobStatus> previousState = new HashMap<>();
+        Map<Long, JobStatus> previousState = new TreeMap<>(Collections.reverseOrder());
 
         while (true) {
             try {
@@ -85,24 +86,43 @@ public class ApplicationRunner implements CommandLineRunner {
                     JobStatus oldJobStatus = previousState.get(entry.getKey());
                     JobStatus newJobStatus = entry.getValue();
 
-                    HazelcastJsonValue json = this.jobToJson(this.jetInstance.getJob(entry.getKey()));
-                    Tuple2<HazelcastJsonValue, JobStatus> message = Tuple2.tuple2(json, oldJobStatus);
-
-                    // Only log delta but publish baseline
-                    if (oldJobStatus == null || oldJobStatus != newJobStatus) {
-                        LOGGER.trace("Job state change: '{}'", message);
+                    Job job = null;
+                    try {
+                        job = this.jetInstance.getJob(entry.getKey());
+                    } catch (Exception e) {
+                        LOGGER.error("Live:," + entry.getKey().toString(), e);
                     }
-                    jobStateTopic.publish(message);
 
-                    // Remove from previous state once examined
-                    previousState.remove(entry.getKey());
+                    if (job != null) {
+                        HazelcastJsonValue json = this.jobToJson(job);
+
+                        Tuple2<HazelcastJsonValue, JobStatus> message = Tuple2.tuple2(json, oldJobStatus);
+
+                        // Only log delta but publish baseline
+                        if (oldJobStatus == null || oldJobStatus != newJobStatus) {
+                            LOGGER.trace("Job state change: '{}'", message);
+                        }
+                        jobStateTopic.publish(message);
+
+                        // Remove from previous state once examined
+                        previousState.remove(entry.getKey());
+                    }
                 }
 
                 // Dead jobs
                 for (Entry<Long, JobStatus> entry : previousState.entrySet()) {
-                    HazelcastJsonValue json = this.jobToJson(this.jetInstance.getJob(entry.getKey()));
-                    Tuple2<HazelcastJsonValue, JobStatus> message = Tuple2.tuple2(json, entry.getValue());
-                    jobStateTopic.publish(message);
+                    Job job = null;
+                    try {
+                        job = this.jetInstance.getJob(entry.getKey());
+                    } catch (Exception e) {
+                        LOGGER.error("Dead:," + entry.getKey().toString(), e);
+                    }
+
+                    if (job != null) {
+                        HazelcastJsonValue json = this.jobToJson(job);
+                        Tuple2<HazelcastJsonValue, JobStatus> message = Tuple2.tuple2(json, entry.getValue());
+                        jobStateTopic.publish(message);
+                    }
                 }
 
                 previousState = currentState;
