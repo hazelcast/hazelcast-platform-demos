@@ -6,12 +6,19 @@
 }
 
 body {
-	background: honeydew;
+	background: var(--site-background);
 }
 
 h1, h2 {
 	text-align: center;
 	color: var(--hazelcast-blue);
+}
+
+.whiteBox {
+	border: 4px solid DarkGray;
+	background-color: white;	
+	color: black;
+	font-family: "Courier New", Courier, monospace;
 }
 
 h3 {

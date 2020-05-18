@@ -75,7 +75,7 @@ class JetToCppServiceImpl final : public JetToCpp::Service {
             // Includes first run as zero, then at 100, 200, 400 .. until every 12800
             if ((count % threshold) == 0) {
                 now = std::time(NULL);
-                std::cout << "Stream count " << count << " @ " << std::put_time(std::localtime(&now), "%FT%T") << std::endl;
+                std::cout << "Stream count " << count << " @ " << std::put_time(std::localtime(&now), "%FT%T") << ", size " << total << std::endl;
                 if (threshold < 10000) {
                     threshold += threshold;
                 }

@@ -3,8 +3,9 @@
 
 <head th:fragment="head">
 <link rel="shortcut icon" th:href="@{/images/favicon.ico}">
+<link rel="stylesheet" type="text/css" th:href="@{/css/__${@siteLowerCase}__.css}" />
 <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}" />
-<title>@my.webapp.title@</title>
+<title th:text="'@my.webapp.title@ - ' + ${@siteLowerCase}">?</title>
 </head>
 
 <body th:fragment="header">
@@ -16,6 +17,9 @@
 					<a th:target="_blank" th:href="@{/swagger-ui.html#/}">Swagger</a>
 			</font>
 			</p>
+		</div>
+		<div class="whiteBox">
+			<h1 th:text="${@siteLowerCase}">?</h1>
 		</div>
 		<hr class="headerfooterline"/>
 	</div>

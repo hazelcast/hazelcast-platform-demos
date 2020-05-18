@@ -22,6 +22,7 @@ import com.hazelcast.client.config.YamlClientConfigBuilder;
 import com.hazelcast.config.KubernetesConfig;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,4 +86,15 @@ public class ApplicationConfig {
         return clientConfig;
     }
 
+    /**
+     * <p>Expose the site as a String for web pages, etc.
+     * </p>
+     *
+     * @param myProperties
+     * @return
+     */
+    @Bean
+    public String siteLowerCase(MyProperties myProperties) {
+        return myProperties.getSite().toString().toLowerCase(Locale.ROOT);
+    }
 }

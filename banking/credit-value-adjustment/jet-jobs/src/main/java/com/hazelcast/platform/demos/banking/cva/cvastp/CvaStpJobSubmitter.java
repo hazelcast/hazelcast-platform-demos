@@ -150,7 +150,7 @@ public class CvaStpJobSubmitter {
         if (dockerEnabled && !kubernetesEnabled && !cppService.equals(CPP_DOCKER)) {
             LOGGER.warn("Docker, but 'my.cpp.service'=='{}'", cppService);
         }
-        if (kubernetesEnabled && !cppService.equals(CPP_KUBERNETES)) {
+        if (kubernetesEnabled && !cppService.startsWith(CPP_KUBERNETES)) {
             LOGGER.warn("Kubernetes, but 'my.cpp.service'=='{}'", cppService);
         }
     }
