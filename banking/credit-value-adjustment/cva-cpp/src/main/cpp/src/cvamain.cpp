@@ -56,13 +56,16 @@ void getMTM(string jsonBundle, string* mtmjson) {
     /**
      * Track if calling member changes
      */
-    Value& debug = d["debug"]; 
-    if (jetMember.size() == 0) {
-        jetMember = debug.GetString();
-    } else {
-        if (jetMember.compare(debug.GetString()) != 0) {
+    bool debugExists = d.HasMember("debug");
+    if (debugExists) {
+        Value& debug = d["debug"]; 
+        if (jetMember.size() == 0) {
             jetMember = debug.GetString();
-            jetMemberChanges++;
+        } else {
+            if (jetMember.compare(debug.GetString()) != 0) {
+                jetMember = debug.GetString();
+                jetMemberChanges++;
+            }
         }
     }
     /**
@@ -93,7 +96,7 @@ class JetToCppServiceImpl final : public JetToCpp::Service {
                 now = std::time(NULL);
                 std::cout << "Stream count " << count << " @ " << std::put_time(std::localtime(&now), "%FT%T")
                     << ", batch size " << total 
-                    << ", member " << jetMember << " (changes: " << jetMemberChanges << ")"
+                    << ", member '" << jetMember << "' (changes: " << jetMemberChanges << ")"
                     << std::endl;
                 if (threshold < 10000) {
                     threshold += threshold;
