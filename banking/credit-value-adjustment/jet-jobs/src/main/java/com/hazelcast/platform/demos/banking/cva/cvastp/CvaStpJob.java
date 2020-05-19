@@ -486,28 +486,13 @@ public class CvaStpJob {
                 .mapUsingServiceAsyncBatched(cppService,
                         batchSize,
                         (service, tuple4List) -> {
-                            List<String> jsonList = new ArrayList<>();
+                            List<String> jsonStrList = new ArrayList<>();
                             for (Tuple4<String, String, Object, String> tuple4 : tuple4List) {
-                                StringBuilder stringBuilder = new StringBuilder();
-
-                                stringBuilder.append("{");
-                                stringBuilder.append(" \"calcdate\": \""
-                                        + calcDateStr + "\"");
-                                stringBuilder.append(", \"debug\": \""
-                                        + CvaStpUtils.escapeQuotes(tuple4.f3()) + "\"");
-                                stringBuilder.append(", \"trade\": \""
-                                        + CvaStpUtils.escapeQuotes(tuple4.f0()) + "\"");
-                                stringBuilder.append(", \"curve\": \""
-                                        + CvaStpUtils.escapeQuotes(tuple4.f1()) + "\"");
-                                stringBuilder.append(", \"fixing\": \""
-                                        + CvaStpUtils.escapeQuotes(tuple4.f2().toString()) + "\"");
-                                stringBuilder.append("}");
-
-                                jsonList.add(stringBuilder.toString());
+                                jsonStrList.add(formJsonStr(tuple4, calcDateStr));
                             }
 
                             InputMessage request =
-                                    InputMessage.newBuilder().addAllInputValue(jsonList).build();
+                                    InputMessage.newBuilder().addAllInputValue(jsonStrList).build();
 
                             return service.call(request).thenApply(result -> {
                                 List<Tuple3<String, String, String>> batch = new ArrayList<>();
@@ -532,6 +517,35 @@ public class CvaStpJob {
                 .setName(STAGE_NAME_MTM);
 
         return mtm;
+    }
+
+
+    /**
+     * <p>Create a string that actually holds JSON, to pass to the C++ pricer.
+     * Field "{@code debug}" is optional.
+     * </p>
+     *
+     * @param tuple4 TradeId, CurveName, Fixing and Jet Member
+     * @param calcDateStr Pre-formatted calculation date
+     * @return A string holding JSON to parse on the receiver
+     */
+    private static String formJsonStr(Tuple4<String, String, Object, String> tuple4, String calcDateStr) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("{");
+        stringBuilder.append(" \"calcdate\": \""
+                + calcDateStr + "\"");
+        stringBuilder.append(", \"debug\": \""
+                + CvaStpUtils.escapeQuotes(tuple4.f3()) + "\"");
+        stringBuilder.append(", \"trade\": \""
+                + CvaStpUtils.escapeQuotes(tuple4.f0()) + "\"");
+        stringBuilder.append(", \"curve\": \""
+                + CvaStpUtils.escapeQuotes(tuple4.f1()) + "\"");
+        stringBuilder.append(", \"fixing\": \""
+                + CvaStpUtils.escapeQuotes(tuple4.f2().toString()) + "\"");
+        stringBuilder.append("}");
+
+        return stringBuilder.toString();
     }
 
 

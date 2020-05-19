@@ -25,6 +25,7 @@ import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.Job;
 import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.pipeline.Pipeline;
+import com.hazelcast.platform.demos.banking.cva.MyConstants;
 import com.hazelcast.platform.demos.banking.cva.MyUtils;
 
 /**
@@ -56,8 +57,7 @@ public class CvaStpJobSubmitter {
      */
     public static Job submitCvaStpJob(JetInstance jetInstance, LocalDate calcDate) throws Exception {
         boolean debug = false;
-        //XXX FIXME test values
-        int batchSize = 10;
+        int batchSize = MyConstants.DEFAULT_BATCH_SIZE;
         int parallelism = 1;
         return CvaStpJobSubmitter.submitCvaStpJob(jetInstance, calcDate, batchSize, parallelism, debug);
     }

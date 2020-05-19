@@ -67,4 +67,8 @@ public class MyConstants {
     // For limiting the logging of long lines
     public static final int HALF_SCREEN_WIDTH = 66;
 
+    // For calling C++
+    //TODO Find a fairly optimal value
+    public static final int DEFAULT_BATCH_SIZE = 100;
+
 }
