@@ -20,6 +20,7 @@ import java.util.List;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.ArrayList;
 import java.util.Map.Entry;
 
 import org.slf4j.Logger;
@@ -292,12 +293,7 @@ import io.grpc.ManagedChannelBuilder;
  * </p>
  * <p>TODO Move fixings to initialisation of C++.
  * </p>
- * <p>TODO Change C++ calc to {@link mapUsingServiceAsyncBatched}.
- * </p>
  * <p>TODO With change to batching, determine batch size.
- * </p>
- * <p>TODO Local parallelism on C++ assumes same number of C++ as Jet. Should allow
- * this to vary.
  * </p>
  */
 public class CvaStpJob {
@@ -326,12 +322,14 @@ public class CvaStpJob {
      * @param calcDate     For C++
      * @param loadBalancer Front for C++ servers
      * @param port         For C++ servers
+     * @param batchSize    For C++, how many requests to send
+     * @param parallelism  Ratio of C++ workers to Jet node
      * @param debug        For development, save intermediate results
      * @return
      */
     @SuppressWarnings("unchecked")
     public static Pipeline buildPipeline(String jobName, long timestamp, LocalDate calcDate,
-            String loadBalancer, int port, boolean debug) {
+            String loadBalancer, int port, int batchSize, int parallelism, boolean debug) {
         String timestampStr = MyUtils.timestampToISO8601(timestamp);
         String calcDateStr = CvaStpUtils.escapeQuotes("{\"calc_date\":\"" + calcDate + "\"}");
 
@@ -376,7 +374,8 @@ public class CvaStpJob {
 
         // Step 9 above, provides trio of trade, curve and MTM
         BatchStage<Tuple3<String, String, String>> mtm =
-                callCppForMtm(loadBalancer, port, tradesXircurves, fixings, calcDateStr);
+                callCppForMtm(loadBalancer, port, batchSize, parallelism,
+                        tradesXircurves, fixings, calcDateStr);
 
         // Step 10 above, provides trio of trade, curve, exposure
         BatchStage<Tuple3<String, String, String>> exposure =
@@ -439,6 +438,8 @@ public class CvaStpJob {
      *
      * @param host A load balancer fronting the C++ calculation processes
      * @param port Expect all C++ calculation processes to use the same port
+     * @param batchSize How many requests to send in a batch
+     * @param parallelism How many C++ workers per Jet node
      * @param tradesXircurves A pair of trade and interest rate curve
      * @param fixings The fixing date/rate to use
      * @param calcDateStr The date for the calculation
@@ -449,6 +450,7 @@ public class CvaStpJob {
      * </p>
      */
     private static BatchStage<Tuple3<String, String, String>> callCppForMtm(String host, int port,
+            int batchSize, int parallelism,
             BatchStage<Tuple2<String, String>> tradesXircurves, BatchStage<String> fixings, String calcDateStr) {
 
         /* A diagnostic service factory to get the calling member to pass to C++.
@@ -481,36 +483,52 @@ public class CvaStpJob {
 
                             return Tuple4.tuple4(tuple3.f0(), tuple3.f1(), tuple3.f2(), source);
                         })
-                .mapUsingServiceAsync(cppService,
-                        (service, tuple4) -> {
-                            String tradeId = new JSONObject(tuple4.f0()).getString("tradeid");
-                            String curveName = new JSONObject(tuple4.f1()).getString("curvename");
+                .mapUsingServiceAsyncBatched(cppService,
+                        batchSize,
+                        (service, tuple4List) -> {
+                            List<String> jsonList = new ArrayList<>();
+                            for (Tuple4<String, String, Object, String> tuple4 : tuple4List) {
+                                StringBuilder stringBuilder = new StringBuilder();
 
-                            StringBuilder stringBuilder = new StringBuilder();
+                                stringBuilder.append("{");
+                                stringBuilder.append(" \"calcdate\": \""
+                                        + calcDateStr + "\"");
+                                stringBuilder.append(", \"debug\": \""
+                                        + CvaStpUtils.escapeQuotes(tuple4.f3()) + "\"");
+                                stringBuilder.append(", \"trade\": \""
+                                        + CvaStpUtils.escapeQuotes(tuple4.f0()) + "\"");
+                                stringBuilder.append(", \"curve\": \""
+                                        + CvaStpUtils.escapeQuotes(tuple4.f1()) + "\"");
+                                stringBuilder.append(", \"fixing\": \""
+                                        + CvaStpUtils.escapeQuotes(tuple4.f2().toString()) + "\"");
+                                stringBuilder.append("}");
 
-                            stringBuilder.append("{");
-                            //FIXME and batching
-                            stringBuilder.append(" \"calcdate\": \""
-                                    + calcDateStr + "\"");
-                            stringBuilder.append(", \"debug\": \""
-                                    + CvaStpUtils.escapeQuotes(tuple4.f3()) + "\"");
-                            stringBuilder.append(", \"trade\": \""
-                                    + CvaStpUtils.escapeQuotes(tuple4.f0()) + "\"");
-                            stringBuilder.append(", \"curve\": \""
-                                    + CvaStpUtils.escapeQuotes(tuple4.f1()) + "\"");
-                            stringBuilder.append(", \"fixing\": \""
-                                    + CvaStpUtils.escapeQuotes(tuple4.f2().toString()) + "\"");
-                            stringBuilder.append("}");
+                                jsonList.add(stringBuilder.toString());
+                            }
 
                             InputMessage request =
-                                    InputMessage.newBuilder().addInputValue(stringBuilder.toString()).build();
+                                    InputMessage.newBuilder().addAllInputValue(jsonList).build();
 
                             return service.call(request).thenApply(result -> {
-                               return Tuple3.tuple3(tradeId, curveName, result.getOutputValue(0));
+                                List<Tuple3<String, String, String>> batch = new ArrayList<>();
+
+                                for (int i = 0 ; i < result.getOutputValueCount(); i++) {
+                                    try {
+                                        String tradeId =
+                                                new JSONObject(tuple4List.get(i).f0()).getString("tradeid");
+                                        String curveName =
+                                                new JSONObject(tuple4List.get(i).f1()).getString("curvename");
+
+                                        batch.add(Tuple3.tuple3(tradeId, curveName, result.getOutputValue(i)));
+                                    } catch (Exception e) {
+                                        LOGGER.error(e.getMessage(), e);
+                                    }
+                                }
+
+                                return batch;
                             });
                         })
-                //TODO Make parameter, see job comments
-                .setLocalParallelism(1)
+                .setLocalParallelism(parallelism)
                 .setName(STAGE_NAME_MTM);
 
         return mtm;

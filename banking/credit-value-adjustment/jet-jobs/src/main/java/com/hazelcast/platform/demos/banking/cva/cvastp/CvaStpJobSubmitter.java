@@ -56,7 +56,10 @@ public class CvaStpJobSubmitter {
      */
     public static Job submitCvaStpJob(JetInstance jetInstance, LocalDate calcDate) throws Exception {
         boolean debug = false;
-        return CvaStpJobSubmitter.submitCvaStpJob(jetInstance, calcDate, debug);
+        //XXX FIXME test values
+        int batchSize = 10;
+        int parallelism = 1;
+        return CvaStpJobSubmitter.submitCvaStpJob(jetInstance, calcDate, batchSize, parallelism, debug);
     }
 
     /**
@@ -71,11 +74,14 @@ public class CvaStpJobSubmitter {
      *
      * @param jetInstance Used to find similar named jobs
      * @param calcDate Calculation date to use
+     * @param batchSize How many calcs to pass to C++
+     * @param parallelism How many C++ workers to each each Jet
      * @param debug If debug job steps are required
      * @return The job if submitted
      * @throws Exception If the job is rejected as a duplicate is still running
      */
-    public static Job submitCvaStpJob(JetInstance jetInstance, LocalDate calcDate, boolean debug) throws Exception {
+    public static Job submitCvaStpJob(JetInstance jetInstance, LocalDate calcDate,
+            int batchSize, int parallelism, boolean debug) throws Exception {
         long timestamp = System.currentTimeMillis();
         String timestampStr = MyUtils.timestampToISO8601(timestamp);
 
@@ -83,7 +89,8 @@ public class CvaStpJobSubmitter {
         String jobName = jobNamePrefix + "$" + calcDate + "@" + timestampStr;
         String cppLoadBalancer = getLoadBalancer();
 
-        Pipeline pipeline = CvaStpJob.buildPipeline(jobName, timestamp, calcDate, cppLoadBalancer, PORT, debug);
+        Pipeline pipeline = CvaStpJob.buildPipeline(jobName, timestamp, calcDate, cppLoadBalancer,
+                PORT, batchSize, parallelism, debug);
 
         JobConfig jobConfig = new JobConfig();
         jobConfig.setName(jobName);
