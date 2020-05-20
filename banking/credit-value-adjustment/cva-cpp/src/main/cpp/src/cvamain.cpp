@@ -63,6 +63,10 @@ void getMTM(string jsonBundle, string* mtmjson) {
             jetMember = debug.GetString();
         } else {
             if (jetMember.compare(debug.GetString()) != 0) {
+                if (jetMemberChanges < 10) {
+                    std::cout << "Change " << jetMemberChanges << " from '"
+                        << jetMember << "' to '" << debug.GetString() << "'" << std::endl;
+                }
                 jetMember = debug.GetString();
                 jetMemberChanges++;
             }
@@ -81,28 +85,32 @@ class JetToCppServiceImpl final : public JetToCpp::Service {
                          ServerReaderWriter<OutputMessage, InputMessage>* stream) override {
         InputMessage request;
         std::time_t now;
-        long count = 0;
-        long threshold = 100;
+        long countBatch = 0;
+        long countTotal = 0;
+        long reportEvery = 50;
         while (stream->Read(&request)) {
             OutputMessage response;
-            int total = request.inputvalue_size();
-            for (int i=0; i<total; i++) {
+            int batchSize = request.inputvalue_size();
+            for (int i=0; i<batchSize; i++) {
                 string* mtmjson = response.add_outputvalue();
                 getMTM(request.inputvalue(i), mtmjson);
             }
             stream->Write(response);
             // Includes first run as zero, then at 100, 200, 400 .. until every 12800
-            if ((count % threshold) == 0) {
+            countTotal += batchSize;
+            if ((countBatch % reportEvery) == 0) {
                 now = std::time(NULL);
-                std::cout << "Stream count " << count << " @ " << std::put_time(std::localtime(&now), "%FT%T")
-                    << ", batch size " << total 
+                std::cout << "Batch number " << std::setfill(' ') << std::setw(4) << countBatch;
+                std::cout << " @ " << std::put_time(std::localtime(&now), "%FT%T")
+                    << ", batch size " << batchSize 
                     << ", member '" << jetMember << "' (changes: " << jetMemberChanges << ")"
+                    << ", total processed " << std::setfill(' ') << std::setw(5) << countTotal 
                     << std::endl;
-                if (threshold < 10000) {
-                    threshold += threshold;
+                if (reportEvery < 10000) {
+                    reportEvery += reportEvery;
                 }
             }
-            count++;
+            countBatch++;
         }
         return Status::OK;
     }

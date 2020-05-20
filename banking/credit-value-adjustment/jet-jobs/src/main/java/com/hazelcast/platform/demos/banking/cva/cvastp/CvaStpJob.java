@@ -524,6 +524,8 @@ public class CvaStpJob {
      * <p>Create a string that actually holds JSON, to pass to the C++ pricer.
      * Field "{@code debug}" is optional.
      * </p>
+     * <p>TODO Moving calcdate, debug and fixing to one per batch.
+     * </p>
      *
      * @param tuple4 TradeId, CurveName, Fixing and Jet Member
      * @param calcDateStr Pre-formatted calculation date
