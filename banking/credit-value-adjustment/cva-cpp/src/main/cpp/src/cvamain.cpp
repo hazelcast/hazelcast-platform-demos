@@ -1,5 +1,6 @@
 #include <ctime>
 #include <iostream>
+#include <thread>
 #include "../include/JsonHandler.h"
 #include "../include/Pricer.h"
 #include "../include/JetToCpp.grpc.pb.h"
@@ -87,7 +88,7 @@ class JetToCppServiceImpl final : public JetToCpp::Service {
         std::time_t now;
         long countBatch = 0;
         long countTotal = 0;
-        long reportEvery = 50;
+        long reportEvery = 1;
         while (stream->Read(&request)) {
             OutputMessage response;
             int batchSize = request.inputvalue_size();
@@ -96,13 +97,15 @@ class JetToCppServiceImpl final : public JetToCpp::Service {
                 getMTM(request.inputvalue(i), mtmjson);
             }
             stream->Write(response);
-            // Includes first run as zero, then at 100, 200, 400 .. until every 12800
             countTotal += batchSize;
+            // Includes first run as zero, doubling the interval until max interval
             if ((countBatch % reportEvery) == 0) {
                 now = std::time(NULL);
+                std::thread::id threadId = std::this_thread::get_id();
                 std::cout << "Batch number " << std::setfill(' ') << std::setw(4) << countBatch;
                 std::cout << " @ " << std::put_time(std::localtime(&now), "%FT%T")
                     << ", batch size " << batchSize 
+                    << ", thread " << threadId
                     << ", member '" << jetMember << "' (changes: " << jetMemberChanges << ")"
                     << ", total processed " << std::setfill(' ') << std::setw(5) << countTotal 
                     << std::endl;
@@ -120,6 +123,17 @@ void RunServer(string server_address) {
     ServerBuilder builder;
     // Listen on the given address without any authentication mechanism.
     builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
+
+    // The C++ code may not be thread-safe, so reduce input queue handler to 1 thread
+    builder.SetSyncServerOption(ServerBuilder::SyncServerOption::MAX_POLLERS, 1);
+    builder.SetSyncServerOption(ServerBuilder::SyncServerOption::MIN_POLLERS, 1);
+    int completionQueues = 1;
+    builder.SetSyncServerOption(ServerBuilder::SyncServerOption::NUM_CQS, completionQueues);
+    ResourceQuota resourceQuota;
+    // 1 for input, and 1 for output
+    resourceQuota.SetMaxThreads(1 + completionQueues);
+    builder.SetResourceQuota(resourceQuota);
+
     // Register "service" as the instance through which we'll communicate with
     // clients. In this case, it corresponds to an *synchronous* service.
     builder.RegisterService(&service);

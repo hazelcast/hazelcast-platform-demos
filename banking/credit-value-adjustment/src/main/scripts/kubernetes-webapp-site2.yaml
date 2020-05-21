@@ -39,11 +39,11 @@ spec:
           imagePullPolicy: Never
           livenessProbe:
             httpGet:
-              path: /
+              path: /k8s
               port: 8080
           name: webapp-site2-container
           readinessProbe:
             httpGet:
-              path: /
+              path: /k8s
               port: 8080
             initialDelaySeconds: 30

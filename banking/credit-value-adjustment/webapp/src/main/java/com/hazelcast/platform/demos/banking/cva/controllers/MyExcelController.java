@@ -27,6 +27,7 @@ import com.hazelcast.aggregation.Aggregators;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.map.IMap;
 import com.hazelcast.platform.demos.banking.cva.MyConstants;
+import com.hazelcast.platform.demos.banking.cva.MyProperties;
 
 /**
  * <p>For Excel live connect, return an HTML table for the latest
@@ -40,6 +41,20 @@ public class MyExcelController {
 
     @Autowired
     private HazelcastInstance hazelcastInstance;
+    @Autowired
+    private MyProperties myProperties;
+
+    /**
+     * <p>Provide a URL for Kubernetes to test the client is alive.
+     * </p>
+     *
+     * @return Any String, doesn't matter, so why not the build timestamp.
+     */
+    @GetMapping(value = "/k8s")
+    public String k8s() {
+        LOGGER.trace("k8s()");
+        return myProperties.getBuildTimestamp();
+    }
 
     /**
      * <p>Find the latest value, and return in HTML form.

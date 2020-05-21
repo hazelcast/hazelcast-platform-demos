@@ -49,7 +49,7 @@ Configuration:
           AppenderRef:
             ref: ConsoleCyan
         - name: com.hazelcast.platform.demos
-          level: trace
+          level: debug
           additivity: false
           AppenderRef:
             ref: ConsoleMagenta

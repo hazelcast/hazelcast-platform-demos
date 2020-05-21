@@ -74,11 +74,8 @@ public class GrafanaGlobalMetricsJob {
     private static BiPredicateEx<LongAccumulator, List<GraphiteMetric>> noopLoggerFilter = (counter, item) -> {
         counter.subtract(1);
         if (counter.get() <= 0) {
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace("{} statistics collected, {}", item.size(), item);
-            } else {
-                LOGGER.debug("{} statistics collected", item.size());
-            }
+            // LOGGER.trace("{} statistics collected, {}", item.size(), item);
+            LOGGER.trace("{} statistics collected", item.size());
             counter.set(LOG_THRESHOLD);
         }
         return true;

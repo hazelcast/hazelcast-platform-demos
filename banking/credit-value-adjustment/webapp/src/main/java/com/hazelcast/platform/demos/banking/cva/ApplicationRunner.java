@@ -100,7 +100,7 @@ public class ApplicationRunner implements CommandLineRunner {
 
                         // Only log delta but publish baseline
                         if (oldJobStatus == null || oldJobStatus != newJobStatus) {
-                            LOGGER.trace("Job state change: '{}'", message);
+                            LOGGER.debug("Job state change: '{}'", message);
                         }
                         jobStateTopic.publish(message);
 
