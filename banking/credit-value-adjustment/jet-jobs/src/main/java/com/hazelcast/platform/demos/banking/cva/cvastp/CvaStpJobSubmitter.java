@@ -35,7 +35,7 @@ import com.hazelcast.platform.demos.banking.cva.MyUtils;
 public class CvaStpJobSubmitter {
     private static final Logger LOGGER = LoggerFactory.getLogger(CvaStpJobSubmitter.class);
 
-    private static final String CPP_DOCKER = "cpp";
+    private static final String CPP_DOCKER = "cva-cpp";
     private static final String CPP_KUBERNETES = "cpp-service";
     private static final String CPP_LOCALHOST = "127.0.0.1";
     private static final int PORT = 50001;

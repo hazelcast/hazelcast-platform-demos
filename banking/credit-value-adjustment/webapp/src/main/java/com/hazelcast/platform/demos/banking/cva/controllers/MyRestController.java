@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
@@ -360,6 +361,40 @@ public class MyRestController {
             String prefix = String.format("fileDownload('%s', '%s')", requestMapName, requestKey);
             LOGGER.error(prefix, e);
             return null;
+        }
+    }
+
+    /**
+     * <p>Useful for testing, return any one item from a map.
+     * </p>
+     *
+     * @param mapName Map name, only those that can be specified as a param
+     * @return Some JSON
+     */
+    @GetMapping(value = "/getany", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getAny(@RequestParam("map") String mapName) {
+        LOGGER.info("getAny('{}')", mapName);
+
+        IMap<?, ?> map = null;
+        for (DistributedObject distributedObject : this.hazelcastInstance.getDistributedObjects()) {
+            if (distributedObject instanceof IMap && distributedObject.getName().endsWith(mapName)) {
+                map = (IMap<?, ?>) distributedObject;
+            }
+        }
+
+        if (map == null) {
+            return "{}";
+        }
+
+        // Hopefully not too big for memory
+        Set<?> keys = map.keySet();
+
+        if (keys.size() == 0) {
+            return "{}";
+        } else {
+            // Hopefully JSON
+            Object key = keys.iterator().next();
+            return map.get(key).toString();
         }
     }
 }

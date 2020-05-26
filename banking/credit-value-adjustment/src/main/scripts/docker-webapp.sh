@@ -20,7 +20,7 @@ fi
 
 DOCKER_IMAGE=hazelcast-${PROJECT}/${MODULE}
 
-CMD="docker run -e MY_KUBERNETES_ENABLED=false -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP} -p 8080:8080 ${DOCKER_IMAGE} $@"
+CMD="docker run -e MY_CPP_SERVICE=cva-cpp -e MY_KUBERNETES_ENABLED=false -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP} -p 8080:8080 ${DOCKER_IMAGE} $@"
 #echo $CMD
 
 $CMD
