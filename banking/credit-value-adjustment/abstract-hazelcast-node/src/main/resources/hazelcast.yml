@@ -1,0 +1,50 @@
+hazelcast:
+  import:
+    - hazelcast-${my.site}.yml
+  #
+  properties:
+    # Graceful shutdown is helpful for Kubernetes scale-down.
+    hazelcast.member.naming.moby.enabled: true
+    hazelcast.shutdownhook.policy: GRACEFUL
+  #
+  # To publish data changes to a remote cluster, the address is added at runtime
+  wan-replication:
+    my-cva-wan-publisher-group:
+      batch-publisher:
+        ${my.remote.site}:
+          discovery-period-seconds: 30
+          use-endpoint-private-address: false
+          discovery-strategies:
+            # See https://github.com/hazelcast/hazelcast/issues/16792
+            discovery-strategies:
+              - class: com.hazelcast.platform.demos.banking.cva.MyWANDiscoveryStrategyFactory
+                enabled: true
+  #
+  # Assuming Kubernetes, but override from Java code if we detect otherwise
+  network:
+    join:
+      multicast:
+        enabled: false
+    rest-api:
+      enabled: true
+      endpoint-groups:
+        HEALTH_CHECK:
+          enabled: true
+  #
+  # Maps which are to be published to a remote cluster. Need not be all of them
+  map:
+    'cva_*':
+      merkle-tree:
+        enabled: true
+      wan-replication-ref:
+        my-cva-wan-publisher-group:
+          merge-policy-class-name: PassThroughMergePolicy
+    # Maintain a near-cache on CDS, rather than use a ReplicatedMap. A design choice, see Documentation
+    'cva_cp_cds':
+      near-cache:
+        in-memory-format: OBJECT
+      merkle-tree:
+        enabled: true
+      wan-replication-ref:
+        my-cva-wan-publisher-group:
+          merge-policy-class-name: PassThroughMergePolicy
