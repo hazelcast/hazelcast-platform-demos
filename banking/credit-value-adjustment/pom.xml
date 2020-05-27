@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hazelcast.platform.demos.banking</groupId>
+		<artifactId>banking-root</artifactId>
+		<version>4.0</version>
+	</parent>
+
+	<groupId>com.hazelcast.platform.demos.banking.cva</groupId>
+	<artifactId>cva-root</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Hazelcast Platform - Banking - Credit Value Adjustment</name>
+	<description>Example implementation for monitoring a series of trades</description>
+
+	<properties>
+		<docker.image.prefix>cva</docker.image.prefix>
+		<main.basedir>${project.parent.parent.basedir}</main.basedir>
+		<!-- Live, probably -->
+		<my.cluster1.name>site1</my.cluster1.name>
+		<!-- DR, probably, unless you alternate -->
+		<my.cluster2.name>site2</my.cluster2.name>
+	</properties>
+
+	<modules>
+		<module>grafana</module>
+		<!--
+		<module>management-center</module>
+		-->
+		<module>common</module>
+		<module>abstract-hazelcast-node</module>
+		<module>hazelcast-node-site1</module>
+		<module>hazelcast-node-site2</module>
+		<module>abstract-hazelcast-client</module>
+		<module>cva-cpp</module>
+		<module>data-loader</module>
+		<module>jet-jobs</module>
+		<module>webapp</module>
+	</modules>
+
+	<dependencies>
+		<!-- Required for YAML style Log4j2 config -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-yaml</artifactId>
+		</dependency>
+		
+		<!-- Validates configuration properties -->
+		<dependency>
+  	 		<groupId>org.hibernate.validator</groupId>
+   			<artifactId>hibernate-validator</artifactId>
+		</dependency>
+
+		<!-- For loading build properties -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+		</dependency>
+		<!-- Log4j2 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-log4j2</artifactId>
+		</dependency>
+		<!-- Kubernetes uses REST to validate containers -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- scope==test -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-parent</artifactId>
+				<type>pom</type>
+				<scope>import</scope>
+				<version>${spring-boot.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<configuration>
+					<target>
+						<echo message="====================================" />
+						<echo message="TODO: 'mvn deploy' to upload to GKE" />
+						<echo message="====================================" />
+						<echo message="TODO: YAML Use readinessGate for sequencing" />
+						<echo message="====================================" />
+						<echo message="TODO: BigDecimal instead of double" />
+						<echo message="====================================" />
+						<echo message="TODO: Protobuf3 instead of JSON" />
+						<echo message="====================================" />
+					</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

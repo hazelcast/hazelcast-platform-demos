@@ -1,0 +1,39 @@
+---
+# Service DNS will be "cpp-service.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cpp-service
+spec:
+  selector:
+    app: cva-cpp
+  ports:
+  - port: 50001
+    protocol: TCP
+    targetPort: 50001
+  type: LoadBalancer
+---
+# Creates 2 pods, for double performance, the minimum to prove scaling
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cva-cpp
+spec:
+  replicas: 2
+  serviceName: cva-cpp-service
+  selector:
+    matchLabels:
+      app: cva-cpp
+  template:
+    metadata:
+      labels:
+        app: cva-cpp
+    spec:
+      containers:
+        - args: ["50001"]
+          image: "hazelcast-cva/cva-cpp"
+          imagePullPolicy: Never
+          name: cva-cpp-container
+---

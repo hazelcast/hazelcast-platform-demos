@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="head">
+<link rel="shortcut icon" th:href="@{/images/favicon.ico}">
+<link rel="stylesheet" type="text/css" th:href="@{/css/__${@siteLowerCase}__.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/main.css}" />
+<title th:text="'@my.webapp.title@ - ' + ${@siteLowerCase}">?</title>
+</head>
+
+<body th:fragment="header">
+	<div class="headerfooter">
+		<h5>Build @maven.build.timestamp@</h5>
+		<div align="right">
+			<p>
+				<font size="-1">
+					<a th:target="_blank" th:href="@{/swagger-ui.html#/}">Swagger</a>
+			</font>
+			</p>
+		</div>
+		<div class="whiteBox">
+			<h1 th:text="${@siteLowerCase}">?</h1>
+		</div>
+		<hr class="headerfooterline"/>
+	</div>
+</body>
+
+<body th:fragment="footer">
+	<div class="headerfooter">
+		<hr class="headerfooterline"/>
+		<p th:text="'&copy; Hazelcast ' + ${#dates.year(#dates.createNow())}" />
+	</div>
+</body>
+
+</html>
