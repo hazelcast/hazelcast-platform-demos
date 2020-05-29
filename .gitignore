@@ -3,6 +3,7 @@
 .factorypath
 .project
 .settings
+.vscode
 #
 *.code-workspace
 #

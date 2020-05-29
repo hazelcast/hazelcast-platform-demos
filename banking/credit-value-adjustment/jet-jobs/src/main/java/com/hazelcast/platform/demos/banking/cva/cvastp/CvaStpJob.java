@@ -460,6 +460,7 @@ public class CvaStpJob {
 
         /* A service factory to provide a BiDirectional connection to a C++ server,
          * using the provided channel builder and invoking function.
+         * TODO: This code is legal Java but most IDEs complain, perhaps generics can be sorted.
          */
         @SuppressWarnings("unchecked")
         ServiceFactory<?, ? extends GrpcService<InputMessage, OutputMessage>> cppService =
