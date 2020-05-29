@@ -371,8 +371,9 @@ public class MyRestController {
      * @param mapName Map name, only those that can be specified as a param
      * @return Some JSON
      */
-    @GetMapping(value = "/getany", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getAny(@RequestParam("map") String mapName) {
+    @GetMapping(value = "/getany/{map}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getAny(
+            @PathVariable("map") String mapName) {
         LOGGER.info("getAny('{}')", mapName);
 
         IMap<?, ?> map = null;
