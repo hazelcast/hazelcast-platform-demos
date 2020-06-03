@@ -113,16 +113,15 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_swa
   &scc_info_SwapTrade_swap_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_swap_2eproto_once;
-static bool descriptor_table_swap_2eproto_initialized = false;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_swap_2eproto = {
-  &descriptor_table_swap_2eproto_initialized, descriptor_table_protodef_swap_2eproto, "swap.proto", 891,
+  false, false, descriptor_table_protodef_swap_2eproto, "swap.proto", 891,
   &descriptor_table_swap_2eproto_once, descriptor_table_swap_2eproto_sccs, descriptor_table_swap_2eproto_deps, 1, 0,
   schemas, file_default_instances, TableStruct_swap_2eproto::offsets,
   file_level_metadata_swap_2eproto, 1, file_level_enum_descriptors_swap_2eproto, file_level_service_descriptors_swap_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
-static bool dynamic_init_dummy_swap_2eproto = (  ::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_swap_2eproto), true);
+static bool dynamic_init_dummy_swap_2eproto = (static_cast<void>(::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_swap_2eproto)), true);
 namespace FlumaionQL {
 
 // ===================================================================
@@ -133,46 +132,54 @@ class SwapTrade::_Internal {
  public:
 };
 
-SwapTrade::SwapTrade()
-  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
+SwapTrade::SwapTrade(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:FlumaionQL.SwapTrade)
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:FlumaionQL.SwapTrade)
 }
 SwapTrade::SwapTrade(const SwapTrade& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message(),
-      _internal_metadata_(nullptr) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   tradeid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_tradeid().empty()) {
-    tradeid_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.tradeid_);
+    tradeid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_tradeid(),
+      GetArena());
   }
   bookid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_bookid().empty()) {
-    bookid_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.bookid_);
+    bookid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_bookid(),
+      GetArena());
   }
   counterparty_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_counterparty().empty()) {
-    counterparty_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.counterparty_);
+    counterparty_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_counterparty(),
+      GetArena());
   }
   fixed_leg_dcc_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_fixed_leg_dcc().empty()) {
-    fixed_leg_dcc_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.fixed_leg_dcc_);
+    fixed_leg_dcc_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_fixed_leg_dcc(),
+      GetArena());
   }
   float_leg_dcc_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_float_leg_dcc().empty()) {
-    float_leg_dcc_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.float_leg_dcc_);
+    float_leg_dcc_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_float_leg_dcc(),
+      GetArena());
   }
   ibor_index_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_ibor_index().empty()) {
-    ibor_index_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.ibor_index_);
+    ibor_index_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_ibor_index(),
+      GetArena());
   }
   fixed_leg_calendar_name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_fixed_leg_calendar_name().empty()) {
-    fixed_leg_calendar_name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.fixed_leg_calendar_name_);
+    fixed_leg_calendar_name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_fixed_leg_calendar_name(),
+      GetArena());
   }
   float_leg_calendar_name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_float_leg_calendar_name().empty()) {
-    float_leg_calendar_name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.float_leg_calendar_name_);
+    float_leg_calendar_name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_float_leg_calendar_name(),
+      GetArena());
   }
   ::memcpy(&notional_, &from.notional_,
     static_cast<size_t>(reinterpret_cast<char*>(&float_leg_date_gen_rule_) -
@@ -198,9 +205,11 @@ void SwapTrade::SharedCtor() {
 SwapTrade::~SwapTrade() {
   // @@protoc_insertion_point(destructor:FlumaionQL.SwapTrade)
   SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 void SwapTrade::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
   tradeid_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   bookid_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   counterparty_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
@@ -211,6 +220,12 @@ void SwapTrade::SharedDtor() {
   float_leg_calendar_name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
+void SwapTrade::ArenaDtor(void* object) {
+  SwapTrade* _this = reinterpret_cast< SwapTrade* >(object);
+  (void)_this;
+}
+void SwapTrade::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
 void SwapTrade::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
@@ -226,22 +241,23 @@ void SwapTrade::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  tradeid_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  bookid_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  counterparty_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  fixed_leg_dcc_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  float_leg_dcc_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  ibor_index_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  fixed_leg_calendar_name_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  float_leg_calendar_name_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  tradeid_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  bookid_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  counterparty_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  fixed_leg_dcc_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  float_leg_dcc_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  ibor_index_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  fixed_leg_calendar_name_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  float_leg_calendar_name_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   ::memset(&notional_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&float_leg_date_gen_rule_) -
       reinterpret_cast<char*>(&notional_)) + sizeof(float_leg_date_gen_rule_));
-  _internal_metadata_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 const char* SwapTrade::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
@@ -284,14 +300,14 @@ const char* SwapTrade::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::
       // int32 payer_receiver_flag = 5;
       case 5:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
-          payer_receiver_flag_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          payer_receiver_flag_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
       // int64 settlement_date = 6;
       case 6:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 48)) {
-          settlement_date_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          settlement_date_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -339,28 +355,28 @@ const char* SwapTrade::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::
       // int64 fixed_leg_start_date = 12;
       case 12:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 96)) {
-          fixed_leg_start_date_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          fixed_leg_start_date_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
       // int64 fixed_leg_end_date = 13;
       case 13:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 104)) {
-          fixed_leg_end_date_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          fixed_leg_end_date_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
       // int32 fixed_leg_tenor_frequency = 14;
       case 14:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 112)) {
-          fixed_leg_tenor_frequency_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          fixed_leg_tenor_frequency_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
       // int32 fixed_leg_tenor_period_enum = 15;
       case 15:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 120)) {
-          fixed_leg_tenor_period_enum_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          fixed_leg_tenor_period_enum_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -376,56 +392,56 @@ const char* SwapTrade::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::
       // int32 fixed_leg_biz_day_conv = 17;
       case 17:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 136)) {
-          fixed_leg_biz_day_conv_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          fixed_leg_biz_day_conv_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
       // int32 fixed_leg_termination_day_conv = 18;
       case 18:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 144)) {
-          fixed_leg_termination_day_conv_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          fixed_leg_termination_day_conv_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
       // int32 fixed_leg_date_gen_rule = 19;
       case 19:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 152)) {
-          fixed_leg_date_gen_rule_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          fixed_leg_date_gen_rule_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
       // bool fixed_leg_end_of_month_flag = 20;
       case 20:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 160)) {
-          fixed_leg_end_of_month_flag_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          fixed_leg_end_of_month_flag_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
       // int64 float_leg_start_date = 21;
       case 21:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 168)) {
-          float_leg_start_date_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          float_leg_start_date_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
       // int64 float_leg_end_date = 22;
       case 22:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 176)) {
-          float_leg_end_date_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          float_leg_end_date_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
       // int32 float_leg_tenor_frequency = 23;
       case 23:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 184)) {
-          float_leg_tenor_frequency_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          float_leg_tenor_frequency_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
       // int32 float_leg_tenor_period_enum = 24;
       case 24:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 192)) {
-          float_leg_tenor_period_enum_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          float_leg_tenor_period_enum_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -441,28 +457,28 @@ const char* SwapTrade::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::
       // int32 float_leg_biz_day_conv = 26;
       case 26:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 208)) {
-          float_leg_biz_day_conv_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          float_leg_biz_day_conv_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
       // int32 float_leg_termination_day_conv = 27;
       case 27:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 216)) {
-          float_leg_termination_day_conv_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          float_leg_termination_day_conv_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
       // int32 float_leg_date_gen_rule = 28;
       case 28:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 224)) {
-          float_leg_date_gen_rule_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          float_leg_date_gen_rule_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
       // bool float_leg_end_of_month_flag = 29;
       case 29:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 232)) {
-          float_leg_end_of_month_flag_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          float_leg_end_of_month_flag_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -472,7 +488,9 @@ const char* SwapTrade::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::
           ctx->SetLastTag(tag);
           goto success;
         }
-        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
         CHK_(ptr != nullptr);
         continue;
       }
@@ -700,7 +718,7 @@ failure:
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target, stream);
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:FlumaionQL.SwapTrade)
   return target;
@@ -934,41 +952,33 @@ void SwapTrade::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 void SwapTrade::MergeFrom(const SwapTrade& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:FlumaionQL.SwapTrade)
   GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (from.tradeid().size() > 0) {
-
-    tradeid_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.tradeid_);
+    _internal_set_tradeid(from._internal_tradeid());
   }
   if (from.bookid().size() > 0) {
-
-    bookid_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.bookid_);
+    _internal_set_bookid(from._internal_bookid());
   }
   if (from.counterparty().size() > 0) {
-
-    counterparty_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.counterparty_);
+    _internal_set_counterparty(from._internal_counterparty());
   }
   if (from.fixed_leg_dcc().size() > 0) {
-
-    fixed_leg_dcc_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.fixed_leg_dcc_);
+    _internal_set_fixed_leg_dcc(from._internal_fixed_leg_dcc());
   }
   if (from.float_leg_dcc().size() > 0) {
-
-    float_leg_dcc_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.float_leg_dcc_);
+    _internal_set_float_leg_dcc(from._internal_float_leg_dcc());
   }
   if (from.ibor_index().size() > 0) {
-
-    ibor_index_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.ibor_index_);
+    _internal_set_ibor_index(from._internal_ibor_index());
   }
   if (from.fixed_leg_calendar_name().size() > 0) {
-
-    fixed_leg_calendar_name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.fixed_leg_calendar_name_);
+    _internal_set_fixed_leg_calendar_name(from._internal_fixed_leg_calendar_name());
   }
   if (from.float_leg_calendar_name().size() > 0) {
-
-    float_leg_calendar_name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.float_leg_calendar_name_);
+    _internal_set_float_leg_calendar_name(from._internal_float_leg_calendar_name());
   }
   if (!(from.notional() <= 0 && from.notional() >= 0)) {
     _internal_set_notional(from._internal_notional());
@@ -1055,44 +1065,21 @@ bool SwapTrade::IsInitialized() const {
 
 void SwapTrade::InternalSwap(SwapTrade* other) {
   using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  tradeid_.Swap(&other->tradeid_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  bookid_.Swap(&other->bookid_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  counterparty_.Swap(&other->counterparty_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  fixed_leg_dcc_.Swap(&other->fixed_leg_dcc_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  float_leg_dcc_.Swap(&other->float_leg_dcc_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  ibor_index_.Swap(&other->ibor_index_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  fixed_leg_calendar_name_.Swap(&other->fixed_leg_calendar_name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  float_leg_calendar_name_.Swap(&other->float_leg_calendar_name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  swap(notional_, other->notional_);
-  swap(payer_receiver_flag_, other->payer_receiver_flag_);
-  swap(settlement_date_, other->settlement_date_);
-  swap(fixed_rate_, other->fixed_rate_);
-  swap(float_spread_, other->float_spread_);
-  swap(fixed_leg_start_date_, other->fixed_leg_start_date_);
-  swap(fixed_leg_end_date_, other->fixed_leg_end_date_);
-  swap(fixed_leg_tenor_frequency_, other->fixed_leg_tenor_frequency_);
-  swap(fixed_leg_tenor_period_enum_, other->fixed_leg_tenor_period_enum_);
-  swap(fixed_leg_biz_day_conv_, other->fixed_leg_biz_day_conv_);
-  swap(fixed_leg_termination_day_conv_, other->fixed_leg_termination_day_conv_);
-  swap(float_leg_start_date_, other->float_leg_start_date_);
-  swap(fixed_leg_date_gen_rule_, other->fixed_leg_date_gen_rule_);
-  swap(float_leg_tenor_frequency_, other->float_leg_tenor_frequency_);
-  swap(float_leg_end_date_, other->float_leg_end_date_);
-  swap(float_leg_tenor_period_enum_, other->float_leg_tenor_period_enum_);
-  swap(fixed_leg_end_of_month_flag_, other->fixed_leg_end_of_month_flag_);
-  swap(float_leg_end_of_month_flag_, other->float_leg_end_of_month_flag_);
-  swap(float_leg_biz_day_conv_, other->float_leg_biz_day_conv_);
-  swap(float_leg_termination_day_conv_, other->float_leg_termination_day_conv_);
-  swap(float_leg_date_gen_rule_, other->float_leg_date_gen_rule_);
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  tradeid_.Swap(&other->tradeid_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  bookid_.Swap(&other->bookid_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  counterparty_.Swap(&other->counterparty_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  fixed_leg_dcc_.Swap(&other->fixed_leg_dcc_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  float_leg_dcc_.Swap(&other->float_leg_dcc_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  ibor_index_.Swap(&other->ibor_index_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  fixed_leg_calendar_name_.Swap(&other->fixed_leg_calendar_name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  float_leg_calendar_name_.Swap(&other->float_leg_calendar_name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(SwapTrade, float_leg_date_gen_rule_)
+      + sizeof(SwapTrade::float_leg_date_gen_rule_)
+      - PROTOBUF_FIELD_OFFSET(SwapTrade, notional_)>(
+          reinterpret_cast<char*>(&notional_),
+          reinterpret_cast<char*>(&other->notional_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata SwapTrade::GetMetadata() const {
@@ -1104,7 +1091,7 @@ void SwapTrade::InternalSwap(SwapTrade* other) {
 }  // namespace FlumaionQL
 PROTOBUF_NAMESPACE_OPEN
 template<> PROTOBUF_NOINLINE ::FlumaionQL::SwapTrade* Arena::CreateMaybeMessage< ::FlumaionQL::SwapTrade >(Arena* arena) {
-  return Arena::CreateInternal< ::FlumaionQL::SwapTrade >(arena);
+  return Arena::CreateMessageInternal< ::FlumaionQL::SwapTrade >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

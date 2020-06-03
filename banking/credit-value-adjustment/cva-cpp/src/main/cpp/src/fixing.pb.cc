@@ -67,16 +67,15 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_fix
   &scc_info_Fixing_fixing_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_fixing_2eproto_once;
-static bool descriptor_table_fixing_2eproto_initialized = false;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_fixing_2eproto = {
-  &descriptor_table_fixing_2eproto_initialized, descriptor_table_protodef_fixing_2eproto, "fixing.proto", 107,
+  false, false, descriptor_table_protodef_fixing_2eproto, "fixing.proto", 107,
   &descriptor_table_fixing_2eproto_once, descriptor_table_fixing_2eproto_sccs, descriptor_table_fixing_2eproto_deps, 1, 0,
   schemas, file_default_instances, TableStruct_fixing_2eproto::offsets,
   file_level_metadata_fixing_2eproto, 1, file_level_enum_descriptors_fixing_2eproto, file_level_service_descriptors_fixing_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
-static bool dynamic_init_dummy_fixing_2eproto = (  ::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_fixing_2eproto), true);
+static bool dynamic_init_dummy_fixing_2eproto = (static_cast<void>(::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_fixing_2eproto)), true);
 namespace FlumaionQL {
 
 // ===================================================================
@@ -87,20 +86,23 @@ class Fixing::_Internal {
  public:
 };
 
-Fixing::Fixing()
-  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
+Fixing::Fixing(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  fixing_dates_(arena),
+  fixing_rates_(arena) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:FlumaionQL.Fixing)
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:FlumaionQL.Fixing)
 }
 Fixing::Fixing(const Fixing& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
-      _internal_metadata_(nullptr),
       fixing_dates_(from.fixing_dates_),
       fixing_rates_(from.fixing_rates_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   curvename_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_curvename().empty()) {
-    curvename_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.curvename_);
+    curvename_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_curvename(),
+      GetArena());
   }
   // @@protoc_insertion_point(copy_constructor:FlumaionQL.Fixing)
 }
@@ -113,12 +115,20 @@ void Fixing::SharedCtor() {
 Fixing::~Fixing() {
   // @@protoc_insertion_point(destructor:FlumaionQL.Fixing)
   SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 void Fixing::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
   curvename_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
+void Fixing::ArenaDtor(void* object) {
+  Fixing* _this = reinterpret_cast< Fixing* >(object);
+  (void)_this;
+}
+void Fixing::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
 void Fixing::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
@@ -136,12 +146,13 @@ void Fixing::Clear() {
 
   fixing_dates_.Clear();
   fixing_rates_.Clear();
-  curvename_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  _internal_metadata_.Clear();
+  curvename_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 const char* Fixing::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
@@ -162,7 +173,7 @@ const char* Fixing::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::int
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedInt64Parser(_internal_mutable_fixing_dates(), ptr, ctx);
           CHK_(ptr);
         } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16) {
-          _internal_add_fixing_dates(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr));
+          _internal_add_fixing_dates(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr));
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -182,7 +193,9 @@ const char* Fixing::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::int
           ctx->SetLastTag(tag);
           goto success;
         }
-        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
         CHK_(ptr != nullptr);
         continue;
       }
@@ -228,7 +241,7 @@ failure:
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target, stream);
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:FlumaionQL.Fixing)
   return target;
@@ -306,15 +319,14 @@ void Fixing::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 void Fixing::MergeFrom(const Fixing& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:FlumaionQL.Fixing)
   GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
   fixing_dates_.MergeFrom(from.fixing_dates_);
   fixing_rates_.MergeFrom(from.fixing_rates_);
   if (from.curvename().size() > 0) {
-
-    curvename_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.curvename_);
+    _internal_set_curvename(from._internal_curvename());
   }
 }
 
@@ -338,11 +350,10 @@ bool Fixing::IsInitialized() const {
 
 void Fixing::InternalSwap(Fixing* other) {
   using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   fixing_dates_.InternalSwap(&other->fixing_dates_);
   fixing_rates_.InternalSwap(&other->fixing_rates_);
-  curvename_.Swap(&other->curvename_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
+  curvename_.Swap(&other->curvename_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata Fixing::GetMetadata() const {
@@ -354,7 +365,7 @@ void Fixing::InternalSwap(Fixing* other) {
 }  // namespace FlumaionQL
 PROTOBUF_NAMESPACE_OPEN
 template<> PROTOBUF_NOINLINE ::FlumaionQL::Fixing* Arena::CreateMaybeMessage< ::FlumaionQL::Fixing >(Arena* arena) {
-  return Arena::CreateInternal< ::FlumaionQL::Fixing >(arena);
+  return Arena::CreateMessageInternal< ::FlumaionQL::Fixing >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 
