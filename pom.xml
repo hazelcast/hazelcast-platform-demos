@@ -42,7 +42,7 @@
 		<jython.version>2.7.2rc1</jython.version>
 		<kafka-clients.version>2.4.0</kafka-clients.version>
 		<poi-ooxml.version>4.1.2</poi-ooxml.version>
-		<protobuf.version>3.9.2</protobuf.version>
+		<protobuf.version>3.12.2</protobuf.version>
 		<spring-boot.version>2.3.0.RELEASE</spring-boot.version>
 		<springfox-swagger.version>2.9.2</springfox-swagger.version>
 
