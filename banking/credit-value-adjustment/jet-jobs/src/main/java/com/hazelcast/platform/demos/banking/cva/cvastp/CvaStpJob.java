@@ -31,6 +31,7 @@ import com.hazelcast.cluster.Cluster;
 import com.hazelcast.cluster.Member;
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.function.ComparatorEx;
+import com.hazelcast.function.FunctionEx;
 import com.hazelcast.function.Functions;
 import com.hazelcast.jet.aggregate.AggregateOperation1;
 import com.hazelcast.jet.aggregate.AggregateOperations;
@@ -51,7 +52,8 @@ import com.hazelcast.platform.demos.banking.cva.MyConstants;
 import com.hazelcast.platform.demos.banking.cva.MyUtils;
 import com.hazelcast.platform.demos.banking.cva.OutputMessage;
 
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.ManagedChannel;
+import io.grpc.stub.StreamObserver;
 
 /**
  * <p>
@@ -327,7 +329,6 @@ public class CvaStpJob {
      * @param debug        For development, save intermediate results
      * @return
      */
-    @SuppressWarnings("unchecked")
     public static Pipeline buildPipeline(String jobName, long timestamp, LocalDate calcDate,
             String loadBalancer, int port, int batchSize, int parallelism, boolean debug) {
         String timestampStr = MyUtils.timestampToISO8601(timestamp);
@@ -460,14 +461,13 @@ public class CvaStpJob {
 
         /* A service factory to provide a BiDirectional connection to a C++ server,
          * using the provided channel builder and invoking function.
-         * TODO: This code is legal Java but most IDEs complain, perhaps generics can be sorted.
          */
-        @SuppressWarnings("unchecked")
+        FunctionEx<? super ManagedChannel,
+                ? extends FunctionEx<StreamObserver<OutputMessage>, StreamObserver<InputMessage>>>
+             callStubFn = channel -> JetToCppGrpc.newStub(channel)::streamingCall;
         ServiceFactory<?, ? extends GrpcService<InputMessage, OutputMessage>> cppService =
                 GrpcServices.bidirectionalStreamingService(
-                        () -> ManagedChannelBuilder.forAddress(host, port).usePlaintext(),
-                        channel -> JetToCppGrpc.newStub(channel)::streamingCall
-                );
+                        () -> CvaStpUtils.getManagedChannelBuilder(host, port), callStubFn);
 
         /* Make the input to C++ for the service call, and extract the output
          * from the result.
