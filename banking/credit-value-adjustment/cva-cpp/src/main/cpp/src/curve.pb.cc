@@ -82,16 +82,15 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_cur
   &scc_info_Curve_curve_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_curve_2eproto_once;
-static bool descriptor_table_curve_2eproto_initialized = false;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_curve_2eproto = {
-  &descriptor_table_curve_2eproto_initialized, descriptor_table_protodef_curve_2eproto, "curve.proto", 321,
+  false, false, descriptor_table_protodef_curve_2eproto, "curve.proto", 321,
   &descriptor_table_curve_2eproto_once, descriptor_table_curve_2eproto_sccs, descriptor_table_curve_2eproto_deps, 1, 0,
   schemas, file_default_instances, TableStruct_curve_2eproto::offsets,
   file_level_metadata_curve_2eproto, 1, file_level_enum_descriptors_curve_2eproto, file_level_service_descriptors_curve_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
-static bool dynamic_init_dummy_curve_2eproto = (  ::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_curve_2eproto), true);
+static bool dynamic_init_dummy_curve_2eproto = (static_cast<void>(::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_curve_2eproto)), true);
 namespace FlumaionQL {
 
 // ===================================================================
@@ -102,33 +101,40 @@ class Curve::_Internal {
  public:
 };
 
-Curve::Curve()
-  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
+Curve::Curve(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  maturity_period_value_(arena),
+  maturity_period_type_(arena),
+  rates_(arena) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:FlumaionQL.Curve)
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:FlumaionQL.Curve)
 }
 Curve::Curve(const Curve& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
-      _internal_metadata_(nullptr),
       maturity_period_value_(from.maturity_period_value_),
       maturity_period_type_(from.maturity_period_type_),
       rates_(from.rates_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   curvename_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_curvename().empty()) {
-    curvename_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.curvename_);
+    curvename_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_curvename(),
+      GetArena());
   }
   index_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_index().empty()) {
-    index_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.index_);
+    index_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_index(),
+      GetArena());
   }
   calendar_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_calendar().empty()) {
-    calendar_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.calendar_);
+    calendar_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_calendar(),
+      GetArena());
   }
   dcc_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_dcc().empty()) {
-    dcc_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.dcc_);
+    dcc_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_dcc(),
+      GetArena());
   }
   ::memcpy(&index_frequency_type_, &from.index_frequency_type_,
     static_cast<size_t>(reinterpret_cast<char*>(&settlement_days_) -
@@ -150,15 +156,23 @@ void Curve::SharedCtor() {
 Curve::~Curve() {
   // @@protoc_insertion_point(destructor:FlumaionQL.Curve)
   SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 void Curve::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
   curvename_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   index_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   calendar_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   dcc_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
+void Curve::ArenaDtor(void* object) {
+  Curve* _this = reinterpret_cast< Curve* >(object);
+  (void)_this;
+}
+void Curve::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
 void Curve::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
@@ -177,18 +191,19 @@ void Curve::Clear() {
   maturity_period_value_.Clear();
   maturity_period_type_.Clear();
   rates_.Clear();
-  curvename_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  index_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  calendar_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  dcc_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  curvename_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  index_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  calendar_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  dcc_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   ::memset(&index_frequency_type_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&settlement_days_) -
       reinterpret_cast<char*>(&index_frequency_type_)) + sizeof(settlement_days_));
-  _internal_metadata_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 const char* Curve::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
@@ -215,14 +230,14 @@ const char* Curve::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::inte
       // int32 index_frequency = 3;
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
-          index_frequency_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          index_frequency_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
       // int64 index_frequency_type = 4;
       case 4:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
-          index_frequency_type_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          index_frequency_type_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -238,7 +253,7 @@ const char* Curve::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::inte
       // int32 bussiness_convention = 6;
       case 6:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 48)) {
-          bussiness_convention_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          bussiness_convention_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -254,14 +269,14 @@ const char* Curve::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::inte
       // bool end_of_month_flag = 8;
       case 8:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 64)) {
-          end_of_month_flag_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          end_of_month_flag_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
       // int32 settlement_days = 9;
       case 9:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 72)) {
-          settlement_days_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          settlement_days_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -271,7 +286,7 @@ const char* Curve::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::inte
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedInt32Parser(_internal_mutable_maturity_period_value(), ptr, ctx);
           CHK_(ptr);
         } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 80) {
-          _internal_add_maturity_period_value(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr));
+          _internal_add_maturity_period_value(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr));
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -281,7 +296,7 @@ const char* Curve::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::inte
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedInt32Parser(_internal_mutable_maturity_period_type(), ptr, ctx);
           CHK_(ptr);
         } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 88) {
-          _internal_add_maturity_period_type(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr));
+          _internal_add_maturity_period_type(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr));
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -301,7 +316,9 @@ const char* Curve::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::inte
           ctx->SetLastTag(tag);
           goto success;
         }
-        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
         CHK_(ptr != nullptr);
         continue;
       }
@@ -416,7 +433,7 @@ failure:
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target, stream);
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:FlumaionQL.Curve)
   return target;
@@ -563,7 +580,7 @@ void Curve::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 void Curve::MergeFrom(const Curve& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:FlumaionQL.Curve)
   GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -571,20 +588,16 @@ void Curve::MergeFrom(const Curve& from) {
   maturity_period_type_.MergeFrom(from.maturity_period_type_);
   rates_.MergeFrom(from.rates_);
   if (from.curvename().size() > 0) {
-
-    curvename_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.curvename_);
+    _internal_set_curvename(from._internal_curvename());
   }
   if (from.index().size() > 0) {
-
-    index_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.index_);
+    _internal_set_index(from._internal_index());
   }
   if (from.calendar().size() > 0) {
-
-    calendar_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.calendar_);
+    _internal_set_calendar(from._internal_calendar());
   }
   if (from.dcc().size() > 0) {
-
-    dcc_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.dcc_);
+    _internal_set_dcc(from._internal_dcc());
   }
   if (from.index_frequency_type() != 0) {
     _internal_set_index_frequency_type(from._internal_index_frequency_type());
@@ -623,23 +636,20 @@ bool Curve::IsInitialized() const {
 
 void Curve::InternalSwap(Curve* other) {
   using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   maturity_period_value_.InternalSwap(&other->maturity_period_value_);
   maturity_period_type_.InternalSwap(&other->maturity_period_type_);
   rates_.InternalSwap(&other->rates_);
-  curvename_.Swap(&other->curvename_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  index_.Swap(&other->index_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  calendar_.Swap(&other->calendar_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  dcc_.Swap(&other->dcc_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  swap(index_frequency_type_, other->index_frequency_type_);
-  swap(index_frequency_, other->index_frequency_);
-  swap(bussiness_convention_, other->bussiness_convention_);
-  swap(end_of_month_flag_, other->end_of_month_flag_);
-  swap(settlement_days_, other->settlement_days_);
+  curvename_.Swap(&other->curvename_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  index_.Swap(&other->index_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  calendar_.Swap(&other->calendar_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  dcc_.Swap(&other->dcc_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(Curve, settlement_days_)
+      + sizeof(Curve::settlement_days_)
+      - PROTOBUF_FIELD_OFFSET(Curve, index_frequency_type_)>(
+          reinterpret_cast<char*>(&index_frequency_type_),
+          reinterpret_cast<char*>(&other->index_frequency_type_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata Curve::GetMetadata() const {
@@ -651,7 +661,7 @@ void Curve::InternalSwap(Curve* other) {
 }  // namespace FlumaionQL
 PROTOBUF_NAMESPACE_OPEN
 template<> PROTOBUF_NOINLINE ::FlumaionQL::Curve* Arena::CreateMaybeMessage< ::FlumaionQL::Curve >(Arena* arena) {
-  return Arena::CreateInternal< ::FlumaionQL::Curve >(arena);
+  return Arena::CreateMessageInternal< ::FlumaionQL::Curve >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

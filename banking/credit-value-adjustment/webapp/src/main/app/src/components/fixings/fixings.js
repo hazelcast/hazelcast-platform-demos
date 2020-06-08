@@ -101,25 +101,45 @@ class Fixings extends Component {
     constructor(props) {
         super(props);
         this.state = {
+        		batch_size: '100',
         		calc_date: '2016-01-07',
+        		debug: 'false',
         		fixings: [],
         		message: '...',
             	message_style: {
             		color: 'grey',
             		fontWeight: 'bold'
-            	}
+            	},
+        		parallelism: '1'
             };
         this.getFixings = this.getFixings.bind(this);
+        this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
+    handleChange(e) {
+    	// Not quite worth switch...
+    	if (e.target.name == 'batch_size') {
+    	    this.setState({batch_size: event.target.value});
+    	}
+    	if (e.target.name == 'debug') {
+    	    this.setState({debug: event.target.value});
+    	}
+    	if (e.target.name == 'parallelism') {
+    	    this.setState({parallelism: event.target.value});
+    	}
+    }
+    
     handleSubmit(e) {
 		e.preventDefault();
         setTimeout(() => {
 	    	var client = rest.wrap(mime);
 	    	var self = this;
 	    	
-	    	var restURL = '/rest/cva/run/?key=' + this.state.calc_date;
+	    	var restURL = '/rest/cva/run/?batch_size=' + this.state.batch_size
+	    		+ '&calc_date=' + this.state.calc_date
+	    		+ '&debug=' + this.state.debug
+	    		+ '&parallelism=' + this.state.parallelism;
 	    	
 	    	client({path:restURL}).then(
 	    			function(response) {
@@ -220,7 +240,16 @@ class Fixings extends Component {
     	      </Styles>
 			  <form>
 			  	<label for="calc_date">Calc Date:</label>
-			  	<input type="text" id="calc_date" name="calc_date" value={this.state.calc_date} readonly/>
+			  	<input type="text"     id="calc_date"   name="calc_date"   value={this.state.calc_date}   readonly/>
+			  	<label for="cdebug">Debug:</label>
+			  	<input type="checkbox" id="debug"       name="debug"       value={this.state.debug}       unchecked
+			  		onChange={this.handleChange}/>
+			  	<label for="batch_size">Batch Size:</label>
+			  	<input type="number"   id="batch_size"  name="batch_size"  value={this.state.batch_size}  min="1"
+			  		onChange={this.handleChange}/>
+				<label for="parallelism">Parallelism:</label>
+			  	<input type="number"   id="parallelism" name="parallelism" value={this.state.parallelism} min="1"
+			  		onChange={this.handleChange}/>
 				<button onClick={this.handleSubmit}>Submit</button>
 			  </form>
     	      <p style={this.state.message_style}>{this.state.message}</p>

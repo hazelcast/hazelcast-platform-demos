@@ -20,12 +20,15 @@ import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
 import com.hazelcast.client.config.YamlClientConfigBuilder;
 import com.hazelcast.config.KubernetesConfig;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.jet.JetInstance;
 
 import java.util.List;
 import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -96,5 +99,17 @@ public class ApplicationConfig {
     @Bean
     public String siteLowerCase(MyProperties myProperties) {
         return myProperties.getSite().toString().toLowerCase(Locale.ROOT);
+    }
+
+    /**
+     * <p>Expose Hazelcast client instance if not already visible
+     * </p>
+     *
+     * @param jetInstance Created by Spring from the Client Config
+     */
+    @Bean
+    @ConditionalOnMissingBean(HazelcastInstance.class)
+    public HazelcastInstance hazelcastInstance(JetInstance jetInstance) {
+        return jetInstance.getHazelcastInstance();
     }
 }

@@ -79,16 +79,15 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_mtm
   &scc_info_MTM_mtms_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mtms_2eproto_once;
-static bool descriptor_table_mtms_2eproto_initialized = false;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mtms_2eproto = {
-  &descriptor_table_mtms_2eproto_initialized, descriptor_table_protodef_mtms_2eproto, "mtms.proto", 270,
+  false, false, descriptor_table_protodef_mtms_2eproto, "mtms.proto", 270,
   &descriptor_table_mtms_2eproto_once, descriptor_table_mtms_2eproto_sccs, descriptor_table_mtms_2eproto_deps, 1, 0,
   schemas, file_default_instances, TableStruct_mtms_2eproto::offsets,
   file_level_metadata_mtms_2eproto, 1, file_level_enum_descriptors_mtms_2eproto, file_level_service_descriptors_mtms_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
-static bool dynamic_init_dummy_mtms_2eproto = (  ::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_mtms_2eproto), true);
+static bool dynamic_init_dummy_mtms_2eproto = (static_cast<void>(::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_mtms_2eproto)), true);
 namespace FlumaionQL {
 
 // ===================================================================
@@ -99,32 +98,41 @@ class MTM::_Internal {
  public:
 };
 
-MTM::MTM()
-  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
+MTM::MTM(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  fixlegdates_(arena),
+  fixlegamount_(arena),
+  fltlegdates_(arena),
+  fltlegamount_(arena),
+  discountvalues_(arena),
+  legfractions_(arena) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:FlumaionQL.MTM)
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:FlumaionQL.MTM)
 }
 MTM::MTM(const MTM& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
-      _internal_metadata_(nullptr),
       fixlegdates_(from.fixlegdates_),
       fixlegamount_(from.fixlegamount_),
       fltlegdates_(from.fltlegdates_),
       fltlegamount_(from.fltlegamount_),
       discountvalues_(from.discountvalues_),
       legfractions_(from.legfractions_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   tradeid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_tradeid().empty()) {
-    tradeid_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.tradeid_);
+    tradeid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_tradeid(),
+      GetArena());
   }
   curvename_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_curvename().empty()) {
-    curvename_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.curvename_);
+    curvename_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_curvename(),
+      GetArena());
   }
   error_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_error().empty()) {
-    error_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.error_);
+    error_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_error(),
+      GetArena());
   }
   ::memcpy(&computetimemicros_, &from.computetimemicros_,
     static_cast<size_t>(reinterpret_cast<char*>(&haserrored_) -
@@ -145,14 +153,22 @@ void MTM::SharedCtor() {
 MTM::~MTM() {
   // @@protoc_insertion_point(destructor:FlumaionQL.MTM)
   SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 void MTM::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
   tradeid_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   curvename_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   error_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
+void MTM::ArenaDtor(void* object) {
+  MTM* _this = reinterpret_cast< MTM* >(object);
+  (void)_this;
+}
+void MTM::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
 void MTM::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
@@ -174,17 +190,18 @@ void MTM::Clear() {
   fltlegamount_.Clear();
   discountvalues_.Clear();
   legfractions_.Clear();
-  tradeid_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  curvename_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  error_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  tradeid_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  curvename_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  error_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   ::memset(&computetimemicros_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&haserrored_) -
       reinterpret_cast<char*>(&computetimemicros_)) + sizeof(haserrored_));
-  _internal_metadata_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 const char* MTM::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
@@ -214,7 +231,7 @@ const char* MTM::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::intern
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedInt64Parser(_internal_mutable_fixlegdates(), ptr, ctx);
           CHK_(ptr);
         } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24) {
-          _internal_add_fixlegdates(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr));
+          _internal_add_fixlegdates(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr));
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -234,7 +251,7 @@ const char* MTM::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::intern
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedInt64Parser(_internal_mutable_fltlegdates(), ptr, ctx);
           CHK_(ptr);
         } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40) {
-          _internal_add_fltlegdates(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr));
+          _internal_add_fltlegdates(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr));
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -271,7 +288,7 @@ const char* MTM::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::intern
       // bool haserrored = 9;
       case 9:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 72)) {
-          haserrored_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          haserrored_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -287,7 +304,7 @@ const char* MTM::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::intern
       // int64 computetimemicros = 11;
       case 11:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 88)) {
-          computetimemicros_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          computetimemicros_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -297,7 +314,9 @@ const char* MTM::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::intern
           ctx->SetLastTag(tag);
           goto success;
         }
-        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
         CHK_(ptr != nullptr);
         continue;
       }
@@ -399,7 +418,7 @@ failure:
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target, stream);
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:FlumaionQL.MTM)
   return target;
@@ -563,7 +582,7 @@ void MTM::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 void MTM::MergeFrom(const MTM& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:FlumaionQL.MTM)
   GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -574,16 +593,13 @@ void MTM::MergeFrom(const MTM& from) {
   discountvalues_.MergeFrom(from.discountvalues_);
   legfractions_.MergeFrom(from.legfractions_);
   if (from.tradeid().size() > 0) {
-
-    tradeid_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.tradeid_);
+    _internal_set_tradeid(from._internal_tradeid());
   }
   if (from.curvename().size() > 0) {
-
-    curvename_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.curvename_);
+    _internal_set_curvename(from._internal_curvename());
   }
   if (from.error().size() > 0) {
-
-    error_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.error_);
+    _internal_set_error(from._internal_error());
   }
   if (from.computetimemicros() != 0) {
     _internal_set_computetimemicros(from._internal_computetimemicros());
@@ -613,21 +629,22 @@ bool MTM::IsInitialized() const {
 
 void MTM::InternalSwap(MTM* other) {
   using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   fixlegdates_.InternalSwap(&other->fixlegdates_);
   fixlegamount_.InternalSwap(&other->fixlegamount_);
   fltlegdates_.InternalSwap(&other->fltlegdates_);
   fltlegamount_.InternalSwap(&other->fltlegamount_);
   discountvalues_.InternalSwap(&other->discountvalues_);
   legfractions_.InternalSwap(&other->legfractions_);
-  tradeid_.Swap(&other->tradeid_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  curvename_.Swap(&other->curvename_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  error_.Swap(&other->error_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  swap(computetimemicros_, other->computetimemicros_);
-  swap(haserrored_, other->haserrored_);
+  tradeid_.Swap(&other->tradeid_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  curvename_.Swap(&other->curvename_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  error_.Swap(&other->error_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(MTM, haserrored_)
+      + sizeof(MTM::haserrored_)
+      - PROTOBUF_FIELD_OFFSET(MTM, computetimemicros_)>(
+          reinterpret_cast<char*>(&computetimemicros_),
+          reinterpret_cast<char*>(&other->computetimemicros_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata MTM::GetMetadata() const {
@@ -639,7 +656,7 @@ void MTM::InternalSwap(MTM* other) {
 }  // namespace FlumaionQL
 PROTOBUF_NAMESPACE_OPEN
 template<> PROTOBUF_NOINLINE ::FlumaionQL::MTM* Arena::CreateMaybeMessage< ::FlumaionQL::MTM >(Arena* arena) {
-  return Arena::CreateInternal< ::FlumaionQL::MTM >(arena);
+  return Arena::CreateMessageInternal< ::FlumaionQL::MTM >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 
