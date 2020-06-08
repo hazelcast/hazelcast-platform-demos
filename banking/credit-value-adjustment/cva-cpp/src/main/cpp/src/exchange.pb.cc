@@ -73,16 +73,15 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_exc
   &scc_info_DataExchange_exchange_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_exchange_2eproto_once;
-static bool descriptor_table_exchange_2eproto_initialized = false;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_exchange_2eproto = {
-  &descriptor_table_exchange_2eproto_initialized, descriptor_table_protodef_exchange_2eproto, "exchange.proto", 187,
+  false, false, descriptor_table_protodef_exchange_2eproto, "exchange.proto", 187,
   &descriptor_table_exchange_2eproto_once, descriptor_table_exchange_2eproto_sccs, descriptor_table_exchange_2eproto_deps, 1, 0,
   schemas, file_default_instances, TableStruct_exchange_2eproto::offsets,
   file_level_metadata_exchange_2eproto, 1, file_level_enum_descriptors_exchange_2eproto, file_level_service_descriptors_exchange_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
-static bool dynamic_init_dummy_exchange_2eproto = (  ::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_exchange_2eproto), true);
+static bool dynamic_init_dummy_exchange_2eproto = (static_cast<void>(::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_exchange_2eproto)), true);
 namespace FlumaionQL {
 
 // ===================================================================
@@ -93,42 +92,49 @@ class DataExchange::_Internal {
  public:
 };
 
-DataExchange::DataExchange()
-  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
+DataExchange::DataExchange(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:FlumaionQL.DataExchange)
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:FlumaionQL.DataExchange)
 }
 DataExchange::DataExchange(const DataExchange& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message(),
-      _internal_metadata_(nullptr) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   curvefile_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_curvefile().empty()) {
-    curvefile_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.curvefile_);
+    curvefile_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_curvefile(),
+      GetArena());
   }
   fixingfile_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_fixingfile().empty()) {
-    fixingfile_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.fixingfile_);
+    fixingfile_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_fixingfile(),
+      GetArena());
   }
   tradefile_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_tradefile().empty()) {
-    tradefile_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.tradefile_);
+    tradefile_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_tradefile(),
+      GetArena());
   }
   evaldate_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_evaldate().empty()) {
-    evaldate_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.evaldate_);
+    evaldate_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_evaldate(),
+      GetArena());
   }
   resultsfile_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_resultsfile().empty()) {
-    resultsfile_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.resultsfile_);
+    resultsfile_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_resultsfile(),
+      GetArena());
   }
   scenarioid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_scenarioid().empty()) {
-    scenarioid_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.scenarioid_);
+    scenarioid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_scenarioid(),
+      GetArena());
   }
   tradeid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_tradeid().empty()) {
-    tradeid_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.tradeid_);
+    tradeid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_tradeid(),
+      GetArena());
   }
   // @@protoc_insertion_point(copy_constructor:FlumaionQL.DataExchange)
 }
@@ -147,9 +153,11 @@ void DataExchange::SharedCtor() {
 DataExchange::~DataExchange() {
   // @@protoc_insertion_point(destructor:FlumaionQL.DataExchange)
   SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 void DataExchange::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
   curvefile_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   fixingfile_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   tradefile_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
@@ -159,6 +167,12 @@ void DataExchange::SharedDtor() {
   tradeid_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
+void DataExchange::ArenaDtor(void* object) {
+  DataExchange* _this = reinterpret_cast< DataExchange* >(object);
+  (void)_this;
+}
+void DataExchange::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
 void DataExchange::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
@@ -174,18 +188,19 @@ void DataExchange::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  curvefile_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  fixingfile_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  tradefile_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  evaldate_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  resultsfile_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  scenarioid_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  tradeid_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  _internal_metadata_.Clear();
+  curvefile_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  fixingfile_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  tradefile_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  evaldate_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  resultsfile_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  scenarioid_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  tradeid_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 const char* DataExchange::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
@@ -260,7 +275,9 @@ const char* DataExchange::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_I
           ctx->SetLastTag(tag);
           goto success;
         }
-        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
         CHK_(ptr != nullptr);
         continue;
       }
@@ -352,7 +369,7 @@ failure:
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target, stream);
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:FlumaionQL.DataExchange)
   return target;
@@ -442,37 +459,30 @@ void DataExchange::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 void DataExchange::MergeFrom(const DataExchange& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:FlumaionQL.DataExchange)
   GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (from.curvefile().size() > 0) {
-
-    curvefile_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.curvefile_);
+    _internal_set_curvefile(from._internal_curvefile());
   }
   if (from.fixingfile().size() > 0) {
-
-    fixingfile_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.fixingfile_);
+    _internal_set_fixingfile(from._internal_fixingfile());
   }
   if (from.tradefile().size() > 0) {
-
-    tradefile_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.tradefile_);
+    _internal_set_tradefile(from._internal_tradefile());
   }
   if (from.evaldate().size() > 0) {
-
-    evaldate_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.evaldate_);
+    _internal_set_evaldate(from._internal_evaldate());
   }
   if (from.resultsfile().size() > 0) {
-
-    resultsfile_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.resultsfile_);
+    _internal_set_resultsfile(from._internal_resultsfile());
   }
   if (from.scenarioid().size() > 0) {
-
-    scenarioid_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.scenarioid_);
+    _internal_set_scenarioid(from._internal_scenarioid());
   }
   if (from.tradeid().size() > 0) {
-
-    tradeid_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.tradeid_);
+    _internal_set_tradeid(from._internal_tradeid());
   }
 }
 
@@ -496,21 +506,14 @@ bool DataExchange::IsInitialized() const {
 
 void DataExchange::InternalSwap(DataExchange* other) {
   using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  curvefile_.Swap(&other->curvefile_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  fixingfile_.Swap(&other->fixingfile_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  tradefile_.Swap(&other->tradefile_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  evaldate_.Swap(&other->evaldate_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  resultsfile_.Swap(&other->resultsfile_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  scenarioid_.Swap(&other->scenarioid_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  tradeid_.Swap(&other->tradeid_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  curvefile_.Swap(&other->curvefile_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  fixingfile_.Swap(&other->fixingfile_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  tradefile_.Swap(&other->tradefile_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  evaldate_.Swap(&other->evaldate_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  resultsfile_.Swap(&other->resultsfile_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  scenarioid_.Swap(&other->scenarioid_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  tradeid_.Swap(&other->tradeid_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata DataExchange::GetMetadata() const {
@@ -522,7 +525,7 @@ void DataExchange::InternalSwap(DataExchange* other) {
 }  // namespace FlumaionQL
 PROTOBUF_NAMESPACE_OPEN
 template<> PROTOBUF_NOINLINE ::FlumaionQL::DataExchange* Arena::CreateMaybeMessage< ::FlumaionQL::DataExchange >(Arena* arena) {
-  return Arena::CreateInternal< ::FlumaionQL::DataExchange >(arena);
+  return Arena::CreateMessageInternal< ::FlumaionQL::DataExchange >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

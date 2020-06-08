@@ -215,16 +215,24 @@ public class MyRestController {
      * @return A String which Spring converts into JSON.
      */
     @GetMapping(value = "/cva/run", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String cvaRun(@RequestParam("key") String requestKey) {
-        LOGGER.info("cvaRun('{}')", requestKey);
+    public String cvaRun(@RequestParam("batch_size") int batchSize,
+            @RequestParam("calc_date") String calcDateStr,
+            @RequestParam("debug") boolean debug,
+            @RequestParam("parallelism") int parallelism) {
+        LOGGER.info("cvaRun(batch size '{}',calc date '{}',debug '{}',parallelism '{}')",
+                batchSize, calcDateStr, debug, parallelism);
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{ \"date\": \"" + new Date() + "\"");
-        stringBuilder.append(", \"key\": \"" + requestKey + "\"");
+        stringBuilder.append(", \"batchSize\": \"" + batchSize + "\"");
+        stringBuilder.append(", \"calcDate\": \"" + calcDateStr + "\"");
+        stringBuilder.append(", \"debug\": \"" + debug + "\"");
+        stringBuilder.append(", \"parallelism\": \"" + parallelism + "\"");
 
         try {
-            LocalDate calcDate = LocalDate.parse(requestKey);
-            Job job = CvaStpJobSubmitter.submitCvaStpJob(this.jetInstance, calcDate);
+            LocalDate calcDate = LocalDate.parse(calcDateStr);
+            Job job = CvaStpJobSubmitter.submitCvaStpJob(this.jetInstance,
+                    calcDate, batchSize, parallelism, debug);
 
             stringBuilder.append(", \"id\": \"" + job.getId() + "\"");
             stringBuilder.append(", \"name\": \"" + job.getName() + "\"");
@@ -371,8 +379,9 @@ public class MyRestController {
      * @param mapName Map name, only those that can be specified as a param
      * @return Some JSON
      */
-    @GetMapping(value = "/getany", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getAny(@RequestParam("map") String mapName) {
+    @GetMapping(value = "/getany/{map}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getAny(
+            @PathVariable("map") String mapName) {
         LOGGER.info("getAny('{}')", mapName);
 
         IMap<?, ?> map = null;
