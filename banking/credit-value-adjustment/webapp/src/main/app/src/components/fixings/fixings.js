@@ -103,7 +103,7 @@ class Fixings extends Component {
         this.state = {
         		batch_size: '100',
         		calc_date: '2016-01-07',
-        		debug: 'false',
+        		debug: false,
         		fixings: [],
         		message: '...',
             	message_style: {
@@ -123,7 +123,7 @@ class Fixings extends Component {
     	    this.setState({batch_size: event.target.value});
     	}
     	if (e.target.name == 'debug') {
-    	    this.setState({debug: event.target.value});
+    	    this.setState({debug: e.target.checked});
     	}
     	if (e.target.name == 'parallelism') {
     	    this.setState({parallelism: event.target.value});
@@ -140,7 +140,7 @@ class Fixings extends Component {
 	    		+ '&calc_date=' + this.state.calc_date
 	    		+ '&debug=' + this.state.debug
 	    		+ '&parallelism=' + this.state.parallelism;
-	    	
+
 	    	client({path:restURL}).then(
 	    			function(response) {
 	    		console.log('response.entity', response.entity);
@@ -241,9 +241,9 @@ class Fixings extends Component {
 			  <form>
 			  	<label for="calc_date">Calc Date:</label>
 			  	<input type="text"     id="calc_date"   name="calc_date"   value={this.state.calc_date}   readonly/>
-			  	<label for="cdebug">Debug:</label>
-			  	<input type="checkbox" id="debug"       name="debug"       value={this.state.debug}       unchecked
-			  		onChange={this.handleChange}/>
+			  	<label for="debug">Debug:</label>
+			  	<input type="checkbox" id="debug"       name="debug"
+			  		checked={this.state.debug} onChange={this.handleChange}/>
 			  	<label for="batch_size">Batch Size:</label>
 			  	<input type="number"   id="batch_size"  name="batch_size"  value={this.state.batch_size}  min="1"
 			  		onChange={this.handleChange}/>
