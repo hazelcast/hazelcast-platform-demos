@@ -20,7 +20,10 @@ where the data originated:
 
 The text here is just a quick reference for building and deploying.
 
-To find out what it really does, how, and why, refer to <a href="_blank">TODO Link to website goes here TODO</a>.
+To find out what it really does, how, and why, refer to
+<a href="https://hazelcast.org/resources/continuous-query-with-drilldown-trade-monitoring-reference-architecture/">here</a>
+and 
+<a href="https://hazelcast.org/resources/hazelcast-continuous-query-with-drilldown-trade-monitoring-wp/">here</a>.
 
 ## Building
 
