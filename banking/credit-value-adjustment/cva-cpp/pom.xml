@@ -104,6 +104,7 @@
 								<arguments>${tmp.docker.image2}</arguments>
 								<arguments>${tmp.docker.image3}</arguments>
 							</arguments>
+							<skip>${dockerfile.skip}</skip>
 							<successCodes>0,1</successCodes>
 						</configuration>
 					</execution>

@@ -389,7 +389,42 @@
 
 	<profiles>
 		<profile>
-			<!-- Check style and build Docker images -->
+			<!-- For Jenkins, all validation sections except Docker build -->
+			<id>jenkins</id>
+			<properties>
+				<dockerfile.skip>true</dockerfile.skip>
+				<failsafe.skip>false</failsafe.skip>
+				<spotbugs.skip>false</spotbugs.skip>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-checkstyle-plugin</artifactId>
+						<version>${maven-checkstyle-plugin.version}</version>
+						<configuration>
+							<configLocation>checkstyle/checkstyle.xml</configLocation>
+							<headerLocation>checkstyle/ClassHeader.txt</headerLocation>
+							<suppressionsLocation>checkstyle/suppressions.xml</suppressionsLocation>
+							<consoleOutput>true</consoleOutput>
+							<failsOnError>true</failsOnError>
+							<failOnViolation>true</failOnViolation>
+							<includeTestSourceDirectory>true</includeTestSourceDirectory>
+							<propertyExpansion>main.basedir=${main.basedir}</propertyExpansion>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>validate</phase>
+								<goals>
+									<goal>check</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<!-- Full release, logically Jenkins profile plus Docker, done this way as cannot inherit profiles -->
 			<id>release</id>
 			<properties>
 				<dockerfile.skip>false</dockerfile.skip>
