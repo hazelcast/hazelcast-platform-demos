@@ -233,7 +233,7 @@ class Fixings extends Component {
 
 	render() {
         return (
-        	<div class="minor_pane">
+        	<div>
     		  <h2>Fixings</h2>
     	      <Styles>
     	        <Table columns={columns} data={this.state.fixings} />
