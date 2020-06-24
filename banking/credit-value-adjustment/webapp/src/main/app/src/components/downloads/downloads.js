@@ -135,6 +135,17 @@ class Downloads extends Component {
 	        	var downloadsResponse = response.entity.downloads;
 	        	
 	        	var newData = [];
+		    	let notAvailable = <div><i>"N/a"</i></div>;
+		    	
+		    	if (downloadsResponse.length == 0) {
+	        		var datum = {
+	        				date: notAvailable,
+	        				kind: notAvailable,
+	        				link: notAvailable,
+	        		};
+	        		
+	        		newData.push(datum);
+		    	}
 
 	        	for (var i = 0; i < downloadsResponse.length; i++) {
 	        		
