@@ -49,34 +49,74 @@ import com.hazelcast.spi.discovery.SimpleDiscoveryNode;
 import com.hazelcast.spi.partitiongroup.PartitionGroupStrategy;
 
 /**
- * <p>Hazelcast provides WAN replication across Kubernetes installations.
- * see
+ * <p>This class is a <u>simplified</u> version of WAN replication for this demo.
+ * </p>
+ * <h2>WAN Replication</h2>
+ * <p>WAN replication is a feature of Hazelcast where the nodes in one
+ * cluster connect to the nodes in another cluster for uni-directional or
+ * bi-directional data sharing.
+ * </p>
+ * <p>They are independent clusters, but when the data in one cluster has changed,
+ * it can then be sent to another cluster to keep the two matching.</p>
+ * <p>Sending is optional, you can select only selected maps and filter out
+ * some entries if you wish.
+ * </p>
+ * <p>Items changed in the source cluster are placed in a sending queue. They
+ * are delivered to the target cluster when connectivity is in place. The queue
+ * builds up when the target cluster goes offline, and drains when the target
+ * cluster is online again. An eventual consistency model.
+ * </p>
+ * <p>Clusters can be anywhere worldwide. The further apart they are, the less
+ * likely both to be affected by the one incident. If each is in a separate
+ * datacenter or cloud provider, it is less likely that both fail at once.
+ * </p>
+ * <h2>Kubernetes complications</h2>
+ * <p>The most resilient set-up would be to have two Hazelcast clusters
+ * in separate Kubernetes clusters, and for these Kubernetes clusters to
+ * be in separate datacenters or cloud provider's regions/zones.
+ * </p>
+ * <p>Two Kubernetes clusters introduces complications for WAN replication:
+ * </p>
+ * <ol>
+ * <li><b>Firewalls</b>
+ * <p>Processes in one Kubernetes cluster need to be able to communicate
+ * with processes in another Kubernetes cluster. Hazelcast uses TCP,
+ * but there need to be no firewalls blocking traffic in or out.</p>
+ * </li>
+ * <li><b>Security</b>
+ * <p>Data passing between Kubernetes cluster may be using the public
+ * internet, so should be encrypted. Authentication would also be
+ * sensible, to prevent unwanted connections.</p>
+ * </li>
+ * <li><b>Pod Exposure</b>
+ * <p>A Hazelcast cluster normally consists of multiple pods. In
+ * Kubernetes this would normally be exposed with a single proxy
+ * such as a {@code NodePort}. Highest performance comes when all
+ * target pods can be directly accessed, rather than use one as
+ * a proxy to reach the others.</p>
+ * </li>
+ * <li><b>Discovery</b>
+ * <p>A Hazelcast cluster would normally run as an internal service
+ * so not be visible as a service to the outside world.</p>
+ * </li>
+ * </ol>
+ * <p>For more details, refer to
  * <a href="https://github.com/hazelcast/hazelcast-code-samples/tree/master/hazelcast-integration/kubernetes/samples/wan">
- * here</a>. But if for some bizarre reason you wish to do it the hard way, this is the code to
- * do it yourself.
+ * this</a> or ask Hazelcast staff for assistance.
  * </p>
- * <p>This version uses DNS queries to Kubernetes itself to obtain the location
- * of each of the remote pods. For real use, this would be across two Kubenetes
- * systems, perhaps on different providers and with different rules. So this of it
- * more as a demo to base a solution upon. Real use will require security and
- * the Kubernetes API.
+ * <h2>Demo simplification</h2>
+ * <p>This demo assumes that both Hazelcast clusters are running
+ * in the same Kubernetes cluster, so that points 1 to 3 above
+ * won't apply.
  * </p>
- * <p>When this is code invoked periodically, it is expected to return
- * a list of node &amp; port pairs for the remote cluster.
- * </p>
- * <p>In essence, the code is:
- * <pre>
- *   Address privateAddress = new Address("127.0.0.1", 5701);
- *   DiscoveryNode discoveryNode = new SimpleDiscoveryNode(privateAddress);
- *   nodes.add(discoveryNode);
- * </pre>
- * with the detail being to find the IP address and port for each
- * node currently in the remote cluster.
+ * <p>Discovery can be done by a simple query to the Kubernetes DNS
+ * server to find the addresses of the pods in the service for the
+ * remote cluster.
  * </p>
  */
 @Component
-public class MyWANDiscoveryStrategy implements DiscoveryStrategy {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MyWANDiscoveryStrategy.class);
+public class MyLocalWANDiscoveryStrategy implements DiscoveryStrategy {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MyLocalWANDiscoveryStrategy.class);
     private static final String SRV_ATTRIBUTE_NAME = "SRV";
     private static final long FIVE_SECOND_TIMEOUT = 5000L;
 
