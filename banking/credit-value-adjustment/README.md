@@ -2,7 +2,7 @@
 
 This example is "_straight-through processing_" of Risk, and uses commercial Hazelcast features.
 
-You will a Jet Enterprise license.
+You will need a Jet Enterprise license.
 
 Register [here](https://hazelcast.com/download/) to request the evaluation license keys you
 need, and put them in your `settings.xml` file as described in [Repository top-level README.md](../../README.md).
@@ -85,11 +85,27 @@ This is a Protobuf3 definition of the gRPC communications between Jet and C++.
 
 ### 2. `cva-cpp`
 
-TODO
+This module contains the C++ code that executes the pricing.
+
+It has has a gRPC server that responds to incoming requests on a specific port (50001).
+
+Each incoming request is one or usually more (default 100) lines of trades and curves
+to price. One output is given for each input.
+
+For normal gRPC use, this module would be accessed via  load balancer.
+It is only available as a Docker image, as it is based on a customerized Ubuntu image.
 
 ### 3. `abstract-hazelcast-node`
 
-TODO
+This module contains code common the Hazelcast sewrvers in cluster "*site1*" and "*site2*".
+It will set up some configuration based on whether it deduces it is running Kubernetes or outside.
+
+In a containerized environment, Docker or Kubernetes, the Grafana job will be initiated if not
+already running.
+
+In a Kubernetes environment, WAN replication will be enabled via the custom code in
+the `MyLocalWANDiscoveryStrategy.java` file. This will probe the Kubernetes DNS server and
+determine if another cluster is running, and initiate a WAN connection to it.
 
 ### 4. `hazelcast-node-site1`
 
@@ -110,22 +126,23 @@ Job "_GrafanaGlobalMetricsJob_" sends some metrics to Grafana.
 
 Job "_CvaStpJob_" is the main job in the CVA application, launching CVA for straight through processing.
 It has 4 parameters:
-* calcDate
+* *calcDate* -
     This is the date for the calculations.
-* batchSize
+* *batchSize* -
     Calculations are passed by Jet to C++ in batches. Configuring the size here enables this to be optimised
     for the network capacity and C++ processing speed.
-* parallelism
+* *parallelism* -
     This controls how many C++ worker nodes each Jet node will communicate with concurrently, and again this
     is configurable to optimise for the deployment architecture.
-* debug
+* *debug* -
     Enabling this flag adds additional stages to the processing pipeline to save the intermediate results
     to maps with the naming prefix "debug_". These are sink stages, not inserted into the main pipeline
     log as intermediate stages.
 
 ### 7. `abstract-hazelcast-client`
 
-TODO
+This module is the common code for clients of the Hazelcast grids, and mainly just sets up the
+configuration for connectivity.
 
 ### 8. `data-loader`
 
@@ -159,11 +176,48 @@ for the CVA application imported.
 
 ### 11. `webapp`
 
-TODO
+This module is a web front-end, the main user-experience for the CVA application.
+Note CVA is compute heavy, so not particularly visual or interactive.
+
+When started, it presents a single page with some information and actions.
+All dynamic data automatically refreshes, so you don't need to refresh the page
+to see updates.
+
+In the top left a panel shows the fixing dates, and has a form that allows you
+to submit the CVA job. The run date is locked, but you can select if debug
+saving is enabled, the batch size and parallelism. Refer to the `jet-jobs`
+module to see what these flags mean.
+
+In the top middle is a panel showing the size of the most important maps for
+the example. This information is also available in the Management Center.
+
+In the top right a panel shows job output available for download. This is all
+downloadable output, so includes output from jobs that ran in another site
+and were shared by WAN replication. In other words, this is a superset of the
+downloads in the last panel.
+
+Across the bottle is a table showing the Jet jobs that have run or are running,
+and their status. For CVA jobs that have completed successfully, a download link
+enables you to get the results as a CSV file or Excel spreadsheet.
 
 ## Running -- sequence
 
-TODO
+There is a partial sequence to running, and some optional modules depending on the environment
+and machine capacity.
+
+* *grafana* &amp; *cva-cpp* -
+These should be started first.
+ *grafana* is only needed when using Docker or Kubernetes.
+ *cva-cpp* is always needed.
+
+* *hazelcast-node-site1* &amp; *hazelcast-node-site2* -
+ These should be started second.
+ Run as many of each as you want. If you don't wish to use WAN, one cluster is enough,
+and *WAN* is only available in Kubernetes.
+
+* *data-loader*, *management-center* &amp; *webapp* -
+ These should be started last.
+Management Center is optional.
 
 ## Running -- Localhost
 
@@ -188,4 +242,6 @@ TODO
 ## Summary
 
 TODO
+
+
 
