@@ -221,7 +221,30 @@ Management Center is optional.
 
 ## Running -- Localhost
 
-TODO
+As above, the mandatory module `cva-cpp` must run in Docker or Kubernetes. However, the rest of the
+example can run on localhost if you have enough compute capacity. `grafana` is ignored on localhost, 
+and if you want to run Management Center the standard build from the Hazelcast website is all that's
+needed.
+
+Start the following commands, located in `src/main/scripts`
+
+* *docker-cva-cpp.sh*
+* *localhost-hazelcast-node-site1.sh*
+* *localhost-data-loader.sh 100*
+* *localhost-webapp.sh*
+
+This will start one C++ worker node, one Hazelcast node for *site1*, do a limited data load capped
+at 100 records, and start the web application.
+
+Then you can navigate http://localhost:8085 to access the web application.
+
+The parameter 100 for the data loader caps the items loaded, the first 100 curves and the first
+100 trades. Therefore there are only 10,000 combinations of intermediate results for the CVA
+calculation. Even then, on a low grade machine such as a laptop it might take 3 minutes or so
+to process the entire run.
+
+To close, use `docker ps` and `docker kill` to shut down the Docker contain for C++.
+Then `docker container prune` to release retainedresources.
 
 ## Running -- Docker
 
@@ -242,6 +265,5 @@ TODO
 ## Summary
 
 TODO
-
 
 
