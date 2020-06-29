@@ -84,12 +84,15 @@ const char descriptor_table_protodef_JetToCpp_2eproto[] PROTOBUF_SECTION_VARIABL
   "\n\016JetToCpp.proto\022(com_hazelcast_platform"
   "_demos_banking_cva\"\"\n\014InputMessage\022\022\n\nin"
   "putValue\030\001 \003(\t\"$\n\rOutputMessage\022\023\n\013outpu"
-  "tValue\030\001 \003(\t2\223\001\n\010JetToCpp\022\206\001\n\rstreamingC"
+  "tValue\030\001 \003(\t2\226\002\n\010JetToCpp\022\206\001\n\rstreamingC"
   "all\0226.com_hazelcast_platform_demos_banki"
   "ng_cva.InputMessage\0327.com_hazelcast_plat"
   "form_demos_banking_cva.OutputMessage\"\000(\001"
-  "0\001B,\n(com.hazelcast.platform.demos.banki"
-  "ng.cvaP\001b\006proto3"
+  "0\001\022\200\001\n\013myUnaryCall\0226.com_hazelcast_platf"
+  "orm_demos_banking_cva.InputMessage\0327.com"
+  "_hazelcast_platform_demos_banking_cva.Ou"
+  "tputMessage\"\000B,\n(com.hazelcast.platform."
+  "demos.banking.cvaP\001b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_JetToCpp_2eproto_deps[1] = {
 };
@@ -99,7 +102,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_Jet
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_JetToCpp_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_JetToCpp_2eproto = {
-  false, false, descriptor_table_protodef_JetToCpp_2eproto, "JetToCpp.proto", 336,
+  false, false, descriptor_table_protodef_JetToCpp_2eproto, "JetToCpp.proto", 467,
   &descriptor_table_JetToCpp_2eproto_once, descriptor_table_JetToCpp_2eproto_sccs, descriptor_table_JetToCpp_2eproto_deps, 2, 0,
   schemas, file_default_instances, TableStruct_JetToCpp_2eproto::offsets,
   file_level_metadata_JetToCpp_2eproto, 2, file_level_enum_descriptors_JetToCpp_2eproto, file_level_service_descriptors_JetToCpp_2eproto,
