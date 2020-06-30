@@ -264,7 +264,6 @@ public class MyRestController {
     public String availableDownloads(HttpServletRequest httpServletRequest) {
         LOGGER.info("availableDownloads()");
 
-        //TODO Validate if these are correct for Kubernetes
         String host = httpServletRequest.getServerName();
         int port = httpServletRequest.getServerPort();
 

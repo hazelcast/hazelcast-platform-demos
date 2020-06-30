@@ -236,7 +236,7 @@ Start the following commands, located in `src/main/scripts`
 This will start one C++ worker node, one Hazelcast node for *site1*, do a limited data load capped
 at 100 records, and start the web application.
 
-Then you can navigate http://localhost:8085 to access the web application.
+Then you can navigate http://localhost:8084 to access the web application.
 
 The parameter 100 for the data loader caps the items loaded, the first 100 curves and the first
 100 trades. Therefore there are only 10,000 combinations of intermediate results for the CVA
@@ -248,22 +248,88 @@ Then `docker container prune` to release retainedresources.
 
 ## Running -- Docker
 
-TODO
+Start the following commands, located in `src/main/scripts`
+
+* *docker-cva-cpp.sh*
+* *docker-grafana.sh*
+* *docker-hazelcast-node-site1.sh*
+* *docker-data-loader.sh 100*
+* *docker-webapp.sh*
+
+This is essentially the same sequence but different script names as for running on localhost.
+The difference is that "`docker-grafana.sh`" is needed so a Grafana server is running, as
+stats are captured for containerized environments.
+
+This uses Docker networking, so be sure to use `docker container prune` to release resources
+prior to each run.
+
+The web UI is available as http://localhost:8081/. Internally it uses and logs port 8080, but
+externally this is mapped to port 8081. This is to allow you to run other applications on
+port 8080, such as the Management Center.
+
+Grafana is available http://localhost:80/. Log in with user "_admin_", password "_admin_". In
+the top menu, select the "_CVA Map Stats_" dashboard.
 
 ## Running -- Kubernetes
+
+Kubernetes is rather more complicated, as it is a full enterprise-grade product. However, the steps
+are much the same.
 
 TODO
 
 ## Running -- Expected Output
 
-TODO
+Each run of the Jet job "_CvaStpJob_" produces one array of values, for the counterparties and the risk value
+derived for each. 
 
-### Logs
+This is stored in the map "_cva_data_", and used as the basis to create a single item in maps "_cva_csv_" 
+and "_cva_xlsx_" which is the same array reformatted as a CSV file and a Excel file respectively. The key for
+all three maps is the job run date as a string, for example "2016-01-07@2020-06-30T09-06-03" representing a run
+with a calculation date of 2016-01-07 and run on 2020-06-30 at 9:06am.
 
-TODO
+Downloading the CSV should look like
+
+```
+ABD,670.5446422902135
+AHI,263794.3274578084
+AHZ,12901.117973960541
+AJK,87590.48230872302
+ALUMLQJH,0.0
+APB,21231.23794486853
+AXTM,38382.9382510774
+BAM,1954.4232334783503
+BBDMFG,17269.583709286322
+BTV,5345.503106886422
+H-PitKKX,19347.947833792157
+HA-PacCorp,19186.126716549883
+HTAyC,67462.90245070258
+IQC,39355.557618121165
+JBV,95.52423603052165
+JJA,10648.800115573642
+M,84396.15064428787
+MQ,95137.85199258443
+VFA,52097.31822236367
+ZSX,21776.002502479965
+```
+
+with the same for Excel except as an Excel spreadsheet which has some extra columns with more counterparty
+information.
+
+There will be a line for each of the 20 counterparties. The risk value derived will depend on the number of
+trades in the input, and may be zero if the counterparty has no trades or no credit risk (all debit values, we
+owe the counterparty). The calculation is deterministic, so repeating for the same input will give the same
+output.
 
 ## Summary
 
-TODO
+The CVA example here presents an alternative architecture for Risk processing.
 
+Input data and final output data are held in Hazelcast maps, as these are very fast and scalable stores.
 
+Calculations are offloaded to C++ worker modules, using gRPC sockets.
+
+Intermediate results, all the Mark-To-Market values are not saved, instead they are streamed direct from
+C++ into aggregators to produce the final results.
+
+Input data is JSON, and this is converted to Protobuf for interaction via gRPC. The final results are available
+in a familiar format, Excel or CSV.
