@@ -340,7 +340,9 @@
 						<buildArgs>
 							<!-- Dockerfile will use for our built modules -->
 							<JAR_FILE>${docker.jar.file}</JAR_FILE>
-							<!-- Dockerfile may use when a license is needed -->
+							<!-- Dockerfile uses for Management Center. -->
+							<MC_ADMINUSER>${my.mc.admin.user}</MC_ADMINUSER>
+							<MC_ADMINPASSWORD>${my.mc.admin.password}</MC_ADMINPASSWORD>
 							<MC_LICENSE>${my.mc.license.key}</MC_LICENSE>
 						</buildArgs>
 						<dockerfile>Dockerfile</dockerfile>

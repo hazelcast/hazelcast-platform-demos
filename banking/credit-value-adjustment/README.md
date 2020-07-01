@@ -169,6 +169,9 @@ For running on _localhost_, just download and use the Management Center from
 configure manually. "*site1*" will be available on "*localhost:5701*" and "*site2*"
 on "*localhost:6701*".
 
+The build for this module pre-configures the license and the logon/password
+for you. See [management-center/README.md](./management-center/README.md).
+
 ### 10. `grafana`
 
 This module creates a Grafana image for Docker, with a special statistics panel
@@ -270,12 +273,14 @@ port 8080, such as the Management Center.
 Grafana is available http://localhost:80/. Log in with user "_admin_", password "_admin_". In
 the top menu, select the "_CVA Map Stats_" dashboard.
 
+TODO - MANCENTER pre-config
+
 ## Running -- Kubernetes
 
 Kubernetes is rather more complicated, as it is a full enterprise-grade product. However, the steps
 are much the same.
 
-TODO
+TODO - YAML
 
 ## Running -- Expected Output
 

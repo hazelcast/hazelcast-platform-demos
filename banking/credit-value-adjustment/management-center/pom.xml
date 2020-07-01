@@ -1,22 +1,26 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-        <modelVersion>4.0.0</modelVersion>
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-        <parent>
+	<parent>
 		<groupId>com.hazelcast.platform.demos.banking.cva</groupId>
-        	<artifactId>cva-root</artifactId>
-                <version>4.0</version>
-        </parent>
+		<artifactId>cva-root</artifactId>
+		<version>4.0</version>
+	</parent>
 
-        <artifactId>cva-management-center</artifactId>
+	<artifactId>cva-management-center</artifactId>
 
-        <name>Hazelcast Platform - CVA - Management Center</name>
-        <description>Credit Value Adjustment - Hazelcast Management Center</description>
+	<name>Hazelcast Platform - CVA - Management Center</name>
+	<description>Credit Value Adjustment - Hazelcast Management Center</description>
 
 	<properties>
 		<docker.image.name>management-center</docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
+
+		<!-- Pre-configure the build image -->
+		<my.mc.admin.user>admin</my.mc.admin.user>
+		<my.mc.admin.password>password1</my.mc.admin.password>
 		<my.mc.license.key>${my.jet.license.key}</my.mc.license.key>
 	</properties>
 
@@ -25,6 +29,17 @@
 			<plugin>
 				<groupId>com.spotify</groupId>
 				<artifactId>dockerfile-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<configuration>
+					<target>
+						<echo message="=============================================================" />
+						<echo message="Setting $$MC_ADMIN_USER=${my.mc.admin.user}"/>
+						<echo message="Setting $$MC_ADMIN_PASSWORD=${my.mc.admin.password}"/>
+						<echo message="=============================================================" />
+					</target>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

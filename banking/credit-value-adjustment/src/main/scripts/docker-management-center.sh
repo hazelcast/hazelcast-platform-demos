@@ -20,7 +20,7 @@ fi
 
 DOCKER_IMAGE=hazelcast-${PROJECT}/${MODULE}
 
-CMD="docker run -p 8080:8080 ${DOCKER_IMAGE} $@"
+CMD="docker run -e JAVA_ARGS=-Dhazelcast.mc.healthCheck.enable=true -p 8080:8080 ${DOCKER_IMAGE} $@"
 #echo $CMD
 
 $CMD
