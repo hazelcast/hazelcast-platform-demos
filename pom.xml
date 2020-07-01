@@ -338,7 +338,10 @@
 					<version>${dockerfile-maven-plugin.version}</version>
 					<configuration>
 						<buildArgs>
+							<!-- Dockerfile will use for our built modules -->
 							<JAR_FILE>${docker.jar.file}</JAR_FILE>
+							<!-- Dockerfile may use when a license is needed -->
+							<MC_LICENSE>${my.mc.license.key}</MC_LICENSE>
 						</buildArgs>
 						<dockerfile>Dockerfile</dockerfile>
 						<pullNewerImage>false</pullNewerImage>
