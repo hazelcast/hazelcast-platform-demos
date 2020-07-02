@@ -87,6 +87,10 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!-- This step deletes the intermediate builds. It saves space. If you keep them, another
+                             build recognises the intermediate builds can be re-used so starts from step 4, much faster
+                          -->
+                        <!--
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
@@ -108,8 +112,9 @@
 							<successCodes>0,1</successCodes>
 						</configuration>
 					</execution>
-				</executions>
+				</executions>t
 			</plugin>
+			-->
 		</plugins>
 	</build>
 </project>

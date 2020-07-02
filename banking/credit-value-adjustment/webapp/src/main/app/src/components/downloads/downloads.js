@@ -5,12 +5,16 @@ import {useTable} from 'react-table';
 import styled from 'styled-components';
 import update from 'immutability-helper';
 
+var rest = require('rest');
+var mime = require('rest/interceptor/mime');
+
 const DOWNLOAD_URL = 'http://' + window.location.host + '/rest/download';
 // Note SockJsClient uses 'http' protocol not 'ws'
 // See https://github.com/lahsivjar/react-stomp/blob/HEAD/API/
 const WS_URL = 'http://' + window.location.host + '/hazelcast';
 const WS_TOPICS_PREFIX = '/topics';
 const WS_TOPICS = [ WS_TOPICS_PREFIX + "/job_state" ];
+
 
 // Styled-components. Could move to CSS
 const Styles = styled.div `
@@ -52,51 +56,16 @@ const Styles = styled.div `
 // Table columns
 const columns = [
 	{
-		Header: 'Job Info',
-		columns: [
-			{
-				Header: 'Id',
-				accessor: 'id',
-			},
-			{
-				Header: 'Name',
-				accessor: 'name',
-			},
-		],
+		Header: 'Date',
+		accessor: 'date',
 	},
 	{
-		Header: 'Status',
-		columns: [
-			{
-				Header: 'Local Start Time',
-				accessor: 'submission_time',
-			},
-			{
-				Header: 'Last Change',
-				accessor: 'now',
-			},
-			{
-				Header: 'Previous',
-				accessor: 'previous_status',
-			},
-			{
-				Header: 'Current',
-				accessor: 'status',
-			},
-		],
+		Header: 'Kind',
+		accessor: 'kind',
 	},
 	{
-		Header: 'Output',
-		columns: [
-			{
-				Header: 'CSV',
-				accessor: 'csv',
-			},
-			{
-				Header: 'XLS',
-				accessor: 'xls',
-			},
-		],
+		Header: 'Link',
+		accessor: 'link',
 	},
 ]
 
@@ -140,86 +109,96 @@ function Table({ columns, data }) {
 	  )
 }
 
-// Format Java timestamp in milliseconds
-function myISO8601(longStr) {
-	var dateObj = new Date(Number(longStr));
-	return dateObj.toISOString().replace('T',' ').split('.')[0];
-}
-
-class Jobs extends Component {
+class Downloads extends Component {
     constructor(props) {
         super(props);
         this.state = {
-    		jobs: []
+    		data: []
         };
         this.handleData = this.handleData.bind(this);
     }
+
     
-    handleData(message) {
-    	//console.log(message);
+    handleData(message){
+    	// message is just a nudge to make REST call
+        this.getData();
+    }
+    
+    getData(){
+		//console.log('downloads.js','getData');
+        setImmediate(() => {
+	    	var client = rest.wrap(mime);
+	    	var self = this;
+	    	
+	    	client({path:'/rest/mapKeysForDownload'}).then(
+	    			function(response) {
+	        	var downloadsResponse = response.entity.downloads;
+	        	
+	        	var newData = [];
+		    	let notAvailable = <div><i>"N/a"</i></div>;
+		    	
+		    	if (downloadsResponse.length == 0) {
+	        		var datum = {
+	        				date: notAvailable,
+	        				kind: notAvailable,
+	        				link: notAvailable,
+	        		};
+	        		
+	        		newData.push(datum);
+		    	}
 
-    	let notAvailable = <div><i>"N/a"</i></div>;
-    	var nowStr = myISO8601(message.now);
-    	var jobKey = message.job.name.split('$')[0];
-    	var outputKey = message.job.name.split('$')[1];
-    	var submissionTimeStr = myISO8601(message.job.submission_time);
-    	var csv = notAvailable;
-    	var xls = notAvailable;
-    	if (jobKey == 'CvaStpJob' && message.job.status == 'COMPLETED') {
-    		var csvUrl = "/rest/download/cva_csv?key=" + outputKey;
-    		var xlsUrl = "/rest/download/cva_xlsx?key=" + outputKey;
-    		csv = <a href={csvUrl} download>Download</a>;
-    		xls = <a href={xlsUrl} download>Download</a>;
-    	}
+	        	for (var i = 0; i < downloadsResponse.length; i++) {
+	        		
+	        		var download_date = downloadsResponse[i].date;
+	        		var download_kind = downloadsResponse[i].kind;
+	        		var the_link = '';
+	        		
+	        		if (download_kind == '.csv' ) {
+    				  var csvUrl = "/rest/download/cva_csv?key=" + download_date;
+	    	          the_link = <a href={csvUrl} download>Download</a>;
+	        		} else {
+    		          var xlsUrl = "/rest/download/cva_xlsx?key=" + download_date;
+    		          the_link = <a href={xlsUrl} download>Download</a>;
+	        		}
+	        		
+	        		var download_link = 'TOTO';//XXX downloadsResponse[i].link;//XXX
+	        				        	
+	        		var datum = {
+	        				date: download_date,
+	        				kind: download_kind,
+	        				link: the_link,
+	        		};
+	        		
+	        		newData.push(datum);
+	        	}
+	        	
+	        	self.setState({
+	        			data: update(self.state.data, {$set: newData}) 
+	        			});
+	        	
+	    	});
+        })
+      }
 
-        var job = {
-        		id: message.job.id,
-        		name: message.job.name,
-        		submission_time: submissionTimeStr,
-        		now: nowStr,
-        		previous_status: message.previous_status,
-        		status: message.job.status,
-        		csv: csv,
-        		xls: xls,
-        		output_key: outputKey,
-        };
-
-        // Append or replace
-    	var jobs = this.state.jobs;
-    	var row = -1;
-    	for (var i = 0; i < jobs.length; i++) { 
-    	    if (jobs[i].id == job.id) {
-    	    	row = i;
-    	    }
-    	}
-    	if (row < 0) {
-    		this.setState({
-    			jobs: update(this.state.jobs, {$push: [job]}) 
-    		})
-    	} else {
-    		if (this.state.jobs[row].status != job.status) {
-        		this.setState({
-        			jobs: update(this.state.jobs, {[row] : {$set: job}}) 
-        		})
-    		}
-    	}
+    componentDidMount(){
+        this.getData();
     }
     
     render() {
         return (
         	<div>
+    		    <h2>Downloads</h2>
         		<SockJsClient 
                 	url={WS_URL}
         			topics={WS_TOPICS}
         			onMessage={this.handleData}
         			debug={false} />
-        		<h2>Jet Jobs</h2>
         	    <Styles>
-        	      <Table columns={columns} data={this.state.jobs} />
+        	      <Table columns={columns} data={this.state.data} />
         	    </Styles>
             </div>
         );
     }
 }
 
-export default Jobs;
+export default Downloads;

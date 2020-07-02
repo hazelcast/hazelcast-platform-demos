@@ -82,6 +82,12 @@ void getMTM(string jsonBundle, string* mtmjson) {
 }
 
 class JetToCppServiceImpl final : public JetToCpp::Service {
+    Status myUnaryCall(ServerContext* context,
+        const InputMessage* request, OutputMessage* response) override {
+        //TODO Add coding when needed
+        std::cout << "unaryCall" << std::endl;
+        return Status::OK;
+    }
     Status streamingCall(ServerContext* context,
                          ServerReaderWriter<OutputMessage, InputMessage>* stream) override {
         InputMessage request;

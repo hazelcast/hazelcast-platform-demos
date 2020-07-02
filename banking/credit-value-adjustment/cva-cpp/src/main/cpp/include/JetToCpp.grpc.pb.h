@@ -45,6 +45,13 @@ class JetToCpp final {
     std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>> PrepareAsyncstreamingCall(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>>(PrepareAsyncstreamingCallRaw(context, cq));
     }
+    virtual ::grpc::Status myUnaryCall(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage& request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::com_hazelcast_platform_demos_banking_cva::OutputMessage>> AsyncmyUnaryCall(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::com_hazelcast_platform_demos_banking_cva::OutputMessage>>(AsyncmyUnaryCallRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::com_hazelcast_platform_demos_banking_cva::OutputMessage>> PrepareAsyncmyUnaryCall(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::com_hazelcast_platform_demos_banking_cva::OutputMessage>>(PrepareAsyncmyUnaryCallRaw(context, request, cq));
+    }
     class experimental_async_interface {
      public:
       virtual ~experimental_async_interface() {}
@@ -52,6 +59,18 @@ class JetToCpp final {
       virtual void streamingCall(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::com_hazelcast_platform_demos_banking_cva::InputMessage,::com_hazelcast_platform_demos_banking_cva::OutputMessage>* reactor) = 0;
       #else
       virtual void streamingCall(::grpc::ClientContext* context, ::grpc::experimental::ClientBidiReactor< ::com_hazelcast_platform_demos_banking_cva::InputMessage,::com_hazelcast_platform_demos_banking_cva::OutputMessage>* reactor) = 0;
+      #endif
+      virtual void myUnaryCall(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage* request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void myUnaryCall(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response, std::function<void(::grpc::Status)>) = 0;
+      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      virtual void myUnaryCall(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage* request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      #else
+      virtual void myUnaryCall(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage* request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      #endif
+      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      virtual void myUnaryCall(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      #else
+      virtual void myUnaryCall(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       #endif
     };
     #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
@@ -65,6 +84,8 @@ class JetToCpp final {
     virtual ::grpc::ClientReaderWriterInterface< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>* streamingCallRaw(::grpc::ClientContext* context) = 0;
     virtual ::grpc::ClientAsyncReaderWriterInterface< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>* AsyncstreamingCallRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) = 0;
     virtual ::grpc::ClientAsyncReaderWriterInterface< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>* PrepareAsyncstreamingCallRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::com_hazelcast_platform_demos_banking_cva::OutputMessage>* AsyncmyUnaryCallRaw(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::com_hazelcast_platform_demos_banking_cva::OutputMessage>* PrepareAsyncmyUnaryCallRaw(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -78,6 +99,13 @@ class JetToCpp final {
     std::unique_ptr<  ::grpc::ClientAsyncReaderWriter< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>> PrepareAsyncstreamingCall(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncReaderWriter< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>>(PrepareAsyncstreamingCallRaw(context, cq));
     }
+    ::grpc::Status myUnaryCall(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage& request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::com_hazelcast_platform_demos_banking_cva::OutputMessage>> AsyncmyUnaryCall(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::com_hazelcast_platform_demos_banking_cva::OutputMessage>>(AsyncmyUnaryCallRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::com_hazelcast_platform_demos_banking_cva::OutputMessage>> PrepareAsyncmyUnaryCall(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::com_hazelcast_platform_demos_banking_cva::OutputMessage>>(PrepareAsyncmyUnaryCallRaw(context, request, cq));
+    }
     class experimental_async final :
       public StubInterface::experimental_async_interface {
      public:
@@ -85,6 +113,18 @@ class JetToCpp final {
       void streamingCall(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::com_hazelcast_platform_demos_banking_cva::InputMessage,::com_hazelcast_platform_demos_banking_cva::OutputMessage>* reactor) override;
       #else
       void streamingCall(::grpc::ClientContext* context, ::grpc::experimental::ClientBidiReactor< ::com_hazelcast_platform_demos_banking_cva::InputMessage,::com_hazelcast_platform_demos_banking_cva::OutputMessage>* reactor) override;
+      #endif
+      void myUnaryCall(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage* request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response, std::function<void(::grpc::Status)>) override;
+      void myUnaryCall(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response, std::function<void(::grpc::Status)>) override;
+      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      void myUnaryCall(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage* request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response, ::grpc::ClientUnaryReactor* reactor) override;
+      #else
+      void myUnaryCall(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage* request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      #endif
+      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      void myUnaryCall(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response, ::grpc::ClientUnaryReactor* reactor) override;
+      #else
+      void myUnaryCall(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       #endif
      private:
       friend class Stub;
@@ -100,7 +140,10 @@ class JetToCpp final {
     ::grpc::ClientReaderWriter< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>* streamingCallRaw(::grpc::ClientContext* context) override;
     ::grpc::ClientAsyncReaderWriter< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>* AsyncstreamingCallRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) override;
     ::grpc::ClientAsyncReaderWriter< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>* PrepareAsyncstreamingCallRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::com_hazelcast_platform_demos_banking_cva::OutputMessage>* AsyncmyUnaryCallRaw(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::com_hazelcast_platform_demos_banking_cva::OutputMessage>* PrepareAsyncmyUnaryCallRaw(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_streamingCall_;
+    const ::grpc::internal::RpcMethod rpcmethod_myUnaryCall_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -109,6 +152,7 @@ class JetToCpp final {
     Service();
     virtual ~Service();
     virtual ::grpc::Status streamingCall(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::com_hazelcast_platform_demos_banking_cva::OutputMessage, ::com_hazelcast_platform_demos_banking_cva::InputMessage>* stream);
+    virtual ::grpc::Status myUnaryCall(::grpc::ServerContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage* request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_streamingCall : public BaseClass {
@@ -130,7 +174,27 @@ class JetToCpp final {
       ::grpc::Service::RequestAsyncBidiStreaming(0, context, stream, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_streamingCall<Service > AsyncService;
+  template <class BaseClass>
+  class WithAsyncMethod_myUnaryCall : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_myUnaryCall() {
+      ::grpc::Service::MarkMethodAsync(1);
+    }
+    ~WithAsyncMethod_myUnaryCall() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status myUnaryCall(::grpc::ServerContext* /*context*/, const ::com_hazelcast_platform_demos_banking_cva::InputMessage* /*request*/, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestmyUnaryCall(::grpc::ServerContext* context, ::com_hazelcast_platform_demos_banking_cva::InputMessage* request, ::grpc::ServerAsyncResponseWriter< ::com_hazelcast_platform_demos_banking_cva::OutputMessage>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_streamingCall<WithAsyncMethod_myUnaryCall<Service > > AsyncService;
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_streamingCall : public BaseClass {
    private:
@@ -169,11 +233,58 @@ class JetToCpp final {
     #endif
       { return nullptr; }
   };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_myUnaryCall : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    ExperimentalWithCallbackMethod_myUnaryCall() {
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      ::grpc::Service::
+    #else
+      ::grpc::Service::experimental().
+    #endif
+        MarkMethodCallback(1,
+          new ::grpc_impl::internal::CallbackUnaryHandler< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>(
+            [this](
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+                   ::grpc::CallbackServerContext*
+    #else
+                   ::grpc::experimental::CallbackServerContext*
+    #endif
+                     context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage* request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response) { return this->myUnaryCall(context, request, response); }));}
+    void SetMessageAllocatorFor_myUnaryCall(
+        ::grpc::experimental::MessageAllocator< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>* allocator) {
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(1);
+    #else
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::experimental().GetHandler(1);
+    #endif
+      static_cast<::grpc_impl::internal::CallbackUnaryHandler< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_myUnaryCall() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status myUnaryCall(::grpc::ServerContext* /*context*/, const ::com_hazelcast_platform_demos_banking_cva::InputMessage* /*request*/, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+    virtual ::grpc::ServerUnaryReactor* myUnaryCall(
+      ::grpc::CallbackServerContext* /*context*/, const ::com_hazelcast_platform_demos_banking_cva::InputMessage* /*request*/, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* /*response*/)
+    #else
+    virtual ::grpc::experimental::ServerUnaryReactor* myUnaryCall(
+      ::grpc::experimental::CallbackServerContext* /*context*/, const ::com_hazelcast_platform_demos_banking_cva::InputMessage* /*request*/, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* /*response*/)
+    #endif
+      { return nullptr; }
+  };
   #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-  typedef ExperimentalWithCallbackMethod_streamingCall<Service > CallbackService;
+  typedef ExperimentalWithCallbackMethod_streamingCall<ExperimentalWithCallbackMethod_myUnaryCall<Service > > CallbackService;
   #endif
 
-  typedef ExperimentalWithCallbackMethod_streamingCall<Service > ExperimentalCallbackService;
+  typedef ExperimentalWithCallbackMethod_streamingCall<ExperimentalWithCallbackMethod_myUnaryCall<Service > > ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_streamingCall : public BaseClass {
    private:
@@ -187,6 +298,23 @@ class JetToCpp final {
     }
     // disable synchronous version of this method
     ::grpc::Status streamingCall(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::com_hazelcast_platform_demos_banking_cva::OutputMessage, ::com_hazelcast_platform_demos_banking_cva::InputMessage>* /*stream*/)  override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_myUnaryCall : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_myUnaryCall() {
+      ::grpc::Service::MarkMethodGeneric(1);
+    }
+    ~WithGenericMethod_myUnaryCall() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status myUnaryCall(::grpc::ServerContext* /*context*/, const ::com_hazelcast_platform_demos_banking_cva::InputMessage* /*request*/, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -209,6 +337,26 @@ class JetToCpp final {
     }
     void RequeststreamingCall(::grpc::ServerContext* context, ::grpc::ServerAsyncReaderWriter< ::grpc::ByteBuffer, ::grpc::ByteBuffer>* stream, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncBidiStreaming(0, context, stream, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_myUnaryCall : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_myUnaryCall() {
+      ::grpc::Service::MarkMethodRaw(1);
+    }
+    ~WithRawMethod_myUnaryCall() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status myUnaryCall(::grpc::ServerContext* /*context*/, const ::com_hazelcast_platform_demos_banking_cva::InputMessage* /*request*/, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestmyUnaryCall(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -249,9 +397,74 @@ class JetToCpp final {
     #endif
       { return nullptr; }
   };
-  typedef Service StreamedUnaryService;
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_myUnaryCall : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    ExperimentalWithRawCallbackMethod_myUnaryCall() {
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      ::grpc::Service::
+    #else
+      ::grpc::Service::experimental().
+    #endif
+        MarkMethodRawCallback(1,
+          new ::grpc_impl::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+                   ::grpc::CallbackServerContext*
+    #else
+                   ::grpc::experimental::CallbackServerContext*
+    #endif
+                     context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->myUnaryCall(context, request, response); }));
+    }
+    ~ExperimentalWithRawCallbackMethod_myUnaryCall() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status myUnaryCall(::grpc::ServerContext* /*context*/, const ::com_hazelcast_platform_demos_banking_cva::InputMessage* /*request*/, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+    virtual ::grpc::ServerUnaryReactor* myUnaryCall(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)
+    #else
+    virtual ::grpc::experimental::ServerUnaryReactor* myUnaryCall(
+      ::grpc::experimental::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)
+    #endif
+      { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_myUnaryCall : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_myUnaryCall() {
+      ::grpc::Service::MarkMethodStreamed(1,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>(
+            [this](::grpc_impl::ServerContext* context,
+                   ::grpc_impl::ServerUnaryStreamer<
+                     ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>* streamer) {
+                       return this->StreamedmyUnaryCall(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_myUnaryCall() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status myUnaryCall(::grpc::ServerContext* /*context*/, const ::com_hazelcast_platform_demos_banking_cva::InputMessage* /*request*/, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedmyUnaryCall(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::com_hazelcast_platform_demos_banking_cva::InputMessage,::com_hazelcast_platform_demos_banking_cva::OutputMessage>* server_unary_streamer) = 0;
+  };
+  typedef WithStreamedUnaryMethod_myUnaryCall<Service > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef Service StreamedService;
+  typedef WithStreamedUnaryMethod_myUnaryCall<Service > StreamedService;
 };
 
 }  // namespace com_hazelcast_platform_demos_banking_cva
