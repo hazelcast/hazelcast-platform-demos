@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROJECT=cva
-MODULE=webapp
+MODULE=management-center 
 
 BASEDIR=`dirname $0`
 cd $BASEDIR/../../../$MODULE
@@ -20,8 +20,7 @@ fi
 
 DOCKER_IMAGE=hazelcast-${PROJECT}/${MODULE}
 
-# External port 8081
-CMD="docker run -e MY_CPP_SERVICE=cva-cpp -e MY_KUBERNETES_ENABLED=false -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP} -p 8081:8080 ${DOCKER_IMAGE} $@"
+CMD="docker run -e JAVA_ARGS=-Dhazelcast.mc.healthCheck.enable=true -p 8080:8080 ${DOCKER_IMAGE} $@"
 #echo $CMD
 
 $CMD

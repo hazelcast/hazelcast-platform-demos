@@ -28,9 +28,7 @@
 
 	<modules>
 		<module>grafana</module>
-		<!--
 		<module>management-center</module>
-		-->
 		<module>common</module>
 		<module>abstract-hazelcast-node</module>
 		<module>hazelcast-node-site1</module>
@@ -120,15 +118,9 @@
 				<artifactId>maven-antrun-plugin</artifactId>
 				<configuration>
 					<target>
-						<echo message="====================================" />
-						<echo message="TODO: 'mvn deploy' to upload to GKE" />
-						<echo message="====================================" />
-						<echo message="TODO: YAML Use readinessGate for sequencing" />
-						<echo message="====================================" />
-						<echo message="TODO: BigDecimal instead of double" />
-						<echo message="====================================" />
-						<echo message="TODO: Protobuf3 instead of JSON" />
-						<echo message="====================================" />
+						<echo message="=============================================================" />
+						<echo message="See README.md in /management-center module for logon/password"/>
+						<echo message="=============================================================" />
 					</target>
 				</configuration>
 			</plugin>

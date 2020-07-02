@@ -77,16 +77,18 @@ public class ApplicationConfig {
         LOGGER.info("Runtime.getRuntime().availableProcessors()=={}",
                 Runtime.getRuntime().availableProcessors());
 
-        this.addWanConfig(jetConfig.getHazelcastConfig().getWanReplicationConfigs());
-
         this.adjustNearCacheConfig(jetConfig.getHazelcastConfig().getMapConfigs());
 
         NetworkConfig networkConfig = jetConfig.getHazelcastConfig().getNetworkConfig();
 
         if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
+            this.addWanConfig(jetConfig.getHazelcastConfig().getWanReplicationConfigs());
+
             LOGGER.info("Kubernetes configuration: service-dns: {}",
                     networkConfig.getJoin().getKubernetesConfig().getProperty("service-dns"));
         } else {
+            this.removeWanConfig(jetConfig.getHazelcastConfig().getMapConfigs());
+
             networkConfig.getJoin().getKubernetesConfig().setEnabled(false);
 
             int port = MyUtils.getLocalhostBasePort(this.site);
@@ -106,7 +108,6 @@ public class ApplicationConfig {
 
         return jetConfig;
     }
-
 
     /**
      * <p>On a 1-node cluster, near-caching normally has no effect. But
@@ -163,6 +164,22 @@ public class ApplicationConfig {
 
         for (DiscoveryStrategyConfig discoveryStrategyConfig : discoveryConfig.getDiscoveryStrategyConfigs()) {
             discoveryStrategyConfig.setDiscoveryStrategyFactory(this.myDiscoveryStrategyFactory);
+        }
+    }
+
+
+    /**
+     * <p>If WAN is not applicable, as not in Kubernetes, remove it from
+     * map configuration.
+     * </p>
+     *
+     * @param mapConfigs
+     */
+    private void removeWanConfig(Map<String, MapConfig> mapConfigs) {
+        for (MapConfig mapConfig : mapConfigs.values()) {
+            if (mapConfig.getWanReplicationRef() != null) {
+                mapConfig.setWanReplicationRef(null);
+            }
         }
     }
 

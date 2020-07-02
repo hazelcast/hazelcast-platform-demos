@@ -5,6 +5,9 @@ import {useTable} from 'react-table';
 import styled from 'styled-components';
 import update from 'immutability-helper';
 
+var rest = require('rest');
+var mime = require('rest/interceptor/mime');
+
 const DOWNLOAD_URL = 'http://' + window.location.host + '/rest/download';
 // Note SockJsClient uses 'http' protocol not 'ws'
 // See https://github.com/lahsivjar/react-stomp/blob/HEAD/API/
@@ -52,51 +55,12 @@ const Styles = styled.div `
 // Table columns
 const columns = [
 	{
-		Header: 'Job Info',
-		columns: [
-			{
-				Header: 'Id',
-				accessor: 'id',
-			},
-			{
-				Header: 'Name',
-				accessor: 'name',
-			},
-		],
+		Header: 'Name',
+		accessor: 'name',
 	},
 	{
-		Header: 'Status',
-		columns: [
-			{
-				Header: 'Local Start Time',
-				accessor: 'submission_time',
-			},
-			{
-				Header: 'Last Change',
-				accessor: 'now',
-			},
-			{
-				Header: 'Previous',
-				accessor: 'previous_status',
-			},
-			{
-				Header: 'Current',
-				accessor: 'status',
-			},
-		],
-	},
-	{
-		Header: 'Output',
-		columns: [
-			{
-				Header: 'CSV',
-				accessor: 'csv',
-			},
-			{
-				Header: 'XLS',
-				accessor: 'xls',
-			},
-		],
+		Header: 'Size',
+		accessor: 'size',
 	},
 ]
 
@@ -140,86 +104,71 @@ function Table({ columns, data }) {
 	  )
 }
 
-// Format Java timestamp in milliseconds
-function myISO8601(longStr) {
-	var dateObj = new Date(Number(longStr));
-	return dateObj.toISOString().replace('T',' ').split('.')[0];
-}
-
-class Jobs extends Component {
+class Sizes extends Component {
     constructor(props) {
         super(props);
         this.state = {
-    		jobs: []
+    		data: []
         };
         this.handleData = this.handleData.bind(this);
     }
     
-    handleData(message) {
-    	//console.log(message);
+    handleData(message){
+    	// message is just a nudge to make REST call
+        this.getData();
+    }
+    
+    getData(){
+        setImmediate(() => {
+	    	var client = rest.wrap(mime);
+	    	var self = this;
+	    	
+	    	client({path:'/rest/mapSizes'}).then(
+	    			function(response) {
+	        	var sizesResponse = response.entity.sizes;
+	        	
+	        	var newData = [];
+	        	
+	        	for (var i = 0; i < sizesResponse.length; i++) {
+	        		
+	        		var size_name = sizesResponse[i].name;
+	        		var size_size = sizesResponse[i].size;
+	        				        	
+	        		var datum = {
+	        				name: size_name,
+	        				size: size_size,
+	        		};
+	        		
+	        		newData.push(datum);
+	        	}
+	        	
+	        	self.setState({
+	        			data: update(self.state.data, {$set: newData}) 
+	        			});
+	        	
+	    	});
+        })
+      }
 
-    	let notAvailable = <div><i>"N/a"</i></div>;
-    	var nowStr = myISO8601(message.now);
-    	var jobKey = message.job.name.split('$')[0];
-    	var outputKey = message.job.name.split('$')[1];
-    	var submissionTimeStr = myISO8601(message.job.submission_time);
-    	var csv = notAvailable;
-    	var xls = notAvailable;
-    	if (jobKey == 'CvaStpJob' && message.job.status == 'COMPLETED') {
-    		var csvUrl = "/rest/download/cva_csv?key=" + outputKey;
-    		var xlsUrl = "/rest/download/cva_xlsx?key=" + outputKey;
-    		csv = <a href={csvUrl} download>Download</a>;
-    		xls = <a href={xlsUrl} download>Download</a>;
-    	}
-
-        var job = {
-        		id: message.job.id,
-        		name: message.job.name,
-        		submission_time: submissionTimeStr,
-        		now: nowStr,
-        		previous_status: message.previous_status,
-        		status: message.job.status,
-        		csv: csv,
-        		xls: xls,
-        		output_key: outputKey,
-        };
-
-        // Append or replace
-    	var jobs = this.state.jobs;
-    	var row = -1;
-    	for (var i = 0; i < jobs.length; i++) { 
-    	    if (jobs[i].id == job.id) {
-    	    	row = i;
-    	    }
-    	}
-    	if (row < 0) {
-    		this.setState({
-    			jobs: update(this.state.jobs, {$push: [job]}) 
-    		})
-    	} else {
-    		if (this.state.jobs[row].status != job.status) {
-        		this.setState({
-        			jobs: update(this.state.jobs, {[row] : {$set: job}}) 
-        		})
-    		}
-    	}
+    componentDidMount(){
+        this.getData();
     }
     
     render() {
         return (
         	<div>
+    		    <h2>Map Sizes</h2>
         		<SockJsClient 
                 	url={WS_URL}
         			topics={WS_TOPICS}
         			onMessage={this.handleData}
         			debug={false} />
-        		<h2>Jet Jobs</h2>
         	    <Styles>
-        	      <Table columns={columns} data={this.state.jobs} />
+        	      <Table columns={columns} data={this.state.data} />
         	    </Styles>
             </div>
         );
     }
 }
 
-export default Jobs;
+export default Sizes;

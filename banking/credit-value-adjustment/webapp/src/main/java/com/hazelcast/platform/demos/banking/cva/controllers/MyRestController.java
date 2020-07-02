@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -54,6 +55,7 @@ import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.Job;
 import com.hazelcast.map.IMap;
 import com.hazelcast.platform.demos.banking.cva.MyConstants;
+import com.hazelcast.platform.demos.banking.cva.MyProperties;
 import com.hazelcast.platform.demos.banking.cva.cvastp.CvaStpJobSubmitter;
 
 /**
@@ -71,6 +73,8 @@ public class MyRestController {
     private HazelcastInstance hazelcastInstance;
     @Autowired
     private JetInstance jetInstance;
+    @Autowired
+    private MyProperties myProperties;
 
     /**
      * <p>List the keys of the counterparty CDS map.
@@ -260,7 +264,6 @@ public class MyRestController {
     public String availableDownloads(HttpServletRequest httpServletRequest) {
         LOGGER.info("availableDownloads()");
 
-        //TODO Validate if these are correct for Kubernetes
         String host = httpServletRequest.getServerName();
         int port = httpServletRequest.getServerPort();
 
@@ -406,4 +409,96 @@ public class MyRestController {
             return map.get(key).toString();
         }
     }
+
+    /**
+     * <p>Provide a URL for Kubernetes to test the client is alive.
+     * </p>
+     *
+     * @return Any String, doesn't matter, so why not the build timestamp.
+     */
+    @GetMapping(value = "/k8s")
+    public String k8s() {
+        LOGGER.trace("k8s()");
+        return myProperties.getBuildTimestamp();
+    }
+
+    /**
+     * <p>Return the size of the important maps, also available in Management
+     * Center, but to help prove Data Loader and/or WAN replication.
+     * </p>
+     *
+     * @return
+     */
+    @GetMapping(value = "/mapSizes", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String mapSizes() {
+        LOGGER.trace("mapSizes()");
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("{ \"sizes\": [");
+
+        // Alphabetical order
+        Set<String> mapNames = new TreeSet<>(MyConstants.IMAP_NAMES);
+        // "data" map is internal, used as basis to build CSV and XLSX
+        mapNames.remove(MyConstants.IMAP_NAME_CVA_DATA);
+        int count = 0;
+        for (String mapName : mapNames) {
+            int size = this.hazelcastInstance.getMap(mapName).size();
+            stringBuilder.append("{ \"name\": \"" + mapName + "\", \"size\": " + size + " }");
+            count++;
+            if (count < mapNames.size()) {
+                stringBuilder.append(", ");
+            }
+        }
+
+        stringBuilder.append("] }");
+        return stringBuilder.toString();
+    }
+
+    /**
+     * <p>Map keys for download in JSON format, reverse collating sequence.
+     * </p>
+     *
+     * @return
+     */
+    @GetMapping(value = "/mapKeysForDownload", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String mapKeysForDownload() {
+        LOGGER.trace("mapKeysForDownload()");
+
+        // Keys for CSV
+        IMap<?, ?> csvMap = this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_CVA_CSV);
+        TreeSet<String> keyNamesCsv = csvMap.keySet()
+        .stream()
+        .map(key -> key.toString() + ",.csv")
+        .collect(Collectors.toCollection(TreeSet::new));
+
+        // Keys for XLSX
+        IMap<?, ?> xlsxMap = this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_CVA_XLSX);
+        TreeSet<String> keyNamesXlsx = xlsxMap.keySet()
+        .stream()
+        .map(key -> key.toString() + ",.xlsx")
+        .collect(Collectors.toCollection(TreeSet::new));
+
+        // Combined keys
+        TreeSet<String> keyNames = new TreeSet<>(keyNamesCsv);
+        keyNames.addAll(keyNamesXlsx);
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("{ \"downloads\": [");
+
+        // Most recent first
+        int count = 0;
+        for (String key : keyNames.descendingSet()) {
+            String[] tokens = key.split(",");
+            stringBuilder.append("{ \"date\": \"" + tokens[0] + "\", ");
+            stringBuilder.append("\"kind\": \"" + tokens[1] + "\" }");
+            count++;
+            if (count < keyNames.size()) {
+                stringBuilder.append(", ");
+            }
+        }
+
+        stringBuilder.append("] }");
+        return stringBuilder.toString();
+    }
+
 }

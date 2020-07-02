@@ -30,15 +30,16 @@ import com.hazelcast.spi.discovery.DiscoveryStrategy;
 import com.hazelcast.spi.discovery.DiscoveryStrategyFactory;
 
 /**
- * <p>A factory to create {@link MyWantDiscoveryStrategy} instances,
- * but in fact always return a singleton Spring {@code @Bean}.
+ * <p>A factory to create {@link MyLocalWantDiscoveryStrategy} instances,
+ * or in principal other types of discovery strategies for WAN.
+ * In fact always return a singleton Spring {@code @Bean}.
  * </p>
  */
 @Component
 public class MyWANDiscoveryStrategyFactory implements DiscoveryStrategyFactory {
 
     @Autowired
-    private MyWANDiscoveryStrategy myDiscoveryStrategy;
+    private MyLocalWANDiscoveryStrategy myLocalDiscoveryStrategy;
 
     /**
      * <p>Not currently configurable.
@@ -55,7 +56,7 @@ public class MyWANDiscoveryStrategyFactory implements DiscoveryStrategyFactory {
      */
     @Override
     public Class<? extends DiscoveryStrategy> getDiscoveryStrategyType() {
-        return MyWANDiscoveryStrategy.class;
+        return MyLocalWANDiscoveryStrategy.class;
     }
 
     /**
@@ -66,7 +67,7 @@ public class MyWANDiscoveryStrategyFactory implements DiscoveryStrategyFactory {
     @Override
     public DiscoveryStrategy newDiscoveryStrategy(DiscoveryNode discoveryNode, ILogger logger,
             Map<String, Comparable> properties) {
-        return this.myDiscoveryStrategy;
+        return this.myLocalDiscoveryStrategy;
     }
 
 }
