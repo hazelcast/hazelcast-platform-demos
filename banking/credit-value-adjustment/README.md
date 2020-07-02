@@ -1,5 +1,7 @@
 # Hazelcast Platform Demo Applications - Banking - Credit Value Adjustment
 
+[Screenshot01]: src/site/markdown/images/screenshot01.png "Image screenshot01.png"
+
 This example is "_straight-through processing_" of Risk, and uses commercial Hazelcast features.
 
 You will need a Jet Enterprise license.
@@ -258,29 +260,110 @@ Start the following commands, located in `src/main/scripts`
 * *docker-hazelcast-node-site1.sh*
 * *docker-data-loader.sh 100*
 * *docker-webapp.sh*
+* *docker-management-center.sh*
 
 This is essentially the same sequence but different script names as for running on localhost.
 The difference is that "`docker-grafana.sh`" is needed so a Grafana server is running, as
-stats are captured for containerized environments.
+stats are captured for containerized environments. Also "`docker-management-center.sh`"
+is added, here at the end, but it can be anywhere in the sequence.
 
 This uses Docker networking, so be sure to use `docker container prune` to release resources
 prior to each run.
 
-The web UI is available as http://localhost:8081/. Internally it uses and logs port 8080, but
+The Web UI is available as http://localhost:8081/. Internally it uses and logs port 8080, but
 externally this is mapped to port 8081. This is to allow you to run other applications on
 port 8080, such as the Management Center.
 
 Grafana is available http://localhost:80/. Log in with user "_admin_", password "_admin_". In
 the top menu, select the "_CVA Map Stats_" dashboard.
 
-TODO - MANCENTER pre-config
+### Running -- Docker -- Management Center
+
+There are two options for running the Management Center in Docker.
+
+You can take the official image from the Docker hub, https://hub.docker.com/r/hazelcast/management-center/
+being careful to take the version at the top of [this file](./management-center/Dockerfile), and
+then run it as a Docker image. This is unconfigured, so you need to set up a user and password,
+and add connections to "_site1_" and "_site2_".
+
+Alternatively, the script "`docker-management-center.sh`" runs a pre-configured Management
+Center, but it is pre-configured for Kubernetes not for Docker. This is pre-configured with
+the user "_admin_" and password "_password1_", and with connections for "_site1_" and "_site2_"
+that need amended.
+
+In either case you need to find your host machine's IP address. A command such as 
+"`ifconfig | grep -w inet`" provides the network IPs, but you need to ignore localhost.
+
+So if your IP 192.168.1.2, the connection for "_site1_" is "_192.168.1.2:5701_", the
+connection for "_site2_" is "_192.168.1.2:6701_".
+
+*Note* the password in pre-configured Management Center is different from pre-configured Grafana,
+as Management Center has stricter rules for allowable passwords. However, neither are production
+strength, and you shouldn't put them on public Github repositories either. This is just an
+example, not a practice to copy.
 
 ## Running -- Kubernetes
 
-Kubernetes is rather more complicated, as it is a full enterprise-grade product. However, the steps
+Kubernetes is slightly more complicated, as it is a full enterprise-grade product. However, the steps
 are much the same.
 
-TODO - YAML
+### Running -- Kubernetes -- YAML
+
+In `src/main/scripts` there are YAML files for potential customization and then use.
+
+The scripts `kubernetes-cva-cpp.yaml`, `kubernetes-hazelcast-node-site1.yaml` and `kubernetes-hazelcast-node-site2.yaml`
+are for stateful sets. All are set as 2, the minimum reasonable stateful set size. If you have sufficient hardware,
+you can scale up and run time for processing will go down. 
+
+The scripts `kubernetes-data-loader-site1.yaml` and `kubernetes-data-loader-site2.yaml` have this line:
+
+```
+          - name: "MY_THRESHOLD"
+            value: "500"
+```
+
+This is the threshold for the amount of data loaded. Here it would mean 500 curves and 500 trades is the limit, making
+500 * 500 = 250,000 calculations to be run. You can reduce the number or increase the number to vary the run time.
+
+### Running -- Kubernetes -- Sequence
+
+Three sets of Kubenetes deployments will set up the CVA example.
+
+First, Grafana, C++, independent of each other. 
+
+```
+kubectl create -f kubernetes-grafana.yaml -f kubernetes-cva-cpp.yaml
+```
+
+Second, the two Hazelcast clusters.
+
+```
+kubectl create -f kubernetes-hazelcast-node-site1.yaml -f kubernetes-hazelcast-node-site2.yaml
+```
+
+Lastly, the data loader for one of the two clusters, the web UI for both of the two clusters, and the Management Center.
+Because of WAN replication, data loaded into one cluster will be replicated into the second.
+
+```
+kubectl create -f kubernetes-data-loader-site1.yaml -f kubernetes-webapp-site1.yaml -f kubernetes-webapp-site2.yaml  -f kubernetes-management-center.yaml
+```
+## Running -- Start Processing
+
+Viewing the web UI in a browser, for example for "_site1_":
+
+![Image of Hazelcast site 1 UI][Screenshot01] 
+
+This shows four tables.
+
+The Fixings table has a "Submit" button to launch the processing job.
+
+The Map Sizes table shows the data stored in Hazelcast maps, the data loaded as input, and any output from job
+runs.
+
+The Downloads table shows results available for download, with links to do so. There will be no results before
+a job completes.
+
+The Jet Jobs table shows which processing jobs are running or have completed.
 
 ## Running -- Expected Output
 
