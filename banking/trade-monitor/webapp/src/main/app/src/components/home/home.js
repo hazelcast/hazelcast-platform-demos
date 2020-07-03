@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Websocket from "react-websocket";
 import ReactTable from "react-table";
 import "react-table/react-table.css";
+import detectBrowserLanguage from 'detect-browser-language';
 
 import Page from "../Page";
 import Pagination from "../Pagination";
@@ -13,12 +14,17 @@ class Home extends Component {
         super(props);
         this.state = {
             symbols: [],
-            expanded: {}
+            expanded: {},
+            browserLanguage: "en"
         };
 
         this.sendMessage = this.sendMessage.bind(this);
         this.handleData = this.handleData.bind(this);
         this.onOpen = this.onOpen.bind(this);
+    }
+
+    componentDidMount(){
+        this.setState({browserLanguage: detectBrowserLanguage()})
     }
 
     sendMessage(message) {
@@ -65,7 +71,7 @@ class Home extends Component {
                     width: 300,
                     Cell: ({ value, columnProps: { className } }) => (
                         <span className={`Table-highlightValue Table-price ${className}`}>
-                        {(value / 100).toLocaleString("en-US", {
+                        {(value / 100).toLocaleString(this.state.browserLanguage, {
                             style: "currency",
                             currency: "USD"
                         })}
