@@ -34,6 +34,8 @@ import io.grpc.ManagedChannelBuilder;
  */
 public class CvaStpUtils {
 
+    private static final double FIVE_ATTEMPTS = 5d;
+
     /**
      * <p>
      * A join clause for the cartesian product.
@@ -237,7 +239,7 @@ public class CvaStpUtils {
 
         // May retries for each RPC
         Map<String, Object> retryPolicy = new HashMap<>();
-        retryPolicy.put("maxAttempts", Double.valueOf(2));
+        retryPolicy.put("maxAttempts", Double.valueOf(FIVE_ATTEMPTS));
         retryPolicy.put("initialBackoff", "0.2s");
         retryPolicy.put("maxBackoff", "10s");
         retryPolicy.put("backoffMultiplier", Double.valueOf(2));
@@ -245,13 +247,13 @@ public class CvaStpUtils {
 
         Map<String, Object> methodConfig = new HashMap<>();
         Map<String, Object> name = new HashMap<>();
-        name.put("service", "cpp-service");
+        name.put("service", "com_hazelcast_platform_demos_banking_cva.JetToCpp");
+        name.put("method", "streamingCall");
 
         methodConfig.put("name", List.of(name));
         methodConfig.put("retryPolicy", retryPolicy);
 
         Map<String, Object> serviceConfig = new HashMap<>();
-        serviceConfig.put("loadBalancingPolicy", "round_robin");
         serviceConfig.put("methodConfig", List.of(methodConfig));
 
         managedChannelBuilder.defaultServiceConfig(serviceConfig);
