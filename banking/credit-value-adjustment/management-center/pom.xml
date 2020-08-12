@@ -22,6 +22,10 @@
 		<my.mc.admin.user>admin</my.mc.admin.user>
 		<my.mc.admin.password>password1</my.mc.admin.password>
 		<my.mc.license.key>${my.jet.license.key}</my.mc.license.key>
+                <my.mc.cluster1.name>${my.cluster1.name}</my.mc.cluster1.name>
+                <my.mc.cluster1.addresslist>${my.cluster1.name}-service.default.svc.cluster.local</my.mc.cluster1.addresslist>
+                <my.mc.cluster2.name>${my.cluster2.name}</my.mc.cluster2.name>
+                <my.mc.cluster2.addresslist>${m:y.cluster2.name}-service.default.svc.cluster.local</my.mc.cluster2.addresslist>
 	</properties>
 
 	<build>

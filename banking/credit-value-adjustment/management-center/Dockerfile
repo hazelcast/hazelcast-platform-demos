@@ -1,20 +1,34 @@
-FROM hazelcast/management-center:4.1-ALPHA-3
-
-# Java 11
-RUN java --version
+FROM hazelcast/management-center:4.2020.08
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MC_LICENSE
 ARG MC_ADMINUSER
 ARG MC_ADMINPASSWORD
+ARG MC_CLUSTER1_NAME
+ARG MC_CLUSTER1_ADDRESSLIST
+ARG MC_CLUSTER2_NAME
+ARG MC_CLUSTER2_ADDRESSLIST
 
 # To check health, uses port 8081 but internal URL. Preconfigure license, logon/password.
 ENV JAVA_OPTS="-Dhazelcast.mc.healthCheck.enable=true \
- -DMC_ADMIN_USER=$MC_ADMINUSER \
- -DMC_ADMIN_PASSWORD=$MC_ADMINPASSWORD \
- -Dhazelcast.mc.license=$MC_LICENSE "
+ -Dhazelcast.mc.prometheusExporter.enabled=true \
+ -Dhazelcast.mc.license=$MC_LICENSE"
 
-# To use the pre-configured data directory into the image, for config connections
-COPY src/main/resources/data 	/data
+# Used by /mc-start.sh to create admin user
+ENV MC_ADMIN_USER=$MC_ADMINUSER
+ENV MC_ADMIN_PASSWORD=$MC_ADMINPASSWORD
 
-CMD ["bash", "/mc-start.sh"]
+# Preconfigure cluster connections
+ENV MC_CLUSTER1_NAME=$MC_CLUSTER1_NAME
+ENV MC_CLUSTER1_ADDRESSLIST=$MC_CLUSTER1_ADDRESSLIST
+ENV MC_CLUSTER2_NAME=$MC_CLUSTER2_NAME
+ENV MC_CLUSTER2_ADDRESSLIST=$MC_CLUSTER2_ADDRESSLIST
+
+# Start Management Center
+CMD ["bash", "-c", "set -euo pipefail \
+      && echo ./mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_ADDRESSLIST} \
+      && ./mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_ADDRESSLIST} \
+      && echo ./mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER2_NAME} --member-addresses=${MC_CLUSTER2_ADDRESSLIST} \
+      && ./mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER2_NAME} --member-addresses=${MC_CLUSTER2_ADDRESSLIST} \
+      && /mc-start.sh \
+     "]
