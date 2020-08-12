@@ -333,6 +333,11 @@
 							<MC_ADMINUSER>${my.mc.admin.user}</MC_ADMINUSER>
 							<MC_ADMINPASSWORD>${my.mc.admin.password}</MC_ADMINPASSWORD>
 							<MC_LICENSE>${my.mc.license.key}</MC_LICENSE>
+							<!-- Preconfigured connections -->
+							<MC_CLUSTER1_NAME>${my.mc.cluster1.name}</MC_CLUSTER1_NAME>
+							<MC_CLUSTER1_ADDRESSLIST>${my.mc.cluster1.addresslist}</MC_CLUSTER1_ADDRESSLIST>
+							<MC_CLUSTER2_NAME>${my.mc.cluster2.name}</MC_CLUSTER2_NAME>
+							<MC_CLUSTER2_ADDRESSLIST>${my.mc.cluster2.addresslist}</MC_CLUSTER2_ADDRESSLIST>
 						</buildArgs>
 						<dockerfile>Dockerfile</dockerfile>
 						<pullNewerImage>false</pullNewerImage>
