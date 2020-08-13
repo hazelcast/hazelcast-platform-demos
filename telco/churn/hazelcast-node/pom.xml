@@ -1,0 +1,83 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+        <parent>
+                <groupId>com.hazelcast.platform.demos.telco.churn</groupId>
+                <artifactId>churn-root</artifactId>
+                <version>4.0</version>
+        </parent>
+
+	<artifactId>churn-hazelcast-node</artifactId>
+
+	<name>Hazelcast Platform - Churn - Hazelcast Node</name>
+	<description>Telco Churn - Hazelcast Node</description>
+
+	<properties>
+		<docker.image.name>hazelcast-node</docker.image.name>
+		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
+		<my.cluster.name>${my.cluster1.name}</my.cluster.name>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>churn-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet-enterprise</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-kubernetes</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.jet.contrib</groupId>
+			<artifactId>hazelcast-jet-spring-boot-starter</artifactId>
+			<exclusions>
+				<exclusion>
+					<!-- Exclude in favour of hazelcast-jet-enterprise -->
+					<groupId>com.hazelcast.jet</groupId>
+					<artifactId>hazelcast-jet</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+
+		<!--
+		<dependency>
+			<groupId>org.apache.kafka</groupId>
+			<artifactId>kafka-clients</artifactId>
+		</dependency>
+		-->
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>dockerfile-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

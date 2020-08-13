@@ -1,0 +1,102 @@
+---
+# Service DNS for Management Center will be "mancenter-service.default.svc.cluster.local".
+# Service DNS for Hazelcast grid will be "sanmateo-service.default.svc.cluster.local".
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$ SERVICE DEFINITIONS $$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Service for Management Center
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: management-center-service
+spec:
+  selector:
+    app: churn-management-center
+  ports:
+    - name: management-center
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer
+---
+# Service for Hazelcast grid
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sanmateo-service
+spec:
+  clusterIP: None
+  selector:
+    app: churn-hazelcast-node
+  ports:
+  - port: 5701
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$ POD DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Pods for Management Center, only need one
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churn-management-center
+spec:
+  selector:
+    matchLabels:
+      app: churn-management-center
+  template:
+    metadata:
+      labels:
+        app: churn-management-center
+    spec:
+      containers:
+        - image: "hazelcast-churn/management-center"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+          name: mancenter-container
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 30
+---
+# Pods for Hazelcast grid, a stateful set sized at two
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: churn-hazelcast-node
+spec:
+  replicas: 2
+  serviceName: sanmateo-hazelcast-node-service
+  selector:
+    matchLabels:
+      app: churn-hazelcast-node
+  template:
+    metadata:
+      labels:
+        app: churn-hazelcast-node
+    spec:
+      containers:
+        - env:
+          - name: "MY_BOOTSTRAP_SERVERS"
+            value: "churn-kafka-broker-0.churn-kafka-broker-service.default.svc.cluster.local:9092,churn-kafka-broker-1.churn-kafka-broker-service.default.svc.cluster.local:9092,churn-kafka-broker-2.churn-kafka-broker-service.default.svc.cluster.local:9092"
+          image: "hazelcast-churn/hazelcast-node"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /hazelcast/health/node-state
+              port: 5701
+          name: hazelcast-node-container
+          readinessProbe:
+            httpGet:
+              path: /hazelcast/health/ready
+              port: 5701
+            initialDelaySeconds: 30
