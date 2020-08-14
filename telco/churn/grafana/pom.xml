@@ -1,0 +1,51 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hazelcast.platform.demos.telco.churn</groupId>
+		<artifactId>churn-root</artifactId>
+		<version>4.0</version>
+	</parent>
+
+	<artifactId>churn-grafana</artifactId>
+
+	<name>Hazelcast Platform - Churn - Grafana</name>
+	<description>Telco Churn - Re-package Grafana</description>
+
+	<properties>
+		<docker.image.name>grafana</docker.image.name>
+		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
+
+		<!-- Pre-configure the build image -->
+		<my.grafana.admin.user>${my.churn.admin.user}</my.grafana.admin.user>
+		<my.grafana.admin.password>${my.churn.admin.password}</my.grafana.admin.password>
+	</properties>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>dockerfile-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<configuration>
+					<target>
+						<echo message="=============================================================" />
+						<echo message="Setting '${my.churn.admin.user}' password '${my.churn.admin.password}'"/>
+						<echo message="=============================================================" />
+					</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

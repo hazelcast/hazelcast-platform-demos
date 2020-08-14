@@ -1,5 +1,5 @@
 ---
-# Service DNS for Management Center will be "mancenter-service.default.svc.cluster.local".
+# Service DNS for Management Center will be "management-center-service.default.svc.cluster.local".
 # Service DNS for Hazelcast grid will be "sanmateo-service.default.svc.cluster.local".
 ---
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$

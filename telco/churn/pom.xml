@@ -25,13 +25,15 @@
 		<!-- Common logons for Management Center, Grafana, Prometheus -->
 		<my.churn.admin.user>admin</my.churn.admin.user>
 		<my.churn.admin.password>password1</my.churn.admin.password>
+
+		<!-- So Grafana can find Prometheus service, must match K8S YAML -->
+		<my.prometheus.name>prometheus</my.prometheus.name>
+		<my.prometheus.port>9090</my.prometheus.port>
 	</properties>
 
 	<modules>
 		<module>common</module>
-		<!--
 		<module>grafana</module>
-		-->
 		<module>hazelcast-node</module>
 		<module>management-center</module>
 		<module>prometheus</module>

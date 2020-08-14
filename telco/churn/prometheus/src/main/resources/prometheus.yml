@@ -5,4 +5,4 @@ global:
 scrape_configs:
   - job_name: 'HZ MC'
     static_configs:
-    - targets: ['mancenter-service.default.svc.cluster.local:8080'] 
+    - targets: ['management-center-service.default.svc.cluster.local:8080'] 
