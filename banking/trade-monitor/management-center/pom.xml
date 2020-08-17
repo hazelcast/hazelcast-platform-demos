@@ -1,18 +1,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+        <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>com.hazelcast.platform.demos.banking.cva</groupId>
-		<artifactId>cva-root</artifactId>
-		<version>4.0</version>
-	</parent>
+        <parent>
+                <groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
+                <artifactId>trade-monitor-root</artifactId>
+                <version>4.0</version>
+        </parent>
 
-	<artifactId>cva-management-center</artifactId>
-
-	<name>Hazelcast Platform - CVA - Management Center</name>
-	<description>Credit Value Adjustment - Hazelcast Management Center</description>
+        <artifactId>trade-monitor-management-center</artifactId>
+        <name>Hazelcast Platform - Trade Monitor - Management Center</name>
+        <description>Trade Monitor - Management Center</description>
 
 	<properties>
 		<docker.image.name>management-center</docker.image.name>
@@ -22,10 +21,9 @@
 		<my.mc.admin.user>admin</my.mc.admin.user>
 		<my.mc.admin.password>password1</my.mc.admin.password>
 		<my.mc.license.key>${my.jet.license.key}</my.mc.license.key>
-                <my.mc.cluster1.name>${my.cluster1.name}</my.mc.cluster1.name>
-                <my.mc.cluster1.addresslist>${my.cluster1.name}-service.default.svc.cluster.local</my.mc.cluster1.addresslist>
-                <my.mc.cluster2.name>${my.cluster2.name}</my.mc.cluster2.name>
-                <my.mc.cluster2.addresslist>${my.cluster2.name}-service.default.svc.cluster.local</my.mc.cluster2.addresslist>
+                <my.mc.cluster1.name>${my.cluster.name}</my.mc.cluster1.name>
+                <my.mc.cluster1.addresslist>${my.cluster.name}-service.default.svc.cluster.local</my.mc.cluster1.addresslist>
+
 	</properties>
 
 	<build>
