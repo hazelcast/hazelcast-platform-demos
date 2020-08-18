@@ -17,10 +17,6 @@
 	<properties>
 		<docker.image.name>prometheus</docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
-
-		<!-- Pre-configure the build image -->
-		<my.prometheus.admin.user>${my.churn.admin.user}</my.prometheus.admin.user>
-		<my.prometheus.admin.password>${my.churn.admin.password}</my.prometheus.admin.password>
 	</properties>
 
 	<build>
@@ -35,16 +31,6 @@
 			<plugin>
 				<groupId>com.spotify</groupId>
 				<artifactId>dockerfile-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<configuration>
-					<target>
-						<echo message="=============================================================" />
-						<echo message="Setting '${my.churn.admin.user}' password '${my.churn.admin.password}'"/>
-						<echo message="=============================================================" />
-					</target>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>

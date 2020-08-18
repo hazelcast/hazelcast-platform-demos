@@ -19,11 +19,12 @@
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 
 		<!-- Pre-configure the build image -->
-		<my.grafana.admin.user>${my.churn.admin.user}</my.grafana.admin.user>
-		<my.grafana.admin.password>${my.churn.admin.password}</my.grafana.admin.password>
+		<my.other.admin.user>${my.churn.admin.user}</my.other.admin.user>
+		<my.other.admin.password>${my.churn.admin.password}</my.other.admin.password>
 	</properties>
 
 	<build>
+		<!-- For datasource -->
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>

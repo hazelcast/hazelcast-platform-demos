@@ -1,0 +1,82 @@
+---
+# Service DNS for Prometheus will be "prometheus-service.default.svc.cluster.local".
+# Service DNS for Grafana will be "grafana-service.default.svc.cluster.local".
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$ SERVICE DEFINITIONS $$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Service for Prometheus
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-service
+spec:
+  selector:
+    app: churn-prometheus
+  ports:
+    - name: prometheus
+      port: 9090
+      targetPort: 9090
+  type: LoadBalancer
+---
+# Service for Grafana
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-service
+spec:
+  selector:
+    app: churn-grafana
+  ports:
+    - name: grafana
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$ POD DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Pods for Prometheus, only need one
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churn-prometheus
+spec:
+  selector:
+    matchLabels:
+      app: churn-prometheus
+  template:
+    metadata:
+      labels:
+        app: churn-prometheus
+    spec:
+      containers:
+        - image: "hazelcast-churn/prometheus"
+          imagePullPolicy: Never
+          name: prometheus-container
+---
+# Pods for Grafana, only need one
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churn-grafana
+spec:
+  selector:
+    matchLabels:
+      app: churn-grafana
+  template:
+    metadata:
+      labels:
+        app: churn-grafana
+    spec:
+      containers:
+        - image: "hazelcast-churn/grafana"
+          imagePullPolicy: Never
+          name: grafana-container
+---
