@@ -31,11 +31,11 @@
 		<!-- Version dependencies - ${project.version} should track Hazelcast version -->
 		<java-annotation.version>1.3.2</java-annotation.version>
 		<guava.version>29.0-jre</guava.version>
-		<grpc.version>1.30.2</grpc.version>
+		<grpc.version>1.31.0</grpc.version>
 		<hazelcast.version>4.0.1</hazelcast.version>
-		<hazelcast-jet.version>4.1.1</hazelcast-jet.version>
+		<hazelcast-jet.version>4.2</hazelcast-jet.version>
 		<hazelcast-jet-spring-boot-starter.version>2.0.0</hazelcast-jet-spring-boot-starter.version>
-		<hazelcast-kubernetes.version>2.0.1</hazelcast-kubernetes.version>
+		<hazelcast-kubernetes.version>2.0.2</hazelcast-kubernetes.version>
 		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
 		<jackson.version>2.10.2</jackson.version>
 		<json.version>20190722</json.version>
@@ -43,8 +43,8 @@
 		<jython.version>2.7.2rc1</jython.version>
 		<kafka-clients.version>2.4.0</kafka-clients.version>
 		<poi-ooxml.version>4.1.2</poi-ooxml.version>
-		<protobuf.version>3.12.2</protobuf.version>
-		<spring-boot.version>2.3.1.RELEASE</spring-boot.version>
+		<protobuf.version>3.12.4</protobuf.version>
+		<spring-boot.version>2.3.2.RELEASE</spring-boot.version>
 		<springfox-swagger.version>2.9.2</springfox-swagger.version>
 
 		<!-- Plugins -->
@@ -195,7 +195,6 @@
 			<url>https://repository.hazelcast.com/release/</url>
 			<releases>
 				<enabled>true</enabled>
-				<updatePolicy>interval:720</updatePolicy>
 			</releases>
 			<snapshots>
 				<enabled>false</enabled>
@@ -204,17 +203,6 @@
 		<repository>
 			<id>Hazelcast Private Snapshot Repository</id>
 			<url>https://repository.hazelcast.com/snapshot/</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>interval:720</updatePolicy>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>Public Release Repository</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 			<releases>
 				<enabled>false</enabled>
 			</releases>
@@ -344,6 +332,11 @@
 							<MC_ADMINUSER>${my.mc.admin.user}</MC_ADMINUSER>
 							<MC_ADMINPASSWORD>${my.mc.admin.password}</MC_ADMINPASSWORD>
 							<MC_LICENSE>${my.mc.license.key}</MC_LICENSE>
+							<!-- Preconfigured connections -->
+							<MC_CLUSTER1_NAME>${my.mc.cluster1.name}</MC_CLUSTER1_NAME>
+							<MC_CLUSTER1_ADDRESSLIST>${my.mc.cluster1.addresslist}</MC_CLUSTER1_ADDRESSLIST>
+							<MC_CLUSTER2_NAME>${my.mc.cluster2.name}</MC_CLUSTER2_NAME>
+							<MC_CLUSTER2_ADDRESSLIST>${my.mc.cluster2.addresslist}</MC_CLUSTER2_ADDRESSLIST>
 						</buildArgs>
 						<dockerfile>Dockerfile</dockerfile>
 						<pullNewerImage>false</pullNewerImage>
