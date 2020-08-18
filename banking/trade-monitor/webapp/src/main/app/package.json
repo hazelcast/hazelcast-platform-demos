@@ -9,7 +9,8 @@
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.0.1",
     "react-table": "^6.7.4",
-    "react-websocket": "^2.1.0"
+    "react-websocket": "^2.1.0",
+    "detect-browser-language": "^0.0.2"
   },
   "scripts": {
     "start": "react-scripts start",

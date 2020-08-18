@@ -4,6 +4,7 @@ import Websocket from 'react-websocket';
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';
 import Pagination from '../Pagination';
+import detectBrowserLanguage from 'detect-browser-language';
 
 class SymbolDetails extends Component {
 
@@ -12,12 +13,17 @@ class SymbolDetails extends Component {
         this.state = {
             symbol: [],
             loading: true,
+            browserLanguage: "en"
         };
 
         this.sendMessage = this.sendMessage.bind(this);
         this.handleData = this.handleData.bind(this);
         this.onOpen = this.onOpen.bind(this);
         this.renderPagination = this.renderPagination.bind(this);
+    }
+
+    componentDidMount(){
+        this.setState({browserLanguage: detectBrowserLanguage()})
     }
 
     sendMessage(message) {
@@ -55,7 +61,7 @@ class SymbolDetails extends Component {
                 Header: 'Time',
                 accessor: 'timestamp',
                 Cell: ({ value }) => (
-                    <span className="Table-highlightValue">{new Date(value).toLocaleString("en-US")}</span>
+                    <span className="Table-highlightValue">{new Date(value).toLocaleString(this.state.browserLanguage)}</span>
                 )
             },
             {
