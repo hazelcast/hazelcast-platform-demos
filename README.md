@@ -46,3 +46,13 @@ and apply the value in your build.
 </settings>
 ```
 
+## 3rd Party Software
+
+These demos use the following 3rd party software. Please ensure their licensing models meet your needs.
+
+1. Trade Monitor
+* [Javalin](./banking/trade-monitor/webapp) From https://javalin.io/
+* [Kafdrop](./banking/trade-monitor/kafdrop) From https://github.com/obsidiandynamics/kafdrop
+* [Kafka](./banking/trade-monitor/kafka-broker) From https://kafka.apache.org/
+* [React](./banking/trade-monitor/webapp/src/main/app/package.json) See [package.json](./banking/trade-monitor/webapp/src/main/app/package.json)
+* [Zookeeper](./banking/trade-monitor/zookeeper) From https://zookeeper.apache.org/

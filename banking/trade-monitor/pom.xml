@@ -35,6 +35,7 @@
 		<module>kafka-broker</module>
 		<module>kafdrop</module>
 		<module>topic-create</module>
+		<module>management-center</module>
 	</modules>
 
 	<dependencyManagement>
