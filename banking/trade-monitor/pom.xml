@@ -36,6 +36,8 @@
 		<module>kafdrop</module>
 		<module>topic-create</module>
 		<module>management-center</module>
+		<module>prometheus</module>
+		<module>grafana</module>
 	</modules>
 
 	<dependencyManagement>
