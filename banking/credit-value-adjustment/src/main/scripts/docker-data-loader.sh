@@ -18,7 +18,7 @@ then
  exit 1
 fi
 
-DOCKER_IMAGE=hazelcast-${PROJECT}/${MODULE}
+DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
 CMD="docker run -e MY_KUBERNETES_ENABLED=false -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP} ${DOCKER_IMAGE} $@"
 #echo $CMD

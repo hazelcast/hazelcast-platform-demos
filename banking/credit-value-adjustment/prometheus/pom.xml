@@ -3,24 +3,22 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>com.hazelcast.platform.demos.banking.cva</groupId>
-		<artifactId>cva-root</artifactId>
-		<version>4.0</version>
-	</parent>
+        <parent>
+                <groupId>com.hazelcast.platform.demos.banking.cva</groupId>
+                <artifactId>cva-root</artifactId>
+                <version>4.0</version>
+        </parent>
 
-	<artifactId>cva-grafana</artifactId>
-
-	<name>Hazelcast Platform - CVA - Grafana</name>
-	<description>Credit Value Adjustment - Re-package Grafana</description>
+        <artifactId>cva-prometheus</artifactId>
+        <name>Hazelcast Platform - CVA - Prometheus</name>
+        <description>Credit Value Adjustment - Prometheus</description>
 
 	<properties>
-		<docker.image.name>grafana</docker.image.name>
+		<docker.image.name>prometheus</docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 
 	<build>
-		<!-- For datasource -->
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>

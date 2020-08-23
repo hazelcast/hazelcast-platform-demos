@@ -5,12 +5,12 @@
 # Services
 ############################################################################
 ---
-# Kafdrop : DNS will be "trade-monitor-kafdrop-service.default.svc.cluster.local".
+# Kafdrop : DNS will be "trade-monitor-kafdrop.default.svc.cluster.local".
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: trade-monitor-kafdrop-service
+  name: trade-monitor-kafdrop
 spec:
   selector:
     app: trade-monitor-kafdrop
@@ -19,12 +19,12 @@ spec:
     targetPort: 9000
   type: LoadBalancer
 ---
-# Kafka Broker : DNS will be "trade-monitor-kafka-broker-service.default.svc.cluster.local".
+# Kafka Broker : DNS will be "trade-monitor-kafka-broker.default.svc.cluster.local".
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: trade-monitor-kafka-broker-service
+  name: trade-monitor-kafka-broker
 spec:
   clusterIP: None
   selector:
@@ -32,12 +32,12 @@ spec:
   ports:
   - port: 9092
 ---
-# Zookeeper : DNS will be "trade-monitor-zookeeper-service.default.svc.cluster.local".
+# Zookeeper : DNS will be "trade-monitor-zookeeper.default.svc.cluster.local".
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: trade-monitor-zookeeper-service
+  name: trade-monitor-zookeeper
 spec:
   selector:
     app: trade-monitor-zookeeper
@@ -74,8 +74,8 @@ spec:
       containers:
         - env:
           - name: "KAFKA_BROKERCONNECT"
-            value: "trade-monitor-kafka-broker-0.trade-monitor-kafka-broker-service.default.svc.cluster.local:9092,trade-monitor-kafka-broker-1.trade-monitor-kafka-broker-service.default.svc.cluster.local:9092,trade-monitor-kafka-broker-2.trade-monitor-kafka-broker-service.default.svc.cluster.local:9092"
-          image: "hazelcast-trade-monitor/kafdrop"
+            value: "trade-monitor-kafka-broker-0.trade-monitor-kafka-broker.default.svc.cluster.local:9092,trade-monitor-kafka-broker-1.trade-monitor-kafka-broker.default.svc.cluster.local:9092,trade-monitor-kafka-broker-2.trade-monitor-kafka-broker.default.svc.cluster.local:9092"
+          image: "hazelcast-platform-demos/trade-monitor-kafdrop"
           imagePullPolicy: Never
           livenessProbe:
             httpGet:
@@ -113,7 +113,7 @@ spec:
         - env:
           - name: "ALLOW_ANONYMOUS_LOGIN"
             value: "true"
-          image: "hazelcast-trade-monitor/zookeeper"
+          image: "hazelcast-platform-demos/trade-monitor-zookeeper"
           imagePullPolicy: Never
           name: zookeeper-container
           livenessProbe:
@@ -145,7 +145,7 @@ metadata:
   name: trade-monitor-kafka-broker
 spec:
   replicas: 3
-  serviceName: trade-monitor-kafka-broker-service
+  serviceName: trade-monitor-kafka-broker
   selector:
     matchLabels:
       app: trade-monitor-kafka-broker
@@ -165,7 +165,7 @@ spec:
           - name: "ALLOW_PLAINTEXT_LISTENER"
             value: "true"
           - name: "KAFKA_CFG_ZOOKEEPER_CONNECT"
-            value: "trade-monitor-zookeeper-service.default.svc.cluster.local"
+            value: "trade-monitor-zookeeper.default.svc.cluster.local"
           - name: "MY_POD_IP"
             valueFrom:
               fieldRef:
@@ -175,12 +175,12 @@ spec:
               fieldRef:
                 fieldPath: metadata.name
           - name: "KAFKA_CFG_ADVERTISED_LISTENERS"
-            value: "PLAINTEXT://$(MY_POD_NAME).trade-monitor-kafka-broker-service.default.svc.cluster.local:9092"
+            value: "PLAINTEXT://$(MY_POD_NAME).trade-monitor-kafka-broker.default.svc.cluster.local:9092"
           - name: "POD_NAME"
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
-          image: "hazelcast-trade-monitor/kafka-broker"
+          image: "hazelcast-platform-demos/trade-monitor-kafka-broker"
           imagePullPolicy: Never
           livenessProbe:
             initialDelaySeconds: 10
@@ -207,7 +207,7 @@ kind: Job
 metadata:
   labels:
     app: job-topic-create
-  name: job-topic-create
+  name: job-trade-monitor-topic-create
 spec:
   backoffLimit: 0
   template:
@@ -222,8 +222,8 @@ spec:
       containers:
         - env:
           - name: "MY_ZOOKEEPER"
-            value: "trade-monitor-zookeeper-service.default.svc.cluster.local"
-          image: "hazelcast-trade-monitor/topic-create"
+            value: "trade-monitor-zookeeper.default.svc.cluster.local"
+          image: "hazelcast-platform-demos/trade-monitor-topic-create"
           imagePullPolicy: Never
           name: container-job-topic-create
       restartPolicy: Never

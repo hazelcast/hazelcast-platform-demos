@@ -3,16 +3,16 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>com.hazelcast.platform.demos.banking.cva</groupId>
-		<artifactId>cva-root</artifactId>
-		<version>4.0</version>
-	</parent>
+        <parent>
+                <groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
+                <artifactId>trade-monitor-root</artifactId>
+                <version>4.0</version>
+        </parent>
 
-	<artifactId>cva-grafana</artifactId>
+        <artifactId>trade-monitor-grafana</artifactId>
 
-	<name>Hazelcast Platform - CVA - Grafana</name>
-	<description>Credit Value Adjustment - Re-package Grafana</description>
+        <name>Hazelcast Platform - Trade Monitor - Grafana</name>
+        <description>Trade Monitor - Grafana</description>
 
 	<properties>
 		<docker.image.name>grafana</docker.image.name>

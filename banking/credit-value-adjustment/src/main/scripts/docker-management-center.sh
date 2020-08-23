@@ -18,13 +18,16 @@ then
  exit 1
 fi
 
-DOCKER_IMAGE=hazelcast-${PROJECT}/${MODULE}
+echo '#################################################################################'
+echo '#' Modify cluster config to use ${HOST_IP} and give it a few seconds to refresh
+echo '#################################################################################'
 
-CMD="docker run -e JAVA_ARGS=-Dhazelcast.mc.healthCheck.enable=true -p 8080:8080 ${DOCKER_IMAGE} $@"
+DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
+
+CMD="docker run -e JAVA_ARGS=-Dhazelcast.mc.healthCheck.enable=true -p 8080:8080 ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD
 RC=$?
 echo RC=${RC}
 exit ${RC}
-

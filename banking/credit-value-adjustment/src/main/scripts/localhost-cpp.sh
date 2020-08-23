@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROJECT=cva
-MODULE=cva-cpp
+MODULE=cpp
 
 BASEDIR=`dirname $0`
 cd $BASEDIR/../../../$MODULE

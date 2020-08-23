@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROJECT=cva
-MODULE=cva-cpp
+MODULE=cpp
 
 BASEDIR=`dirname $0`
 cd $BASEDIR/../../../$MODULE
@@ -18,7 +18,7 @@ then
  exit 1
 fi
 
-DOCKER_IMAGE=hazelcast-${PROJECT}/${MODULE}
+DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
 # CPP Server on port 50001
 PORT=50001

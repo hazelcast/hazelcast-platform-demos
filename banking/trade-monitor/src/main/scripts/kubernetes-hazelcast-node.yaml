@@ -1,10 +1,10 @@
 ---
-# Service DNS will be "trade-monitor-service.default.svc.cluster.local".
+# Service DNS will be "trade-monitor-hazelcast.default.svc.cluster.local".
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: trade-monitor-service
+  name: trade-monitor-hazelcast
 spec:
   clusterIP: None
   selector:
@@ -20,7 +20,7 @@ metadata:
   name: trade-monitor-hazelcast-node
 spec:
   replicas: 2
-  serviceName: trade-monitor-hazelcast-node-service
+  serviceName: trade-monitor-hazelcast
   selector:
     matchLabels:
       app: trade-monitor-hazelcast-node
@@ -32,8 +32,8 @@ spec:
       containers:
         - env:
           - name: "MY_BOOTSTRAP_SERVERS"
-            value: "trade-monitor-kafka-broker-0.trade-monitor-kafka-broker-service.default.svc.cluster.local:9092,trade-monitor-kafka-broker-1.trade-monitor-kafka-broker-service.default.svc.cluster.local:9092,trade-monitor-kafka-broker-2.trade-monitor-kafka-broker-service.default.svc.cluster.local:9092"
-          image: "hazelcast-trade-monitor/hazelcast-node"
+            value: "trade-monitor-kafka-broker-0.trade-monitor-kafka-broker.default.svc.cluster.local:9092,trade-monitor-kafka-broker-1.trade-monitor-kafka-broker.default.svc.cluster.local:9092,trade-monitor-kafka-broker-2.trade-monitor-kafka-broker.default.svc.cluster.local:9092"
+          image: "hazelcast-platform-demos/trade-monitor-hazelcast-node"
           imagePullPolicy: Never
           livenessProbe:
             httpGet:

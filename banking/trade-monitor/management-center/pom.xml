@@ -10,6 +10,7 @@
         </parent>
 
         <artifactId>trade-monitor-management-center</artifactId>
+
         <name>Hazelcast Platform - Trade Monitor - Management Center</name>
         <description>Trade Monitor - Management Center</description>
 
@@ -18,11 +19,11 @@
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 
 		<!-- Pre-configure the build image -->
-		<my.mc.admin.user>admin</my.mc.admin.user>
-		<my.mc.admin.password>password1</my.mc.admin.password>
+		<my.mc.admin.user>${my.other.admin.user}</my.mc.admin.user>
+		<my.mc.admin.password>${my.other.admin.password}</my.mc.admin.password>
 		<my.mc.license.key>${my.jet.license.key}</my.mc.license.key>
-                <my.mc.cluster1.name>${my.cluster.name}</my.mc.cluster1.name>
-                <my.mc.cluster1.addresslist>${my.cluster.name}-service.default.svc.cluster.local</my.mc.cluster1.addresslist>
+                <my.mc.cluster1.name>${my.cluster1.name}</my.mc.cluster1.name>
+                <my.mc.cluster1.addresslist>${my.cluster1.name}-hazelcast.default.svc.cluster.local</my.mc.cluster1.addresslist>
 
 	</properties>
 
@@ -31,17 +32,6 @@
 			<plugin>
 				<groupId>com.spotify</groupId>
 				<artifactId>dockerfile-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<configuration>
-					<target>
-						<echo message="=============================================================" />
-						<echo message="Setting $$MC_ADMIN_USER=${my.mc.admin.user}"/>
-						<echo message="Setting $$MC_ADMIN_PASSWORD=${my.mc.admin.password}"/>
-						<echo message="=============================================================" />
-					</target>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
