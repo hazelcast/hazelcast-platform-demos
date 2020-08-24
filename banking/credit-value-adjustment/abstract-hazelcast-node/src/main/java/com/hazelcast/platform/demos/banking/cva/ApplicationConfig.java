@@ -19,6 +19,7 @@ package com.hazelcast.platform.demos.banking.cva;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import com.hazelcast.config.DiscoveryConfig;
 import com.hazelcast.config.DiscoveryStrategyConfig;
@@ -54,10 +55,17 @@ public class ApplicationConfig {
     private MyWANDiscoveryStrategyFactory myDiscoveryStrategyFactory;
 
     public ApplicationConfig(MyProperties myProperties) {
+        LOGGER.info("Runtime.getRuntime().availableProcessors()=={}",
+                Runtime.getRuntime().availableProcessors());
+
         // From Maven, application.yml, wouldn't be in environment by default.
         this.remoteSite = myProperties.getRemoteSite();
         this.site = myProperties.getSite();
         System.setProperty("my.remote.site", this.remoteSite.toString());
+        System.setProperty("my.partitions", String.valueOf(myProperties.getPartitions()));
+        if (myProperties.getPartitions() < 20000) {
+        	LOGGER.error("NEED TO TRY WITH 25057 PARTITIONS");//XXX 
+        }
         System.setProperty("my.site", this.site.toString());
     }
 
@@ -74,8 +82,7 @@ public class ApplicationConfig {
     @Bean
     public JetConfig jetConfig() {
         JetConfig jetConfig = new YamlJetConfigBuilder().build();
-        LOGGER.info("Runtime.getRuntime().availableProcessors()=={}",
-                Runtime.getRuntime().availableProcessors());
+        this.logProperties(jetConfig);
 
         this.adjustNearCacheConfig(jetConfig.getHazelcastConfig().getMapConfigs());
 
@@ -107,6 +114,25 @@ public class ApplicationConfig {
         }
 
         return jetConfig;
+    }
+
+    /**
+     * <p>Log any set or derived properties.
+     * </p>
+     *
+     * @param jetConfig Loaded from Yaml
+     */
+    private void logProperties(JetConfig jetConfig) {
+        Properties properties = jetConfig.getProperties();
+        for (Object propertyKey : properties.keySet()) {
+            LOGGER.info("Property '{}'=='{}'",
+                    propertyKey, properties.get(propertyKey));
+        }
+        properties = jetConfig.getHazelcastConfig().getProperties();
+        for (Object propertyKey : properties.keySet()) {
+            LOGGER.info("Property '{}'=='{}'",
+                    propertyKey, properties.get(propertyKey));
+        }
     }
 
     /**

@@ -48,6 +48,7 @@ public class MyProperties {
     @NotNull
     private Site site;
     private Site remoteSite;
+    private int partitions;
 
     public String getBuildTimestamp() {
         return this.buildTimestamp;
@@ -55,6 +56,13 @@ public class MyProperties {
     public void setBuildTimestamp(String buildTimestamp) {
         this.buildTimestamp = buildTimestamp;
         LOGGER.info("myProperties.buildTimestamp=='{}'", this.buildTimestamp);
+    }
+    public int getPartitions() {
+        return this.partitions;
+    }
+    public void setPartitions(int partitions) {
+        this.partitions = partitions;
+        LOGGER.info("myProperties.partitions=='{}'", this.partitions);
     }
     public Site getRemoteSite() {
         return this.remoteSite;

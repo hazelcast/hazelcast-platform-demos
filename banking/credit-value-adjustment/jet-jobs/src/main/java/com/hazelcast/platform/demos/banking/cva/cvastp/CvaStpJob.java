@@ -333,6 +333,10 @@ public class CvaStpJob {
             String loadBalancer, int port, int batchSize, int parallelism, boolean debug) {
         String timestampStr = MyUtils.timestampToISO8601(timestamp);
         String calcDateStr = CvaStpUtils.escapeQuotes("{\"calc_date\":\"" + calcDate + "\"}");
+        //XXX Experimental
+        LOGGER.error("buildPipeline loadBalancer='{}'", loadBalancer);
+        LOGGER.error("buildPipeline loadBalancer='{}'", loadBalancer);
+        LOGGER.error("buildPipeline loadBalancer='{}'", loadBalancer);
 
         Pipeline pipeline = Pipeline.create();
 

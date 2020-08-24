@@ -5,6 +5,7 @@ hazelcast:
   properties:
     # Graceful shutdown is helpful for Kubernetes scale-down.
     hazelcast.member.naming.moby.enabled: true
+    hazelcast.partition.count: ${my.partitions}
     hazelcast.shutdownhook.policy: GRACEFUL
   #
   # To publish data changes to a remote cluster, the address is added at runtime

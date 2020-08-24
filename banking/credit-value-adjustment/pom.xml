@@ -22,6 +22,8 @@
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
 		<!-- Live, probably -->
 		<my.cluster1.name>site1</my.cluster1.name>
+		<my.cluster1.partitions>25057</my.cluster1.partitions>
+		<my.cluster1.partitions>1999</my.cluster1.partitions>
 		<!-- DR, probably, unless you alternate -->
 		<my.cluster2.name>site2</my.cluster2.name>
 
@@ -33,6 +35,7 @@
                 <my.prometheus.name>${docker.image.prefix}-prometheus</my.prometheus.name>
                 <my.prometheus.port>9090</my.prometheus.port>
                 <my.management.center.name>${docker.image.prefix}-management-center</my.management.center.name>
+		<my.cluster2.partitions>271</my.cluster2.partitions>
 	</properties>
 
 	<modules>
@@ -48,6 +51,7 @@
 		<module>data-loader</module>
 		<module>jet-jobs</module>
 		<module>webapp</module>
+		<module>hazelcast-node-site1-cpp</module>
 	</modules>
 
 	<dependencies>

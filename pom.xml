@@ -33,7 +33,7 @@
 		<guava.version>29.0-jre</guava.version>
 		<grpc.version>1.31.0</grpc.version>
 		<hazelcast.version>4.0.1</hazelcast.version>
-		<hazelcast-jet.version>4.2</hazelcast-jet.version>
+		<hazelcast-jet.version>4.3-SNAPSHOT</hazelcast-jet.version>
 		<hazelcast-jet-spring-boot-starter.version>2.0.0</hazelcast-jet-spring-boot-starter.version>
 		<hazelcast-kubernetes.version>2.0.2</hazelcast-kubernetes.version>
 		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
