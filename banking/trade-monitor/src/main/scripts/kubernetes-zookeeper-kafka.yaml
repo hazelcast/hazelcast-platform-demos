@@ -81,7 +81,7 @@ spec:
             httpGet:
               path: /
               port: 9000
-          name: kafdrop-container
+          name: trade-monitor-kafdrop-container
           ports:
             - containerPort: 9000
           readinessProbe:
@@ -121,7 +121,7 @@ spec:
             periodSeconds: 10
             tcpSocket:
               port: 2181
-          name: zookeeper-container
+          name: trade-monitor-zookeeper-container
           ports:
             - containerPort: 2181
           readinessProbe:
@@ -187,7 +187,7 @@ spec:
             periodSeconds: 10
             tcpSocket:
               port: 9092
-          name: kafka-broker-container
+          name: trade-monitor-kafka-broker-container
           ports:
             - containerPort: 9092
           readinessProbe:
@@ -206,14 +206,14 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   labels:
-    app: job-topic-create
-  name: job-trade-monitor-topic-create
+    app: trade-monitor-job-topic-create
+  name: trade-monitor-job-topic-create
 spec:
   backoffLimit: 0
   template:
     metadata:
       labels:
-        app: job-topic-create
+        app: trade-monitor-job-topic-create
     spec:
       initContainers:
         - name: wait-for-pod-kafka-broker
@@ -225,7 +225,7 @@ spec:
             value: "trade-monitor-zookeeper.default.svc.cluster.local"
           image: "hazelcast-platform-demos/trade-monitor-topic-create"
           imagePullPolicy: Never
-          name: container-job-topic-create
+          name: trade-monitor-job-topic-create-container
       restartPolicy: Never
 ---
 

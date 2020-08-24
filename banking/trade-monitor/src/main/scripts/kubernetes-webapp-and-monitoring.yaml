@@ -41,7 +41,7 @@ spec:
             httpGet:
               path: /
               port: 8080
-          name: webapp-container
+          name: trade-monitor-webapp-container
           readinessProbe:
             httpGet:
               path: /
@@ -58,7 +58,7 @@ spec:
   selector:
     app: trade-monitor-management-center
   ports:
-    - name: management-center
+    - name: trade-monitor-management-center
       port: 8080
       targetPort: 8080
   type: LoadBalancer
@@ -85,7 +85,7 @@ spec:
             httpGet:
               path: /health
               port: 8081
-          name: mancenter-container
+          name: trade-monitor-management-center-container
           readinessProbe:
             httpGet:
               path: /health
@@ -125,7 +125,7 @@ spec:
       containers:
         - image: "hazelcast-platform-demos/trade-monitor-prometheus"
           imagePullPolicy: Never
-          name: prometheus-container
+          name: trade-monitor-prometheus-container
 ---
 # Service for Grafana
 ---
@@ -160,5 +160,5 @@ spec:
       containers:
         - image: "hazelcast-platform-demos/trade-monitor-grafana"
           imagePullPolicy: Never
-          name: grafana-container
+          name: trade-monitor-grafana-container
 ---
