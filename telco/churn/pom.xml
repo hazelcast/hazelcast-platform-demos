@@ -23,12 +23,13 @@
 		<my.cluster1.name>sanmateo</my.cluster1.name>
 
 		<!-- Common logons for Management Center, Grafana, Prometheus -->
-		<my.churn.admin.user>admin</my.churn.admin.user>
-		<my.churn.admin.password>password1</my.churn.admin.password>
+                <my.other.admin.user>admin</my.other.admin.user>
+                <my.other.admin.password>password1</my.other.admin.password>
 
 		<!-- So Grafana can find Prometheus service, must match K8S YAML -->
 		<my.prometheus.name>prometheus</my.prometheus.name>
 		<my.prometheus.port>9090</my.prometheus.port>
+                <my.management.center.name>${docker.image.prefix}-management-center</my.management.center.name>
 	</properties>
 
 	<modules>

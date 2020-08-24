@@ -22,7 +22,7 @@ echo '##########################################################################
 echo '#' Modify cluster config to use ${HOST_IP} and give it a few seconds to refresh
 echo '#################################################################################'
 
-DOCKER_IMAGE=hazelcast-${PROJECT}/${MODULE}
+DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
 CMD="docker run -e JAVA_ARGS=-Dhazelcast.mc.healthCheck.enable=true -p 8080:8080 ${DOCKER_IMAGE}"
 #echo $CMD

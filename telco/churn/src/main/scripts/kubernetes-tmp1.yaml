@@ -1,6 +1,6 @@
 ---
-# Service DNS for Management Center will be "management-center-service.default.svc.cluster.local".
-# Service DNS for Hazelcast grid will be "sanmateo-service.default.svc.cluster.local".
+# Service DNS for Management Center will be "churn-management-center.default.svc.cluster.local".
+# Service DNS for Hazelcast grid will be "churn-sanmateo-hazelcast.default.svc.cluster.local".
 ---
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 # $$$$$$$$$$$$$$$$$$$$$ SERVICE DEFINITIONS $$$$$$$$$$$$$$$$$$$$$
@@ -11,7 +11,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: management-center-service
+  name: churn-management-center
 spec:
   selector:
     app: churn-management-center
@@ -26,11 +26,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: sanmateo-service
+  name: churn-sanmateo-hazelcast
 spec:
   clusterIP: None
   selector:
-    app: churn-hazelcast-node
+    app: churn-sanmateo-hazelcast
   ports:
   - port: 5701
 ---
@@ -54,13 +54,13 @@ spec:
         app: churn-management-center
     spec:
       containers:
-        - image: "hazelcast-churn/management-center"
+        - image: "hazelcast-platform-demos/churn-management-center"
           imagePullPolicy: Never
           livenessProbe:
             httpGet:
               path: /health
               port: 8081
-          name: mancenter-container
+          name: churn-management-center-container
           readinessProbe:
             httpGet:
               path: /health
@@ -72,29 +72,29 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: churn-hazelcast-node
+  name: churn-sanmateo-hazelcast
 spec:
   replicas: 2
-  serviceName: sanmateo-hazelcast-node-service
+  serviceName: churn-sanmateo-hazelcast
   selector:
     matchLabels:
-      app: churn-hazelcast-node
+      app: churn-sanmateo-hazelcast
   template:
     metadata:
       labels:
-        app: churn-hazelcast-node
+        app: churn-sanmateo-hazelcast
     spec:
       containers:
         - env:
           - name: "MY_BOOTSTRAP_SERVERS"
-            value: "churn-kafka-broker-0.churn-kafka-broker-service.default.svc.cluster.local:9092,churn-kafka-broker-1.churn-kafka-broker-service.default.svc.cluster.local:9092,churn-kafka-broker-2.churn-kafka-broker-service.default.svc.cluster.local:9092"
-          image: "hazelcast-churn/hazelcast-node"
+            value: "churn-kafka-broker-0.churn-kafka-broker.default.svc.cluster.local:9092,churn-kafka-broker-1.churn-kafka-broker.default.svc.cluster.local:9092,churn-kafka-broker-2.churn-kafka-broker.default.svc.cluster.local:9092"
+          image: "hazelcast-platform-demos/churn-hazelcast-node"
           imagePullPolicy: Never
           livenessProbe:
             httpGet:
               path: /hazelcast/health/node-state
               port: 5701
-          name: hazelcast-node-container
+          name: churn-sanmateo-hazelcast-container
           readinessProbe:
             httpGet:
               path: /hazelcast/health/ready

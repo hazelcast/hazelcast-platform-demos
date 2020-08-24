@@ -338,13 +338,13 @@
 							<MC_CLUSTER1_ADDRESSLIST>${my.mc.cluster1.addresslist}</MC_CLUSTER1_ADDRESSLIST>
 							<MC_CLUSTER2_NAME>${my.mc.cluster2.name}</MC_CLUSTER2_NAME>
 							<MC_CLUSTER2_ADDRESSLIST>${my.mc.cluster2.addresslist}</MC_CLUSTER2_ADDRESSLIST>
-							<!-- Dockerfile uses for other tools -->
-							<MY_ADMINUSER>${my.other.admin.user}</MY_ADMINUSER>
-							<MY_ADMINPASSWORD>${my.other.admin.password}</MY_ADMINPASSWORD>
+                                                        <!-- Dockerfile uses for other tools -->
+                                                        <MY_ADMINUSER>${my.other.admin.user}</MY_ADMINUSER>
+                                                        <MY_ADMINPASSWORD>${my.other.admin.password}</MY_ADMINPASSWORD>
 						</buildArgs>
 						<dockerfile>Dockerfile</dockerfile>
 						<pullNewerImage>false</pullNewerImage>
-						<repository>hazelcast-${docker.image.prefix}/${docker.image.name}</repository>
+						<repository>hazelcast-platform-demos/${docker.image.prefix}-${docker.image.name}</repository>
 						<tag>latest</tag>
 					</configuration>
 					<executions>

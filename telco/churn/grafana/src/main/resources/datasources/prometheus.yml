@@ -9,7 +9,7 @@ datasources:
     type: prometheus
     access: proxy
     orgId: 1
-    url: http://@my.prometheus.name@-service.default.svc.cluster.local:@my.prometheus.port@
+    url: http://@my.prometheus.name@.default.svc.cluster.local:@my.prometheus.port@
     isDefault: true
     version: 1
     editable: false

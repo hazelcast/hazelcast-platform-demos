@@ -1,6 +1,6 @@
 ---
-# Service DNS for Prometheus will be "prometheus-service.default.svc.cluster.local".
-# Service DNS for Grafana will be "grafana-service.default.svc.cluster.local".
+# Service DNS for Prometheus will be "churn-prometheus.default.svc.cluster.local".
+# Service DNS for Grafana will be "churn-grafana.default.svc.cluster.local".
 ---
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 # $$$$$$$$$$$$$$$$$$$$$ SERVICE DEFINITIONS $$$$$$$$$$$$$$$$$$$$$
@@ -11,7 +11,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: prometheus-service
+  name: churn-prometheus
 spec:
   selector:
     app: churn-prometheus
@@ -26,7 +26,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: grafana-service
+  name: churn-grafana
 spec:
   selector:
     app: churn-grafana
@@ -56,9 +56,9 @@ spec:
         app: churn-prometheus
     spec:
       containers:
-        - image: "hazelcast-churn/prometheus"
+        - image: "hazelcast-platform-demos/churn-prometheus"
           imagePullPolicy: Never
-          name: prometheus-container
+          name: churn-prometheus-container
 ---
 # Pods for Grafana, only need one
 ---
@@ -76,7 +76,7 @@ spec:
         app: churn-grafana
     spec:
       containers:
-        - image: "hazelcast-churn/grafana"
+        - image: "hazelcast-platform-demos/churn-grafana"
           imagePullPolicy: Never
-          name: grafana-container
+          name: churn-grafana-container
 ---
