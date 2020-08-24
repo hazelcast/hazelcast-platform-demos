@@ -27,7 +27,7 @@
                 <my.other.admin.password>password1</my.other.admin.password>
 
 		<!-- So Grafana can find Prometheus service, must match K8S YAML -->
-		<my.prometheus.name>prometheus</my.prometheus.name>
+		<my.prometheus.name>${docker.image.prefix}-prometheus</my.prometheus.name>
 		<my.prometheus.port>9090</my.prometheus.port>
                 <my.management.center.name>${docker.image.prefix}-management-center</my.management.center.name>
 	</properties>
