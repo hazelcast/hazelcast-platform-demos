@@ -8,14 +8,14 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   labels:
-    app: job-trade-producer
-  name: job-trade-monitor-trade-producer
+    app: trade-monitor-job-trade-producer
+  name: trade-monitor-job-trade-producer
 spec:
   backoffLimit: 0
   template:
     metadata:
       labels:
-        app: job-trade-producer
+        app: trade-monitor-job-trade-producer
     spec:
       containers:
         - env:
@@ -23,5 +23,5 @@ spec:
             value: "trade-monitor-kafka-broker-0.trade-monitor-kafka-broker.default.svc.cluster.local:9092,trade-monitor-kafka-broker-1.trade-monitor-kafka-broker.default.svc.cluster.local:9092,trade-monitor-kafka-broker-2.trade-monitor-kafka-broker.default.svc.cluster.local:9092"
           image: "hazelcast-platform-demos/trade-monitor-trade-producer"
           imagePullPolicy: Never
-          name: container-job-trade-producer
+          name: trade-monitor-job-trade-producer-container
       restartPolicy: Never

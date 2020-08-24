@@ -20,7 +20,7 @@
 	<properties>
 		<docker.image.prefix>trade-monitor</docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
-		<my.cluster1.name>trade-monitor</my.cluster1.name>
+		<my.cluster1.name>grid</my.cluster1.name>
 
 		<!-- Project specific versions -->
 		<javalin.version>3.7.0</javalin.version>

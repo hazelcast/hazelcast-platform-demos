@@ -4,11 +4,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: trade-monitor-hazelcast
+  name: trade-monitor-grid-hazelcast
 spec:
   clusterIP: None
   selector:
-    app: trade-monitor-hazelcast-node
+    app: trade-monitor-grid-hazelcast
   ports:
   - port: 5701
 ---
@@ -17,17 +17,17 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: trade-monitor-hazelcast-node
+  name: trade-monitor-grid-hazelcast
 spec:
   replicas: 2
-  serviceName: trade-monitor-hazelcast
+  serviceName: trade-monitor-grid-hazelcast
   selector:
     matchLabels:
-      app: trade-monitor-hazelcast-node
+      app: trade-monitor-grid-hazelcast
   template:
     metadata:
       labels:
-        app: trade-monitor-hazelcast-node
+        app: trade-monitor-grid-hazelcast
     spec:
       containers:
         - env:
@@ -39,7 +39,7 @@ spec:
             httpGet:
               path: /hazelcast/health/node-state
               port: 5701
-          name: hazelcast-node-container
+          name: trade-monitor-grid-hazelcast-container
           readinessProbe:
             httpGet:
               path: /hazelcast/health/ready
