@@ -136,7 +136,7 @@
     ]
   },
   "timezone": "",
-  "title": "Hazelcast - \"sanmateo\" cluster",
+  "title": "Hazelcast - \"@my.cluster1.name@\" cluster",
   "uid": "ygVbWWNMk",
   "version": 1
 }
