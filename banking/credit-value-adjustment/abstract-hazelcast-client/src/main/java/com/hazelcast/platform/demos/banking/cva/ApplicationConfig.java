@@ -46,7 +46,7 @@ public class ApplicationConfig {
 
     public ApplicationConfig(MyProperties myProperties) {
         this.project = myProperties.getProject();
-        System.setProperty("my.site", this.project);
+        System.setProperty("my.project", this.project);
     }
 
     /**
