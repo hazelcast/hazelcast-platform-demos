@@ -10,7 +10,7 @@ ARG JAR_FILE
 COPY target/${JAR_FILE} application.jar
 
 # Default values provided
-ENV MY_GRAFANA_SERVICE "grafana-service"
+ENV MY_GRAFANA_SERVICE "cva-grafana"
 ENV MY_KUBERNETES_ENABLED "true"
 
 ENV JAVA_ARGS ""
