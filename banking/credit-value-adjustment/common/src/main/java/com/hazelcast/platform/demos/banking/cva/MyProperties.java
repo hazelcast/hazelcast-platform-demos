@@ -44,6 +44,8 @@ public class MyProperties {
 
     @NotNull
     private String buildTimestamp;
+    @NotNull
+    private String project;
 
     @NotNull
     private Site site;
@@ -55,6 +57,13 @@ public class MyProperties {
     public void setBuildTimestamp(String buildTimestamp) {
         this.buildTimestamp = buildTimestamp;
         LOGGER.info("myProperties.buildTimestamp=='{}'", this.buildTimestamp);
+    }
+    public String getProject() {
+        return this.project;
+    }
+    public void setProject(String project) {
+        this.project = project;
+        LOGGER.info("myProperties.project=='{}'", this.project);
     }
     public Site getRemoteSite() {
         return this.remoteSite;
