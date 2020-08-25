@@ -44,10 +44,14 @@ public class MyProperties {
 
     @NotNull
     private String buildTimestamp;
+    @NotNull
+    private String project;
 
     @NotNull
     private Site site;
+    @NotNull
     private Site remoteSite;
+    @NotNull
     private int partitions;
 
     public String getBuildTimestamp() {
@@ -63,6 +67,12 @@ public class MyProperties {
     public void setPartitions(int partitions) {
         this.partitions = partitions;
         LOGGER.info("myProperties.partitions=='{}'", this.partitions);
+    public String getProject() {
+        return this.project;
+    }
+    public void setProject(String project) {
+        this.project = project;
+        LOGGER.info("myProperties.project=='{}'", this.project);
     }
     public Site getRemoteSite() {
         return this.remoteSite;

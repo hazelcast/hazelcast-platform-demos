@@ -138,8 +138,9 @@ public class MyLocalWANDiscoveryStrategy implements DiscoveryStrategy {
     @Override
     public void start() {
         // We are looking for the other cluster
-        this.serviceDns = this.myProperties.getRemoteSite().toString().toLowerCase(Locale.ROOT)
-                + "-service.default.svc.cluster.local";
+        this.serviceDns = this.myProperties.getProject() + "-"
+                + this.myProperties.getRemoteSite().toString().toLowerCase(Locale.ROOT)
+                + "-hazelcast.default.svc.cluster.local";
 
         Hashtable<String, String> env = new Hashtable<String, String>();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.dns.DnsContextFactory");

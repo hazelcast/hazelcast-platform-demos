@@ -42,6 +42,13 @@ import org.springframework.context.annotation.Configuration;
 public class ApplicationConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
 
+    private final String project;
+
+    public ApplicationConfig(MyProperties myProperties) {
+        this.project = myProperties.getProject();
+        System.setProperty("my.site", this.project);
+    }
+
     /**
      * <p>Produce configuration for a client based on "{@code *.yml}" configuration
      * files loaded from the classpath, and amended accordingly.
@@ -66,7 +73,8 @@ public class ApplicationConfig {
 
             kubernetesConfig.setEnabled(true);
             kubernetesConfig.setProperty("service-dns",
-                    System.getProperty("my.site") + "-service.default.svc.cluster.local");
+                    System.getProperty("my.project") + "-"
+                    + System.getProperty("my.site") + "-hazelcast.default.svc.cluster.local");
 
             clientNetworkConfig.setKubernetesConfig(kubernetesConfig);
 
