@@ -1,5 +1,5 @@
 ---
-# Service DNS will be "site1-webapp.default.svc.cluster.local".
+# Service DNS will be "cva-site1-webapp.default.svc.cluster.local".
 ---
 apiVersion: v1
 kind: Service
