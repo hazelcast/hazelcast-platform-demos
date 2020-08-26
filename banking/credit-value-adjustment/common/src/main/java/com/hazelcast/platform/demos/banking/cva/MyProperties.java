@@ -67,6 +67,7 @@ public class MyProperties {
     public void setPartitions(int partitions) {
         this.partitions = partitions;
         LOGGER.info("myProperties.partitions=='{}'", this.partitions);
+    }
     public String getProject() {
         return this.project;
     }

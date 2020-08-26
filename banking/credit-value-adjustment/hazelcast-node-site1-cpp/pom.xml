@@ -1,0 +1,44 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hazelcast.platform.demos.banking.cva</groupId>
+		<artifactId>cva-root</artifactId>
+		<version>4.0</version>
+	</parent>
+
+	<artifactId>cva-hazelcast-node-site1-cpp</artifactId>
+
+	<name>Hazelcast Platform - CVA - Hazelcast Node Site 1 &amp; C++ Pricer</name>
+	<description>Credit Value Adjustment - Hazelcast Node - Site 1 incl C++</description>
+
+	<properties>
+		<docker.image.name>hazelcast-node-site1-cpp</docker.image.name>
+		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>cva-hazelcast-node-site1</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>cva-cpp</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>dockerfile-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

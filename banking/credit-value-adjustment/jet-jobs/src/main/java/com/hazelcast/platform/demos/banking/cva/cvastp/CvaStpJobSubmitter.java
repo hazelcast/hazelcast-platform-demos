@@ -88,18 +88,6 @@ public class CvaStpJobSubmitter {
         String jobNamePrefix = CvaStpJob.JOB_NAME_PREFIX;
         String jobName = jobNamePrefix + "$" + calcDate + "@" + timestampStr;
         String cppLoadBalancer = getLoadBalancer();
-        if (cppLoadBalancer != null) {
-        	cppLoadBalancer = "127.0.0.1";
-        }
-        LOGGER.error("submitCvaStpJob cppLoadBalancer='{}'", cppLoadBalancer);
-        LOGGER.error("submitCvaStpJob cppLoadBalancer='{}'", cppLoadBalancer);
-        LOGGER.error("submitCvaStpJob cppLoadBalancer='{}'", cppLoadBalancer);
-        LOGGER.error("submitCvaStpJob cppLoadBalancer='{}'", cppLoadBalancer);
-        System.out.println("submitCvaStpJob cppLoadBalancer='{}'" + cppLoadBalancer + "'");
-        System.out.println("submitCvaStpJob cppLoadBalancer='{}'" + cppLoadBalancer + "'");
-        System.out.println("submitCvaStpJob cppLoadBalancer='{}'" + cppLoadBalancer + "'");
-        System.out.println("submitCvaStpJob cppLoadBalancer='{}'" + cppLoadBalancer + "'");
-        System.out.println("submitCvaStpJob cppLoadBalancer='{}'" + cppLoadBalancer + "'");
 
         Pipeline pipeline = CvaStpJob.buildPipeline(jobName, timestamp, calcDate, cppLoadBalancer,
                 PORT, batchSize, parallelism, debug);
@@ -133,7 +121,12 @@ public class CvaStpJobSubmitter {
         boolean kubernetesEnabled =
                 System.getProperty("my.kubernetes.enabled", "false").equalsIgnoreCase(Boolean.TRUE.toString());
  
-        LOGGER.error("getLoadBalancer IN cppService='{}'", cppService);
+    	//XXX Experiment build
+        if (kubernetesEnabled || dockerEnabled) {
+            cppService = CPP_LOCALHOST;
+        	LOGGER.error("Experimental build, use '{}'", cppService);
+            return cppService;
+        }
 
         // If set, validate but don't reject
         if (cppService.length() > 0) {
@@ -144,20 +137,13 @@ public class CvaStpJobSubmitter {
                 cppService = CPP_LOCALHOST;
             }
             if (dockerEnabled && !kubernetesEnabled) {
-                //XXX cppService = CPP_DOCKER;
-                LOGGER.warn("Experimental build, using '{}' instead of '{}'",
-                        CPP_LOCALHOST, CPP_DOCKER);
-                cppService = CPP_LOCALHOST;
+                cppService = CPP_DOCKER;
             }
             if (kubernetesEnabled) {
-                //XXX cppService = CPP_KUBERNETES;
-                LOGGER.warn("Experimental build, using '{}' instead of '{}'",
-                        CPP_LOCALHOST, CPP_KUBERNETES);
-                cppService = CPP_LOCALHOST;
+                cppService = CPP_KUBERNETES;
             }
         }
 
-        LOGGER.error("getLoadBalancer OUT cppService='{}'", cppService);
         return cppService;
     }
 
