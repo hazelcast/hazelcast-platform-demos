@@ -30,11 +30,15 @@
 		<spotbugs.skip>true</spotbugs.skip>
 
 		<!-- Version dependencies - ${project.version} should track Hazelcast version -->
+		<!-- 
+		<dse-java-driver-core.version>2.4.0</dse-java-driver-core.version>
+		<dse-java-driver-mapping.version>1.9.0</dse-java-driver-mapping.version>
+		 -->
 		<java-annotation.version>1.3.2</java-annotation.version>
 		<guava.version>29.0-jre</guava.version>
 		<grpc.version>1.31.0</grpc.version>
-		<hazelcast.version>4.0.1</hazelcast.version>
-		<hazelcast-jet.version>4.2</hazelcast-jet.version>
+		<hazelcast.version>4.1-SNAPSHOT</hazelcast.version>
+		<hazelcast-jet.version>4.3-SNAPSHOT</hazelcast-jet.version>
 		<hazelcast-jet-spring-boot-starter.version>2.0.0</hazelcast-jet-spring-boot-starter.version>
 		<hazelcast-kubernetes.version>2.0.2</hazelcast-kubernetes.version>
 		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
@@ -43,9 +47,10 @@
 		<junit.version>4.13</junit.version>
 		<jython.version>2.7.2rc1</jython.version>
 		<kafka-clients.version>2.4.0</kafka-clients.version>
+ 		<mongo-java-driver.version>3.12.7</mongo-java-driver.version>
 		<poi-ooxml.version>4.1.2</poi-ooxml.version>
 		<protobuf.version>3.12.4</protobuf.version>
-		<spring-boot.version>2.3.2.RELEASE</spring-boot.version>
+		<spring-boot.version>2.3.3.RELEASE</spring-boot.version>
 		<springfox-swagger.version>2.9.2</springfox-swagger.version>
 
 		<!-- Plugins -->
@@ -84,6 +89,19 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<!-- 
+			<dependency>
+				<groupId>com.datastax.dse</groupId>
+				<artifactId>dse-java-driver-core</artifactId>
+				<version>${dse-java-driver-core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.datastax.dse</groupId>
+				<artifactId>dse-java-driver-mapping</artifactId>
+				<version>${dse-java-driver-mapping.version}</version>
+			</dependency>
+			-->
+
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-databind</artifactId>
@@ -180,6 +198,12 @@
 				<groupId>org.json</groupId>
 				<artifactId>json</artifactId>
 				<version>${json.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mongodb</groupId>
+				<artifactId>mongo-java-driver</artifactId>
+				<version>${mongo-java-driver.version}</version>
 			</dependency>
 
 			<dependency>
@@ -339,8 +363,9 @@
 							<MC_CLUSTER2_NAME>${my.mc.cluster2.name}</MC_CLUSTER2_NAME>
 							<MC_CLUSTER2_ADDRESSLIST>${my.mc.cluster2.addresslist}</MC_CLUSTER2_ADDRESSLIST>
                                                         <!-- Dockerfile uses for other tools -->
-                                                        <MY_ADMINUSER>${my.other.admin.user}</MY_ADMINUSER>
-                                                        <MY_ADMINPASSWORD>${my.other.admin.password}</MY_ADMINPASSWORD>
+                                                        <MY_OTHERUSER>${my.other.admin.user}</MY_OTHERUSER>
+                                                        <MY_OTHERPASSWORD>${my.other.admin.password}</MY_OTHERPASSWORD>
+                                                        <MY_OTHERDATABASE>${my.other.admin.database}</MY_OTHERDATABASE>
 						</buildArgs>
 						<dockerfile>Dockerfile</dockerfile>
 						<pullNewerImage>false</pullNewerImage>

@@ -1,18 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+        <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>com.hazelcast.platform.demos.telco.churn</groupId>
-		<artifactId>churn-root</artifactId>
-		<version>4.0</version>
-	</parent>
+        <parent>
+                <groupId>com.hazelcast.platform.demos.telco.churn</groupId>
+                <artifactId>churn-root</artifactId>
+                <version>4.0</version>
+        </parent>
 
-	<artifactId>churn-common</artifactId>
+        <artifactId>churn-common</artifactId>
 
-	<name>Hazelcast Platform - Churn - Common</name>
-	<description>Telco Churn - Common</description>
+        <name>Hazelcast Platform - Churn - Common</name>
+        <description>Telco Churn - Common</description>
 
 	<properties>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>

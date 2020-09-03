@@ -23,24 +23,38 @@
 		<my.cluster1.name>sanmateo</my.cluster1.name>
 
 		<!-- Common logons for Management Center, Grafana, Prometheus -->
-                <my.other.admin.user>admin</my.other.admin.user>
-                <my.other.admin.password>password1</my.other.admin.password>
+		<my.other.admin.user>admin</my.other.admin.user>
+		<my.other.admin.password>password1</my.other.admin.password>
+		<my.other.admin.database>${docker.image.prefix}</my.other.admin.database>
 
 		<!-- So Grafana can find Prometheus service, must match K8S YAML -->
 		<my.prometheus.name>${docker.image.prefix}-prometheus</my.prometheus.name>
 		<my.prometheus.port>9090</my.prometheus.port>
-                <my.management.center.name>${docker.image.prefix}-management-center</my.management.center.name>
+		<my.management.center.name>${docker.image.prefix}-management-center</my.management.center.name>
 	</properties>
 
 	<modules>
-		<module>common</module>
+		<!-- Standalone, not part of Hazelcast apart from Management Center -->
+		<module>cassandra</module>
 		<module>grafana</module>
-		<module>hazelcast-node</module>
 		<module>management-center</module>
 		<module>prometheus</module>
+		<module>mongo</module>
+		<module>mysql</module>
+
+		<!-- Add test data to Cassandra/Mongo/MySql -->
+		<module>preload-legacy</module>
+
+		<!-- Hazelcast bits -->
+		<module>common</module>
+		<module>hazelcast-node</module>
 	</modules>
 
 	<dependencies>
+		<!-- <dependency> <groupId>com.datastax.dse</groupId> <artifactId>dse-java-driver-core</artifactId> 
+			</dependency> <dependency> <groupId>com.datastax.dse</groupId> <artifactId>dse-java-driver-mapping</artifactId> 
+			</dependency> -->
+
 		<!-- Required for YAML style Log4j2 config -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -49,6 +63,11 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-yaml</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
 
 		<!-- Validates configuration properties -->
