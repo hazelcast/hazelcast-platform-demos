@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROJECT=churn
-MODULE=preload-legacy
+MODULE=mysql
 
 BASEDIR=`dirname $0`
 cd $BASEDIR/../../../$MODULE
@@ -23,7 +23,7 @@ docker network create $PROJECT --driver bridge > /dev/null 2>&1
 
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
-CMD="docker run --name=${MODULE} --network=${PROJECT} ${DOCKER_IMAGE}"
+CMD="docker run -p 3306:3306 --name=${MODULE} --network=${PROJECT} ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD

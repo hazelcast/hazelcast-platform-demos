@@ -18,13 +18,16 @@ then
  exit 1
 fi
 
+# Private network so can use container names
+docker network create $PROJECT --driver bridge > /dev/null 2>&1
+
 echo '#################################################################################'
 echo '#' Modify cluster config to use ${HOST_IP} and give it a few seconds to refresh
 echo '#################################################################################'
 
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
-CMD="docker run -e JAVA_ARGS=-Dhazelcast.mc.healthCheck.enable=true -p 8080:8080 ${DOCKER_IMAGE}"
+CMD="docker run -e JAVA_ARGS=-Dhazelcast.mc.healthCheck.enable=true -p 8080:8080 --name=${MODULE} --network=${PROJECT} ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD

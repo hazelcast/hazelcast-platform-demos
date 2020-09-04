@@ -18,6 +18,9 @@ then
  exit 1
 fi
 
+# Private network so can use container names
+docker network create $PROJECT --driver bridge > /dev/null 2>&1
+
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
 CMD="docker run -p 27017:27017 --name=${MODULE} --network=${PROJECT} ${DOCKER_IMAGE}"
