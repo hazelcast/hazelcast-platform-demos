@@ -48,3 +48,4 @@ jobs
 
 # C++ never terminates, foreground Jet
 fg
+echo fg ends: $?

@@ -66,9 +66,6 @@ public class ApplicationConfig {
         System.setProperty("my.project", this.project);
         System.setProperty("my.remote.site", this.remoteSite.toString());
         System.setProperty("my.partitions", String.valueOf(myProperties.getPartitions()));
-        if (myProperties.getPartitions() < 20000) {
-        	LOGGER.error("NEED TO TRY WITH 25057 PARTITIONS");//XXX 
-        }
         System.setProperty("my.site", this.site.toString());
     }
 

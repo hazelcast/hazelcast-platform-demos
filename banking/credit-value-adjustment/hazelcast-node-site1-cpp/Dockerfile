@@ -18,6 +18,8 @@ ENV JAVA_OPTS "--add-modules java.se --add-exports java.base/jdk.internal.ref=AL
 
 ENTRYPOINT exec /cvaWrapper.sh $0 \
   $JAVA_ARGS \
+  -XX:+UseG1GC -XX:ActiveProcessorCount=1 \
+  -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp -XX:+ShowMessageBoxOnError \
   -Xmx$JAVA_HEAP_SIZE -Xms$JAVA_HEAP_SIZE $JAVA_OPTS \
  -Dmy.docker.enabled=true \
  -Dmy.grafana.service=$MY_GRAFANA_SERVICE \
