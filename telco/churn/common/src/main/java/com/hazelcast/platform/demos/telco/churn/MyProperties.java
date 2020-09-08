@@ -40,6 +40,12 @@ public class MyProperties {
     private String buildTimestamp;
     @NotNull
     private String buildUserName;
+    // Can't be null
+    private int initSize;
+    @NotNull
+    private String project;
+    // Null allowed
+    private String site;
 
     public String getBuildTimestamp() {
         return this.buildTimestamp;
@@ -55,6 +61,30 @@ public class MyProperties {
     public void setBuildUserName(String buildUserName) {
         this.buildUserName = buildUserName;
         LOGGER.info("myProperties.buildUserName=='{}'", this.buildUserName);
+    }
+
+    public int getInitSize() {
+        return this.initSize;
+    }
+    public void setInitSize(int initSize) {
+        this.initSize = initSize;
+        LOGGER.info("myProperties.initSize=='{}'", this.initSize);
+    }
+
+    public String getProject() {
+        return this.project;
+    }
+    public void setProject(String project) {
+        this.project = project;
+        LOGGER.info("myProperties.project=='{}'", this.project);
+    }
+
+    public String getSite() {
+        return this.site;
+    }
+    public void setSite(String site) {
+        this.site = site;
+        LOGGER.info("myProperties.site=='{}'", this.site);
     }
 
 }

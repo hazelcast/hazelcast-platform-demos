@@ -20,6 +20,8 @@
 	<properties>
 		<docker.image.prefix>churn</docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
+
+		<my.cluster1.init.size>1</my.cluster1.init.size>
 		<my.cluster1.name>sanmateo</my.cluster1.name>
 
 		<!-- Common logons for Management Center, Grafana, Prometheus -->
@@ -42,11 +44,13 @@
 		<module>mongo</module>
 		<module>mysql</module>
 
+		<!-- Shared with legacy preloader and Hazelcast bits -->
+		<module>common</module>
+
 		<!-- Add test data to Cassandra/Mongo/MySql -->
 		<module>preload-legacy</module>
 
 		<!-- Hazelcast bits -->
-		<module>common</module>
 		<module>hazelcast-node</module>
 	</modules>
 

@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -27,12 +29,21 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @SpringBootApplication
 @EnableConfigurationProperties(MyProperties.class)
 public class Application {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
     /**
      * <p>Start Jet with specific configuration, and leave it running.
      * </p>
      */
     public static void main(String[] args) throws Exception {
+
+        // Use for importing security config per environment
+        String environment = System.getProperty("my.environment");
+        if (environment == null || environment.length() == 0) {
+            LOGGER.error("Usage: 'my.environment' system property not set");
+            System.exit(1);
+        }
+
         SpringApplication.run(Application.class, args);
     }
 

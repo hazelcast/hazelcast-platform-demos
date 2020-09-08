@@ -34,29 +34,28 @@ Configuration:
           additivity: false
           AppenderRef:
             ref: ConsoleCyan
+        - name: com.hazelcast.security
+          level: debug
+          additivity: false
+          AppenderRef:
+            ref: ConsoleRed
         - name: com.hazelcast.platform.demos
           level: debug
           additivity: false
           AppenderRef:
             ref: ConsoleMagenta
-        - name: com.hazelcast.platform.demos.banking.churn
+        - name: com.hazelcast.platform.demos.banking.churn.security
           level: debug
           additivity: false
           AppenderRef:
             ref: ConsoleYellow
-        # For "Sinks.logger()"
-        - name: com.hazelcast.jet.impl.connector.WriteLoggerP
-          level: trace
-          additivity: false
-          AppenderRef:
-            - ref: ConsoleRed
         # Hide irrelevant warnings from Hibernate Validator
         - name: org.hibernate
           level: error
           additivity: false
           AppenderRef:
             ref: ConsoleGreen
-        # Useful to see the selected web port in a different colour
+        # Useful to see the selected web port
         - name: org.springframework.boot.web.embedded.tomcat.TomcatWebServer
           level: info
           additivity: false

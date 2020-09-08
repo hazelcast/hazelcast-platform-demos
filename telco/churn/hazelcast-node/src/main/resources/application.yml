@@ -1,0 +1,4 @@
+# Replaced by Maven
+my:
+  initSize: @my.init.size@
+  site: @my.cluster.name@
