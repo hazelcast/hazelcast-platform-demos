@@ -38,22 +38,22 @@ Configuration:
           level: debug
           additivity: false
           AppenderRef:
-            ref: ConsoleRed
+            ref: ConsoleYellow
         - name: com.hazelcast.security
           level: debug
           additivity: false
           AppenderRef:
-            ref: ConsoleRed
+            ref: ConsoleYellow
         - name: com.hazelcast.platform.demos
           level: debug
           additivity: false
           AppenderRef:
             ref: ConsoleMagenta
-        - name: com.hazelcast.platform.demos.banking.churn.security
+        - name: com.hazelcast.platform.demos.telco.churn.security
           level: debug
           additivity: false
           AppenderRef:
-            ref: ConsoleYellow
+            ref: ConsoleRed
         # Hide irrelevant warnings from Hibernate Validator
         - name: org.hibernate
           level: error
