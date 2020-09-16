@@ -18,7 +18,10 @@ package com.hazelcast.platform.demos.telco.churn.security;
 
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -36,13 +39,14 @@ import com.hazelcast.security.SimpleTokenCredentials;
  * <p>Returns the same credentials every time in this example,
  * token based.
  * </p>
- * <p><b>Note:</b> This is <em>simplified sample code</em>, do not use as-is production security.</p>
+ * <p><b>Note:</b> This is <em>simplified sample code</em>, do not use as-is for Production security.</p>
  */
 public class MyServerCredentialsFactory implements ICredentialsFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MyServerCredentialsFactory.class);
 
     private SimpleTokenCredentials myCredentials;
-    private String timestamp;
+    private String buildTimestamp;
+    private String moduleName;
     private String userName;
 
     /**
@@ -51,7 +55,8 @@ public class MyServerCredentialsFactory implements ICredentialsFactory {
      */
     @Override
     public void init(Properties properties) {
-        this.timestamp = properties.getProperty("timestamp");
+        this.buildTimestamp = properties.getProperty("buildTimestamp");
+        this.moduleName = properties.getProperty("moduleName");
         this.userName = properties.getProperty("userName");
     }
 
@@ -65,21 +70,33 @@ public class MyServerCredentialsFactory implements ICredentialsFactory {
 
     /**
      * <p>Create CSV style token authentication credentials, once.
-     * Member name is dynamically allocated and not available at this
-     * point, so use IP address to distinguish server for logging.
      * </p>
      */
     @Override
     public Credentials newCredentials() {
         if (this.myCredentials == null) {
-            String token = this.userName + "," + this.timestamp + ","
-                    + this.getClass().getSimpleName() + ",";
+            // Due to NATting this may not match receiver's view of sender's endpoint
+            String ip = "?";
             try {
-                token += InetAddress.getLocalHost().getHostAddress();
+                ip = InetAddress.getLocalHost().getHostAddress();
             } catch (Exception e) {
                 LOGGER.error("newCredentials()", e);
-                token += "?";
             }
+
+            // Run start timestamp, to counterpart build timestamp. In Docker so use universal time
+            long now = System.currentTimeMillis();
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            String startTimestamp = simpleDateFormat.format(new Date(now));
+
+            String token = this.userName
+                    + "," + this.buildTimestamp
+                    + "," + this.getClass().getSimpleName()
+                    + "," + this.moduleName
+                    + "," + startTimestamp
+                    + "," + ip;
+
+            LOGGER.info("newCredentials => {}", token);
             this.myCredentials = new SimpleTokenCredentials(token.getBytes(StandardCharsets.UTF_8));
         }
         return this.myCredentials;

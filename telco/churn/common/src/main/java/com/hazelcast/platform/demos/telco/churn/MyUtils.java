@@ -16,15 +16,44 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
+import java.util.Locale;
 
 /**
  * <p>Utility functions that may be useful to more than one module.
  * </p>
  */
 public class MyUtils {
-    //private static final Logger LOGGER = LoggerFactory.getLogger(MyUtils.class);
+    private static final String ALPHABET_UC = "abcdefghijklmnopqrstuvwxyz".toUpperCase(Locale.ROOT);
+    private static final String ALPHABET_LC = ALPHABET_UC.toLowerCase(Locale.ROOT);
+    private static final String[] ALPHABETS = { ALPHABET_UC, ALPHABET_LC };
+    private static final int ALPHABET_LENGTH = ALPHABET_UC.length();
+    private static final int HALF_ALPHABET_LENGTH = ALPHABET_LENGTH / 2;
 
-    //TODO Remove class if not needed
+    /**
+     * <p>The classic 13 character rotation encryption.
+     * "{@code a}" maps to "{@code n}", and "{@code n}" maps
+     * back to "{@code a}".
+     * </p>
+     */
+    public static String rot13(String input) {
+        if (input == null) {
+            return null;
+        }
+
+        char[] output = new char[input.length()];
+
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            for (String alphabet : ALPHABETS) {
+                int pos = alphabet.indexOf(c);
+                if (pos != -1) {
+                    pos = (pos + HALF_ALPHABET_LENGTH) % ALPHABET_LENGTH;
+                    c = alphabet.charAt(pos);
+                }
+            }
+            output[i] = c;
+        }
+
+        return new String(output);
+    }
 }

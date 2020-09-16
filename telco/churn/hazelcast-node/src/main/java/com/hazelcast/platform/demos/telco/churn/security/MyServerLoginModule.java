@@ -16,6 +16,7 @@
 
 package com.hazelcast.platform.demos.telco.churn.security;
 
+import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import com.hazelcast.security.ClusterIdentityPrincipal;
 import com.hazelcast.security.Credentials;
 import com.hazelcast.security.CredentialsCallback;
+import com.hazelcast.security.EndpointCallback;
 import com.hazelcast.security.SimpleTokenCredentials;
 
 /**
@@ -45,7 +47,7 @@ import com.hazelcast.security.SimpleTokenCredentials;
  * </p>
  * <p>Servers use {@link com.hazelcast.security.SimpleTokenCredentials SimpleTokenCredentials}.
  * </p>
- * <p><b>Note:</b> This is <em>simplified sample code</em>, do not use as-is production security.</p>
+ * <p><b>Note:</b> This is <em>simplified sample code</em>, do not use as-is for Production security.</p>
  */
 public class MyServerLoginModule implements LoginModule {
     private static final Logger LOGGER = LoggerFactory.getLogger(MyServerLoginModule.class);
@@ -54,7 +56,7 @@ public class MyServerLoginModule implements LoginModule {
     private Subject subject;
     private CallbackHandler callbackHandler;
     private Map<String, Object> sharedState;
-    private String myTimestamp;
+    private String myBuildTimestamp;
 
     /**
      * <p>Prepare the login module for this connection attempt, capture
@@ -70,15 +72,23 @@ public class MyServerLoginModule implements LoginModule {
     @Override
     public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
             Map<String, ?> options) {
-        LOGGER.trace("initialize({}, {}, {}, {})",
+        String myIp = "?";
+        try {
+            myIp = InetAddress.getLocalHost().getHostAddress();
+        } catch (Exception e) {
+            LOGGER.error("initialize", e);
+        }
+
+        LOGGER.trace("initialize({}, {}, {}, {}), my IP={}",
                 subject.getPrincipals(),
                 callbackHandler.getClass().getSimpleName(),
                 sharedState.keySet(),
-                options.keySet());
+                options.keySet(),
+                myIp);
         this.subject = subject;
         this.callbackHandler = callbackHandler;
         this.sharedState = (Map<String, Object>) sharedState;
-        this.myTimestamp = options.get("timestamp").toString();
+        this.myBuildTimestamp = options.get("buildTimestamp").toString();
     }
 
     /**
@@ -92,35 +102,41 @@ public class MyServerLoginModule implements LoginModule {
      */
     @Override
     public boolean login() throws LoginException {
-        Credentials credentials = null;
+        CredentialsCallback credentialsCallback = new CredentialsCallback();
+        EndpointCallback endpointCallback = new EndpointCallback();
 
         try {
-            CredentialsCallback credentialsCallback = new CredentialsCallback();
-            this.callbackHandler.handle(new Callback[]{credentialsCallback});
-            credentials = credentialsCallback.getCredentials();
+            this.callbackHandler.handle(new Callback[]{credentialsCallback, endpointCallback});
         } catch (Exception e) {
             throw new LoginException(e.getMessage());
         }
+
+        Credentials credentials = credentialsCallback.getCredentials();
+        String endpoint = endpointCallback.getEndpoint();
 
         if (credentials == null) {
             LOGGER.error("login(), credentials are null");
             return false;
         }
         if (!(credentials instanceof SimpleTokenCredentials)) {
-            LOGGER.error("login(), credentials=='{}'", credentials.getClass());
+            LOGGER.error("login(), credentials are not SimpleTokenCredentials");
+            return false;
+        }
+        if (endpoint == null) {
+            LOGGER.error("login(), endpoint is null");
             return false;
         }
 
         SimpleTokenCredentials simpleTokenCredentials = (SimpleTokenCredentials) credentials;
         String[] tokens = new String(simpleTokenCredentials.getToken(), StandardCharsets.UTF_8).split(",");
-        if (tokens.length != QUADRUPLE) {
+        if (tokens.length < QUADRUPLE) {
             LOGGER.error("login() tokens=='{}'", Arrays.asList(tokens));
             return false;
         }
 
-        String theirTimestamp = tokens[1];
+        String theirBuildTimestamp = tokens[1];
         String kind = tokens[2];
-        String ip = tokens[3];
+        String module = tokens[3];
 
         if (!MyServerCredentialsFactory.class.getSimpleName().equals(kind)) {
             LOGGER.error("login() wrong kind for '{}'", Arrays.asList(tokens));
@@ -128,14 +144,14 @@ public class MyServerLoginModule implements LoginModule {
         }
 
         // Tolerable for clients but not for servers
-        if (!this.myTimestamp.equals(theirTimestamp)) {
+        if (!this.myBuildTimestamp.equals(theirBuildTimestamp)) {
             LOGGER.error("login() my build '{}' different from their build in '{}'",
-                this.myTimestamp, Arrays.asList(tokens));
+                this.myBuildTimestamp, Arrays.asList(tokens));
             return false;
         }
 
-        LOGGER.debug("login() tokens=='{}'", Arrays.asList(tokens));
-        this.sharedState.put(Context.SECURITY_CREDENTIALS, ip);
+        LOGGER.info("login() endpoint='{}', tokens=='{}'", endpoint, Arrays.asList(tokens));
+        this.sharedState.put(Context.SECURITY_CREDENTIALS, module);
         return true;
     }
 
@@ -148,9 +164,9 @@ public class MyServerLoginModule implements LoginModule {
      */
     @Override
     public boolean commit() throws LoginException {
-        String ip = (String) sharedState.get(Context.SECURITY_CREDENTIALS);
+        String name = (String) sharedState.get(Context.SECURITY_CREDENTIALS);
 
-        ClusterIdentityPrincipal clusterIdentityPrincipal = new ClusterIdentityPrincipal(ip);
+        ClusterIdentityPrincipal clusterIdentityPrincipal = new ClusterIdentityPrincipal(name);
 
         this.subject.getPrincipals().add(clusterIdentityPrincipal);
 
@@ -166,7 +182,7 @@ public class MyServerLoginModule implements LoginModule {
      */
     @Override
     public boolean abort() throws LoginException {
-        LOGGER.debug("abort()");
+        LOGGER.info("abort()");
         return this.logout();
     }
 
@@ -177,7 +193,7 @@ public class MyServerLoginModule implements LoginModule {
      */
     @Override
     public boolean logout() throws LoginException {
-        LOGGER.debug("logout()");
+        LOGGER.info("logout({})", this.subject.getPrincipals());
         this.sharedState.clear();
         this.subject.getPrincipals().clear();
         return true;

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hazelcast-client xmlns="http://www.hazelcast.com/schema/client-config"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://www.hazelcast.com/schema/client-config
+                  http://www.hazelcast.com/schema/client-config/hazelcast-client-config-4.1.xsd">
+                  
+    <cluster-name>@my.cluster1.name@</cluster-name>
+
+    <properties>
+        <property name="hazelcast.client.statistics.enabled">true</property>
+    </properties>
+
+   	<network>
+   		<!-- 
+        <cluster-members>
+            <address>127.0.0.1</address>
+        </cluster-members>
+   		 -->
+        <kubernetes enabled="true">
+            <service-name>@docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local</service-name>
+        </kubernetes>        
+    </network>
+
+    <security>
+    	<!--  See MyClientLoginModule for acceptance criteria -->
+    	<username-password username="MCJVM" password="zpwiz"/>
+    </security>	
+    
+</hazelcast-client>
