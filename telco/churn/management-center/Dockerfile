@@ -23,9 +23,9 @@ ENV MC_ADMIN_PASSWORD=$MC_ADMINPASSWORD
 COPY target/classes/hazelcast-client-cluster1.xml /
 
 # If want a custom login module for JAAS.
-#ARG JAR_FILE
-#COPY target/${JAR_FILE} /application.jar
-#ENV MC_CLASSPATH=/application.jar
+ARG JAR_FILE
+COPY target/${JAR_FILE} /application.jar
+ENV MC_CLASSPATH=/application.jar
 
 # Start Management Center
 CMD ["bash", "-c", "set -euo pipefail \

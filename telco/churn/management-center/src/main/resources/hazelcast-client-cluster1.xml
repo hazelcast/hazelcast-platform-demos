@@ -23,7 +23,14 @@
 
     <security>
     	<!--  See MyClientLoginModule for acceptance criteria -->
-    	<username-password username="MCJVM" password="zpwiz"/>
+    	
+    	<!-- Direct credentials or via a factory -->
+
+		<!-- 
+    	<username-password username="ManagementCenter" password="znantrzragpragre"/>
+		 -->
+ 		<credentials-factory class-name="com.hazelcast.platform.demos.telco.churn.security.MyMCCredentialsFactory"/>
+ 
     </security>	
     
 </hazelcast-client>

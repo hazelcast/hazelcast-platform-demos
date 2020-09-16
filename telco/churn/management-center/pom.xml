@@ -27,6 +27,14 @@
 		<my.mc.cluster1.addresslist>${docker.image.prefix}-${my.cluster1.name}-hazelcast.default.svc.cluster.local</my.mc.cluster1.addresslist>
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-enterprise</artifactId>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
 	<build>
 		<resources>
 			<resource>
