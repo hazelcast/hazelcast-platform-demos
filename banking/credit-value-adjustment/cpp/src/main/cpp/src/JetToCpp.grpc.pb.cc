@@ -2,8 +2,8 @@
 // If you make any local change, they will be lost.
 // source: JetToCpp.proto
 
-#include "../include/JetToCpp.pb.h"
-#include "../include/JetToCpp.grpc.pb.h"
+#include "JetToCpp.pb.h"
+#include "JetToCpp.grpc.pb.h"
 
 #include <functional>
 #include <grpcpp/impl/codegen/async_stream.h>
