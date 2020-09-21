@@ -89,6 +89,13 @@ public class CvaStpJobSubmitter {
         String jobName = jobNamePrefix + "$" + calcDate + "@" + timestampStr;
         String cppLoadBalancer = getLoadBalancer();
 
+        int maxParallelism = 2;
+        if (parallelism > maxParallelism) {
+            LOGGER.error("Experimental build, parallelism {} constrained to max parallelism {}",
+                    parallelism, maxParallelism);
+            parallelism = maxParallelism;
+        }
+
         Pipeline pipeline = CvaStpJob.buildPipeline(jobName, timestamp, calcDate, cppLoadBalancer,
                 PORT, batchSize, parallelism, debug);
 
@@ -120,11 +127,11 @@ public class CvaStpJobSubmitter {
                 System.getProperty("my.docker.enabled", "false").equalsIgnoreCase(Boolean.TRUE.toString());
         boolean kubernetesEnabled =
                 System.getProperty("my.kubernetes.enabled", "false").equalsIgnoreCase(Boolean.TRUE.toString());
- 
-    	//XXX Experiment build
+
+        //XXX Experiment build
         if (kubernetesEnabled || dockerEnabled) {
             cppService = CPP_LOCALHOST;
-        	LOGGER.error("Experimental build, use '{}'", cppService);
+            LOGGER.error("Experimental build, use '{}'", cppService);
             return cppService;
         }
 
@@ -133,15 +140,15 @@ public class CvaStpJobSubmitter {
             validate(dockerEnabled, kubernetesEnabled, cppService);
         } else {
             // Unset, so guess
-            if (!dockerEnabled && !kubernetesEnabled) {
+            //XXXif (!dockerEnabled && !kubernetesEnabled) {
                 cppService = CPP_LOCALHOST;
-            }
-            if (dockerEnabled && !kubernetesEnabled) {
-                cppService = CPP_DOCKER;
-            }
-            if (kubernetesEnabled) {
-                cppService = CPP_KUBERNETES;
-            }
+            //}
+            //XXXif (dockerEnabled && !kubernetesEnabled) {
+            //    cppService = CPP_DOCKER;
+            //}
+            //XXXif (kubernetesEnabled) {
+            //    cppService = CPP_KUBERNETES;
+            //}
         }
 
         return cppService;

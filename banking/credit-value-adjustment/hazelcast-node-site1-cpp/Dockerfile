@@ -1,6 +1,8 @@
 FROM hazelcast-platform-demos/cva-cpp:latest
 
+RUN apt update
 RUN apt install -y openjdk-11-jdk
+RUN java --version
 
 COPY --from=hazelcast-platform-demos/cva-hazelcast-node-site1  application.jar /application.jar
 
@@ -11,6 +13,8 @@ RUN chmod u+x /cvaWrapper.sh
 # Default values provided
 ENV MY_GRAFANA_SERVICE "cva-grafana"
 ENV MY_KUBERNETES_ENABLED "true"
+ENV MY_INITSIZE ""
+ENV MY_PARTITIONS ""
 
 ENV JAVA_ARGS ""
 ENV JAVA_HEAP_SIZE "4g"
@@ -23,4 +27,6 @@ ENTRYPOINT exec /cvaWrapper.sh $0 \
   -Xmx$JAVA_HEAP_SIZE -Xms$JAVA_HEAP_SIZE $JAVA_OPTS \
  -Dmy.docker.enabled=true \
  -Dmy.grafana.service=$MY_GRAFANA_SERVICE \
- -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED
+ -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+ -Dmy.initSize=$MY_INITSIZE \
+ -Dmy.partitions=$MY_PARTITIONS

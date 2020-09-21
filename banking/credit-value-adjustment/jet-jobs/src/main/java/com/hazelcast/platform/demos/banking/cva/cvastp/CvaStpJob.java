@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Map.Entry;
+import java.util.concurrent.ForkJoinPool;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +36,13 @@ import com.hazelcast.function.FunctionEx;
 import com.hazelcast.function.Functions;
 import com.hazelcast.jet.aggregate.AggregateOperation1;
 import com.hazelcast.jet.aggregate.AggregateOperations;
+import com.hazelcast.jet.core.Processor;
 import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.jet.datamodel.Tuple4;
 import com.hazelcast.jet.grpc.GrpcService;
-import com.hazelcast.jet.grpc.GrpcServices;
+//FIXME Experimental import com.hazelcast.jet.grpc.GrpcServices;
+import com.hazelcast.jet.grpc.impl.BidirectionalStreamingService;
 import com.hazelcast.jet.pipeline.BatchStage;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.ServiceFactories;
@@ -53,6 +56,7 @@ import com.hazelcast.platform.demos.banking.cva.MyUtils;
 import com.hazelcast.platform.demos.banking.cva.OutputMessage;
 
 import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 
 /**
@@ -429,6 +433,43 @@ public class CvaStpJob {
 
 
     /**
+     * XXX Experimental code
+     *
+     * @param <T>
+     * @param <R>
+     * @param host
+     * @param port
+     * @param parallelism
+     * @param channelFn
+     * @param callStubFn
+     * @return
+     */
+    private static <T, R> ServiceFactory
+        <?, ? extends GrpcService<T, R>> bidirectionalStreamingServiceV2(
+            String host,
+            int port,
+            FunctionEx<? super ManagedChannel, ? extends FunctionEx<StreamObserver<R>, StreamObserver<T>>>
+                            callStubFn
+            ) {
+                return ServiceFactories.nonSharedService(
+                        ctx -> {
+                            int i = ctx.localProcessorIndex();
+                            int actualPort = port + i;
+                            LOGGER.warn("ctx.localProcessorIndex()=={} gets port {}", i, actualPort);
+
+                            FunctionEx<Processor.Context, ? extends ManagedChannelBuilder<?>> channelFn =
+                                    (ctx2) -> CvaStpUtils.getManagedChannelBuilder(host, actualPort);
+
+                            return new BidirectionalStreamingService<>(
+                                ctx,
+                                channelFn.apply(ctx).executor(ForkJoinPool.commonPool()).build(),
+                                callStubFn);
+                        },
+                        BidirectionalStreamingService::destroy
+                );
+            }
+
+    /**
      * <p>Push a quadruple of calculation date, fixing dates &amp; rates, trade and interest
      * rate curve to the <b>C++</b> calculation, which will return the <i>mark-to-market</i>
      * for the curve scenario.
@@ -465,9 +506,14 @@ public class CvaStpJob {
         FunctionEx<? super ManagedChannel,
                 ? extends FunctionEx<StreamObserver<OutputMessage>, StreamObserver<InputMessage>>>
              callStubFn = channel -> JetToCppGrpc.newStub(channel)::streamingCall;
+
+        //XXX Experimental code
         ServiceFactory<?, ? extends GrpcService<InputMessage, OutputMessage>> cppService =
+                /*XXX Experimental code */
+                CvaStpJob.bidirectionalStreamingServiceV2(host, port, callStubFn);
+                /*XXX Original code
                 GrpcServices.bidirectionalStreamingService(
-                        () -> CvaStpUtils.getManagedChannelBuilder(host, port), callStubFn);
+                        () -> CvaStpUtils.getManagedChannelBuilder(host, port), callStubFn);*/
 
         /* Make the input to C++ for the service call, and extract the output
          * from the result.

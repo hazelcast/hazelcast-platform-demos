@@ -61,6 +61,7 @@ public class ApplicationInitializer {
                LOGGER.info("Cluster size {}, not initializing until {}",
                        currentSize, this.myProperties.getInitSize());
            } else {
+               LOGGER.info("Cluster size {}, initializing", currentSize);
                this.createNeededObjects();
                this.launchNeededJobs(isLocalhost);
            }

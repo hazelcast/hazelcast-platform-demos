@@ -47,6 +47,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ApplicationConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
+    private static final int DEFAULT_PARTITION_COUNT = 271;
 
     private final String project;
     private final Site site;
@@ -55,10 +56,12 @@ public class ApplicationConfig {
     @Autowired
     private MyWANDiscoveryStrategyFactory myDiscoveryStrategyFactory;
 
-    public ApplicationConfig(MyProperties myProperties) {
+    static {
         LOGGER.info("Runtime.getRuntime().availableProcessors()=={}",
                 Runtime.getRuntime().availableProcessors());
+    }
 
+    public ApplicationConfig(MyProperties myProperties) {
         // From Maven, application.yml, wouldn't be in environment by default.
         this.project = myProperties.getProject();
         this.remoteSite = myProperties.getRemoteSite();
@@ -67,6 +70,31 @@ public class ApplicationConfig {
         System.setProperty("my.remote.site", this.remoteSite.toString());
         System.setProperty("my.partitions", String.valueOf(myProperties.getPartitions()));
         System.setProperty("my.site", this.site.toString());
+
+        String initSizeStr = System.getProperty("my.initSize", "");
+        myProperties.setInitSize(1);
+        if (initSizeStr.length() == 0) {
+            LOGGER.warn("System property 'my.initSize' empty");
+        } else {
+            try {
+                myProperties.setInitSize(Integer.parseInt(initSizeStr));
+            } catch (NumberFormatException nfe) {
+                LOGGER.error("System property 'my.initSize' exception '{}' '{}'",
+                        initSizeStr, nfe.getMessage());
+            }
+        }
+        String partitionsStr = System.getProperty("my.partitions", "");
+        myProperties.setPartitions(DEFAULT_PARTITION_COUNT);
+        if (partitionsStr.length() == 0) {
+            LOGGER.warn("System property 'my.partitions' empty");
+        } else {
+            try {
+                myProperties.setPartitions(Integer.parseInt(partitionsStr));
+            } catch (NumberFormatException nfe) {
+                LOGGER.error("System property 'my.partitions' exception '{}' '{}'",
+                        partitionsStr, nfe.getMessage());
+            }
+        }
     }
 
     /**
@@ -124,14 +152,14 @@ public class ApplicationConfig {
      */
     private void logProperties(JetConfig jetConfig) {
         Properties properties = jetConfig.getProperties();
-        for (Object propertyKey : properties.keySet()) {
+        for (Map.Entry propertyEntry : properties.entrySet()) {
             LOGGER.info("Property '{}'=='{}'",
-                    propertyKey, properties.get(propertyKey));
+                    propertyEntry.getKey(), propertyEntry.getValue());
         }
         properties = jetConfig.getHazelcastConfig().getProperties();
-        for (Object propertyKey : properties.keySet()) {
+        for (Map.Entry propertyEntry : properties.entrySet()) {
             LOGGER.info("Property '{}'=='{}'",
-                    propertyKey, properties.get(propertyKey));
+                    propertyEntry.getKey(), propertyEntry.getValue());
         }
     }
 
