@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 
 import org.slf4j.Logger;
@@ -34,6 +35,7 @@ import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.function.ComparatorEx;
 import com.hazelcast.function.FunctionEx;
 import com.hazelcast.function.Functions;
+import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.aggregate.AggregateOperation1;
 import com.hazelcast.jet.aggregate.AggregateOperations;
 import com.hazelcast.jet.core.Processor;
@@ -431,6 +433,23 @@ public class CvaStpJob {
         return pipeline;
     }
 
+    /**
+     * <p>Log which host this is.
+     * </p>
+     *
+     * @param jetInstance
+     */
+    private static void logHost(JetInstance jetInstance) {
+        Member self = jetInstance.getCluster().getLocalMember();
+        Set<Member> members = jetInstance.getCluster().getMembers();
+        int i = 0;
+        for (Member member : members) {
+            if (member.getUuid().equals(self.getUuid())) {
+                LOGGER.warn("This is member {} in set of {}", i, members.size());
+            }
+            i++;
+        }
+    }
 
     /**
      * XXX Experimental code
@@ -453,6 +472,8 @@ public class CvaStpJob {
             ) {
                 return ServiceFactories.nonSharedService(
                         ctx -> {
+                            logHost(ctx.jetInstance());
+
                             int i = ctx.localProcessorIndex();
                             int actualPort = port + i;
                             LOGGER.warn("ctx.localProcessorIndex()=={} gets port {}", i, actualPort);
