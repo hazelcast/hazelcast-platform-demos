@@ -445,7 +445,7 @@ public class CvaStpJob {
         int i = 0;
         for (Member member : members) {
             if (member.getUuid().equals(self.getUuid())) {
-                LOGGER.warn("This is member {} in set of {}", i, members.size());
+                LOGGER.info("This is member {} in set of {}", i, members.size());
             }
             i++;
         }
@@ -476,7 +476,7 @@ public class CvaStpJob {
 
                             int i = ctx.localProcessorIndex();
                             int actualPort = port + i;
-                            LOGGER.warn("ctx.localProcessorIndex()=={} gets port {}", i, actualPort);
+                            LOGGER.info("ctx.localProcessorIndex()=={} gets port {}", i, actualPort);
 
                             FunctionEx<Processor.Context, ? extends ManagedChannelBuilder<?>> channelFn =
                                     (ctx2) -> CvaStpUtils.getManagedChannelBuilder(host, actualPort);
