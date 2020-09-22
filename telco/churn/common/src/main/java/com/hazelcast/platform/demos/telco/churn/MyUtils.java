@@ -16,7 +16,15 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+
+import com.hazelcast.jet.JetInstance;
+import com.hazelcast.jet.Job;
+import com.hazelcast.jet.core.JobStatus;
 
 /**
  * <p>Utility functions that may be useful to more than one module.
@@ -55,5 +63,54 @@ public class MyUtils {
         }
 
         return new String(output);
+    }
+
+    /**
+     * <p>Take a timestamp {@code long} and convert it into an ISO-8601
+     * style string, but drop the millisecond accuracy.
+     * </p>
+     *
+     * @see <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO-8601</a>
+     * @param timestamp From "{@code System.currentTimeMillis()}" probabaly
+     * @return Time as a string
+     */
+    public static String timestampToISO8601(long timestamp) {
+        LocalDateTime localDateTime =
+                Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+        String timestampStr = DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(localDateTime);
+
+        if (timestampStr.indexOf('.') > 0) {
+            timestampStr = timestampStr.substring(0, timestampStr.indexOf('.'));
+        }
+
+        return timestampStr;
+    }
+
+    /**
+     * <p>In the {@link JobConfig} jobs are named with their function
+     * and a submission timestamp. Look for the job name, to see if a
+     * job is already running, to stop running the same job twice.
+     * </p>
+     *
+     * @param prefix The start of a job name
+     * @param jetInstance To access the job registry
+     * @return The first match, or null if none.
+     */
+    public static Job findRunningJobsWithSamePrefix(String prefix, JetInstance jetInstance) {
+        Job match = null;
+
+        for (Job job : jetInstance.getJobs()) {
+            if (job.getName() != null && job.getName().startsWith(prefix)) {
+                if ((job.getStatus() == JobStatus.STARTING)
+                     || (job.getStatus() == JobStatus.RUNNING)
+                     || (job.getStatus() == JobStatus.SUSPENDED)
+                     || (job.getStatus() == JobStatus.SUSPENDED_EXPORTING_SNAPSHOT)) {
+                    return job;
+                }
+            }
+        }
+
+        return match;
     }
 }

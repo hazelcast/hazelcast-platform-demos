@@ -11,14 +11,17 @@
     </properties>
 
    	<network>
+        <cluster-members>
+            <address>192.168.254.218</address>
+        </cluster-members>
    		<!-- 
         <cluster-members>
             <address>127.0.0.1</address>
         </cluster-members>
-   		 -->
         <kubernetes enabled="true">
             <service-name>@docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local</service-name>
         </kubernetes>        
+   		 -->
     </network>
 
     <security>
@@ -27,10 +30,9 @@
     	<!-- Direct credentials or via a factory -->
 
 		<!-- 
-    	<username-password username="ManagementCenter" password="znantrzragpragre"/>
+    	<username-password username="ManagementCenter" password="${my.password}"/>
 		 -->
  		<credentials-factory class-name="com.hazelcast.platform.demos.telco.churn.security.MyMCCredentialsFactory"/>
- 
     </security>	
     
 </hazelcast-client>

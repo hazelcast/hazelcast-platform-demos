@@ -9,7 +9,7 @@
     	
     	<!-- Direct credentials or via a factory -->
 
-        <username-password username="JobSubmitter" password="wbofhozvggre"/>
+        <username-password username="JobSubmitter" password="${my.password}"/>
 		<!-- 
  		<credentials-factory class-name="com.hazelcast.platform.demos.telco.churn.security.MyNotYetWrittenCredentialsFactory"/>
 		 -->
