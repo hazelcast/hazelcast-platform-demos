@@ -36,10 +36,9 @@
 	</properties>
 
 	<modules>
-		<!-- Standalone, not part of Hazelcast apart from Management Center -->
+		<!-- Standalone, not part of Hazelcast -->
 		<module>cassandra</module>
 		<module>grafana</module>
-		<module>management-center</module>
 		<module>prometheus</module>
 		<module>mongo</module>
 		<module>mysql</module>
@@ -49,9 +48,14 @@
 
 		<!-- Add test data to Cassandra/Mongo/MySql -->
 		<module>preload-legacy</module>
+		<module>update-legacy</module>
 
 		<!-- Hazelcast bits -->
 		<module>hazelcast-node</module>
+		<module>abstract-client</module>
+		<module>java-client</module>
+		<module>slack-alerting</module>
+		<module>management-center</module>
 	</modules>
 
 	<dependencies>

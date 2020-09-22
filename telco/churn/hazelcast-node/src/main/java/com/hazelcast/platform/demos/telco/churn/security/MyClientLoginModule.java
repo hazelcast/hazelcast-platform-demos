@@ -18,7 +18,10 @@ package com.hazelcast.platform.demos.telco.churn.security;
 
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.naming.Context;
@@ -31,32 +34,38 @@ import javax.security.auth.spi.LoginModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hazelcast.platform.demos.telco.churn.MyUtils;
 import com.hazelcast.security.ClusterIdentityPrincipal;
+import com.hazelcast.security.ClusterRolePrincipal;
 import com.hazelcast.security.Credentials;
 import com.hazelcast.security.CredentialsCallback;
 import com.hazelcast.security.EndpointCallback;
 import com.hazelcast.security.SimpleTokenCredentials;
+import com.hazelcast.security.UsernamePasswordCredentials;
 
 /**
- * <p>This validates incoming credentials coming from another
- * <u>server</u> trying to join the cluster. Return "{@code true}"
+ * <p>This validates incoming credentials coming from a
+ * <u>client</u> trying to join the cluster. Return "{@code true}"
  * to allow and "{@code false}" for reject, unsurprisingly.
  * </p>
  * <p>JAAS allows multiple login modules to be used, and the first
  * to fail stops the login. Here there is only one.
  * </p>
- * <p>Servers use {@link com.hazelcast.security.SimpleTokenCredentials SimpleTokenCredentials}.
+ * <p>Clients may use {@link com.hazelcast.security.SimpleTokenCredentials SimpleTokenCredentials}
+ * or {@link com.hazelcast.security.UsernamePasswordCredentials UsernamePasswordCredentials} depending
+ * on their configuration, so support both types.
  * </p>
  * <p><b>Note:</b> This is <em>simplified sample code</em>, do not use as-is for Production security.</p>
  */
-public class MyServerLoginModule implements LoginModule {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MyServerLoginModule.class);
+public class MyClientLoginModule implements LoginModule {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MyClientLoginModule.class);
     private static final int QUADRUPLE = 4;
 
     private Subject subject;
     private CallbackHandler callbackHandler;
     private Map<String, Object> sharedState;
     private String myBuildTimestamp;
+    private List<String> blockedPasswords;
 
     /**
      * <p>Prepare the login module for this connection attempt, capture
@@ -89,12 +98,17 @@ public class MyServerLoginModule implements LoginModule {
         this.callbackHandler = callbackHandler;
         this.sharedState = (Map<String, Object>) sharedState;
         this.myBuildTimestamp = options.get("buildTimestamp").toString();
+        this.blockedPasswords = new ArrayList<>();
+        String blockedPasswordsCsv = options.get("blockedPasswordsCsv").toString();
+        for (String blockedPassword : blockedPasswordsCsv.split(",")) {
+            this.blockedPasswords.add(blockedPassword);
+            LOGGER.debug("Adding '{}' to blocked password list", blockedPassword);
+        }
     }
 
     /**
-     * <p>Accept or reject the login. We expect a 4-tuple of
-     * build name, build timestamp, the word "{@code server}", and the
-     * IP address of the sender.
+     * <p>Accept or reject the login. Allow it to be a token or a username/password
+     * and validate accordingly.
      * </p>
      * <p> The next call will be a {@link #commit} or {@link #abort},
      * based on all "{@code true}" or any "{@ codefalse}" in the login chain.
@@ -118,16 +132,33 @@ public class MyServerLoginModule implements LoginModule {
             LOGGER.error("login(), credentials are null");
             return false;
         }
-        if (!(credentials instanceof SimpleTokenCredentials)) {
-            LOGGER.error("login(), credentials are not SimpleTokenCredentials");
-            return false;
-        }
         if (apparentEndpoint == null) {
             LOGGER.error("login(), apparentEndpoint is null");
             return false;
         }
 
-        SimpleTokenCredentials simpleTokenCredentials = (SimpleTokenCredentials) credentials;
+        if (credentials instanceof SimpleTokenCredentials) {
+            return loginSimpleTokenCredentials((SimpleTokenCredentials) credentials, apparentEndpoint);
+        }
+        if (credentials instanceof UsernamePasswordCredentials) {
+            return loginUsernamePasswordCredentials((UsernamePasswordCredentials) credentials, apparentEndpoint);
+        }
+
+        LOGGER.error("login(), credentials=='{}'", credentials.getClass());
+        return false;
+    }
+
+    /**
+     * <p>Validate the token, has it enough fields and is the producing class as expected.
+     * <b><u>Certainly not an acceptable method to use for real! This is just a demo.</u></b>
+     * </p>
+     *
+     * @param simpleTokenCredentials
+     * @param apparentEndpoint
+     * @return
+     */
+    private boolean loginSimpleTokenCredentials(SimpleTokenCredentials simpleTokenCredentials, String apparentEndpoint) {
+
         String[] tokens = new String(simpleTokenCredentials.getToken(), StandardCharsets.UTF_8).split(",");
         if (tokens.length < QUADRUPLE) {
             LOGGER.error("login() tokens=='{}'", Arrays.asList(tokens));
@@ -138,21 +169,55 @@ public class MyServerLoginModule implements LoginModule {
         String kind = tokens[2];
         String module = tokens[3];
 
-        if (!MyServerCredentialsFactory.class.getSimpleName().equals(kind)) {
+        if (!MyClientCredentialsFactory.class.getSimpleName().equals(kind)) {
             LOGGER.error("login() wrong kind for '{}'", Arrays.asList(tokens));
             return false;
         }
 
         // Tolerable for clients but not for servers
         if (!this.myBuildTimestamp.equals(theirBuildTimestamp)) {
-            LOGGER.error("login() my build '{}' different from their build in '{}'",
+            LOGGER.warn("login() my build '{}' different from their build in '{}'",
                 this.myBuildTimestamp, Arrays.asList(tokens));
-            return false;
         }
 
         LOGGER.info("login() apparentEndpoint='{}', tokens=='{}'", apparentEndpoint, Arrays.asList(tokens));
         this.sharedState.put(Context.SECURITY_CREDENTIALS, module);
         return true;
+    }
+
+    /**
+     * <p>Validate the password, is it based on the Ro13 of the user name.
+     * <b><u>Certainly not an acceptable method to use for real! This is just a demo.</u></b>
+     * </p>
+     *
+     * @param usernamePasswordCredentials
+     * @param apparentEndpoint
+     * @return
+     */
+    private boolean loginUsernamePasswordCredentials(UsernamePasswordCredentials usernamePasswordCredentials,
+            String apparentEndpoint) {
+
+        String unencryptedPassword = MyUtils.rot13(usernamePasswordCredentials.getPassword());
+        boolean accept = usernamePasswordCredentials.getName().toLowerCase(Locale.ROOT)
+                .equals(unencryptedPassword);
+
+        for (String blockedPassword : this.blockedPasswords) {
+            if (blockedPassword.equals(unencryptedPassword)) {
+                accept = false;
+                LOGGER.debug("Password in bloacked list");
+            }
+        }
+
+        if (accept) {
+            LOGGER.info("login(), apparentEndpoint='{}', credentials=='{}'", apparentEndpoint,
+                    usernamePasswordCredentials);
+            this.sharedState.put(Context.SECURITY_CREDENTIALS, usernamePasswordCredentials.getName());
+            return true;
+        } else {
+            LOGGER.error("login(), incorrect password for credentials=='{}'",
+                    usernamePasswordCredentials);
+            return false;
+        }
     }
 
     /**
@@ -164,11 +229,13 @@ public class MyServerLoginModule implements LoginModule {
      */
     @Override
     public boolean commit() throws LoginException {
-        String name = (String) sharedState.get(Context.SECURITY_CREDENTIALS);
+        String name = (String) this.sharedState.get(Context.SECURITY_CREDENTIALS);
 
         ClusterIdentityPrincipal clusterIdentityPrincipal = new ClusterIdentityPrincipal(name);
+        ClusterRolePrincipal clusterRolePrincipal = new ClusterRolePrincipal(name);
 
-        this.subject.getPrincipals().add(clusterIdentityPrincipal);
+        // For role based authorisation
+        this.subject.getPrincipals().add(clusterRolePrincipal);
 
         this.sharedState.put(Context.SECURITY_PRINCIPAL, clusterIdentityPrincipal);
 

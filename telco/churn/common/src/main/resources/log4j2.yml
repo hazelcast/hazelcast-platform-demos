@@ -35,12 +35,12 @@ Configuration:
           AppenderRef:
             ref: ConsoleCyan
         - name: com.hazelcast.enterprise.security
-          level: debug
+          level: trace
           additivity: false
           AppenderRef:
             ref: ConsoleYellow
         - name: com.hazelcast.security
-          level: debug
+          level: trace
           additivity: false
           AppenderRef:
             ref: ConsoleYellow
@@ -57,6 +57,11 @@ Configuration:
         # Hide irrelevant warnings from Hibernate Validator
         - name: org.hibernate
           level: error
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+        - name: org.springframework
+          level: info
           additivity: false
           AppenderRef:
             ref: ConsoleGreen
