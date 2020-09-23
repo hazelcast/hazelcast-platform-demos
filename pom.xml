@@ -44,13 +44,9 @@
 		<jython.version>2.7.2rc1</jython.version>
 		<kafka-clients.version>2.4.0</kafka-clients.version>
 		<poi-ooxml.version>4.1.2</poi-ooxml.version>
-<<<<<<< HEAD
                 <!-- Run same version with 'protoc - -grpc_out=. - -plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin' 
                      banking/credit-value-adjustment/common/src/main/proto/JetToCpp.proto -->
 		<protobuf.version>3.12.2</protobuf.version>
-=======
-		<protobuf.version>3.12.4</protobuf.version>
->>>>>>> master
 		<spring-boot.version>2.3.2.RELEASE</spring-boot.version>
 		<springfox-swagger.version>2.9.2</springfox-swagger.version>
 
@@ -344,13 +340,10 @@
 							<MC_CLUSTER1_ADDRESSLIST>${my.mc.cluster1.addresslist}</MC_CLUSTER1_ADDRESSLIST>
 							<MC_CLUSTER2_NAME>${my.mc.cluster2.name}</MC_CLUSTER2_NAME>
 							<MC_CLUSTER2_ADDRESSLIST>${my.mc.cluster2.addresslist}</MC_CLUSTER2_ADDRESSLIST>
-<<<<<<< HEAD
                                                         <!-- Dockerfile uses for other tools -->
                                                         <MY_OTHERUSER>${my.other.admin.user}</MY_OTHERUSER>
                                                         <MY_OTHERPASSWORD>${my.other.admin.password}</MY_OTHERPASSWORD>
                                                         <MY_OTHERDATABASE>${my.other.admin.database}</MY_OTHERDATABASE>
-=======
->>>>>>> master
 						</buildArgs>
 						<dockerfile>Dockerfile</dockerfile>
 						<pullNewerImage>false</pullNewerImage>
