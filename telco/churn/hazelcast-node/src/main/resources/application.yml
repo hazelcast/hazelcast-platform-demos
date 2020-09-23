@@ -2,5 +2,4 @@
 my:
   build-timestamp: @maven.build.timestamp@
   build-userName: @user.name@
-  initSize: @my.init.size@
   site: @my.cluster.name@

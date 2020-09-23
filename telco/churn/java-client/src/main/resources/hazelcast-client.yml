@@ -1,0 +1,35 @@
+hazelcast-client:
+  import:
+    - client-labels.yml
+#    #- client-name.yml
+    - client-security-${my.environment}.yml
+  #
+#  config-replacers:
+#    fail-if-value-missing: false
+#    replacers:
+#      - class-name: com.hazelcast.config.replacer.EncryptionReplacer
+#        properties:
+#          cipherAlgorithm: AES
+#          keyLengthBits: 128
+#          passwordFile: /Users/neil/Documents/security/password.file
+#          passwordUserProperties: false
+##          secretKeyAlgorithm: AES
+#          secretKeyFactoryAlgorithm: PBKDF2WithHmacSHA256
+
+  # Replaced by Maven
+  cluster-name: '@my.cluster.name@'
+  # Replaced by Maven
+  instance-name: '@project.artifactId@'
+  properties:
+    hazelcast.client.statistics.enabled: true
+  network:
+    # Default, but make it obvious webapp can multiplex
+    smart-routing: true
+
+#    password: $ENC{DI6eLDxtaJQ=:531:NiniFhbXH6kHniFpgD4qdw==}
+
+  # Value must match MyConstants.java
+  serialization:
+    data-serializable-factories:
+      - factory-id: 1000
+        class-name: com.hazelcast.platform.demos.telco.churn.MyIdentifiedDataSerializableFactory  

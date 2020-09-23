@@ -1,0 +1,2 @@
+hazelcast-client:
+  instance-name: java-client-normal

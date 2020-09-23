@@ -44,6 +44,24 @@ public class Application {
             System.exit(1);
         }
 
+        // For cluster initialization, defer til expected size
+        String initSizeStr = System.getProperty("my.initSize");
+        if (initSizeStr == null || initSizeStr.length() == 0) {
+            LOGGER.error("Usage: 'my.initSize' system property not set");
+            System.exit(1);
+        } else {
+            try {
+                int initSize = Integer.parseInt(initSizeStr);
+                if (initSize <= 0) {
+                    LOGGER.error("Usage: 'my.initSize' system property negative, '{}'", initSizeStr);
+                    System.exit(1);
+                }
+            } catch (Exception e) {
+                LOGGER.error("Usage: 'my.initSize' system property not a number, '{}'", initSizeStr);
+                System.exit(1);
+            }
+        }
+
         SpringApplication.run(Application.class, args);
     }
 

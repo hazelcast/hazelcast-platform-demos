@@ -24,11 +24,24 @@ import java.util.List;
  */
 public class MyConstants {
 
+    // Used also in Node.js clients, Java clients and Java servers.
+    public static final int CLASS_ID_MYDATASERIALIZABLEFACTORY = 1000;
+    public static final int CLASS_ID_MYCREDENTIALS = 1;
+
     // Map names, for eager creation
     //TODO Temporary name for testing
     public static final String IMAP_NAME_NEIL  = "neil";
-
     public static final List<String> IMAP_NAMES =
             List.of(IMAP_NAME_NEIL);
 
+    // Topic names, for eager creation
+    public static final String ITOPIC_NAME_SLACK  = "slack";
+    public static final List<String> ITOPIC_NAMES =
+            List.of(ITOPIC_NAME_SLACK);
+
+    // For Jet job that writes to Slack
+    public static final String SLACK_ACCESS_TOKEN_KEY = "accessToken";
+    public static final String SLACK_CHANNEL_ID_KEY = "channelId";
+    public static final String SLACK_CHANNEL_ID_VALUE = "ext_hazelcast-platform-demos";
+    public static final String SLACK_TOPIC_NAME_KEY = "topicName";
 }

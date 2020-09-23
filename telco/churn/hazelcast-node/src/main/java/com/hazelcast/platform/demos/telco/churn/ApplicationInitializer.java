@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.hazelcast.core.DistributedObject;
 import com.hazelcast.jet.JetInstance;
 
 /**
@@ -35,6 +38,7 @@ import com.hazelcast.jet.JetInstance;
 @Configuration
 public class ApplicationInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInitializer.class);
+    private static final long TWO_MINUTES = 120L;
 
     @Autowired
     private JetInstance jetInstance;
@@ -61,6 +65,15 @@ public class ApplicationInitializer {
                 this.createNeededObjects();
                 this.launchNeededJobs(isLocalhost);
             }
+            LOGGER.error("SLEEP");
+            TimeUnit.SECONDS.sleep(TWO_MINUTES);
+            LOGGER.error("AWAKE");
+            LOGGER.error("====");
+            for (DistributedObject distributedObject : this.jetInstance.getHazelcastInstance().getDistributedObjects()) {
+                LOGGER.error("distributedObject '{}' '{}'",
+                        distributedObject.getName(), distributedObject.getClass().getName());
+            }
+            LOGGER.error("====");
         };
     }
 
@@ -75,6 +88,12 @@ public class ApplicationInitializer {
         for (String iMapName : MyConstants.IMAP_NAMES) {
             this.jetInstance.getHazelcastInstance().getMap(iMapName);
         }
+        for (String iTopicName : MyConstants.ITOPIC_NAMES) {
+            this.jetInstance.getHazelcastInstance().getTopic(iTopicName);
+        }
+        //XXX
+        this.jetInstance.getMap(MyConstants.IMAP_NAME_NEIL)
+        .put(this.myProperties.getBuildUserName(), this.myProperties.getBuildTimestamp());
     }
 
     /**

@@ -1,0 +1,9 @@
+# Replaced by Maven
+my:
+  build-timestamp: @maven.build.timestamp@
+  build-userName: @user.name@
+  site: @my.cluster.name@
+
+spring:
+  application:
+    name: @project.artifactId@

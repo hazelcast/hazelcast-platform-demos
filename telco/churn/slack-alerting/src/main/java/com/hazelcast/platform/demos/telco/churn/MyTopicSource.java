@@ -39,9 +39,11 @@ public class MyTopicSource implements MessageListener<String> {
     private static final int QUEUE_CAPACITY = 1_000;
 
     private final BlockingQueue<String> queue = new LinkedBlockingQueue<>(QUEUE_CAPACITY);
+    private final String member;
 
-    public MyTopicSource(ITopic<String> topic) {
+    public MyTopicSource(ITopic<String> topic, String member) {
         topic.addMessageListener(this);
+        this.member = member;
     }
 
     /**
@@ -52,6 +54,7 @@ public class MyTopicSource implements MessageListener<String> {
     @Override
     public void onMessage(Message<String> message) {
         String messageObject = message.getMessageObject();
+        messageObject += ", via " + member;
         boolean success = this.queue.offer(messageObject);
         if (!success) {
             LOGGER.error("Dropped message, buffer full, '{}'", messageObject);
