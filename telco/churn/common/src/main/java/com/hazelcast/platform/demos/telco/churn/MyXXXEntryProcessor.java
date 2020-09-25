@@ -36,16 +36,10 @@ public class MyXXXEntryProcessor implements EntryProcessor<Integer, Object, Stri
    private static final long serialVersionUID = 1L;
    private static final Logger LOGGER = LoggerFactory.getLogger(MyXXXEntryProcessor.class);
 
-   public MyXXXEntryProcessor() {
-       LOGGER.warn("MyXXXEntryProcessor().{}", this);
-   }
-
    @Override
    public String process(Entry<Integer, Object> entry) {
-       LOGGER.warn("MyXXXEntryProcessor().{} PROCESS", this);
        LOGGER.warn("MyXXXEntryProcessor().{} PROCESS KEY {}", this, entry.getKey());
        Object value = entry.getValue();
-       LOGGER.warn("MyXXXEntryProcessor().{} PROCESS VALUE {} {}", this, entry.getKey(), value.getClass());
        String result = "KEY " + entry.getKey() + " VALUE " + value.getClass().getCanonicalName();
        if (value instanceof GenericRecord) {
            GenericRecord genericRecord = (GenericRecord) value;

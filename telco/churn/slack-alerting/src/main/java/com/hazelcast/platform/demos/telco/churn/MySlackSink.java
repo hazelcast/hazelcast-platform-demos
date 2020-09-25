@@ -20,7 +20,14 @@ import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * <p>Make a REST call to sink the object to the designated Slack destination.
@@ -31,42 +38,84 @@ import org.springframework.boot.configurationprocessor.json.JSONObject;
  */
 public class MySlackSink {
     private static final Logger LOGGER = LoggerFactory.getLogger(MySlackSink.class);
-
-    /*
-    return SinkBuilder.sinkBuilder(
-            "slackSink-" + channelName,
-            context -> null
-             SimpleHttpClient
-                    .create(URL))
-            .<String>receiveFn(
-                    ((httpClient, message) ->
-                    httpClient
-                            .withHeader("Authorization", String.format("Bearer %s", accessToken))
-                            .withParam("channel", channel)
-                            .withParam("text", message)
-                            .postWithParams())
-                    )
-            .build();*/
+    private final String channel;
+    private final String token;
+    private final RestTemplate restTemplate;
 
     public MySlackSink(Properties properties) {
-        // TODO Auto-generated constructor stub
+        this.channel = properties.getProperty(SlackConstants.CHANNEL);
+        this.token = properties.getProperty(SlackConstants.TOKEN);
+        this.restTemplate = new RestTemplate();
     }
 
     /**
-     * XXX
+     * <p>Take a JSON message, enrich with Slack connectity
+     * and do an HTTP Post.
+     * </p>
      *
-     * @param o
+     * @param jsonObject Message without delivery params
      */
-    public Object receiveFn(JSONObject item) {
-        LOGGER.error("XXX receive " + item);
+    @SuppressWarnings("deprecation")
+    public Object receiveFn(JSONObject jsonObject) {
+        try {
+            // Target channel goes in JSON message
+            jsonObject.put(SlackConstants.CHANNEL, this.channel);
+
+            HttpHeaders headers = new HttpHeaders();
+            //FIXME This is deprecated, but Slack seems to require it. Should be MediaType.APPLICATION_JSON
+            headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+            headers.setBearerAuth(this.token);
+
+            HttpEntity<String> request =
+                    new HttpEntity<String>(jsonObject.toString(), headers);
+
+            LOGGER.info("Sending to Slack: {}", jsonObject);
+
+            ResponseEntity<Object> responseEntity
+                = restTemplate.postForEntity(SlackConstants.POST_MESSAGE_URL, request, Object.class);
+
+            Object body = responseEntity.getBody();
+            if (responseEntity.getStatusCode() != HttpStatus.OK || body == null) {
+                String message = String.format("---- Send to Slack fail ----%n => HTTP Status Code %d : %s%n => %s%n",
+                        responseEntity.getStatusCodeValue(),
+                        responseEntity.getStatusCode().getReasonPhrase(),
+                        responseEntity);
+                LOGGER.error(message);
+            } else {
+                try {
+                    JSONObject responseBody = new JSONObject(body.toString());
+                    boolean ok = responseBody.getBoolean("ok");
+                    LOGGER.error("ok=={}", ok);
+                    if (!ok) {
+                        String message = String.format("---- Send to Slack fail ----%n => HTTP Status Code %d : %s%n => %s%n",
+                                responseEntity.getStatusCodeValue(),
+                                responseEntity.getStatusCode().getReasonPhrase(),
+                                responseBody);
+                        LOGGER.error(message);
+                    }
+                } catch (JSONException e2) {
+                    /*FIXME Slack returns bad JSON on success!
+                     */
+                    if (e2.getMessage().startsWith("Unterminated object at character")) {
+                        LOGGER.trace("Slack returns bad JSON on success: {}", body);
+                    } else {
+                        LOGGER.error("receiveFn()", e2);
+                    }
+                }
+            }
+
+        } catch (JSONException e) {
+            LOGGER.error("receiveFn()", e);
+        }
+
         return this;
     }
 
     /**
-     * XXX
+     * <p>Nothing to do, connection to Slack isn't kept open.
+     * </p>
      */
     public Object destroyFn() {
-        LOGGER.error("XXX destroy");
         return this;
     }
 }

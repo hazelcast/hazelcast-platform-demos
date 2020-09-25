@@ -18,6 +18,8 @@ package com.hazelcast.platform.demos.telco.churn;
 
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 import com.hazelcast.cluster.Address;
@@ -25,8 +27,10 @@ import com.hazelcast.function.FunctionEx;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.Sink;
 import com.hazelcast.jet.pipeline.SinkBuilder;
+import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.pipeline.SourceBuilder;
 import com.hazelcast.jet.pipeline.StreamSource;
+import com.hazelcast.jet.pipeline.StreamStage;
 import com.hazelcast.topic.ITopic;
 
 /**
@@ -79,22 +83,32 @@ import com.hazelcast.topic.ITopic;
  */
 public class TopicToSlack {
     public static final String JOB_NAME_PREFIX = TopicToSlack.class.getSimpleName();
+    private static final Logger LOGGER = LoggerFactory.getLogger(TopicToSlack.class);
 
     /**
      * <p>Straight-forward connectivity, read from a topic and pass everything
      * to the Slack cannel.
      * </p>
      */
-    public static Pipeline buildPipeline(Properties properties) {
-        String topicName = properties.getProperty(MyConstants.SLACK_TOPIC_NAME_KEY);
-        String channelId = properties.getProperty(MyConstants.SLACK_CHANNEL_ID_KEY);
+    public static Pipeline buildPipeline(Properties properties, String topicName) {
+        String channel = properties.getProperty(SlackConstants.CHANNEL);
 
         Pipeline pipeline = Pipeline.create();
 
-        pipeline
-        .readFrom(TopicToSlack.myTopicSource(topicName)).withoutTimestamps()
-        .map(TopicToSlack.myMapStage()).setName("reformat-to-JSON")
-        .writeTo(TopicToSlack.mySlackChannel(channelId, properties));
+        StreamStage<JSONObject> readAndMap =
+                pipeline
+                .readFrom(TopicToSlack.myTopicSource(topicName)).withoutTimestamps()
+                .map(TopicToSlack.myMapStage()).setName("reformat-to-JSON");
+
+        // If Slack integration not available, log to console instead
+        if (properties.get(SlackConstants.TOKEN) == null) {
+            LOGGER.error("No Slack access token, alerting will be to stdout");
+            readAndMap
+            .writeTo(Sinks.logger());
+        } else {
+            readAndMap
+            .writeTo(TopicToSlack.mySlackChannel(channel, properties));
+        }
 
         return pipeline;
     }
@@ -133,7 +147,7 @@ public class TopicToSlack {
             String cleanStr = str.replaceAll("\"", "'");
 
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("text", cleanStr);
+            jsonObject.put(SlackConstants.TEXT, cleanStr);
 
             return jsonObject;
         };
@@ -143,13 +157,13 @@ public class TopicToSlack {
      * <p>Create a sink that makes REST calls to write a JSON message to Slack's API.
      * </p>
      *
-     * @param channelId
-     * @param properties
+     * @param channel Used to name the job stage
+     * @param properties To pass to the Sink builder
      * @return
      */
-    private static Sink<JSONObject> mySlackChannel(String channelId, Properties properties) {
+    private static Sink<JSONObject> mySlackChannel(String channel, Properties properties) {
         return SinkBuilder.sinkBuilder(
-                    "slackSink-" + channelId,
+                    "slackSink-" + channel,
                     context -> new MySlackSink(properties)
                 )
                 .receiveFn(

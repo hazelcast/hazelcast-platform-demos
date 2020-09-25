@@ -40,8 +40,6 @@ public class MyConstants {
             List.of(ITOPIC_NAME_SLACK);
 
     // For Jet job that writes to Slack
-    public static final String SLACK_ACCESS_TOKEN_KEY = "accessToken";
-    public static final String SLACK_CHANNEL_ID_KEY = "channelId";
-    public static final String SLACK_CHANNEL_ID_VALUE = "ext_hazelcast-platform-demos";
-    public static final String SLACK_TOPIC_NAME_KEY = "topicName";
+    public static final String SLACK_ACCESS_TOKEN = "accessToken";
+    public static final String SLACK_CHANNEL = "ext_hazelcast-platform-demos";
 }

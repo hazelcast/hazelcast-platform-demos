@@ -22,7 +22,6 @@ import java.util.Iterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.security.Credentials;
 import com.hazelcast.security.Parameters;
 import com.hazelcast.security.SecurityInterceptor;
@@ -32,10 +31,8 @@ import com.hazelcast.security.SecurityInterceptor;
  * to reject them with custom logic. Here we just use it for logging.
  * </p>
  */
-public class MyLoggingSecurityInterceptor implements /*XXX HazelcastInstanceAware,*/ SecurityInterceptor {
+public class MyLoggingSecurityInterceptor implements SecurityInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(MyLoggingSecurityInterceptor.class);
-
-    private HazelcastInstance hazelcastInstance;
 
     /**
      * <p>Logging specific operations, here just what is happening on topics.
@@ -56,7 +53,6 @@ public class MyLoggingSecurityInterceptor implements /*XXX HazelcastInstanceAwar
                     Parameters parameters) throws AccessControlException {
 
         if (objectType.endsWith("topicService")) {
-            LOGGER.warn("THIS.HZ = {}", this.hazelcastInstance);
             LOGGER.warn("before({},{}, {}, {}, {})", credentials, objectType,
             objectName, methodName, parameters);
             Iterator iterator = parameters.iterator();
@@ -65,22 +61,15 @@ public class MyLoggingSecurityInterceptor implements /*XXX HazelcastInstanceAwar
                 LOGGER.warn("  ==> PARAMS {}", param);
             }
         }
-            /*XXX
-            // No constants for "hz:impl:mapService" and "get" ?
-            if (objectType.equals("hz:impl:mapService")
-                            && objectName.equals("hamlet")
-                            && methodName.equals("get")) {
-                    if (parameters.length() == 1) {
-                            Object key = parameters.get(0);
-                            if (key instanceof Integer) {
-                                    if (((Integer) key) % 2 == 0) {
-                                            String message =
-                                                String.format("Key '%s' rejected, EVEN, only ODD allowed", key);
-                                            throw new AccessControlException(message);
-                                    }
-                            }
-                    }
-            }*/
+        if (objectType.endsWith("sqlService")) {
+            LOGGER.warn("before({},{}, {}, {}, {})", credentials, objectType,
+            objectName, methodName, parameters);
+            Iterator iterator = parameters.iterator();
+            while (iterator.hasNext()) {
+                Object param = iterator.next();
+                LOGGER.warn("  ==> PARAMS {}", param);
+            }
+        }
     }
 
     /**

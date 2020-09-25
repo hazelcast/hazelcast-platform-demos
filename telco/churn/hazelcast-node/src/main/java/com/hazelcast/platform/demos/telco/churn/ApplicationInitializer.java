@@ -70,8 +70,10 @@ public class ApplicationInitializer {
             LOGGER.error("AWAKE");
             LOGGER.error("====");
             for (DistributedObject distributedObject : this.jetInstance.getHazelcastInstance().getDistributedObjects()) {
-                LOGGER.error("distributedObject '{}' '{}'",
-                        distributedObject.getName(), distributedObject.getClass().getName());
+                if (!distributedObject.getName().startsWith("__")) {
+                    LOGGER.warn("distributedObject '{}' '{}'",
+                            distributedObject.getName(), distributedObject.getClass().getName());
+                }
             }
             LOGGER.error("====");
         };

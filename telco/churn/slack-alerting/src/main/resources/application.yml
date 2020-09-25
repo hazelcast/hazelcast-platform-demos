@@ -3,3 +3,4 @@ my:
   build-timestamp: @maven.build.timestamp@
   build-userName: @user.name@
   site: @my.cluster.name@
+  slackAccessToken: @slack.bot.user.oath.access.token@

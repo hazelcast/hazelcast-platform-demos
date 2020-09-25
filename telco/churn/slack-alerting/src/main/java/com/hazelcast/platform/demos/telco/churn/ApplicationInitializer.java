@@ -61,11 +61,13 @@ public class ApplicationInitializer {
             String jobName = jobNamePrefix + "@" + timestampStr;
 
             Properties properties = new Properties();
-            properties.setProperty(MyConstants.SLACK_ACCESS_TOKEN_KEY, "REPLACE_THIS");
-            properties.setProperty(MyConstants.SLACK_CHANNEL_ID_KEY, MyConstants.SLACK_CHANNEL_ID_VALUE);
-            properties.setProperty(MyConstants.SLACK_TOPIC_NAME_KEY, MyConstants.ITOPIC_NAME_SLACK);
+            if (this.myProperties.getSlackAccessToken() != null
+                    && this.myProperties.getSlackAccessToken().length() > 0) {
+                properties.setProperty(SlackConstants.TOKEN, this.myProperties.getSlackAccessToken());
+            }
+            properties.setProperty(SlackConstants.CHANNEL, MyConstants.SLACK_CHANNEL);
 
-            Pipeline pipeline = TopicToSlack.buildPipeline(properties);
+            Pipeline pipeline = TopicToSlack.buildPipeline(properties, MyConstants.ITOPIC_NAME_SLACK);
 
             JobConfig jobConfig = new JobConfig();
             jobConfig.setName(jobName);

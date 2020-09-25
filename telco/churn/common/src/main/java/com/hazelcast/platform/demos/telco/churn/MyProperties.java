@@ -46,6 +46,8 @@ public class MyProperties {
     private String project;
     // Null allowed
     private String site;
+    // Null allowed
+    private String slackAccessToken;
 
     public String getBuildTimestamp() {
         return this.buildTimestamp;
@@ -85,6 +87,15 @@ public class MyProperties {
     public void setSite(String site) {
         this.site = site;
         LOGGER.info("myProperties.site=='{}'", this.site);
+    }
+
+    public String getSlackAccessToken() {
+        return this.slackAccessToken;
+    }
+    public void setSlackAccessToken(String slackAccessToken) {
+        this.slackAccessToken = slackAccessToken;
+        // Don't log the token, something to confirm if set or not
+        LOGGER.info("myProperties.slackAccessToken.length()=={}", this.slackAccessToken.length());
     }
 
 }

@@ -39,6 +39,11 @@ Configuration:
           additivity: false
           AppenderRef:
             ref: ConsoleYellow
+        - name: com.hazelcast.jet.impl.connector.WriteLoggerP
+          level: trace
+          additivity: false
+          AppenderRef:
+            ref: ConsoleBlue
         - name: com.hazelcast.security
           level: trace
           additivity: false
