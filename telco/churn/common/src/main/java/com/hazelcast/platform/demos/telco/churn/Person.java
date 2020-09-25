@@ -30,7 +30,7 @@ public class Person implements /*XXX java.io.Serializable*/ Portable {
      *
      */
     //private static final long serialVersionUID = 1L;
-    private static final int NINENINENINE = 999;
+    public static final int NINENINENINE = 999;
     private String firstName;
     private String lastName;
     @Override

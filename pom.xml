@@ -36,7 +36,8 @@
 		 -->
 		<java-annotation.version>1.3.2</java-annotation.version>
 		<guava.version>29.0-jre</guava.version>
-		<grpc.version>1.31.0</grpc.version>
+                <!-- Matches banking/credit-value-adjustment/cpp/Dockerfile2 -->
+		<grpc.version>1.31.1</grpc.version>
 		<hazelcast.version>4.1-BETA-1</hazelcast.version>
 		<!-- Temp build until Jet 4.4-SNAPSHOT, wrapping IMDG 4.1 -->
 		<hazelcast-jet.version>4.3-NEIL</hazelcast-jet.version>
@@ -50,7 +51,9 @@
 		<kafka-clients.version>2.4.0</kafka-clients.version>
  		<mongo-java-driver.version>3.12.7</mongo-java-driver.version>
 		<poi-ooxml.version>4.1.2</poi-ooxml.version>
-		<protobuf.version>3.12.4</protobuf.version>
+                <!-- Run same version with 'protoc - -grpc_out=. - -plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin' 
+                     banking/credit-value-adjustment/common/src/main/proto/JetToCpp.proto -->
+		<protobuf.version>3.12.2</protobuf.version>
 		<spring-boot.version>2.3.4.RELEASE</spring-boot.version>
 		<springfox-swagger.version>2.9.2</springfox-swagger.version>
 
@@ -135,6 +138,11 @@
 				<groupId>com.hazelcast</groupId>
 				<artifactId>hazelcast-kubernetes</artifactId>
 				<version>${hazelcast-kubernetes.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.hazelcast</groupId>
+				<artifactId>hazelcast-sql</artifactId>
+				<version>${hazelcast.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>

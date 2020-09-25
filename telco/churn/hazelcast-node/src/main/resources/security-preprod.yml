@@ -69,15 +69,9 @@ hazelcast:
 #            - put
 #            - read
             - all
-        #
-        - name: "<sql>"
-          principal: churn-java-client
-          actions:
-            - sql
       topic:
         #
         - name: "slack"
-          principal: churn-java-client
           actions:
             - publish
       # For unique job ids
@@ -86,6 +80,8 @@ hazelcast:
           principal: "JobSubmitter"
           actions:
             - all
+      sql:
+        principal: churn-java-client
     client-block-unmapped-actions: false
     
     # Doesn't block, just logs

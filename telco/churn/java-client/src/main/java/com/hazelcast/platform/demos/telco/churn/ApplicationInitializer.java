@@ -16,10 +16,10 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
-//import java.util.HashSet;
-//import java.util.Map;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-//import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -34,6 +34,8 @@ import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.map.IMap;
+import com.hazelcast.sql.SqlResult;
+import com.hazelcast.sql.SqlRow;
 import com.hazelcast.topic.ITopic;
 
 /**
@@ -105,7 +107,7 @@ public class ApplicationInitializer {
             }
 
             LOGGER.info("-=-=-=  MIDDLE  {}  MIDDLE  =-=-=-=-", hazelcastInstance.getName());
-            //this.beta(hazelcastInstance);
+            this.beta(hazelcastInstance);
             LOGGER.info("-=-=-=-=-  END  {}  END  -=-=-=-=-=-", hazelcastInstance.getName());
             TimeUnit.SECONDS.sleep(TEN_MINUTES);
             hazelcastInstance.shutdown();
@@ -115,7 +117,7 @@ public class ApplicationInitializer {
     /**
      * XXX Test BETA code
      * @param hazelcastInstance
-     *
+     */
     private void beta(HazelcastInstance hazelcastInstance) {
         String mapName = Person.class.getSimpleName();
 
@@ -125,7 +127,7 @@ public class ApplicationInitializer {
 
         person1.setFirstName("Neil");
         person1.setLastName("Stevenson");
-        person1.setFirstName("Xxx");
+        person2.setFirstName("Xxx");
         person2.setLastName("Stevenson");
         person3.setFirstName("Neil");
         person3.setLastName("Zzz");
@@ -148,33 +150,41 @@ public class ApplicationInitializer {
 
             completionStage.thenAccept(map -> {
                 System.out.println((map.getClass()) + " map size ==" + map.size());
+                /*XXX
                 for (@SuppressWarnings("rawtypes") Map.Entry entry : map.entrySet()) {
                     System.out.println("Entry key1 " + entry.getKey().getClass());
                     System.out.println("Entry key2 " + entry.getKey());
                     System.out.println("Entry val1 " + entry.getValue().getClass());
                     System.out.println("Entry val2 " + entry.getValue());
-                }
+                }*/
             });
 
         } catch (Exception e) {
             String message = String.format("(%s).submitToKeys()", mapName);
             LOGGER.error(message + ":" + e.getMessage());
         }
-       */
-        /*FIXME Doesn't work ? Security bug??
-         * 
+
+        //String query = "SELECT firstName FROM '" + mapName + "' WHERE lastName = 'Stevenson'";
+        //String query = "SELECT firstName FROM \"" + mapName + "\" WHERE lastName = 'Stevenson'";
         String query = "SELECT firstName FROM " + mapName + " WHERE lastName = 'Stevenson'";
         try {
             SqlResult sqlResult = hazelcastInstance.getSql().execute(query);
+            System.out.println(query + " RESULT IS NULL is ");
             for (SqlRow sqlRow : sqlResult) {
-                String name = sqlRow.getObject(0);
-                System.out.println(name);
+                if (sqlRow == null) {
+                    System.out.println("ROW IS NULL");
+                } else {
+                    if (sqlRow.getObject(0) == null) {
+                        System.out.println("NAME IS NULL");
+                    } else {
+                        System.out.println(sqlRow.getObject(0).toString());
+                    }
+                }
             }
         } catch (Exception e) {
             String message = String.format("getMap(%s) SQL '%s'", mapName, query);
-            LOGGER.error(message + ":" + e.getMessage());
+            LOGGER.warn(message + ": " + e.getMessage());
+            LOGGER.error("XXX", e);
         }
-        */
-    /*
-    }*/
+    }
 }

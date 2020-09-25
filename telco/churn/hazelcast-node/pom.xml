@@ -38,6 +38,16 @@
 			<artifactId>hazelcast-kubernetes</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-sql</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.hazelcast</groupId>
+					<artifactId>hazelcast</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
 			<groupId>com.hazelcast.jet.contrib</groupId>
 			<artifactId>hazelcast-jet-spring-boot-starter</artifactId>
 			<exclusions>
