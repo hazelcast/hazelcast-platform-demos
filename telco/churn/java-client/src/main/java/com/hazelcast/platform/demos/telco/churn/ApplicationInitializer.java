@@ -87,8 +87,10 @@ public class ApplicationInitializer {
                                             + " (build: " + key + ", " + value + ")"
                                             + " '" + payload + "' @ "
                                             + MyUtils.timestampToISO8601(System.currentTimeMillis());
-                                    LOGGER.info("Topic {}.publish('{}')", topic.getName(), message);
-                                    topic.publish(message);
+                                    if (iMap.getName().equals("neil")) {
+                                        LOGGER.info("Topic {}.publish('{}')", topic.getName(), message);
+                                        topic.publish(message);
+                                    }
                                     TimeUnit.SECONDS.sleep(3L);
                                 } catch (Exception e) {
                                     String message = String.format("%s.get(%s)", mapName, key.toString());
