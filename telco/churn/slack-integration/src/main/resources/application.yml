@@ -4,3 +4,5 @@ my:
   build-userName: @user.name@
   site: @my.cluster.name@
   slackAccessToken: @slack.bot.user.oath.access.token@
+  slackChannelName: @slack.bot.channel.name@
+  slackChannelId: @slack.bot.channel.id@

@@ -41,5 +41,6 @@ public class MyConstants {
 
     // For Jet job that writes to Slack
     public static final String SLACK_ACCESS_TOKEN = "accessToken";
-    public static final String SLACK_CHANNEL = "ext_hazelcast-platform-demos";
+    public static final String SLACK_CHANNEL_ID = "channelId";
+    public static final String SLACK_CHANNEL_NAME = "channelName";
 }

@@ -44,10 +44,11 @@ public class MyProperties {
     private int initSize;
     @NotNull
     private String project;
-    // Null allowed
+    // Null allowed for following
     private String site;
-    // Null allowed
     private String slackAccessToken;
+    private String slackChannelId;
+    private String slackChannelName;
 
     public String getBuildTimestamp() {
         return this.buildTimestamp;
@@ -94,8 +95,25 @@ public class MyProperties {
     }
     public void setSlackAccessToken(String slackAccessToken) {
         this.slackAccessToken = slackAccessToken;
-        // Don't log the token, something to confirm if set or not
+        // Don't log details, only enough to confirm if set
         LOGGER.info("myProperties.slackAccessToken.length()=={}", this.slackAccessToken.length());
+    }
+
+    public String getSlackChannelId() {
+        return this.slackChannelId;
+    }
+    public void setSlackChannelId(String slackChannelId) {
+        this.slackChannelId = slackChannelId;
+        // Don't log details, only enough to confirm if set
+        LOGGER.info("myProperties.slackChannelId.length()=={}", this.slackChannelId.length());
+    }
+
+    public String getSlackChannelName() {
+        return this.slackChannelName;
+    }
+    public void setSlackChannelName(String slackChannelName) {
+        this.slackChannelName = slackChannelName;
+        LOGGER.info("myProperties.slackChannelName=='{}'", this.slackChannelName);
     }
 
 }

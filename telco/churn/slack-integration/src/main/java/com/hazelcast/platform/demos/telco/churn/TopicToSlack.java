@@ -91,7 +91,6 @@ public class TopicToSlack {
      * </p>
      */
     public static Pipeline buildPipeline(Properties properties, String topicName) {
-        String channel = properties.getProperty(SlackConstants.CHANNEL);
 
         Pipeline pipeline = Pipeline.create();
 
@@ -101,11 +100,15 @@ public class TopicToSlack {
                 .map(TopicToSlack.myMapStage()).setName("reformat-to-JSON");
 
         // If Slack integration not available, log to console instead
-        if (properties.get(SlackConstants.TOKEN) == null) {
-            LOGGER.error("No Slack access token, alerting will be to stdout");
+        if (properties.get(MyConstants.SLACK_ACCESS_TOKEN) == null
+                || properties.get(MyConstants.SLACK_CHANNEL_ID) == null
+                || properties.get(MyConstants.SLACK_CHANNEL_NAME) == null) {
+            LOGGER.error("No Slack connection properties, alerting will be to stdout");
             readAndMap
             .writeTo(Sinks.logger());
         } else {
+            String channel = properties.getProperty(MyConstants.SLACK_CHANNEL_NAME);
+
             readAndMap
             .writeTo(TopicToSlack.mySlackChannel(channel, properties));
         }

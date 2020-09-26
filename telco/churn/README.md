@@ -12,9 +12,9 @@ Be sure to mention this is for "Telco - Churn Predication" example so you get a 
 ## `settings.xml`
 
 You will need a Jet Enterprise license to run this example. If you wish to use alerting to Slack,
-you will need a Slack access token.
+you will need a Slack access token, plus the channel name and id.
 
-Both need to go in your Maven `settings.xml` file, such as the below. You can define other properties.
+All need to go in your Maven `settings.xml` file, such as the below. You can define other properties.
 
 ```
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
@@ -31,6 +31,8 @@ Both need to go in your Maven `settings.xml` file, such as the below. You can de
       <properties>
         <my.jet.license.key>GOES HERE</my.jet.license.key>
 	<my.slack.bot.user.oath.access.token>GOES HERE</my.slack.bot.user.oath.access.token>
+	<my.slack.bot.channel.name>GOES HERE</my.slack.bot.channel.name>
+	<my.slack.bot.channel.id>GOES HERE</my.slack.bot.channel.id>
       </properties>
     </profile>
   </profiles>

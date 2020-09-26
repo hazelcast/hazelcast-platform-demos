@@ -57,7 +57,7 @@
                 <!--
 		<module>nodejs-client</module>
                 -->
-		<module>slack-alerting</module>
+		<module>slack-integration</module>
 		<module>management-center</module>
 	</modules>
 

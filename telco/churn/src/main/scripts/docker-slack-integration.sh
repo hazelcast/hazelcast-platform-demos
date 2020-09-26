@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROJECT=churn
-MODULE=slack-alerting
+MODULE=slack-integration
 
 BASEDIR=`dirname $0`
 cd $BASEDIR/../../../$MODULE

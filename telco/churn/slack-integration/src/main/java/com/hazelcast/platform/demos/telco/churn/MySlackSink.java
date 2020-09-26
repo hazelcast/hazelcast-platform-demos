@@ -38,13 +38,13 @@ import org.springframework.web.client.RestTemplate;
  */
 public class MySlackSink {
     private static final Logger LOGGER = LoggerFactory.getLogger(MySlackSink.class);
-    private final String channel;
+    private final String channelName;
     private final String token;
     private final RestTemplate restTemplate;
 
     public MySlackSink(Properties properties) {
-        this.channel = properties.getProperty(SlackConstants.CHANNEL);
-        this.token = properties.getProperty(SlackConstants.TOKEN);
+        this.channelName = properties.getProperty(MyConstants.SLACK_CHANNEL_NAME);
+        this.token = properties.getProperty(MyConstants.SLACK_ACCESS_TOKEN);
         this.restTemplate = new RestTemplate();
     }
 
@@ -59,7 +59,7 @@ public class MySlackSink {
     public Object receiveFn(JSONObject jsonObject) {
         try {
             // Target channel goes in JSON message
-            jsonObject.put(SlackConstants.CHANNEL, this.channel);
+            jsonObject.put(SlackConstants.CHANNEL, this.channelName);
 
             HttpHeaders headers = new HttpHeaders();
             //FIXME This is deprecated, but Slack seems to require it. Should be MediaType.APPLICATION_JSON

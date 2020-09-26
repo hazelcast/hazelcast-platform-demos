@@ -9,17 +9,19 @@
                 <version>4.0</version>
         </parent>
 
-	<artifactId>churn-slack-alerting</artifactId>
+	<artifactId>churn-slack-integration</artifactId>
 
-	<name>Hazelcast Platform - Churn - Slack Alerting</name>
-	<description>Telco Churn - Alerting to Slack</description>
+	<name>Hazelcast Platform - Churn - Slack Integration</name>
+	<description>Telco Churn - Read/write from/to Slack</description>
 
 	<properties>
-		<docker.image.name>slack-alerting</docker.image.name>
+		<docker.image.name>slack-integration</docker.image.name>
 		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 		<my.cluster.name>${my.cluster1.name}</my.cluster.name>
                 <slack.bot.user.oath.access.token>${my.slack.bot.user.oath.access.token}</slack.bot.user.oath.access.token>
+                <slack.bot.channel.name>${my.slack.bot.channel.name}</slack.bot.channel.name>
+                <slack.bot.channel.id>${my.slack.bot.channel.id}</slack.bot.channel.id>
 	</properties>
 
 	<dependencies>

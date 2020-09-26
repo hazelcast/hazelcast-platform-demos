@@ -60,12 +60,20 @@ public class ApplicationInitializer {
             String jobNamePrefix = TopicToSlack.JOB_NAME_PREFIX;
             String jobName = jobNamePrefix + "@" + timestampStr;
 
+            /* Job still works if Slack properties aren't present, but logs to STDOUT instead
+             */
             Properties properties = new Properties();
             if (this.myProperties.getSlackAccessToken() != null
-                    && this.myProperties.getSlackAccessToken().length() > 0) {
-                properties.setProperty(SlackConstants.TOKEN, this.myProperties.getSlackAccessToken());
+                    && this.myProperties.getSlackChannelId() != null
+                    && this.myProperties.getSlackChannelName() != null) {
+                if (this.myProperties.getSlackAccessToken().length() > 0
+                        && this.myProperties.getSlackChannelId().length() > 0
+                        && this.myProperties.getSlackChannelName().length() > 0) {
+                    properties.setProperty(MyConstants.SLACK_ACCESS_TOKEN, this.myProperties.getSlackAccessToken());
+                    properties.setProperty(MyConstants.SLACK_CHANNEL_ID, this.myProperties.getSlackChannelId());
+                    properties.setProperty(MyConstants.SLACK_CHANNEL_NAME, this.myProperties.getSlackChannelName());
+                }
             }
-            properties.setProperty(SlackConstants.CHANNEL, MyConstants.SLACK_CHANNEL);
 
             Pipeline pipeline = TopicToSlack.buildPipeline(properties, MyConstants.ITOPIC_NAME_SLACK);
 
