@@ -57,11 +57,13 @@ public class ApplicationInitializer {
 
             long timestamp = System.currentTimeMillis();
             String timestampStr = MyUtils.timestampToISO8601(timestamp);
-            String jobNamePrefix = TopicToSlack.JOB_NAME_PREFIX;
-            String jobName = jobNamePrefix + "@" + timestampStr;
+            String jobNamePrefixTopicToSlack = TopicToSlack.JOB_NAME_PREFIX;
+            String jobNameTopicToSlack = jobNamePrefixTopicToSlack + "@" + timestampStr;
 
-            /* Job still works if Slack properties aren't present, but logs to STDOUT instead
+            /* Slack publish still works if Slack properties aren't present, but publishess to STDOUT instead.
+             * Slack reader obviously can't.
              */
+            boolean slackUseable = false;
             Properties properties = new Properties();
             if (this.myProperties.getSlackAccessToken() != null
                     && this.myProperties.getSlackChannelId() != null
@@ -72,31 +74,55 @@ public class ApplicationInitializer {
                     properties.setProperty(MyConstants.SLACK_ACCESS_TOKEN, this.myProperties.getSlackAccessToken());
                     properties.setProperty(MyConstants.SLACK_CHANNEL_ID, this.myProperties.getSlackChannelId());
                     properties.setProperty(MyConstants.SLACK_CHANNEL_NAME, this.myProperties.getSlackChannelName());
+                    slackUseable = true;
                 }
             }
 
-            Pipeline pipeline = TopicToSlack.buildPipeline(properties, MyConstants.ITOPIC_NAME_SLACK);
+            Pipeline pipelineTopicToSlack = TopicToSlack.buildPipeline(properties, MyConstants.ITOPIC_NAME_SLACK);
 
-            JobConfig jobConfig = new JobConfig();
-            jobConfig.setName(jobName);
-            jobConfig.addClass(TopicToSlack.class);
-            jobConfig.addClass(MyTopicSource.class);
-            jobConfig.addClass(MySlackSink.class);
-            jobConfig.addClass(JSONObject.class);
+            JobConfig jobConfigTopicToSlack = new JobConfig();
+            jobConfigTopicToSlack.setName(jobNameTopicToSlack);
+            jobConfigTopicToSlack.addClass(TopicToSlack.class);
+            jobConfigTopicToSlack.addClass(MyTopicSource.class);
+            jobConfigTopicToSlack.addClass(MySlackSink.class);
+            jobConfigTopicToSlack.addClass(JSONObject.class);
 
-            Job job = MyUtils.findRunningJobsWithSamePrefix(jobNamePrefix, this.jetInstance);
-            if (job != null) {
-                String message = String.format("Previous job '%s' id=='%d' still at status '%s'",
-                        job.getName(), job.getId(), job.getStatus());
-                throw new RuntimeException(message);
-            } else {
-                job = jetInstance.newJobIfAbsent(pipeline, jobConfig);
-                LOGGER.info("Submitted {}", job);
+            this.trySubmit(jobNamePrefixTopicToSlack, jobConfigTopicToSlack, pipelineTopicToSlack);
+            if (slackUseable) {
+                //XXX
+                this.trySubmit(jobNamePrefixTopicToSlack, jobConfigTopicToSlack, pipelineTopicToSlack);
             }
 
             LOGGER.info("-=-=-=-=-  END  {}  END  -=-=-=-=-=-", hazelcastInstance.getName());
             hazelcastInstance.shutdown();
         };
+    }
+
+    /**
+     * <p>Jobs are named "{@code something@timestamp}" and we only wish one of each running.
+     * Check for running jobs with the same prefix before attempting to submit. This
+     * mechanism isn't rock solid, as between checking and submitting another process
+     * could submit. However (a) this is a demo, and (b) it wouldn't matter too much
+     * here to produce double-output, as processing is idempotent, it's more for
+     * elegance. For a more robust solution, use Hazelcast's
+     * {@link com.hazelcast.cp.lock.FencedLock FencedLock}.
+     * </p>
+     *
+     * @param jobNamePrefix
+     * @param jobConfig
+     * @param pipeline
+     * @throws Exception
+     */
+    private void trySubmit(String jobNamePrefix, JobConfig jobConfig, Pipeline pipeline) throws Exception {
+        Job job = MyUtils.findRunningJobsWithSamePrefix(jobNamePrefix, this.jetInstance);
+        if (job != null) {
+            String message = String.format("Previous job '%s' id=='%d' still at status '%s'",
+                    job.getName(), job.getId(), job.getStatus());
+            throw new RuntimeException(message);
+        } else {
+            job = jetInstance.newJobIfAbsent(pipeline, jobConfig);
+            LOGGER.info("Submitted {}", job);
+        }
     }
 
 }

@@ -25,9 +25,11 @@ package com.hazelcast.platform.demos.telco.churn;
  */
 public class SlackConstants {
 
-    public static final String CHANNEL = "channel";
-    public static final String TEXT = "text";
-    public static final String TOKEN = "token";
+    public static final String PARAM_CHANNEL = "channel";
+    public static final String PARAM_TEXT = "text";
+    public static final String PARAM_TOKEN = "token";
+
+    public static final String RESPONSE_KEY_OK = "ok";
 
     public static final String POST_MESSAGE_URL = "https://slack.com/api/chat.postMessage";
 

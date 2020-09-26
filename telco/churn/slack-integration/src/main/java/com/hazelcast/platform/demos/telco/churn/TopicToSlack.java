@@ -150,7 +150,7 @@ public class TopicToSlack {
             String cleanStr = str.replaceAll("\"", "'");
 
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put(SlackConstants.TEXT, cleanStr);
+            jsonObject.put(SlackConstants.PARAM_TEXT, cleanStr);
 
             return jsonObject;
         };
