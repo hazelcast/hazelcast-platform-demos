@@ -64,7 +64,7 @@ public class MySlackSink {
             jsonObject.put(SlackConstants.PARAM_CHANNEL, this.channelName);
 
             HttpHeaders headers = new HttpHeaders();
-            //FIXME This is deprecated, but Slack seems to require it. Should be MediaType.APPLICATION_JSON
+            //TODO This is deprecated, but Slack seems to require it. Should be MediaType.APPLICATION_JSON
             headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
             headers.setBearerAuth(this.token);
 
@@ -74,7 +74,7 @@ public class MySlackSink {
             LOGGER.info("Sending to Slack: {}", jsonObject);
 
             ResponseEntity<Object> responseEntity
-                = restTemplate.postForEntity(SlackConstants.POST_MESSAGE_URL, requestEntity, Object.class);
+                = restTemplate.postForEntity(SlackConstants.WRITE_MESSAGE_URL, requestEntity, Object.class);
 
             Object body = responseEntity.getBody();
             if (responseEntity.getStatusCode() != HttpStatus.OK || body == null || !(body instanceof Map)) {

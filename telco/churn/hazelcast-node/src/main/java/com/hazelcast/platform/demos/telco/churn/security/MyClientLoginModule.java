@@ -60,6 +60,7 @@ import com.hazelcast.security.UsernamePasswordCredentials;
 public class MyClientLoginModule implements LoginModule {
     private static final Logger LOGGER = LoggerFactory.getLogger(MyClientLoginModule.class);
     private static final int QUADRUPLE = 4;
+    private static boolean loggedOnce;
 
     private Subject subject;
     private CallbackHandler callbackHandler;
@@ -102,8 +103,11 @@ public class MyClientLoginModule implements LoginModule {
         String blockedPasswordsCsv = options.get("blockedPasswordsCsv").toString();
         for (String blockedPassword : blockedPasswordsCsv.split(",")) {
             this.blockedPasswords.add(blockedPassword);
-            LOGGER.debug("Adding '{}' to blocked password list", blockedPassword);
+            if (passwordLoggingOn()) {
+                LOGGER.debug("Adding '{}' to blocked password list", blockedPassword);
+            }
         }
+        setPasswordLoggingOff();
     }
 
     /**
@@ -264,5 +268,20 @@ public class MyClientLoginModule implements LoginModule {
         this.sharedState.clear();
         this.subject.getPrincipals().clear();
         return true;
+    }
+
+    /**
+     * <p>Only log the blocked passwords once.
+     * </p>
+     */
+    static boolean passwordLoggingOn() {
+        return !loggedOnce;
+    }
+    /**
+     * <p>Only log the blocked passwords once.
+     * </p>
+     */
+    static void setPasswordLoggingOff() {
+        loggedOnce = true;
     }
 }

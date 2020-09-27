@@ -20,17 +20,24 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
 
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.Job;
 import com.hazelcast.jet.core.JobStatus;
+import com.hazelcast.sql.SqlColumnMetadata;
+import com.hazelcast.sql.SqlResult;
+import com.hazelcast.sql.SqlRow;
+import com.hazelcast.sql.SqlRowMetadata;
 
 /**
  * <p>Utility functions that may be useful to more than one module.
  * </p>
  */
 public class MyUtils {
+    public static final String NEWLINE = System.getProperty("line.separator");
+
     private static final String ALPHABET_UC = "abcdefghijklmnopqrstuvwxyz".toUpperCase(Locale.ROOT);
     private static final String ALPHABET_LC = ALPHABET_UC.toLowerCase(Locale.ROOT);
     private static final String[] ALPHABETS = { ALPHABET_UC, ALPHABET_LC };
@@ -113,4 +120,82 @@ public class MyUtils {
 
         return match;
     }
+
+    /**
+     * <p>Convert characters the user may have typed and look normal into
+     * their equivalents.
+     * </p>
+     *
+     * @param input
+     * @return
+     */
+    public static String makeUTF8(String input) {
+        if (input == null) {
+            return null;
+        }
+
+        char[] output = new char[input.length()];
+
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+
+            switch (c) {
+            case '‘': c = '\'';
+                    break;
+            case '’': c = '\'';
+                    break;
+            case '“': c = '"';
+                    break;
+            case '”': c = '"';
+                    break;
+            default:
+                    break;
+            }
+
+            output[i] = c;
+        }
+
+        return new String(output);
+    }
+
+    /**
+     * <p>Pretty-print an SQL result.
+     * </p>
+     *
+     * @param sqlResult
+     * @return
+     */
+    public static String prettyPrintSqlResult(SqlResult sqlResult) {
+        StringBuilder stringBuilder = new StringBuilder();
+        String format = "%15s";
+
+        // Column headers in capitals
+        SqlRowMetadata sqlRowMetaData = sqlResult.getRowMetadata();
+        List<SqlColumnMetadata> sqlColumnMetadata = sqlRowMetaData.getColumns();
+        int i = 0;
+        for (SqlColumnMetadata sqlColumnMetadatum : sqlColumnMetadata) {
+            if (i != 0) {
+                stringBuilder.append(',');
+            }
+            stringBuilder.append(String.format(format, sqlColumnMetadatum.getName().toUpperCase(Locale.ROOT)));
+            i++;
+        }
+        stringBuilder.append(NEWLINE);
+
+        int count = 0;
+        for (SqlRow sqlRow : sqlResult) {
+            count++;
+            for (int j = 0; j < sqlColumnMetadata.size() ; j++) {
+                if (j != 0) {
+                    stringBuilder.append(',');
+                }
+                stringBuilder.append(String.format(format, sqlRow.getObject(j).toString()));
+            }
+            stringBuilder.append(NEWLINE);
+        }
+
+        stringBuilder.append("[").append(count).append(count == 1 ? " row]" : " rows]").append(NEWLINE);
+        return stringBuilder.toString();
+    }
+
 }

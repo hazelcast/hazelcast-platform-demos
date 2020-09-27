@@ -29,8 +29,13 @@ public class SlackConstants {
     public static final String PARAM_TEXT = "text";
     public static final String PARAM_TOKEN = "token";
 
+    public static final String RESPONSE_BOT_ID = "bot_id";
     public static final String RESPONSE_KEY_OK = "ok";
+    public static final String RESPONSE_MESSAGES = "messages";
+    public static final String RESPONSE_TEXT = "text";
+    public static final String RESPONSE_TIMESTAMP = "ts";
 
-    public static final String POST_MESSAGE_URL = "https://slack.com/api/chat.postMessage";
+    public static final String READ_MESSAGE_URL = "https://slack.com/api/conversations.history";
+    public static final String WRITE_MESSAGE_URL = "https://slack.com/api/chat.postMessage";
 
 }

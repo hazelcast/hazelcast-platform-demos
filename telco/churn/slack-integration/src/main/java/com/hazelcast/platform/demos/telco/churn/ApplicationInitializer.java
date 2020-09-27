@@ -33,8 +33,22 @@ import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.pipeline.Pipeline;
 
 /**
- * <p>XXX
+ * <p>A job launcher for Slack jobs
  * </p>
+ * <ol>
+ * <li>
+ * <p>{@link TopicToSlack}</p>
+ * <p>Always submitted, re-publishes from a Hazelcast {@link com.hazelcast.topic.ITopic}
+ * to Slack if Slack credentials exist, or to the STDOUT otherwise.
+ * </p>
+ * </li>
+ * <li>
+ * <p>{@link SlackToSlackCLI}</p>
+ * <p>Possibly submitted, reads from Slack and attempts to use input as a command, hence
+ * only valid to try to run if Slack credentials exist.
+ * </p>
+ * </li>
+ * </ol>
  */
 @Configuration
 public class ApplicationInitializer {
@@ -46,7 +60,8 @@ public class ApplicationInitializer {
     private MyProperties myProperties;
 
     /**
-     * <p>XXX
+     * <p>Launch jobs that connect to Slack, if Slack connectivity credentials
+     * have been provided.
      * </p>
      */
     @Bean
@@ -57,8 +72,12 @@ public class ApplicationInitializer {
 
             long timestamp = System.currentTimeMillis();
             String timestampStr = MyUtils.timestampToISO8601(timestamp);
+
             String jobNamePrefixTopicToSlack = TopicToSlack.JOB_NAME_PREFIX;
             String jobNameTopicToSlack = jobNamePrefixTopicToSlack + "@" + timestampStr;
+
+            String jobNamePrefixSlackToSlackCLI = SlackToSlackCLI.JOB_NAME_PREFIX;
+            String jobNameSlackToSlackCLI = jobNamePrefixSlackToSlackCLI + "@" + timestampStr;
 
             /* Slack publish still works if Slack properties aren't present, but publishess to STDOUT instead.
              * Slack reader obviously can't.
@@ -87,10 +106,18 @@ public class ApplicationInitializer {
             jobConfigTopicToSlack.addClass(MySlackSink.class);
             jobConfigTopicToSlack.addClass(JSONObject.class);
 
+            Pipeline pipelineSlackToSlackCLI = SlackToSlackCLI.buildPipeline(properties);
+
+            JobConfig jobConfigSlackToSlackCLI = new JobConfig();
+            jobConfigSlackToSlackCLI.setName(jobNameSlackToSlackCLI);
+            jobConfigSlackToSlackCLI.addClass(SlackToSlackCLI.class);
+            jobConfigSlackToSlackCLI.addClass(MySlackSource.class);
+            jobConfigSlackToSlackCLI.addClass(MySlackSink.class);
+            jobConfigSlackToSlackCLI.addClass(MyUtils.class);
+
             this.trySubmit(jobNamePrefixTopicToSlack, jobConfigTopicToSlack, pipelineTopicToSlack);
             if (slackUseable) {
-                //XXX
-                this.trySubmit(jobNamePrefixTopicToSlack, jobConfigTopicToSlack, pipelineTopicToSlack);
+                this.trySubmit(jobNamePrefixSlackToSlackCLI, jobConfigSlackToSlackCLI, pipelineSlackToSlackCLI);
             }
 
             LOGGER.info("-=-=-=-=-  END  {}  END  -=-=-=-=-=-", hazelcastInstance.getName());

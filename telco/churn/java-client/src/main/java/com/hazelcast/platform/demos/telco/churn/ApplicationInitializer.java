@@ -35,7 +35,6 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.map.IMap;
 import com.hazelcast.sql.SqlResult;
-import com.hazelcast.sql.SqlRow;
 import com.hazelcast.topic.ITopic;
 
 /**
@@ -171,18 +170,7 @@ public class ApplicationInitializer {
         String query = "SELECT firstName FROM " + mapName + " WHERE lastName = 'Stevenson'";
         try {
             SqlResult sqlResult = hazelcastInstance.getSql().execute(query);
-            System.out.println(query + " RESULT IS NULL is ");
-            for (SqlRow sqlRow : sqlResult) {
-                if (sqlRow == null) {
-                    System.out.println("ROW IS NULL");
-                } else {
-                    if (sqlRow.getObject(0) == null) {
-                        System.out.println("NAME IS NULL");
-                    } else {
-                        System.out.println(sqlRow.getObject(0).toString());
-                    }
-                }
-            }
+            System.out.println(MyUtils.prettyPrintSqlResult(sqlResult));
         } catch (Exception e) {
             String message = String.format("getMap(%s) SQL '%s'", mapName, query);
             LOGGER.warn(message + ": " + e.getMessage());
