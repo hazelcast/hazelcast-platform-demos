@@ -49,7 +49,7 @@ public class MySlackSink {
         this.channelName = properties.getProperty(MyConstants.SLACK_CHANNEL_NAME);
         this.token = properties.getProperty(MyConstants.SLACK_ACCESS_TOKEN);
         this.restTemplate = new RestTemplate();
-        this.messagePrefix = "(" + projectName + "): ";
+        this.messagePrefix = "(_" + projectName + "_): ";
     }
 
     /**
@@ -70,14 +70,14 @@ public class MySlackSink {
             headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
             headers.setBearerAuth(this.token);
 
-            HttpEntity<String> requestEntity =
-                    new HttpEntity<String>(jsonObject.toString(), headers);
-
             String text = jsonObject.getString(SlackConstants.PARAM_TEXT);
-            if (text.startsWith(this.messagePrefix)) {
+            if (!text.startsWith(this.messagePrefix)) {
                 jsonObject.put(SlackConstants.PARAM_TEXT, this.messagePrefix + text);
             }
             LOGGER.info("Sending to Slack: {}", jsonObject);
+
+            HttpEntity<String> requestEntity =
+                    new HttpEntity<String>(jsonObject.toString(), headers);
 
             ResponseEntity<Object> responseEntity
                 = restTemplate.postForEntity(SlackConstants.WRITE_MESSAGE_URL, requestEntity, Object.class);
