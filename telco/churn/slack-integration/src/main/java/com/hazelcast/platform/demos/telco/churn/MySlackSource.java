@@ -46,7 +46,6 @@ public class MySlackSource {
     private static final Logger LOGGER = LoggerFactory.getLogger(MySlackSource.class);
     private static final long FOUR_SECONDS = 4L;
     private static final int MAX_ALLOWED_MESSAGES = 999;
-    private static final long XXX = 1600000000L;
 
     private final HttpHeaders httpHeaders;
     private final String channelId;
@@ -58,8 +57,7 @@ public class MySlackSource {
         this.restTemplate = new RestTemplate();
 
         // Start to consume messages since launch
-        this.lastPoll = XXX;
-        //XXX Instant.now().getEpochSecond();
+        this.lastPoll = Instant.now().getEpochSecond();
 
         this.httpHeaders = new HttpHeaders();
         this.httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);

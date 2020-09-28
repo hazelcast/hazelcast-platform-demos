@@ -98,20 +98,28 @@ public class MyUtilsTest {
 
     @Test
     public void testMakeUTF8DoubleQuotes() throws Exception {
-        String input = "SELECT firstName from Person WHERE lastName = “Stevenson”";
-        String expected = "SELECT firstName from Person WHERE lastName = \"Stevenson\"";
-        String output = MyUtils.makeUTF8(input);
-        System.out.println("input=='" + input + "' output=='" + output + "'");
+        String input1 = "SELECT firstName FROM Person WHERE lastName = “Stevenson”";
+        String input2 = "SELECT firstName FROM Person WHERE lastName = 'Stevenson'";
+        String expected = "SELECT firstName FROM Person WHERE lastName = 'Stevenson'";
 
-        assertThat(output).isNotNull();
-        assertThat(output).isInstanceOf(String.class);
-        assertThat(output).isEqualTo(expected);
+        assertThat(input1).isNotEqualTo(input2);
+
+        String[] inputs = new String[] { input1, input2 };
+
+        for (String input : inputs) {
+            String output = MyUtils.makeUTF8(input);
+            System.out.println("input=='" + input + "' output=='" + output + "'");
+
+            assertThat(output).isNotNull();
+            assertThat(output).isInstanceOf(String.class);
+            assertThat(output).isEqualTo(expected);
+        }
     }
 
     @Test
     public void testMakeUTF8SingleQuotes() throws Exception {
-        String input = "SELECT firstName from Person WHERE lastName = ‘Stevenson’";
-        String expected = "SELECT firstName from Person WHERE lastName = 'Stevenson'";
+        String input = "SELECT firstName FROM Person WHERE lastName = ‘Stevenson’";
+        String expected = "SELECT firstName FROM Person WHERE lastName = 'Stevenson'";
         String output = MyUtils.makeUTF8(input);
         System.out.println("input=='" + input + "' output=='" + output + "'");
 

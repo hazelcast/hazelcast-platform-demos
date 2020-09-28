@@ -97,7 +97,9 @@ public class ApplicationInitializer {
                 }
             }
 
-            Pipeline pipelineTopicToSlack = TopicToSlack.buildPipeline(properties, MyConstants.ITOPIC_NAME_SLACK);
+            String projectName = this.myProperties.getProject();
+            Pipeline pipelineTopicToSlack =
+                    TopicToSlack.buildPipeline(properties, MyConstants.ITOPIC_NAME_SLACK, projectName);
 
             JobConfig jobConfigTopicToSlack = new JobConfig();
             jobConfigTopicToSlack.setName(jobNameTopicToSlack);
@@ -106,7 +108,7 @@ public class ApplicationInitializer {
             jobConfigTopicToSlack.addClass(MySlackSink.class);
             jobConfigTopicToSlack.addClass(JSONObject.class);
 
-            Pipeline pipelineSlackToSlackCLI = SlackToSlackCLI.buildPipeline(properties);
+            Pipeline pipelineSlackToSlackCLI = SlackToSlackCLI.buildPipeline(properties, projectName);
 
             JobConfig jobConfigSlackToSlackCLI = new JobConfig();
             jobConfigSlackToSlackCLI.setName(jobNameSlackToSlackCLI);
@@ -114,6 +116,7 @@ public class ApplicationInitializer {
             jobConfigSlackToSlackCLI.addClass(MySlackSource.class);
             jobConfigSlackToSlackCLI.addClass(MySlackSink.class);
             jobConfigSlackToSlackCLI.addClass(MyUtils.class);
+            jobConfigSlackToSlackCLI.addClass(JSONObject.class);
 
             this.trySubmit(jobNamePrefixTopicToSlack, jobConfigTopicToSlack, pipelineTopicToSlack);
             if (slackUseable) {

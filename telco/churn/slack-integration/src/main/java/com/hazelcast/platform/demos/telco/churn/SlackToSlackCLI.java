@@ -22,15 +22,18 @@ import java.util.function.Supplier;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.function.BiFunctionEx;
+import com.hazelcast.function.FunctionEx;
 import com.hazelcast.jet.datamodel.Tuple2;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.ServiceFactories;
 import com.hazelcast.jet.pipeline.ServiceFactory;
-import com.hazelcast.jet.pipeline.Sinks;
+import com.hazelcast.jet.pipeline.Sink;
+import com.hazelcast.jet.pipeline.SinkBuilder;
 import com.hazelcast.jet.pipeline.SourceBuilder;
 import com.hazelcast.jet.pipeline.StreamSource;
 import com.hazelcast.jet.pipeline.StreamStage;
@@ -61,6 +64,12 @@ import com.hazelcast.sql.SqlResult;
  *                     \       /
  *                      \     /
  *                +------( 5 )------+
+ *                | Format as JSON  |
+ *                +-----------------+
+ *                         |
+ *                         |
+ *                         |
+ *                +------( 6 )------+
  *                |  Slack Source   |
  *                +-----------------+
  * </pre>
@@ -95,6 +104,13 @@ import com.hazelcast.sql.SqlResult;
  * Right leg - try to accept
  * </p>
  * <p>Try to process the input, returning the result or an error.
+ * </p>
+ * </li>
+ * <li>
+ * <p>
+ * Format
+ * </p>
+ * <p>Prepare JSON for sending to Slack.
  * </p>
  * </li>
  * <li>
@@ -153,7 +169,8 @@ public class SlackToSlackCLI {
      * processing the human's input.
      * </p>
      */
-    public static Pipeline buildPipeline(Properties properties) {
+    public static Pipeline buildPipeline(Properties properties, String projectName) {
+        String channel = properties.getProperty(MyConstants.SLACK_CHANNEL_NAME);
 
         ServiceFactory<?, HazelcastInstance> hazelcastInstanceService =
                 ServiceFactories.sharedService(ctx -> ctx.jetInstance().getHazelcastInstance());
@@ -173,7 +190,7 @@ public class SlackToSlackCLI {
             }).setName("determine-if-handled");
 
         // Branch for unhandled input type
-        StreamStage<String> unhandlerInput =
+        StreamStage<String> unhandledInput =
                 possibleSqlStatement
                 .filter(tuple2 -> !tuple2.f0())
                 .map(tuple2 -> {
@@ -182,20 +199,17 @@ public class SlackToSlackCLI {
                 .setName("not-an-sql-statement");
 
         // Branch for handled input type, throttle to 1 thread
-        StreamStage<String> handlerInput =
+        StreamStage<String> handledInput =
                 possibleSqlStatement
                 .filter(tuple2 -> tuple2.f0())
                 .mapUsingServiceAsync(hazelcastInstanceService, mapAsyncSqlFn())
                 .setLocalParallelism(1)
                 .setName("is-an-sql-statement");
 
-        //XXX Join the output to the same sink.
-        //XXX String channel = properties.getProperty(MyConstants.SLACK_CHANNEL_NAME);
-        //XXX .writeTo(SlackToSlackCLI.mySlackChannel(channel, properties));
-        //Sink<Object> sink1 = Sinks.logger();
-        //Sink<Object> sink2 = Sinks.logger();
-        unhandlerInput.writeTo(Sinks.logger());
-        handlerInput.writeTo(Sinks.logger());
+        // Join the handled and unhandled, and return to Slack
+        unhandledInput.merge(handledInput).setName("merge-handled-and-unhandled")
+        .map(SlackToSlackCLI.myMapStage()).setName("reformat-to-JSON")
+        .writeTo(SlackToSlackCLI.mySlackChannelSink(channel, properties, projectName));
 
         return pipeline;
     }
@@ -220,6 +234,22 @@ public class SlackToSlackCLI {
                 .build();
     }
 
+    /**
+     * <p>Reformat the incoming text to a JSON object for Slack.
+     * </p>
+     * <p>Use internal rather than global constants, only relevant for Slack.
+     * </p>
+     */
+    private static FunctionEx<String, JSONObject> myMapStage() {
+        return str -> {
+            String cleanStr = str.replaceAll("\"", "'");
+
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(SlackConstants.PARAM_TEXT, cleanStr);
+
+            return jsonObject;
+        };
+    }
 
     /**
      * <p>Create a sink that makes REST calls to write a JSON message to Slack's API.
@@ -227,12 +257,13 @@ public class SlackToSlackCLI {
      *
      * @param channel Used to name the job stage
      * @param properties To pass to the Sink builder
+     * @param projectName To identify the sender
      * @return
-     *XXX
-    private static Sink<JSONObject> mySlackChannelSink(String channel, Properties properties) {
+     */
+    private static Sink<JSONObject> mySlackChannelSink(String channel, Properties properties, String projectName) {
         return SinkBuilder.sinkBuilder(
                     "slackSink-" + channel,
-                    context -> new MySlackSink(properties)
+                    context -> new MySlackSink(properties, projectName)
                 )
                 .receiveFn(
                         (MySlackSink mySlackSink, JSONObject item) -> mySlackSink.receiveFn(item)
@@ -240,5 +271,5 @@ public class SlackToSlackCLI {
                 .destroyFn(mySlackSink -> mySlackSink.destroyFn())
                 .preferredLocalParallelism(1)
                 .build();
-    }*/
+    }
 }

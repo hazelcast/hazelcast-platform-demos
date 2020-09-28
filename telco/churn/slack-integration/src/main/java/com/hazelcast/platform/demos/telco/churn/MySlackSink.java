@@ -41,13 +41,15 @@ import org.springframework.web.client.RestTemplate;
 public class MySlackSink {
     private static final Logger LOGGER = LoggerFactory.getLogger(MySlackSink.class);
     private final String channelName;
+    private final String messagePrefix;
     private final String token;
     private final RestTemplate restTemplate;
 
-    public MySlackSink(Properties properties) {
+    public MySlackSink(Properties properties, String projectName) {
         this.channelName = properties.getProperty(MyConstants.SLACK_CHANNEL_NAME);
         this.token = properties.getProperty(MyConstants.SLACK_ACCESS_TOKEN);
         this.restTemplate = new RestTemplate();
+        this.messagePrefix = "(" + projectName + "): ";
     }
 
     /**
@@ -71,6 +73,10 @@ public class MySlackSink {
             HttpEntity<String> requestEntity =
                     new HttpEntity<String>(jsonObject.toString(), headers);
 
+            String text = jsonObject.getString(SlackConstants.PARAM_TEXT);
+            if (text.startsWith(this.messagePrefix)) {
+                jsonObject.put(SlackConstants.PARAM_TEXT, this.messagePrefix + text);
+            }
             LOGGER.info("Sending to Slack: {}", jsonObject);
 
             ResponseEntity<Object> responseEntity

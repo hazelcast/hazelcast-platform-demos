@@ -90,7 +90,7 @@ public class TopicToSlack {
      * to the Slack cannel.
      * </p>
      */
-    public static Pipeline buildPipeline(Properties properties, String topicName) {
+    public static Pipeline buildPipeline(Properties properties, String topicName, String projectName) {
 
         Pipeline pipeline = Pipeline.create();
 
@@ -110,7 +110,7 @@ public class TopicToSlack {
             String channel = properties.getProperty(MyConstants.SLACK_CHANNEL_NAME);
 
             readAndMap
-            .writeTo(TopicToSlack.mySlackChannel(channel, properties));
+            .writeTo(TopicToSlack.mySlackChannel(channel, properties, projectName));
         }
 
         return pipeline;
@@ -162,12 +162,13 @@ public class TopicToSlack {
      *
      * @param channel Used to name the job stage
      * @param properties To pass to the Sink builder
+     * @param projectName To identify the sender
      * @return
      */
-    private static Sink<JSONObject> mySlackChannel(String channel, Properties properties) {
+    private static Sink<JSONObject> mySlackChannel(String channel, Properties properties, String projectName) {
         return SinkBuilder.sinkBuilder(
                     "slackSink-" + channel,
-                    context -> new MySlackSink(properties)
+                    context -> new MySlackSink(properties, projectName)
                 )
                 .receiveFn(
                         (MySlackSink mySlackSink, JSONObject item) -> mySlackSink.receiveFn(item)

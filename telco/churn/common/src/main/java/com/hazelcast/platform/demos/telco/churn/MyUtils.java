@@ -140,16 +140,14 @@ public class MyUtils {
             char c = input.charAt(i);
 
             switch (c) {
-            case '‘': c = '\'';
-                    break;
-            case '’': c = '\'';
-                    break;
-            case '“': c = '"';
-                    break;
-            case '”': c = '"';
-                    break;
+            case '‘':
+            case '’':
+            case '“':
+            case '”':
+                c = '\'';
+                break;
             default:
-                    break;
+                break;
             }
 
             output[i] = c;

@@ -167,7 +167,10 @@ public class ApplicationInitializer {
 
         //String query = "SELECT firstName FROM '" + mapName + "' WHERE lastName = 'Stevenson'";
         //String query = "SELECT firstName FROM \"" + mapName + "\" WHERE lastName = 'Stevenson'";
-        String query = "SELECT firstName FROM " + mapName + " WHERE lastName = 'Stevenson'";
+        //String query = "SELECT firstName FROM " + mapName + " WHERE lastName = 'Stevenson'";
+        String query = "SELECT firstName FROM Person WHERE lastName = “Stevenson”";
+        //String query = "SELECT firstName from Person WHERE lastName = ‘Stevenson’";
+        query = MyUtils.makeUTF8(query);
         try {
             SqlResult sqlResult = hazelcastInstance.getSql().execute(query);
             System.out.println(MyUtils.prettyPrintSqlResult(sqlResult));
