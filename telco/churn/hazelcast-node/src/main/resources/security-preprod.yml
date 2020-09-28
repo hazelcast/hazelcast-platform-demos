@@ -80,8 +80,6 @@ hazelcast:
           principal: "JobSubmitter"
           actions:
             - all
-      sql:
-        principal: churn-java-client
     client-block-unmapped-actions: false
     
     # Doesn't block, just logs

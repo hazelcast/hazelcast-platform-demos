@@ -39,9 +39,12 @@
 		<!-- Standalone, not part of Hazelcast -->
 		<module>cassandra</module>
 		<module>grafana</module>
+                <module>kafdrop</module>
+                <module>kafka-broker</module>
 		<module>prometheus</module>
 		<module>mongo</module>
 		<module>mysql</module>
+		<module>zookeeper</module>
 
 		<!-- Shared with legacy preloader and Hazelcast bits -->
 		<module>common</module>
