@@ -6,6 +6,9 @@ CPU=0
 # Job control
 set -m
 
+# Logging
+echo $# args == $*
+
 # Capture port is optional first argument
 PORT=${1}
 RANGE=1
@@ -14,11 +17,13 @@ if [[ -z "${1}" ]] || ! [[ $1 =~ ^[0-9]+$ ]] ; then
 else
  PORT=${1}
  shift
+ # Range is 2nd argument if port is first
  RANGE=${1}
  shift
 fi
 echo \$PORT==$PORT
 echo \$RANGE==$RANGE
+echo $# args == $*
 
 # Start gRPC server in background, first uses CPU 0, second uses CPU 1
 while [[ $CPU -lt $RANGE ]] 

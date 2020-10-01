@@ -33,7 +33,11 @@ spec:
         - env:
           - name: "MY_GRAFANA_SERVICE"
             value: "cva-grafana.default.svc.cluster.local"
-          args: ["50001"]
+          - name: "MY_INITSIZE"
+            value: "2"
+          - name: "MY_PARTITIONS"
+            value: "271"
+          args: ["50001", "2"]
           image: "hazelcast-platform-demos/cva-hazelcast-node-site1-cpp"
           imagePullPolicy: Never
           livenessProbe:
