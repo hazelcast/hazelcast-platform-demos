@@ -89,7 +89,7 @@ public class CvaStpJobSubmitter {
         String jobName = jobNamePrefix + "$" + calcDate + "@" + timestampStr;
         String cppLoadBalancer = getLoadBalancer();
 
-        int maxParallelism = 2;
+        int maxParallelism = 3;
         if (parallelism > maxParallelism) {
             LOGGER.error("Experimental build, parallelism {} constrained to max parallelism {}",
                     parallelism, maxParallelism);

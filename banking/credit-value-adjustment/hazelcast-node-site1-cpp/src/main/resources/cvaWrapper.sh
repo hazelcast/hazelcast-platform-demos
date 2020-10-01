@@ -8,14 +8,15 @@ set -m
 
 # Capture port is optional first argument
 PORT=${1}
+RANGE=1
 if [[ -z "${1}" ]] || ! [[ $1 =~ ^[0-9]+$ ]] ; then
  PORT=50001
 else
  PORT=${1}
  shift
+ RANGE=${1}
+ shift
 fi
-RANGE=2
-#RANGE=1
 echo \$PORT==$PORT
 echo \$RANGE==$RANGE
 
