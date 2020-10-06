@@ -128,8 +128,7 @@ public class JsonLoaderService {
                 this.read++;
             }
             while (!this.stopEarly && line != null) {
-                if (!line.startsWith("#")
-                        && (!line.contains("curvescenario") || line.contains("curvescenario0206"))) {
+                if (!line.startsWith("#")) {
                     try {
                         HazelcastJsonValue value = new HazelcastJsonValue(line);
 
