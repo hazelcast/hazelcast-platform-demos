@@ -30,7 +30,7 @@ while [[ $CPU -lt $RANGE ]]
 do
  ACTUAL_PORT=$(($PORT + $CPU))
  echo /cvarisk/build/cvarisk_server 0.0.0.0:${ACTUAL_PORT} \&
- /cvarisk/build/cvarisk_server 0.0.0.0:${ACTUAL_PORT} &
+ /cvarisk/build/cvarisk_server 0.0.0.0:${ACTUAL_PORT} 2>&1 &
  PID=$!
  CMD="taskset -p -c $CPU $PID" 
  echo $CMD
@@ -41,7 +41,7 @@ done
 
 # Start Jet node in background, CPU 0, "-XX:ActiveProcessorCount=2"
 echo /usr/bin/java $* -jar application.jar \&
-/usr/bin/java $* -jar application.jar &
+/usr/bin/java $* -jar application.jar 2>&1 &
 PID=$!
 CMD="taskset -p -c $CPU $PID" 
 echo $CMD

@@ -12,7 +12,9 @@ ARG MC_CLUSTER2_ADDRESSLIST
 # To check health, uses port 8081 but internal URL. Preconfigure license, logon/password.
 ENV JAVA_OPTS="-Dhazelcast.mc.healthCheck.enable=true \
  -Dhazelcast.mc.prometheusExporter.enabled=true \
- -Dhazelcast.mc.license=$MC_LICENSE"
+ -Dhazelcast.mc.license=$MC_LICENSE \
+ -Xmx3G -Xms3G \
+ -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/neil"
 
 # Used by /mc-start.sh to create admin user
 ENV MC_ADMIN_USER=$MC_ADMINUSER

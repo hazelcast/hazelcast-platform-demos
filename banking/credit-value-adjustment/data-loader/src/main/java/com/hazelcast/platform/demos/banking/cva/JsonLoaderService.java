@@ -128,7 +128,8 @@ public class JsonLoaderService {
                 this.read++;
             }
             while (!this.stopEarly && line != null) {
-                if (!line.startsWith("#")) {
+                if (!line.startsWith("#")
+                        && (!line.contains("curvescenario") || line.contains("curvescenario0206"))) {
                     try {
                         HazelcastJsonValue value = new HazelcastJsonValue(line);
 
@@ -187,7 +188,7 @@ public class JsonLoaderService {
                         }
                         String line = scanner.nextLine();
                         this.read++;
-                        if (!line.startsWith("#")) {
+                        if (!line.startsWith("#") && !line.contains("\"settlement_date\":\"0\"")) {
                             try {
                                 HazelcastJsonValue value = new HazelcastJsonValue(line);
 
