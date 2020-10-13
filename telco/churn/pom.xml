@@ -59,7 +59,7 @@
 		<module>hazelcast-node</module>
 		<module>abstract-client</module>
 		<module>java-client</module>
-		<!-- <module>nodejs-client</module> -->
+		<module>nodejs-client</module>
 		<module>jet-jobs</module>
 		<module>slack-integration</module>
 		<module>management-center</module>
