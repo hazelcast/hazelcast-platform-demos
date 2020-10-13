@@ -31,7 +31,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * <p>XXX
+ * <p>Shared configuration for Hazelcast (Java) clients, such as the Jet
+ * job submitters.
  * </p>
  */
 @Configuration
@@ -41,7 +42,11 @@ public class ApplicationConfig {
     private static final String XML_CLIENT_CONFIG = "hazelcast-client.xml";
 
     /**
-     * XXX
+     * <p>Set properties in the environment that may be used in Hazelcast
+     * configuration files. This constructor runs before the
+     * {@link #clientConfig} method which processes these configuration
+     * files.
+     * </p>
      */
     public ApplicationConfig(MyProperties myProperties) {
         System.setProperty("my.build-timestamp", myProperties.getBuildTimestamp());

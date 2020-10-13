@@ -45,10 +45,19 @@ public class MyProperties {
     @NotNull
     private String project;
     // Null allowed for following
+    private String bootstrapServers;
     private String site;
     private String slackAccessToken;
     private String slackChannelId;
     private String slackChannelName;
+
+    public String getBootstrapServers() {
+        return this.bootstrapServers;
+    }
+    public void setBootstrapServers(String bootstrapServers) {
+        this.bootstrapServers = bootstrapServers;
+        LOGGER.info("myProperties.bootstrapServers=='{}'", this.bootstrapServers);
+    }
 
     public String getBuildTimestamp() {
         return this.buildTimestamp;

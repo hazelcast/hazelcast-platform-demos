@@ -39,8 +39,8 @@
                 <!-- Matches banking/credit-value-adjustment/cpp/Dockerfile2 -->
 		<grpc.version>1.31.1</grpc.version>
 		<hazelcast.version>4.1-SNAPSHOT</hazelcast.version>
-		<!-- Temp build until Jet 4.4-SNAPSHOT, wrapping IMDG 4.1 -->
-		<hazelcast-jet.version>4.3-NEIL</hazelcast-jet.version>
+		<!-- Temp build of Jet 4.4-SNAPSHOT, wrapping IMDG 4.1 -->
+		<hazelcast-jet.version>4.4-SNAPSHOT</hazelcast-jet.version>
 		<hazelcast-jet-spring-boot-starter.version>2.0.0</hazelcast-jet-spring-boot-starter.version>
 		<hazelcast-kubernetes.version>2.0.2</hazelcast-kubernetes.version>
 		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>

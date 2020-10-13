@@ -30,9 +30,10 @@ public class MyConstants {
 
     // Map names, for eager creation
     //TODO Temporary name for testing
+    public static final String IMAP_NAME_CDR  = "cdr";
     public static final String IMAP_NAME_NEIL  = "neil";
     public static final List<String> IMAP_NAMES =
-            List.of(IMAP_NAME_NEIL);
+            List.of(IMAP_NAME_CDR, IMAP_NAME_NEIL);
 
     // Topic names, for eager creation
     public static final String ITOPIC_NAME_SLACK  = "slack";
@@ -43,4 +44,8 @@ public class MyConstants {
     public static final String SLACK_ACCESS_TOKEN = "accessToken";
     public static final String SLACK_CHANNEL_ID = "channelId";
     public static final String SLACK_CHANNEL_NAME = "channelName";
+
+    // To read from Kafka, must match Dockerfile in topic-create module
+    public static final String KAFKA_TOPIC_CALLS_NAME = "calls";
+    public static final int KAFKA_TOPIC_CALLS_PARTITIONS = 3;
 }

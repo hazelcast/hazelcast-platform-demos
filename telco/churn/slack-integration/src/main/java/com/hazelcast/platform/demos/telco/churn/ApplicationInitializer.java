@@ -33,7 +33,7 @@ import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.pipeline.Pipeline;
 
 /**
- * <p>A job launcher for Slack jobs
+ * <p>A job launcher for the optional Slack jobs
  * </p>
  * <ol>
  * <li>

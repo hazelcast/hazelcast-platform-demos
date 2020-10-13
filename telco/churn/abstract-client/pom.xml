@@ -31,6 +31,10 @@
 			<artifactId>hazelcast-jet-enterprise</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
+            <artifactId>hazelcast-jet-kafka</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-kubernetes</artifactId>
 		</dependency>
