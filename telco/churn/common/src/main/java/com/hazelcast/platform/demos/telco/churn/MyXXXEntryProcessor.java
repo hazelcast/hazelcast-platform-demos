@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hazelcast.map.EntryProcessor;
-import com.hazelcast.nio.serialization.GenericRecord;
+//FIXME import com.hazelcast.nio.serialization.GenericRecord;
 
 /**
  * XXX
@@ -41,11 +41,12 @@ public class MyXXXEntryProcessor implements EntryProcessor<Integer, Object, Stri
        LOGGER.warn("MyXXXEntryProcessor().{} PROCESS KEY {}", this, entry.getKey());
        Object value = entry.getValue();
        String result = "KEY " + entry.getKey() + " VALUE " + value.getClass().getCanonicalName();
+       /*FIXME needs IMDG 4.1
        if (value instanceof GenericRecord) {
            GenericRecord genericRecord = (GenericRecord) value;
            LOGGER.warn("MyXXXEntryProcessor().{} PROCESS VALUE {} {}", this, entry.getKey(), genericRecord);
            result += " GenericRecord " + genericRecord;
-       }
+       }*/
        return result;
    }
 

@@ -25,8 +25,8 @@ import com.hazelcast.function.BiFunctionEx;
 import com.hazelcast.function.FunctionEx;
 import com.hazelcast.jet.datamodel.Tuple2;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//FIXME import org.slf4j.Logger;
+//FIXME import org.slf4j.LoggerFactory;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 import com.hazelcast.jet.pipeline.Pipeline;
@@ -37,7 +37,7 @@ import com.hazelcast.jet.pipeline.SinkBuilder;
 import com.hazelcast.jet.pipeline.SourceBuilder;
 import com.hazelcast.jet.pipeline.StreamSource;
 import com.hazelcast.jet.pipeline.StreamStage;
-import com.hazelcast.sql.SqlResult;
+//FIXME import com.hazelcast.sql.SqlResult;
 
 /**
  * <p>A job to process "{@code CLI}" messages from Slack
@@ -124,7 +124,7 @@ import com.hazelcast.sql.SqlResult;
  */
 public class SlackToSlackCLI {
     public static final String JOB_NAME_PREFIX = SlackToSlackCLI.class.getSimpleName();
-    private static final Logger LOGGER = LoggerFactory.getLogger(SlackToSlackCLI.class);
+    //FIXME private static final Logger LOGGER = LoggerFactory.getLogger(SlackToSlackCLI.class);
 
     private static final String SELECT = "SELECT";
 
@@ -146,6 +146,7 @@ public class SlackToSlackCLI {
                     stringBuilder.append("```");
                     stringBuilder.append("Query: ").append(query).append(MyUtils.NEWLINE);
 
+                    /*FIXME needs IMDG 4.1
                     try {
                         SqlResult sqlResult = hazelcastInstance.getSql().execute(query);
 
@@ -153,7 +154,7 @@ public class SlackToSlackCLI {
                     } catch (Exception e) {
                         LOGGER.error("Query: {} gave {}", tuple2.f1(), e.getMessage());
                         stringBuilder.append("FAILED: ").append(e.getMessage()).append(MyUtils.NEWLINE);
-                    }
+                    }*/
 
                     stringBuilder.append("```");
                     return stringBuilder.toString();

@@ -34,7 +34,7 @@ import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.map.IMap;
-import com.hazelcast.sql.SqlResult;
+//FIXME import com.hazelcast.sql.SqlResult;
 import com.hazelcast.topic.ITopic;
 
 /**
@@ -171,6 +171,9 @@ public class ApplicationInitializer {
         String query = "SELECT firstName FROM Person WHERE lastName = “Stevenson”";
         //String query = "SELECT firstName from Person WHERE lastName = ‘Stevenson’";
         query = MyUtils.makeUTF8(query);
+        //FIXME
+        LOGGER.error("Needs IMDG 4.1 for {}", query);
+        /*FIXME needs IMDG 4.1
         try {
             SqlResult sqlResult = hazelcastInstance.getSql().execute(query);
             System.out.println(MyUtils.prettyPrintSqlResult(sqlResult));
@@ -178,6 +181,6 @@ public class ApplicationInitializer {
             String message = String.format("getMap(%s) SQL '%s'", mapName, query);
             LOGGER.warn(message + ": " + e.getMessage());
             LOGGER.error("XXX", e);
-        }
+        }*/
     }
 }

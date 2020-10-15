@@ -41,6 +41,7 @@
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-kubernetes</artifactId>
 		</dependency>
+		<!-- Needs IMDG 4.1 
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-sql</artifactId>
@@ -51,6 +52,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		-->
 		<dependency>
 			<groupId>com.hazelcast.jet.contrib</groupId>
 			<artifactId>hazelcast-jet-spring-boot-starter</artifactId>

@@ -20,16 +20,16 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+//FIXME import java.util.List;
 import java.util.Locale;
 
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.Job;
 import com.hazelcast.jet.core.JobStatus;
-import com.hazelcast.sql.SqlColumnMetadata;
-import com.hazelcast.sql.SqlResult;
-import com.hazelcast.sql.SqlRow;
-import com.hazelcast.sql.SqlRowMetadata;
+//FIXME import com.hazelcast.sql.SqlColumnMetadata;
+//FIXME import com.hazelcast.sql.SqlResult;
+//FIXME import com.hazelcast.sql.SqlRow;
+//FIXME import com.hazelcast.sql.SqlRowMetadata;
 
 /**
  * <p>Utility functions that may be useful to more than one module.
@@ -162,7 +162,7 @@ public class MyUtils {
      *
      * @param sqlResult
      * @return
-     */
+     *FIXME needs IMDG 4.1
     public static String prettyPrintSqlResult(SqlResult sqlResult) {
         StringBuilder stringBuilder = new StringBuilder();
         String format = "%15s";
@@ -195,5 +195,6 @@ public class MyUtils {
         stringBuilder.append("[").append(count).append(count == 1 ? " row]" : " rows]").append(NEWLINE);
         return stringBuilder.toString();
     }
+    */
 
 }
