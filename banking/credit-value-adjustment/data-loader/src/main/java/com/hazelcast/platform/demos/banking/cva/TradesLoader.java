@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  * </p>
  */
 @Component
-@Order(value = 4)
+@Order(value = 0)
 public class TradesLoader implements CommandLineRunner {
 
     private static final boolean PARTIAL_OK = true;
