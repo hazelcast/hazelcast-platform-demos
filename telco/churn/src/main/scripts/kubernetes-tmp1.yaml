@@ -65,7 +65,6 @@ spec:
             httpGet:
               path: /health
               port: 8081
-            initialDelaySeconds: 30
 ---
 # Pods for Hazelcast grid, a stateful set sized at two
 ---
@@ -101,4 +100,3 @@ spec:
             httpGet:
               path: /hazelcast/health/ready
               port: 5701
-            initialDelaySeconds: 30
