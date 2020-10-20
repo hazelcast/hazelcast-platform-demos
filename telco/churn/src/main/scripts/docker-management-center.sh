@@ -27,7 +27,7 @@ echo '##########################################################################
 
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
-CMD="docker run -e JAVA_ARGS=-Dhazelcast.mc.healthCheck.enable=true -p 8080:8080 --name=${MODULE} --network=${PROJECT} ${DOCKER_IMAGE}"
+CMD="docker run -p 8080:8080 --name=${MODULE} --network=${PROJECT} ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD
