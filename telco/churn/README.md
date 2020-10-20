@@ -39,12 +39,7 @@ All need to go in your Maven `settings.xml` file, such as the below. You can def
 </settings>
 ```
 
-### Slack configuration
+The settings `my.slack.bot.user.oath.access.token`, `my.slack.bot.channel.name` and
+`my.slack.bot.channel.id` are only needed if you use the [slack-integration](./slack-integration)
+module.
 
-TODO explain how
-
-
-## TODO
-TODO is `com.datastax.dse:dse-java-driver-core:2.4.0` needed ?
-TODO is `com.datastax.dse:dse-java-driver-mapping:1.9.0` needed ?
-ADD DEBEZIUM
