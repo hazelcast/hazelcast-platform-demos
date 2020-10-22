@@ -8,7 +8,7 @@ An example showing continuous aggregation of stock market trades, providing
 a UI for inspection of the aggregated values with the ability to drill-down
 to see the trades contained in each aggregation.
 
-[Watch The Video](https://hazelcast.com/thank-you/?resource_id=754405)
+[Watch The Video](https://hazelcast.com/resources/continuous-query-with-drill-down-demo/)
 
 This example only requires open-source Hazelcast.
 
