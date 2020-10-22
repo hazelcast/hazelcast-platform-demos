@@ -30,7 +30,7 @@ spec:
         app: ml-ri-hazelcast-node
     spec:
       containers:
-        - image: "hazelcast-ml-ri/hazelcast-node"
+        - image: "hazelcast-platform-demos/ml-ri-hazelcast-node"
           imagePullPolicy: Never
           livenessProbe:
             httpGet:
