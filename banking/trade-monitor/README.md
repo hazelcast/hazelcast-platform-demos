@@ -8,6 +8,8 @@ An example showing continuous aggregation of stock market trades, providing
 a UI for inspection of the aggregated values with the ability to drill-down
 to see the trades contained in each aggregation.
 
+[Watch The Video](https://hazelcast.com/thank-you/?resource_id=754405)
+
 This example only requires open-source Hazelcast.
 
 There are modules for monitoring which involve licensing, but these are optional.
