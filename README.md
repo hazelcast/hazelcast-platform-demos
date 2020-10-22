@@ -7,6 +7,7 @@ of [Hazelcast Jet](https://hazelcast.org/jet/) and [Hazelcast IMDG](https://haze
 
 1. Banking
   * [Trade Monitor](./banking/trade-monitor) Monitoring and aggregation of stock market trading volumes.
+    ** [Video](https://hazelcast.com/thank-you/?resource_id=754405)
   * [Credit Value Adjustment](./banking/credit-value-adjustment) Risk exposure calculation for Interest Rate Swaps.
 2. Machine Learning
   * [RI](./ml/ml-ri) Reference Implementation for Machine Learning Inference, minimal dependencies.
