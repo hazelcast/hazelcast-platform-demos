@@ -33,6 +33,10 @@
 			<artifactId>hazelcast-jet-enterprise</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
+            <artifactId>hazelcast-jet-python</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-kubernetes</artifactId>
 		</dependency>
@@ -61,6 +65,12 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
 
 		<plugins>
 			<plugin>

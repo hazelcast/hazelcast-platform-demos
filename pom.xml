@@ -63,9 +63,8 @@
 		<maven-checkstyle-plugin.version>3.1.0</maven-checkstyle-plugin.version>
 		<maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-		<maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
 		<maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
-		<maven-failsafe-plugin.version>3.0.0-M4</maven-failsafe-plugin.version>
+		<maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
 		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
 		<maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
 		<maven-shade-plugin.version>3.2.2</maven-shade-plugin.version>
@@ -205,6 +204,20 @@
 				<artifactId>jython</artifactId>
 				<version>${jython.version}</version>
 			</dependency>
+
+            <!-- scope==test -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <version>${spring-boot.version}</version>
+                <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.junit.vintage</groupId>
+                        <artifactId>junit-vintage-engine</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -275,6 +288,8 @@
 				</configuration>
 				<executions>
 					<execution>
+						<!-- No default phase to avoid collision with Spring Boot and Dockerfile -->
+						<phase>package</phase>
 						<goals>
 							<goal>integration-test</goal>
 							<goal>verify</goal>
@@ -328,10 +343,6 @@
 				<plugin>
 					<artifactId>maven-clean-plugin</artifactId>
 					<version>${maven-clean-plugin.version}</version>
-				</plugin>
-				<plugin>
-					<artifactId>maven-dependency-plugin</artifactId>
-					<version>${maven-dependency-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-deploy-plugin</artifactId>
