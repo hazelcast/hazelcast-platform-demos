@@ -1,4 +1,14 @@
-FROM library/openjdk:11-jre-slim
+# Use Python 3.7 as Grppcio:1.26.0 is incompatible with Python 3.8.
+# Use Buster (Debian) as Alpine does not work well with wheel packages.
+FROM library/python:3.7-buster
+
+# Add Java
+RUN apt update
+RUN apt install -y openjdk-11-jdk
+
+# Download requirements into image makes start up faster when growing cluster
+COPY target/classes/requirements.txt /
+RUN pip3 install -r ./requirements.txt
 
 # Maven compiled target
 ARG JAR_FILE
