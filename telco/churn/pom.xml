@@ -48,6 +48,9 @@
 
 		<!-- Shared with legacy preloader and Hazelcast bits -->
 		<module>common</module>
+		<module>common-cassandra</module>
+		<module>common-mongo</module>
+		<module>common-mysql</module>
 
 		<!-- Add test data to Cassandra/Mongo/MySql -->
 		<module>topic-create</module>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.hazelcast.platform.demos.telco.churn;
+package com.hazelcast.platform.demos.telco.churn.domain;
 
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.Column;
@@ -24,13 +24,14 @@ import org.springframework.data.cassandra.core.mapping.Table;
 //XXX import java.io.Serializable;
 
 /**
+ *
  * XXX
 datastax-java-driver.basic.load-balancing-policy {
   local-datacenter = datacenter1
 }
  */
 @Table(value = "cpostcode")
-public class CPostcode {
+public class CallDataRecord {
 
     /**
      * XXX

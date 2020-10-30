@@ -16,36 +16,18 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
-//XXX import org.slf4j.Logger;
-//XXX import org.slf4j.LoggerFactory;
-//XXX import org.springframework.boot.configurationprocessor.json.JSONObject;
-
-import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.pipeline.Pipeline;
 
 /**
  * XXX
  */
-public class CassandraDebeziumCDC {
-    private static final String JOB_NAME_PREFIX = CassandraDebeziumCDC.class.getSimpleName();
-    //private static final Logger LOGGER = LoggerFactory.getLogger(CassandraDebeziumCDC.class);
+public class CassandraDebeziumCDC extends MyJobWrapper {
 
-    /**
-     * <p>Job configuration, mainly which classes need to be distributed
-     * to execution nodes.
-     * </p>
-     */
-    public static JobConfig buildJobConfig(String timestampStr) {
-        JobConfig jobConfig = new JobConfig();
-
-        jobConfig.setName(JOB_NAME_PREFIX + "@" + timestampStr);
-
-        //XXX jobConfig.addClass(JSONObject.class);
-
-        return jobConfig;
+    CassandraDebeziumCDC(long arg0) {
+        super(arg0);
     }
 
-    public static Pipeline buildPipeline() {
+    public Pipeline getPipeline() {
         return null;
     }
 }

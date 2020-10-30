@@ -16,7 +16,12 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,25 +30,72 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import com.hazelcast.platform.demos.telco.churn.domain.Tariff;
+import com.hazelcast.platform.demos.telco.churn.domain.TariffRepository;
+import com.hazelcast.platform.demos.telco.churn.testdata.TariffTestdata;
+
 /**
- * XXX
+ * <p>Inserts tariffs into the table for the current and next calendar year.
  */
 @Configuration
-@EnableJpaRepositories(basePackageClasses = JPostcodeRepository.class)
+@EnableJpaRepositories(basePackageClasses = TariffRepository.class)
 public class JpaInitializer implements CommandLineRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(JpaInitializer.class);
 
     @Autowired
-    private JPostcodeRepository postcodeRepository;
+    private TariffRepository tariffRepository;
 
     /**
-     * XXX
+     * Inject data if table empty.
      */
     @Override
     public void run(String... args) throws Exception {
-        List<JPostcode> list = this.postcodeRepository.findAll();
+        LOGGER.trace("BEFORE: count()=={}", this.tariffRepository.count());
 
-        LOGGER.error("JPA {}", list);
+        int year = LocalDate.now().getYear();
+
+        List<String> listNow = this.tariffRepository.findThisYearsTariffs(year);
+        List<String> listFuture = this.tariffRepository.findThisYearsTariffs(year + 1);
+
+        if ((listNow.size() + listFuture.size()) != 0) {
+            LOGGER.error("Tariffs already loaded, ignoring");
+        } else {
+            this.saveTariffs(year);
+        }
+
+        LOGGER.trace("AFTER:  count()=={}", this.tariffRepository.count());
+    }
+
+    /**
+     * <p>Allow exceptions if bad data, fail fast.
+     * </p>
+     *
+     * @param year Base for offset.
+     */
+    private void saveTariffs(int currentYear) {
+        int count = 0;
+        Set<Integer> years = new TreeSet<>();
+
+        for (Object[] tariffData : TariffTestdata.getTariffs()) {
+            Tariff tariff = new Tariff();
+            Iterator<Object> iterator = Arrays.asList(tariffData).iterator();
+
+            // Base year from runtime plus offset from test data
+            int effectiveYear = currentYear + Integer.parseInt(iterator.next().toString());
+            years.add(effectiveYear);
+
+            tariff.setYear(effectiveYear);
+            tariff.setId(iterator.next().toString() + effectiveYear);
+            tariff.setName(iterator.next().toString() + " " + effectiveYear);
+            tariff.setInternational(Boolean.parseBoolean(iterator.next().toString()));
+            tariff.setRatePerMinute(Double.parseDouble(iterator.next().toString()));
+
+            this.tariffRepository.save(tariff);
+            LOGGER.trace("saved: {}", tariff);
+            count++;
+        }
+
+        LOGGER.info("Wrote {} records for years {}", count, years);
     }
 
 }

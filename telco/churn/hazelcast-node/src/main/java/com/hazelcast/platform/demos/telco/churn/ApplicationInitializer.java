@@ -27,6 +27,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.jet.JetInstance;
+import com.hazelcast.map.IMap;
 
 /**
  * <p>
@@ -73,6 +74,14 @@ public class ApplicationInitializer {
                 if (!distributedObject.getName().startsWith("__")) {
                     LOGGER.warn("distributedObject '{}' '{}'",
                             distributedObject.getName(), distributedObject.getClass().getName());
+                    if (distributedObject instanceof IMap) {
+                        IMap<?, ?> iMap = (IMap<?, ?>) distributedObject;
+                        LOGGER.warn("  :: IMap '{}'", iMap.getName());
+                        for (Object key : iMap.keySet()) {
+                            LOGGER.warn("  ::   :: IMap K,V == {},{}", key, iMap.get(key));
+                        }
+                        LOGGER.warn("  :: '{}'.size()=={}", iMap.getName(), iMap.size());
+                    }
                 }
             }
             LOGGER.error("====");
@@ -93,9 +102,6 @@ public class ApplicationInitializer {
         for (String iTopicName : MyConstants.ITOPIC_NAMES) {
             this.jetInstance.getHazelcastInstance().getTopic(iTopicName);
         }
-        //XXX
-        this.jetInstance.getMap(MyConstants.IMAP_NAME_NEIL)
-        .put(this.myProperties.getBuildUserName(), this.myProperties.getBuildTimestamp());
     }
 
     /**

@@ -1,0 +1,4 @@
+# Replaced by Maven
+my:
+  build-timestamp: @maven.build.timestamp@
+  build-userName: @user.name@

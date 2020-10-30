@@ -25,23 +25,26 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+import com.hazelcast.platform.demos.telco.churn.domain.Customer;
+import com.hazelcast.platform.demos.telco.churn.domain.CustomerRepository;
+
 /**
  * XXX
  */
 @Configuration
-@EnableMongoRepositories(basePackageClasses = MPostcodeRepository.class)
+@EnableMongoRepositories(basePackageClasses = CustomerRepository.class)
 public class MongoInitializer implements CommandLineRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(MongoInitializer.class);
 
     @Autowired
-    private MPostcodeRepository postcodeRepository;
+    private CustomerRepository postcodeRepository;
 
     /**
      * XXX
      */
     @Override
     public void run(String... args) throws Exception {
-        List<MPostcode> list = this.postcodeRepository.findAll();
+        List<Customer> list = this.postcodeRepository.findAll();
 
         LOGGER.error("MONGO {}", list);
     }

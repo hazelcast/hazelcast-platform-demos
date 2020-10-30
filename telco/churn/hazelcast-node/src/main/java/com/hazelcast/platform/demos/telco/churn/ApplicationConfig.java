@@ -56,20 +56,47 @@ public class ApplicationConfig {
     }
 
     /**
-     * XXX
+     * <p>Extend config to wire in Spring {@code @Bean} instead
+     * of normal Java class instances.
+     * </p>
      */
     @Bean
     public Config config(MyMapStoreFactory myMapStoreFactory) {
         Config config = new ClasspathYamlConfig("hazelcast.yml");
 
-        MapConfig neilMapConfig = new MapConfig(MyConstants.IMAP_NAME_NEIL);
+        // Call data records - Cassandra
+        MapConfig cdrMapConfig = new MapConfig(MyConstants.IMAP_NAME_CDR);
 
-        MapStoreConfig myMapStoreConfig = new MapStoreConfig();
-        myMapStoreConfig.setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER);
-        myMapStoreConfig.setFactoryImplementation(myMapStoreFactory);
-        neilMapConfig.setMapStoreConfig(myMapStoreConfig);
+        MapStoreConfig cdrMapStoreConfig = new MapStoreConfig();
+        cdrMapStoreConfig.setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER);
+        cdrMapStoreConfig.setFactoryImplementation(myMapStoreFactory);
+        cdrMapConfig.setMapStoreConfig(cdrMapStoreConfig);
 
-        //XXX config.getMapConfigs().put(neilMapConfig.getName(), neilMapConfig);
+        //config.getMapConfigs().put(cdrMapConfig.getName(), cdrMapConfig);
+        //FIXME
+        LOGGER.error("FIXME don't use {} yet", cdrMapConfig.getClass().getName());
+
+        // Customer records - Mongo
+        MapConfig customerMapConfig = new MapConfig(MyConstants.IMAP_NAME_CUSTOMER);
+
+        MapStoreConfig customerMapStoreConfig = new MapStoreConfig();
+        customerMapStoreConfig.setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER);
+        customerMapStoreConfig.setFactoryImplementation(myMapStoreFactory);
+        customerMapConfig.setMapStoreConfig(customerMapStoreConfig);
+
+        //config.getMapConfigs().put(customerMapConfig.getName(), customerMapConfig);
+        //FIXME
+        LOGGER.error("FIXME don't use {} yet", customerMapConfig.getClass().getName());
+
+        // Tariff records - MySql
+        MapConfig tariffMapConfig = new MapConfig(MyConstants.IMAP_NAME_TARIFF);
+
+        MapStoreConfig tariffMapStoreConfig = new MapStoreConfig();
+        tariffMapStoreConfig.setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER);
+        tariffMapStoreConfig.setFactoryImplementation(myMapStoreFactory);
+        tariffMapConfig.setMapStoreConfig(tariffMapStoreConfig);
+
+        config.getMapConfigs().put(tariffMapConfig.getName(), tariffMapConfig);
 
         return config;
     }

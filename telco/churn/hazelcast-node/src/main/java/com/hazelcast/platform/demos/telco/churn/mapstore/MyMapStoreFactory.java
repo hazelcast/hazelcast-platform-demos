@@ -20,6 +20,10 @@ import java.util.Properties;
 
 import com.hazelcast.map.MapLoader;
 import com.hazelcast.map.MapStoreFactory;
+import com.hazelcast.platform.demos.telco.churn.MyConstants;
+import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordRepository;
+import com.hazelcast.platform.demos.telco.churn.domain.CustomerRepository;
+import com.hazelcast.platform.demos.telco.churn.domain.TariffRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +32,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
- * XXX
+ * <p>Create {@link MapLoader} for specific maps.
+ * </p>
+ * <p>A {@link MapLoader} imports data, defined for Cassandra, Mongo and MySql.
+ * Cassandra is also a {@link MapStore} so can export data back to Cassandra
+ * if it is changed in the grid.
+ * </p>
  */
 @SuppressWarnings("rawtypes")
 @Component
@@ -38,14 +47,42 @@ public class MyMapStoreFactory implements MapStoreFactory {
     @Autowired
     private ApplicationContext applicationContext;
 
+    /**
+     * <p>Return a {@link MapLoader} (legacy into Hazelcast), which may
+     * also be a {@link MapStore} (legacy into Hazelcast, Hazelcast into legacy)
+     * </p>
+     */
     @Override
-    public MapLoader newMapStore(String arg0, Properties arg1) {
-        LOGGER.error("newMapStore({}, {})", arg0, arg1);
-        LOGGER.error("{}", this.applicationContext);
-        // TODO Auto-generated method stub
-        //XXX TeamRepository teamRepository = this.applicationContext.getBean(TeamRepository.class);
-        //XXX return new TeamMapStore(league, teamRepository);
-        return null;
+    public MapLoader newMapStore(String mapName, Properties properties) {
+        LOGGER.trace("newMapStore({}, {})", mapName, properties);
+
+        MapLoader mapLoader = null;
+
+        switch (mapName) {
+        case MyConstants.IMAP_NAME_CDR:
+            CallDataRecordRepository callDataRecordRepository =
+                this.applicationContext.getBean(CallDataRecordRepository.class);
+            mapLoader = new CallDataRecordMapStore(callDataRecordRepository);
+            break;
+        case MyConstants.IMAP_NAME_CUSTOMER:
+            CustomerRepository customerRepository =
+                this.applicationContext.getBean(CustomerRepository.class);
+            mapLoader = new CustomerMapLoader(customerRepository);
+            break;
+        case MyConstants.IMAP_NAME_TARIFF:
+            TariffRepository tariffRepository =
+                this.applicationContext.getBean(TariffRepository.class);
+            mapLoader = new TariffMapLoader(tariffRepository);
+            break;
+        default:
+            break;
+        }
+
+        if (mapLoader == null) {
+            throw new RuntimeException("No @Bean for mapName==" + mapName);
+        }
+
+        return mapLoader;
     }
 
 }

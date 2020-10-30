@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +36,17 @@ import com.hazelcast.jet.pipeline.Pipeline;
  * </p>
  * <ol>
  * <li>
+ * <p>{@link CassandraDebeziumCDC}</p>
+ * <p>XXX
+ * </p>
+ * </li>
+ * <li>
  * <p>{@link KafkaIngest}</p>
  * <p>XXX
  * </p>
  * </li>
  * <li>
- * <p>{@link CassandraDebeziumCDC}</p>
+ * <p>{@link MLChurnDetector}</p>
  * <p>XXX
  * </p>
  * </li>
@@ -66,19 +73,17 @@ public class ApplicationInitializer {
             HazelcastInstance hazelcastInstance = this.jetInstance.getHazelcastInstance();
             LOGGER.info("-=-=-=-=- START {} START -=-=-=-=-=-", hazelcastInstance.getName());
 
-            long timestamp = System.currentTimeMillis();
-            String timestampStr = MyUtils.timestampToISO8601(timestamp);
+            var timestamp = System.currentTimeMillis();
 
-            JobConfig jobConfigKafkaIngest = KafkaIngest.buildJobConfig(timestampStr);
-            Pipeline pipelineKafkaIngest =
-                    KafkaIngest.buildPipeline(this.myProperties.getBootstrapServers());
-
-            JobConfig jobConfigCassandraDebeziumCDC = CassandraDebeziumCDC.buildJobConfig(timestampStr);
-            Pipeline pipelineCassandraDebeziumCDC =
-                    CassandraDebeziumCDC.buildPipeline();
-
-            this.trySubmit(jobConfigKafkaIngest, pipelineKafkaIngest);
-            this.trySubmit(jobConfigCassandraDebeziumCDC, pipelineCassandraDebeziumCDC);
+            List.of(
+                    new CassandraDebeziumCDC(timestamp),
+                    new KafkaIngest(timestamp, this.myProperties.getBootstrapServers()),
+                    new MLChurnDetector(timestamp)
+                    )
+            .stream()
+            //FIXME Turn off Cassandra and Kafka for testing
+            .filter(jobWrapper -> jobWrapper.getJobConfig().getName().startsWith("M"))
+            .forEach(this::trySubmit);
 
             LOGGER.info("-=-=-=-=-  END  {}  END  -=-=-=-=-=-", hazelcastInstance.getName());
             hazelcastInstance.shutdown();
@@ -95,11 +100,12 @@ public class ApplicationInitializer {
      * {@link com.hazelcast.cp.lock.FencedLock FencedLock}.
      * </p>
      *
-     * @param jobConfig
-     * @param pipeline
-     * @throws Exception
+     * @param myJobWrapper {@link JobConfig} and {@link Pipeline} together.
      */
-    private void trySubmit(JobConfig jobConfig, Pipeline pipeline) throws Exception {
+    private void trySubmit(MyJobWrapper myJobWrapper) {
+        JobConfig jobConfig = myJobWrapper.getJobConfig();
+        Pipeline pipeline = myJobWrapper.getPipeline();
+
         String jobName = jobConfig.getName();
         int atSymbol = jobName.indexOf('@');
         if (atSymbol < 0) {
@@ -109,8 +115,7 @@ public class ApplicationInitializer {
         String jobNamePrefix = jobName.substring(atSymbol);
 
         if (pipeline == null) {
-            LOGGER.error("Not submitting '{}', pipeline is null", jobName);
-            return;
+            throw new RuntimeException("Null pipeline for " + jobName);
         }
 
         Job job = MyUtils.findRunningJobsWithSamePrefix(jobNamePrefix, this.jetInstance);

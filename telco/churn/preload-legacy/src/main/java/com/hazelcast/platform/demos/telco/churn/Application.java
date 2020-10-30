@@ -29,10 +29,13 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 public class Application {
 
     /**
-     * XXX
+     * <p>Run all the initializers in an unspecified order
+     * then shutdown.
+     * </p>
      */
     public static void main(String[] args) throws Exception {
         SpringApplication.run(Application.class, args);
+        System.exit(0);
     }
 
 }

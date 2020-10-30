@@ -14,16 +14,23 @@
  * limitations under the License.
  */
 
-package com.hazelcast.platform.demos.telco.churn;
+package com.hazelcast.platform.demos.telco.churn.domain;
+
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
- * XXX
+ * <p>Add a custom query to find tariff primary keys.
+ * </p>
  */
 @Repository
-public interface JPostcodeRepository extends JpaRepository<JPostcode, String> {
+public interface TariffRepository extends JpaRepository<Tariff, String> {
 
+    @Query("SELECT t.id FROM Tariff t WHERE t.year = :year ORDER BY 1 ASC")
+    List<String> findThisYearsTariffs(@Param("year") int year);
 
 }

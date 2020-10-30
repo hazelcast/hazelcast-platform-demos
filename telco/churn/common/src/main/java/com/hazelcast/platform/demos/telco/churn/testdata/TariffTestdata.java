@@ -14,14 +14,24 @@
  * limitations under the License.
  */
 
-package com.hazelcast.platform.demos.telco.churn;
-
-import org.springframework.data.cassandra.repository.CassandraRepository;
-import org.springframework.stereotype.Repository;
+package com.hazelcast.platform.demos.telco.churn.testdata;
 
 /**
- * XXX
+ * <p>Test data for call tariff bands.
+ * </p>
  */
-@Repository
-public interface CPostcodeRepository extends CassandraRepository<CPostcode, String> {
+public class TariffTestdata {
+
+    private static final Object[][] TARIFFS = {
+            // Year offset, Id, Name, International, Rate
+            { 0, "stddom", "Standard Domestic Rate", false, 1.1 },
+            { 0, "stdint", "Standard International Rate", true, 5.5 },
+            { 1, "stddom", "Standard Domestic Rate", false, 1.3 },
+            { 1, "stdint", "Standard International Rate", true, 5.9 },
+    };
+
+    public static Object[][] getTariffs() {
+        return TARIFFS.clone();
+    }
+
 }

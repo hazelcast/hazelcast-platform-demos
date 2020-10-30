@@ -62,18 +62,23 @@ import com.hazelcast.jet.pipeline.Sinks;
  * </li>
  * </ol>
  */
-public class KafkaIngest {
-    private static final String JOB_NAME_PREFIX = KafkaIngest.class.getSimpleName();
+public class KafkaIngest extends MyJobWrapper {
+
+    private String bootstrapServers;
+
+    KafkaIngest(long arg0, String arg1) {
+        super(arg0);
+        this.bootstrapServers = arg1;
+    }
 
     /**
      * <p>Job configuration, mainly which classes need to be distributed
      * to execution nodes.
      * </p>
      */
-    public static JobConfig buildJobConfig(String timestampStr) {
-        JobConfig jobConfig = new JobConfig();
-
-        jobConfig.setName(JOB_NAME_PREFIX + "@" + timestampStr);
+    @Override
+    JobConfig getJobConfig() {
+        JobConfig jobConfig = super.getJobConfig();
 
         jobConfig.addClass(MyKafkaValueDeserializer.class);
 
@@ -83,9 +88,8 @@ public class KafkaIngest {
     /**
      * <p>Read from Kafka, write to a map. No filter or other processing.
      */
-    public static Pipeline buildPipeline(String bootstrapServers) {
-
-        Properties kafkaConnectionProperties = buildKafkaConnectionProperties(bootstrapServers);
+    public Pipeline getPipeline() {
+        Properties kafkaConnectionProperties = buildKafkaConnectionProperties(this.bootstrapServers);
 
         Pipeline pipeline = Pipeline.create();
 

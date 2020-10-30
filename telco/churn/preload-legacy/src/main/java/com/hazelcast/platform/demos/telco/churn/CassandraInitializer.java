@@ -25,23 +25,26 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories;
 
+import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecord;
+import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordRepository;
+
 /**
  * XXX
  */
 @Configuration
-@EnableCassandraRepositories(basePackageClasses = CPostcodeRepository.class)
+@EnableCassandraRepositories(basePackageClasses = CallDataRecordRepository.class)
 public class CassandraInitializer implements CommandLineRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(CassandraInitializer.class);
 
     @Autowired
-    private CPostcodeRepository postcodeRepository;
+    private CallDataRecordRepository postcodeRepository;
 
     /**
      * XXX
      */
     @Override
     public void run(String... args) throws Exception {
-        List<CPostcode> list = this.postcodeRepository.findAll();
+        List<CallDataRecord> list = this.postcodeRepository.findAll();
 
         LOGGER.error("CASSANDRA {}", list);
     }

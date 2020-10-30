@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package com.hazelcast.platform.demos.telco.churn;
+package com.hazelcast.platform.demos.telco.churn.domain;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.cassandra.repository.CassandraRepository;
 import org.springframework.stereotype.Repository;
 
 /**
  * XXX
  */
 @Repository
-public interface MPostcodeRepository extends MongoRepository<MPostcode, String> {
-
-
+public interface CallDataRecordRepository extends CassandraRepository<CallDataRecord, String> {
 }

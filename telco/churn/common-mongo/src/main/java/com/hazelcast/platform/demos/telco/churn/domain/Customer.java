@@ -14,31 +14,20 @@
  * limitations under the License.
  */
 
-package com.hazelcast.platform.demos.telco.churn;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+package com.hazelcast.platform.demos.telco.churn.domain;
 
 //XXX import java.io.Serializable;
 
 /**
  * XXX
  */
-@Table(name = "neil")
-//XXX REMOVE from init.sql
-@Entity
-public class JPostcode {
+public class Customer {
 
     /**
      * XXX
      */
     //private static final long serialVersionUID = 1L;
-    @Id
-    @Column(name = "one")
     private String outer;
-    @Column(name = "two")
     private String inner;
 
     /**

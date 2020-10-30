@@ -29,11 +29,12 @@ public class MyConstants {
     public static final int CLASS_ID_MYCREDENTIALS = 1;
 
     // Map names, for eager creation
-    //TODO Temporary name for testing
     public static final String IMAP_NAME_CDR  = "cdr";
-    public static final String IMAP_NAME_NEIL  = "neil";
+    public static final String IMAP_NAME_CUSTOMER  = "customer";
+    public static final String IMAP_NAME_TARIFF  = "tariff";
     public static final List<String> IMAP_NAMES =
-            List.of(IMAP_NAME_CDR, IMAP_NAME_NEIL);
+            List.of(IMAP_NAME_CDR, IMAP_NAME_CUSTOMER,
+                    IMAP_NAME_TARIFF);
 
     // Topic names, for eager creation
     public static final String ITOPIC_NAME_SLACK  = "slack";
