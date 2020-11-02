@@ -37,16 +37,39 @@ public class CassandraInitializer implements CommandLineRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(CassandraInitializer.class);
 
     @Autowired
-    private CallDataRecordRepository postcodeRepository;
+    private CallDataRecordRepository callDataRecordRepository;
 
     /**
      * XXX
      */
     @Override
     public void run(String... args) throws Exception {
-        List<CallDataRecord> list = this.postcodeRepository.findAll();
+        List<CallDataRecord> list = this.callDataRecordRepository.findAll();
+        LOGGER.error("CASSANDRA BEFORE {}", list);
 
-        LOGGER.error("CASSANDRA {}", list);
+        CallDataRecord cdr0 = new CallDataRecord();
+        cdr0.setId("a");
+        cdr0.setCallerTelno("a1");
+        cdr0.setCallerMastId("a2");
+        cdr0.setCalleeTelno("a3");
+        cdr0.setCalleeMastId("a4");
+        cdr0.setDurationSeconds(1);
+        cdr0.setStartTimestamp(Long.MIN_VALUE);
+        cdr0.setSuccessful(false);
+        this.callDataRecordRepository.save(cdr0);
+        CallDataRecord cdr1 = new CallDataRecord();
+        cdr1.setId("b");
+        cdr1.setCallerTelno("b1");
+        cdr1.setCallerMastId("b2");
+        cdr1.setCalleeTelno("b3");
+        cdr1.setCalleeMastId("b4");
+        cdr1.setDurationSeconds(2);
+        cdr1.setStartTimestamp(Long.MAX_VALUE);
+        cdr1.setSuccessful(true);
+        this.callDataRecordRepository.save(cdr1);
+
+        list = this.callDataRecordRepository.findAll();
+        LOGGER.error("CASSANDRA AFTER {}", list);
     }
 
 }

@@ -16,19 +16,31 @@
 
 package com.hazelcast.platform.demos.telco.churn.mapstore;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.map.MapStore;
+import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecord;
+import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordIdOnly;
+import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordMetadata;
 import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordRepository;
 
 /**
  * <p>Load a {@link CallDataRecord} object from Cassandra and turn it into JSON.
+ * Save it back when it changes.
  * </p>
  */
 public class CallDataRecordMapStore implements MapStore<String, HazelcastJsonValue> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CallDataRecordMapStore.class);
 
     private CallDataRecordRepository callDataRecordRepository;
 
@@ -36,71 +48,143 @@ public class CallDataRecordMapStore implements MapStore<String, HazelcastJsonVal
         this.callDataRecordRepository = arg0;
     }
 
+    /**
+     * <p>Try to load a specific key from Cassandra</p>
+     */
     @Override
-    public HazelcastJsonValue load(String arg0) {
-        // TODO Auto-generated method stub
-        return null;
+    public HazelcastJsonValue load(String key) {
+        LOGGER.trace("load('{}')", key);
+
+        HazelcastJsonValue result = null;
+
+        try {
+            CallDataRecord callDataRecord = this.callDataRecordRepository.findById(key).get();
+
+            if (callDataRecord != null) {
+                JSONObject json = new JSONObject(callDataRecord);
+                MapStoreHelpers.validate(json, CallDataRecordMetadata.FIELD_NAMES);
+                result = new HazelcastJsonValue(json.toString());
+            }
+
+        } catch (Exception exception) {
+            LOGGER.error("load('{}'), EXCEPTION: {}", key, exception.getMessage());
+        }
+
+        LOGGER.trace("load('{}') -> {}", key, result);
+        return result;
     }
 
-    /*
+    /**
+     * <p>Each member is given blocks of keys to load. Depending on the
+     * technology it may be feasible to retrieve these in one shot from
+     * the database, but here it is coded to retrieve them individually.
+     * </p>
+     */
     @Override
-    public void store(String key, Team value) {
-            log.info("'{}'::store('{}', '{}')",
-                            this.league, key, value);
-            this.teamRepository.save(value);
+    public Map<String, HazelcastJsonValue> loadAll(Collection<String> keys) {
+        int expectedSize = keys.size();
+        LOGGER.trace("loadAll({})", expectedSize);
+
+        Map<String, HazelcastJsonValue> result = new HashMap<>();
+        for (String key : keys) {
+            HazelcastJsonValue json = null;
+            try {
+                json = this.load(key);
+            } catch (Exception exception) {
+                LOGGER.error("loadAll({}) for key '" + key + "'", exception);
+            }
+
+            if (json != null) {
+                result.put(key, json);
+            }
+        }
+
+        if (result.size() != expectedSize) {
+            LOGGER.error("loadAll({}) got only {}", expectedSize, result.size());
+        } else {
+            LOGGER.trace("loadAll({}) got only {}", expectedSize, result.size());
+        }
+
+        return result;
     }
 
+    /**
+     * <p>One member calls this to find the subset of primary keys in the
+     * database that we wish to load. The keys are then shared across the
+     * whole cluster, and each member loads it's allocated keys.
+     * </p>
+     */
     @Override
-    public void storeAll(Map<String, Team> map) {
-            log.error("'{}'::storeAll('{}'), not yet implemeted",
-                            this.league, map.entrySet());
+    public Iterable<String> loadAllKeys() {
+        LOGGER.trace("loadAllKeys()");
+
+        try {
+            List<CallDataRecordIdOnly> resultsProjection =
+                    this.callDataRecordRepository.findByIdGreaterThan("");
+            List<String> results = new ArrayList<>(resultsProjection.size());
+
+            for (CallDataRecordIdOnly callDataRecordIdOnly : resultsProjection) {
+                results.add(callDataRecordIdOnly.getId());
+            }
+
+            if (results.size() == 0) {
+                LOGGER.error("loadAllKeys() -> {}, was preload-legacy run?",
+                        results.size());
+            } else {
+                LOGGER.debug("loadAllKeys() -> {}", results.size());
+            }
+
+            return results;
+        } catch (Exception e) {
+            LOGGER.error("loadAllKeys()", e);
+            return Collections.emptyList();
+        }
     }
 
     @Override
     public void delete(String key) {
-            log.error("'{}'::delete('{}'), not yet implemeted",
-                            this.league, key);
+        LOGGER.trace("delete({})", key);
+        LOGGER.error("delete({})", key);
+        // TODO Auto-generated method stub
     }
 
+    /**
+     * <p>Use easy iterating delete, could do bulk delete
+     * if available.
+     * </p>
+     *
+     * @param keys
+     */
     @Override
     public void deleteAll(Collection<String> keys) {
-            log.error("'{}'::deleteAll('{}'), not yet implemeted",
-                            this.league, keys);
-    }
-    */
-    @Override
-    public Map<String, HazelcastJsonValue> loadAll(Collection<String> arg0) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Iterable<String> loadAllKeys() {
-        // TODO Auto-generated method stub
-        if (this.callDataRecordRepository == null) {
-            return Collections.emptyList();
+        int expectedSize = keys.size();
+        LOGGER.trace("deleteAll({})", expectedSize);
+        for (String key : keys) {
+            this.delete(key);
         }
-        return null;
     }
 
     @Override
-    public void delete(String arg0) {
+    public void store(String key, HazelcastJsonValue value) {
+        LOGGER.trace("store({}, {})", key, value);
+        LOGGER.error("store({}, {})", key, value);
         // TODO Auto-generated method stub
     }
 
+    /**
+     * <p>Use easy iterating store, could do bulk store
+     * if available.
+     * </p>
+     *
+     * @param entries
+     */
     @Override
-    public void deleteAll(Collection<String> arg0) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void store(String arg0, HazelcastJsonValue arg1) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void storeAll(Map<String, HazelcastJsonValue> arg0) {
-        // TODO Auto-generated method stub
+    public void storeAll(Map<String, HazelcastJsonValue> entries) {
+        int expectedSize = entries.size();
+        LOGGER.trace("storeAll({})", expectedSize);
+        for (Map.Entry<String, HazelcastJsonValue> entry : entries.entrySet()) {
+            this.store(entry.getKey(), entry.getValue());
+        }
     }
 
 }

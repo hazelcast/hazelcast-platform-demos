@@ -29,7 +29,8 @@ import com.hazelcast.platform.demos.telco.churn.domain.Customer;
 import com.hazelcast.platform.demos.telco.churn.domain.CustomerRepository;
 
 /**
- * XXX
+ * <p>Inserts customer records into Mongo
+ * </p>
  */
 @Configuration
 @EnableMongoRepositories(basePackageClasses = CustomerRepository.class)
@@ -37,16 +38,33 @@ public class MongoInitializer implements CommandLineRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(MongoInitializer.class);
 
     @Autowired
-    private CustomerRepository postcodeRepository;
+    private CustomerRepository customerRepository;
 
     /**
      * XXX
      */
     @Override
     public void run(String... args) throws Exception {
-        List<Customer> list = this.postcodeRepository.findAll();
+        List<Customer> list = this.customerRepository.findAll();
+        LOGGER.error("BEFORE MONGO {}", list);
 
-        LOGGER.error("MONGO {}", list);
+        Customer c0 = new Customer();
+        c0.setAccountType("?");
+        c0.setFirstName("n");
+        c0.setLastName("s");
+        c0.setId("b");
+        this.customerRepository.save(c0);
+
+        Customer c1 = new Customer();
+        c1.setAccountType("?");
+        c1.setFirstName("neil");
+        c1.setLastName("stevenson");
+        c1.setId("a");
+        this.customerRepository.save(c1);
+
+
+        list = this.customerRepository.findAll();
+        LOGGER.error("AFTERE MONGO {}", list);
     }
 
 }

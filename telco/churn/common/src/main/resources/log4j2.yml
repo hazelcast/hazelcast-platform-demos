@@ -29,6 +29,11 @@ Configuration:
  
   Loggers:
     logger:
+        - name: com.datastax
+          level: warn
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
         - name: com.hazelcast
           level: info
           additivity: false
@@ -64,14 +69,39 @@ Configuration:
           additivity: false
           AppenderRef:
             ref: ConsoleRed
+        - name: com.zaxxer
+          level: warn
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+        - name: org.apache
+          level: warn
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
         # Hide irrelevant warnings from Hibernate Validator
         - name: org.hibernate
           level: error
           additivity: false
           AppenderRef:
             ref: ConsoleGreen
+        - name: org.mongodb
+          level: warn
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
         - name: org.springframework
           level: info
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+        - name: org.springframework.boot.actuate
+          level: warn
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+        - name: org.springframework.data
+          level: warn
           additivity: false
           AppenderRef:
             ref: ConsoleGreen
