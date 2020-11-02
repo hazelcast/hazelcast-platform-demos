@@ -16,12 +16,22 @@
 
 package com.hazelcast.platform.demos.telco.churn.mapstore;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.map.MapLoader;
+import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordMetadata;
+import com.hazelcast.platform.demos.telco.churn.domain.Customer;
+import com.hazelcast.platform.demos.telco.churn.domain.CustomerMetadata;
 import com.hazelcast.platform.demos.telco.churn.domain.CustomerRepository;
 
 /**
@@ -29,6 +39,7 @@ import com.hazelcast.platform.demos.telco.churn.domain.CustomerRepository;
  * </p>
  */
 public class CustomerMapLoader implements MapLoader<String, HazelcastJsonValue> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomerMapLoader.class);
 
     private CustomerRepository customerRepository;
 
@@ -36,25 +47,100 @@ public class CustomerMapLoader implements MapLoader<String, HazelcastJsonValue> 
         this.customerRepository = arg0;
     }
 
+    /**
+     * <p>The domain object from Mongo is JSON, but
+     * validate the fields still.
+     * </p>
+     */
     @Override
-    public HazelcastJsonValue load(String arg0) {
-        // TODO Auto-generated method stub
-        return null;
+    public HazelcastJsonValue load(String key) {
+        LOGGER.trace("load('{}')", key);
+
+        HazelcastJsonValue result = null;
+
+        try {
+            Customer customer = this.customerRepository.findById(key).get();
+
+            if (customer != null) {
+                JSONObject json = new JSONObject(customer);
+                MapStoreHelpers.validate(json, CustomerMetadata.FIELD_NAMES);
+                result = new HazelcastJsonValue(json.toString());
+            }
+
+        } catch (Exception exception) {
+            LOGGER.error("load('{}'), EXCEPTION: {}", key, exception.getMessage());
+        }
+
+        LOGGER.trace("load('{}') -> {}", key, result);
+        return result;
     }
 
+    /**
+     * <p>Each member is given blocks of keys to load. Depending on the
+     * technology it may be feasible to retrieve these in one shot from
+     * the database, but here it is coded to retrieve them individually.
+     * </p>
+     */
     @Override
-    public Map<String, HazelcastJsonValue> loadAll(Collection<String> arg0) {
-        // TODO Auto-generated method stub
-        return null;
+    public Map<String, HazelcastJsonValue> loadAll(Collection<String> keys) {
+        int expectedSize = keys.size();
+        LOGGER.trace("loadAll({})", expectedSize);
+
+        Map<String, HazelcastJsonValue> result = new HashMap<>();
+        for (String key : keys) {
+            HazelcastJsonValue json = null;
+            try {
+                json = this.load(key);
+            } catch (Exception exception) {
+                LOGGER.error("loadAll({}) for key '" + key + "'", exception);
+            }
+
+            if (json != null) {
+                result.put(key, json);
+            }
+        }
+
+        if (result.size() != expectedSize) {
+            LOGGER.error("loadAll({}) got only {}", expectedSize, result.size());
+        } else {
+            LOGGER.trace("loadAll({}) got only {}", expectedSize, result.size());
+        }
+
+        return result;
     }
 
+    /**
+     * <p>One member calls this to find the subset of primary keys in the
+     * database that we wish to load. The keys are then shared across the
+     * whole cluster, and each member loads it's allocated keys.
+     * </p>
+     */
     @Override
     public Iterable<String> loadAllKeys() {
-        // TODO Auto-generated method stub
-        if (this.customerRepository == null) {
+        LOGGER.trace("loadAllKeys()");
+
+        try {
+            List<String> resultsProjection = this.customerRepository.findOnlyId();
+            List<String> results = new ArrayList<>(resultsProjection.size());
+
+            for (Object result : resultsProjection) {
+                JSONObject json = new JSONObject(result.toString());
+                // The projection prefixes the projected field name with "_"
+                results.add(json.get("_" + CallDataRecordMetadata.ID).toString());
+            }
+
+            if (results.size() == 0) {
+                LOGGER.error("loadAllKeys() -> {}, was preload-legacy run?",
+                        results.size());
+            } else {
+                LOGGER.debug("loadAllKeys() -> {}", results.size());
+            }
+
+            return results;
+        } catch (Exception e) {
+            LOGGER.error("loadAllKeys()", e);
             return Collections.emptyList();
         }
-        return null;
     }
 
 }

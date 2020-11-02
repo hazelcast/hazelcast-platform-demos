@@ -16,12 +16,19 @@
 
 package com.hazelcast.platform.demos.telco.churn.domain;
 
+import java.util.List;
+
 import org.springframework.data.cassandra.repository.CassandraRepository;
+import org.springframework.data.cassandra.repository.Query;
 import org.springframework.stereotype.Repository;
 
 /**
- * XXX
+ * <p>The projection retuns the domain object, with nulls for non-projected fields</p>
  */
 @Repository
 public interface CallDataRecordRepository extends CassandraRepository<CallDataRecord, String> {
+
+    @Query("SELECT id FROM cdr")
+    List<CallDataRecordIdOnly> findByIdGreaterThan(String ignored);
+
 }

@@ -18,6 +18,7 @@ package com.hazelcast.platform.demos.telco.churn.mapstore;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +70,7 @@ public class TariffMapLoader implements MapLoader<String, HazelcastJsonValue> {
             LOGGER.error("load('{}'), EXCEPTION: {}", key, exception.getMessage());
         }
 
-        LOGGER.debug("load('{}') -> {}", key, result);
+        LOGGER.trace("load('{}') -> {}", key, result);
         return result;
     }
 
@@ -99,9 +100,9 @@ public class TariffMapLoader implements MapLoader<String, HazelcastJsonValue> {
         }
 
         if (result.size() != expectedSize) {
-            LOGGER.error("loadAll({}) -> {}", expectedSize, result.size());
+            LOGGER.error("loadAll({}) got only {}", expectedSize, result.size());
         } else {
-            LOGGER.trace("loadAll({}) -> {}", expectedSize, result.size());
+            LOGGER.trace("loadAll({}) got only {}", expectedSize, result.size());
         }
 
         return result;
@@ -117,17 +118,22 @@ public class TariffMapLoader implements MapLoader<String, HazelcastJsonValue> {
     public Iterable<String> loadAllKeys() {
         LOGGER.trace("loadAllKeys()");
 
-        int year = LocalDate.now().getYear();
-        List<String> results = this.tariffRepository.findThisYearsTariffs(year);
+        try {
+            int year = LocalDate.now().getYear();
+            List<String> results = this.tariffRepository.findThisYearsTariffs(year);
 
-        if (results.size() == 0) {
-            LOGGER.error("loadAllKeys() -> {} for year {}, was preload-legacy run?",
-                    results.size(), year);
-        } else {
-            LOGGER.debug("loadAllKeys() -> {}", results.size());
+            if (results.size() == 0) {
+                LOGGER.error("loadAllKeys() -> {} for year {}, was preload-legacy run?",
+                        results.size(), year);
+            } else {
+                LOGGER.debug("loadAllKeys() -> {}", results.size());
+            }
+
+            return results;
+        } catch (Exception e) {
+            LOGGER.error("loadAllKeys()", e);
+            return Collections.emptyList();
         }
-
-        return results;
     }
 
 }

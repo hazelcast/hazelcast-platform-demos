@@ -16,9 +16,8 @@
 
 package com.hazelcast.platform.demos.telco.churn.domain;
 
-import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
+import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
 /**
@@ -31,7 +30,7 @@ import org.springframework.data.cassandra.core.mapping.Table;
 @Table(value = "cdr")
 public class CallDataRecord {
 
-    @PrimaryKeyColumn(value = "id", type = PrimaryKeyType.PARTITIONED)
+    @PrimaryKey(value = "id")
     private String id;
     @Column(value = "caller_telno")
     private String callerTelno;

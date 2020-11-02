@@ -16,19 +16,11 @@
 
 package com.hazelcast.platform.demos.telco.churn.domain;
 
-import java.util.List;
-
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
-import org.springframework.stereotype.Repository;
-
 /**
- * <p>On {@code @Query} use true/false to select columns</p>
+ * <p>Domain object for the {@link CallDataRecordRepository} projection query.</p>
  */
-@Repository
-public interface CustomerRepository extends MongoRepository<Customer, String> {
+public interface CallDataRecordIdOnly {
 
-    @Query(value = "{}", fields = "{id : 1, firstName: 0, lastName: 0, accountType: 0, _class: 0}")
-    List<String> findOnlyId();
+    String getId();
 
 }

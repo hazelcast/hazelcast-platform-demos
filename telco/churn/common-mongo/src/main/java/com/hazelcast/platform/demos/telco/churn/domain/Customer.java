@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.telco.churn.domain;
 
+import org.springframework.data.annotation.Id;
+
 /**
  * <p>Java representation of a customer in Mongo.
  * As this is mapped to Json, fields don't need "{@code @Column}"
@@ -24,6 +26,7 @@ package com.hazelcast.platform.demos.telco.churn.domain;
  */
 public class Customer {
 
+    @Id
     private String id;
     private String firstName;
     private String lastName;
