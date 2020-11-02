@@ -2,10 +2,16 @@ CREATE KEYSPACE @my.other.admin.database@ WITH replication = { 'class' : 'Simple
 
 USE  @my.other.admin.database@;
 
-CREATE TABLE cpostcode(
-  couter TEXT,
-  cinner TEXT,
-  PRIMARY KEY (couter)
+CREATE TABLE cdr(
+  id TEXT,
+  caller_telno TEXT,
+  caller_mast_id TEXT,
+  callee_telno TEXT,
+  callee_mast_id TEXT,
+  start_timestamp BIGINT,
+  duration_seconds INT,
+  successful BOOLEAN,
+  PRIMARY KEY (id)
 );
 
 DESCRIBE TABLES;

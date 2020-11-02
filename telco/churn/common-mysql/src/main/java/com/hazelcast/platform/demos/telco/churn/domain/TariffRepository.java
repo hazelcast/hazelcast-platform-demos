@@ -30,7 +30,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TariffRepository extends JpaRepository<Tariff, String> {
 
-    @Query("SELECT t.id FROM Tariff t WHERE t.year = :year ORDER BY 1 ASC")
+    @Query("SELECT t.id FROM Tariff t WHERE t.year = :year")
     List<String> findThisYearsTariffs(@Param("year") int year);
 
 }
