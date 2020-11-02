@@ -16,54 +16,50 @@
 
 package com.hazelcast.platform.demos.telco.churn.domain;
 
-//XXX import java.io.Serializable;
-
 /**
- * XXX
+ * <p>Java representation of a customer in Mongo.
+ * As this is mapped to Json, fields don't need "{@code @Column}"
+ * tags that Cassandra and MySql modules do.
+ * </p>
  */
 public class Customer {
 
-    /**
-     * XXX
-     */
-    //private static final long serialVersionUID = 1L;
-    private String outer;
-    private String inner;
+    private String id;
+    private String firstName;
+    private String lastName;
+    private String accountType;
 
-    /**
-     * XXX
-     */
-    public String getInner() {
-        return inner;
+    // Generated code below
+
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
+    public String getFirstName() {
+        return firstName;
+    }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+    public String getLastName() {
+        return lastName;
+    }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+    public String getAccountType() {
+        return accountType;
+    }
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
     }
 
-    /**
-     * XXX
-     */
-    public void setInner(String inner) {
-        this.inner = inner;
-    }
-
-    /**
-     * XXX
-     */
-    public String getOuter() {
-        return outer;
-    }
-
-    /**
-     * XXX
-     */
-    public void setOuter(String outer) {
-        this.outer = outer;
-    }
-
-    /**
-     * XXX
-     */
     @Override
     public String toString() {
-        return "Postcode [outer=" + outer + ", inner=" + inner + "]";
+        return "Customer [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", accountType="
+                + accountType + "]";
     }
 
 }

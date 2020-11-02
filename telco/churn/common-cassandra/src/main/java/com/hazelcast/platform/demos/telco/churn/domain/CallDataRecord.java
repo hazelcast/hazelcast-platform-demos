@@ -21,61 +21,89 @@ import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.core.mapping.Table;
 
-//XXX import java.io.Serializable;
-
 /**
- *
- * XXX
-datastax-java-driver.basic.load-balancing-policy {
-  local-datacenter = datacenter1
-}
+ * <p>Java representation of a table in Cassandra,
+ * created by the <i>cassandra</i> module,
+ * from it's "{@code src/main/resources/cql/churn.cql}"
+ * and populated by the <i>preload-legacy</i> module.
+ * </p>
  */
-@Table(value = "cpostcode")
+@Table(value = "cdr")
 public class CallDataRecord {
 
-    /**
-     * XXX
-     */
-    //private static final long serialVersionUID = 1L;
-    @PrimaryKeyColumn(value = "couter", type = PrimaryKeyType.PARTITIONED)
-    private String outer;
-    @Column(value = "cinner")
-    private String inner;
+    @PrimaryKeyColumn(value = "id", type = PrimaryKeyType.PARTITIONED)
+    private String id;
+    @Column(value = "caller_telno")
+    private String callerTelno;
+    @Column(value = "caller_mast_id")
+    private String callerMastId;
+    @Column(value = "callee_telno")
+    private String calleeTelno;
+    @Column(value = "callee_mast_id")
+    private String calleeMastId;
+    @Column(value = "start_timestamp")
+    private Long startTimestamp;
+    @Column(value = "duration_seconds")
+    private Integer durationSeconds;
+    @Column(value = "successful")
+    private Boolean successful;
 
-    /**
-     * XXX
-     */
-    public String getInner() {
-        return inner;
+    // Generated code below
+
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
+    public String getCallerTelno() {
+        return callerTelno;
+    }
+    public void setCallerTelno(String callerTelno) {
+        this.callerTelno = callerTelno;
+    }
+    public String getCallerMastId() {
+        return callerMastId;
+    }
+    public void setCallerMastId(String callerMastId) {
+        this.callerMastId = callerMastId;
+    }
+    public String getCalleeTelno() {
+        return calleeTelno;
+    }
+    public void setCalleeTelno(String calleeTelno) {
+        this.calleeTelno = calleeTelno;
+    }
+    public String getCalleeMastId() {
+        return calleeMastId;
+    }
+    public void setCalleeMastId(String calleeMastId) {
+        this.calleeMastId = calleeMastId;
+    }
+    public Long getStartTimestamp() {
+        return startTimestamp;
+    }
+    public void setStartTimestamp(Long startTimestamp) {
+        this.startTimestamp = startTimestamp;
+    }
+    public Integer getDurationSeconds() {
+        return durationSeconds;
+    }
+    public void setDurationSeconds(Integer durationSeconds) {
+        this.durationSeconds = durationSeconds;
+    }
+    public Boolean getSuccessful() {
+        return successful;
+    }
+    public void setSuccessful(Boolean successful) {
+        this.successful = successful;
     }
 
-    /**
-     * XXX
-     */
-    public void setInner(String inner) {
-        this.inner = inner;
-    }
-
-    /**
-     * XXX
-     */
-    public String getOuter() {
-        return outer;
-    }
-
-    /**
-     * XXX
-     */
-    public void setOuter(String outer) {
-        this.outer = outer;
-    }
-
-    /**
-     * XXX
-     */
     @Override
     public String toString() {
-        return "Postcode [outer=" + outer + ", inner=" + inner + "]";
+        return "CallDataRecord [id=" + id + ", callerTelno=" + callerTelno + ", callerMastId=" + callerMastId
+                + ", calleeTelno=" + calleeTelno + ", calleeMastId=" + calleeMastId + ", startTimestamp="
+                + startTimestamp + ", durationSeconds=" + durationSeconds + ", successful=" + successful + "]";
     }
 
 }

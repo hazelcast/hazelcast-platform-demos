@@ -72,9 +72,7 @@ public class ApplicationConfig {
         cdrMapStoreConfig.setFactoryImplementation(myMapStoreFactory);
         cdrMapConfig.setMapStoreConfig(cdrMapStoreConfig);
 
-        //config.getMapConfigs().put(cdrMapConfig.getName(), cdrMapConfig);
-        //FIXME
-        LOGGER.error("FIXME don't use {} yet", cdrMapConfig.getClass().getName());
+        config.getMapConfigs().put(cdrMapConfig.getName(), cdrMapConfig);
 
         // Customer records - Mongo
         MapConfig customerMapConfig = new MapConfig(MyConstants.IMAP_NAME_CUSTOMER);
@@ -84,9 +82,7 @@ public class ApplicationConfig {
         customerMapStoreConfig.setFactoryImplementation(myMapStoreFactory);
         customerMapConfig.setMapStoreConfig(customerMapStoreConfig);
 
-        //config.getMapConfigs().put(customerMapConfig.getName(), customerMapConfig);
-        //FIXME
-        LOGGER.error("FIXME don't use {} yet", customerMapConfig.getClass().getName());
+        config.getMapConfigs().put(customerMapConfig.getName(), customerMapConfig);
 
         // Tariff records - MySql
         MapConfig tariffMapConfig = new MapConfig(MyConstants.IMAP_NAME_TARIFF);
