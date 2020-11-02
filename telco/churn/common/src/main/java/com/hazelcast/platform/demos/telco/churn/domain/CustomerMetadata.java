@@ -25,9 +25,9 @@ import java.util.List;
 public class CustomerMetadata {
 
     public static final String ID = "id";
-    public static final String FIRSTNAME = "first_name";
-    public static final String LASTNAME = "last_name";
-    public static final String ACCOUNT_TYPE = "account_type";
+    public static final String FIRSTNAME = "firstName";
+    public static final String LASTNAME = "lastName";
+    public static final String ACCOUNT_TYPE = "accountType";
 
     public static final List<String> FIELD_NAMES =
             List.of(ID, FIRSTNAME, LASTNAME, ACCOUNT_TYPE);

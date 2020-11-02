@@ -26,12 +26,12 @@ import java.util.List;
 public class CallDataRecordMetadata {
 
     public static final String ID = "id";
-    public static final String CALLER_TELNO = "caller_telno";
-    public static final String CALLER_MAST_ID = "caller_mast_id";
-    public static final String CALLEE_TELNO = "callee_telno";
-    public static final String CALLEE_MAST_ID = "callee_mast_id";
-    public static final String START_TIMESTAMP = "start_timestamp";
-    public static final String DURATION_SECONDS = "duration_seconds";
+    public static final String CALLER_TELNO = "callerTelno";
+    public static final String CALLER_MAST_ID = "callerMastId";
+    public static final String CALLEE_TELNO = "calleeTelno";
+    public static final String CALLEE_MAST_ID = "calleeMastId";
+    public static final String START_TIMESTAMP = "startTimestamp";
+    public static final String DURATION_SECONDS = "durationSeconds";
     public static final String SUCCESSFUL = "successful";
 
     public static final List<String> FIELD_NAMES =
