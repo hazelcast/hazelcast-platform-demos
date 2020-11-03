@@ -16,8 +16,6 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +27,14 @@ import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecord;
 import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordRepository;
 
 /**
- * XXX
+ * <p>Insert data records into Cassandra.</p>
  */
 @Configuration
 @EnableCassandraRepositories(basePackageClasses = CallDataRecordRepository.class)
 public class CassandraInitializer implements CommandLineRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(CassandraInitializer.class);
+    //XXX
+    private static final int XXX = 100;
 
     @Autowired
     private CallDataRecordRepository callDataRecordRepository;
@@ -44,8 +44,7 @@ public class CassandraInitializer implements CommandLineRunner {
      */
     @Override
     public void run(String... args) throws Exception {
-        List<CallDataRecord> list = this.callDataRecordRepository.findAll();
-        LOGGER.error("CASSANDRA BEFORE {}", list);
+        LOGGER.debug("BEFORE: count()=={}", this.callDataRecordRepository.count());
 
         CallDataRecord cdr0 = new CallDataRecord();
         cdr0.setId("a");
@@ -67,9 +66,20 @@ public class CassandraInitializer implements CommandLineRunner {
         cdr1.setStartTimestamp(Long.MAX_VALUE);
         cdr1.setSuccessful(true);
         this.callDataRecordRepository.save(cdr1);
+        for (int i = 0 ; i < XXX; i++) {
+            CallDataRecord cdr = new CallDataRecord();
+            cdr.setId("i" + i);
+            cdr.setCallerTelno("i" + i);
+            cdr.setCallerMastId("i" + i);
+            cdr.setCalleeTelno("i" + i);
+            cdr.setCalleeMastId("i" + i);
+            cdr.setDurationSeconds(0);
+            cdr.setStartTimestamp(0L);
+            cdr.setSuccessful(true);
+            this.callDataRecordRepository.save(cdr);
+        }
 
-        list = this.callDataRecordRepository.findAll();
-        LOGGER.error("CASSANDRA AFTER {}", list);
+        LOGGER.debug("AFTER:  count()=={}", this.callDataRecordRepository.count());
     }
 
 }

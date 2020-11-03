@@ -16,7 +16,11 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,25 +29,95 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories;
 
+import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecord;
+import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordIdOnly;
+import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordRepository;
+
 /**
- * XXX
+ * <p>Update data in Cassandra</p>
  */
 @Configuration
-@EnableCassandraRepositories(basePackageClasses = CPostcodeRepository.class)
+@EnableCassandraRepositories(basePackageClasses = CallDataRecordRepository.class)
 public class CassandraInitializer implements CommandLineRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(CassandraInitializer.class);
 
+    // 2^3
+    private static final int MASK_8 = 0x0008;
+    private static final int SECONDS_IN_A_MINUTE = 60;
+
     @Autowired
-    private CPostcodeRepository postcodeRepository;
+    private CallDataRecordRepository callDataRecordRepository;
 
     /**
-     * XXX
+     * <p>Update alternate blocks of eight records</p>
      */
     @Override
     public void run(String... args) throws Exception {
-        List<CPostcode> list = this.postcodeRepository.findAll();
+        LOGGER.debug("BEFORE: count()=={}", this.callDataRecordRepository.count());
 
-        LOGGER.error("CASSANDRA {}", list);
+        List<CallDataRecordIdOnly> resultsProjection =
+                this.callDataRecordRepository.findByIdGreaterThan("");
+
+        // stream.sorted() not ideal for scaling, but TreeSet not much better
+        SortedSet<String> keysTmp = (SortedSet<String>) resultsProjection
+                .stream()
+                .map(CallDataRecordIdOnly::getId)
+                .collect(Collectors.toCollection(TreeSet::new));
+        List<String> keys = new ArrayList<>(keysTmp);
+
+        int count = 0;
+        for (int i = 0 ; i < keys.size() ; i++) {
+            if ((i & MASK_8) != 0) {
+                boolean success = this.update(keys.get(i));
+                if (success) {
+                    count++;
+                }
+            }
+        }
+
+        if (count == 0) {
+            LOGGER.error("AFTER:  updates made=={}", count);
+        } else {
+            LOGGER.debug("AFTER:  updates made=={}", count);
+        }
+
+        LOGGER.debug("AFTER:  count()=={}", this.callDataRecordRepository.count());
     }
 
+    /**
+     * <p>Try an update
+     * </p>
+     *
+     * @param key Should be found as nothing running deletes in this demo
+     * @return If successful
+     */
+    public boolean update(String key) {
+        try {
+            CallDataRecord callDataRecord =
+                    this.callDataRecordRepository.findById(key).get();
+
+            if (callDataRecord == null) {
+                LOGGER.error("No record to update for key '{}'", key);
+                return false;
+            } else {
+                LOGGER.trace("Change:  {}", callDataRecord);
+
+                // Possibly tweak call success, otherwise duration
+                if (key.endsWith("0")) {
+                    callDataRecord.setSuccessful(!callDataRecord.getSuccessful());
+                } else {
+                    callDataRecord.setDurationSeconds(callDataRecord.getDurationSeconds()
+                            + SECONDS_IN_A_MINUTE);
+                }
+
+                this.callDataRecordRepository.save(callDataRecord);
+                LOGGER.trace("Changed: {}", callDataRecord);
+                return true;
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(key, e);
+            return false;
+        }
+    }
 }

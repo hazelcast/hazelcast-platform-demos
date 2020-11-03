@@ -16,8 +16,6 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +43,7 @@ public class MongoInitializer implements CommandLineRunner {
      */
     @Override
     public void run(String... args) throws Exception {
-        List<Customer> list = this.customerRepository.findAll();
-        LOGGER.error("BEFORE MONGO {}", list);
+        LOGGER.debug("BEFORE: count()=={}", this.customerRepository.count());
 
         Customer c0 = new Customer();
         c0.setAccountType("?");
@@ -63,8 +60,7 @@ public class MongoInitializer implements CommandLineRunner {
         this.customerRepository.save(c1);
 
 
-        list = this.customerRepository.findAll();
-        LOGGER.error("AFTERE MONGO {}", list);
+        LOGGER.debug("AFTER:  count()=={}", this.customerRepository.count());
     }
 
 }

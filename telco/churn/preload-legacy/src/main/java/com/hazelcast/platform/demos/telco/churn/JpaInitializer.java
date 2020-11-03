@@ -50,7 +50,7 @@ public class JpaInitializer implements CommandLineRunner {
      */
     @Override
     public void run(String... args) throws Exception {
-        LOGGER.trace("BEFORE: count()=={}", this.tariffRepository.count());
+        LOGGER.debug("BEFORE: count()=={}", this.tariffRepository.count());
 
         int year = LocalDate.now().getYear();
 
@@ -63,7 +63,7 @@ public class JpaInitializer implements CommandLineRunner {
             this.saveTariffs(year);
         }
 
-        LOGGER.trace("AFTER:  count()=={}", this.tariffRepository.count());
+        LOGGER.debug("AFTER:  count()=={}", this.tariffRepository.count());
     }
 
     /**
