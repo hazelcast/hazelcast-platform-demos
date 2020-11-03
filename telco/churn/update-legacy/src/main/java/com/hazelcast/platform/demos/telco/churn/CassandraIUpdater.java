@@ -34,12 +34,12 @@ import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordIdOnly;
 import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordRepository;
 
 /**
- * <p>Update data in Cassandra</p>
+ * <p>Update data in Cassandra, can be run multiple times</p>
  */
 @Configuration
 @EnableCassandraRepositories(basePackageClasses = CallDataRecordRepository.class)
-public class CassandraInitializer implements CommandLineRunner {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CassandraInitializer.class);
+public class CassandraIUpdater implements CommandLineRunner {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CassandraIUpdater.class);
 
     // 2^3
     private static final int MASK_8 = 0x0008;
@@ -76,9 +76,9 @@ public class CassandraInitializer implements CommandLineRunner {
         }
 
         if (count == 0) {
-            LOGGER.error("AFTER:  updates made=={}", count);
+            LOGGER.error("updates made=={}", count);
         } else {
-            LOGGER.debug("AFTER:  updates made=={}", count);
+            LOGGER.info("updates made=={}", count);
         }
 
         LOGGER.debug("AFTER:  count()=={}", this.callDataRecordRepository.count());
