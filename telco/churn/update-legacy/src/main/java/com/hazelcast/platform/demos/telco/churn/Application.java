@@ -29,7 +29,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 public class Application {
 
     /**
-     * XXX
+     * <p>Use Spring to invoke separate runner classes.
+     * </p>
      */
     public static void main(String[] args) throws Exception {
         SpringApplication.run(Application.class, args);
