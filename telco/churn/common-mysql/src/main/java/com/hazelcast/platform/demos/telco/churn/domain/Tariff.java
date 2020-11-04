@@ -21,6 +21,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.hazelcast.platform.demos.telco.churn.MyConstants;
+
 /**
  * <p>Java representation of a table in MySql,
  * created by the <i>mysql</i> module,
@@ -28,7 +30,7 @@ import javax.persistence.Table;
  * and populated by the <i>preload-legacy</i> module.
  * </p>
  */
-@Table(name = "tariff")
+@Table(name = MyConstants.MYSQL_TABLE_NAME)
 @Entity
 public class Tariff {
 

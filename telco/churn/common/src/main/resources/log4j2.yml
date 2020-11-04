@@ -74,6 +74,11 @@ Configuration:
           additivity: false
           AppenderRef:
             ref: ConsoleGreen
+        - name: io.debezium
+          level: warn
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
         - name: org.apache
           level: warn
           additivity: false

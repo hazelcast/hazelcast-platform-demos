@@ -40,6 +40,7 @@ import com.hazelcast.map.IMap;
 public class ApplicationInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInitializer.class);
     private static final long TWO_MINUTES = 120L;
+    private static final int LOOPS = 10;
 
     @Autowired
     private JetInstance jetInstance;
@@ -66,21 +67,30 @@ public class ApplicationInitializer {
                 this.createNeededObjects();
                 this.launchNeededJobs(isLocalhost);
             }
-            LOGGER.error("SLEEP");
-            TimeUnit.SECONDS.sleep(TWO_MINUTES);
-            LOGGER.error("AWAKE");
-            LOGGER.error("====");
-            for (DistributedObject distributedObject : this.jetInstance.getHazelcastInstance().getDistributedObjects()) {
-                if (!distributedObject.getName().startsWith("__")) {
-                    LOGGER.warn("distributedObject '{}' '{}'",
-                            distributedObject.getName(), distributedObject.getClass().getName());
-                    if (distributedObject instanceof IMap) {
-                        IMap<?, ?> iMap = (IMap<?, ?>) distributedObject;
-                        LOGGER.warn("  :: IMap '{}'", iMap.getName());
-                        for (Object key : iMap.keySet()) {
-                            LOGGER.warn("  ::   :: IMap K,V == {},{}", key, iMap.get(key));
+            for (int k = 0 ; k < LOOPS ; k++) {
+                LOGGER.error("SLEEP");
+                TimeUnit.SECONDS.sleep(TWO_MINUTES);
+                LOGGER.error("AWAKE");
+                LOGGER.error("====");
+                for (DistributedObject distributedObject : this.jetInstance.getHazelcastInstance().getDistributedObjects()) {
+                    if (!distributedObject.getName().startsWith("__")) {
+                        LOGGER.warn("distributedObject '{}' '{}'",
+                                distributedObject.getName(), distributedObject.getClass().getName());
+                        if (distributedObject instanceof IMap) {
+                            IMap<?, ?> iMap = (IMap<?, ?>) distributedObject;
+                            LOGGER.warn("  :: IMap '{}'", iMap.getName());
+                            int j = 0;
+                            for (Object key : iMap.keySet()) {
+                                j++;
+                                if (j < 3) {
+                                    LOGGER.warn("  ::   :: IMap K,V == {},{}", key, iMap.get(key));
+                                }
+                                if (j == 3) {
+                                    LOGGER.warn("  ::   :: etc");
+                                }
+                            }
+                            LOGGER.warn("  :: '{}'.size()=={}", iMap.getName(), iMap.size());
                         }
-                        LOGGER.warn("  :: '{}'.size()=={}", iMap.getName(), iMap.size());
                     }
                 }
             }

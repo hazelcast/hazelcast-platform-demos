@@ -21,6 +21,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,6 +51,11 @@ import com.hazelcast.jet.pipeline.Pipeline;
  * <p>XXX
  * </p>
  * </li>
+ * <li>
+ * <p>{@link CassandraDebeziumCDC}</p>
+ * <p>XXX
+ * </p>
+ * </li>
  * </ol>
  */
 @Configuration
@@ -60,6 +66,10 @@ public class ApplicationInitializer {
     private JetInstance jetInstance;
     @Autowired
     private MyProperties myProperties;
+    @Value("${spring.datasource.username}")
+    private String mySqlUsername;
+    @Value("${spring.datasource.password}")
+    private String mySqlPassword;
 
     /**
      * <p>Launch for mandatory input process, uploading call data records from
@@ -78,11 +88,12 @@ public class ApplicationInitializer {
             List.of(
                     new CassandraDebeziumCDC(timestamp),
                     new KafkaIngest(timestamp, this.myProperties.getBootstrapServers()),
-                    new MLChurnDetector(timestamp)
+                    new MLChurnDetector(timestamp),
+                    new MySqlDebeziumCDC(timestamp, this.mySqlUsername, this.mySqlPassword)
                     )
             .stream()
             //FIXME Turn off Cassandra and Kafka for testing
-            .filter(jobWrapper -> jobWrapper.getJobConfig().getName().startsWith("M"))
+            .filter(jobWrapper -> jobWrapper.getJobConfig().getName().startsWith("MySql"))
             .forEach(this::trySubmit);
 
             LOGGER.info("-=-=-=-=-  END  {}  END  -=-=-=-=-=-", hazelcastInstance.getName());
@@ -124,8 +135,13 @@ public class ApplicationInitializer {
                     job.getName(), job.getId(), job.getStatus());
             throw new RuntimeException(message);
         } else {
-            job = jetInstance.newJobIfAbsent(pipeline, jobConfig);
-            LOGGER.info("Submitted {}", job);
+            try {
+                job = jetInstance.newJobIfAbsent(pipeline, jobConfig);
+                LOGGER.info("Submitted {}", job);
+            } catch (Exception e) {
+                // Add some helpful context, which job!
+                throw new RuntimeException(jobName, e);
+            }
         }
     }
 

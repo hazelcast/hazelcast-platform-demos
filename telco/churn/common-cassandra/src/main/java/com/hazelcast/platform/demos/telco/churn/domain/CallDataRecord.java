@@ -20,6 +20,8 @@ import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
+import com.hazelcast.platform.demos.telco.churn.MyConstants;
+
 /**
  * <p>Java representation of a table in Cassandra,
  * created by the <i>cassandra</i> module,
@@ -27,7 +29,7 @@ import org.springframework.data.cassandra.core.mapping.Table;
  * and populated by the <i>preload-legacy</i> module.
  * </p>
  */
-@Table(value = "cdr")
+@Table(value = MyConstants.CASSANDRA_TABLE_NAME)
 public class CallDataRecord {
 
     @PrimaryKey(value = "id")
