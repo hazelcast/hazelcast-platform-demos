@@ -134,6 +134,16 @@
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>
+				<artifactId>hazelcast-jet-cdc-debezium</artifactId>
+				<version>${hazelcast-jet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.hazelcast.jet</groupId>
+				<artifactId>hazelcast-jet-cdc-mysql</artifactId>
+				<version>${hazelcast-jet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.hazelcast.jet</groupId>
 				<artifactId>hazelcast-jet-enterprise</artifactId>
 				<version>${hazelcast-jet.version}</version>
 			</dependency>

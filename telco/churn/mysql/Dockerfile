@@ -13,3 +13,6 @@ ENV MYSQL_ROOT_PASSWORD=$MY_OTHERPASSWORD
 
 # Setup
 COPY target/classes/init.sql     /docker-entrypoint-initdb.d 
+ENTRYPOINT ["/entrypoint.sh"]
+
+CMD ["mysqld", "--log-bin=ON", "--binlog_format=ROW", "--server-id=1"]

@@ -1,5 +1,5 @@
 alter user '@my.other.admin.user@'@'%'
-identified by '@my.other.admin.password@';
+identified with mysql_native_password by '@my.other.admin.password@';
 
 grant all privileges on *.* to '@my.other.admin.user@'@'%';
 

@@ -12,6 +12,6 @@ CREATE TABLE cdr(
   duration_seconds INT,
   successful BOOLEAN,
   PRIMARY KEY (id)
-);
+) WITH cdc=true;
 
 DESCRIBE TABLES;

@@ -6,4 +6,5 @@ RUN java --version
 # Default values provided
 ENV MY_ZOOKEEPER "zookeeper:2181"
 
-CMD kafka-topics.sh --zookeeper $MY_ZOOKEEPER --create --partitions 3 --replication-factor 1 --topic calls
+CMD for ATOPIC in calls cassandra ; do kafka-topics.sh --zookeeper $MY_ZOOKEEPER --create --partitions 3 --replication-factor 1 --topic $ATOPIC ; done
+
