@@ -16,21 +16,19 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
-//FIXME import java.util.List;
+import java.util.List;
 
-//FIXME import org.junit.BeforeClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.hazelcast.jet.config.JobConfig;
-//FIXME import com.hazelcast.jet.pipeline.BatchStage;
+import com.hazelcast.jet.pipeline.BatchStage;
 import com.hazelcast.jet.pipeline.Pipeline;
-//FIXME import com.hazelcast.jet.pipeline.Sinks;
-//FIXME import com.hazelcast.jet.pipeline.test.AssertionSinks;
-//FIXME import com.hazelcast.jet.pipeline.test.TestSources;
-//FIXME ?
-//FIXME import com.hazelcast.jet.python.PythonServiceConfig;
-//FIXME ?
-//FIXME import com.hazelcast.jet.python.PythonTransforms;
+import com.hazelcast.jet.pipeline.Sinks;
+import com.hazelcast.jet.pipeline.test.AssertionSinks;
+import com.hazelcast.jet.pipeline.test.TestSources;
+import com.hazelcast.jet.python.PythonServiceConfig;
+import com.hazelcast.jet.python.PythonTransforms;
 
 /**
  * <p>Test the correctness of "trainedmodel.py" for various inputs
@@ -38,25 +36,25 @@ import com.hazelcast.jet.pipeline.Pipeline;
  */
 public class MyChurnDetectorIT extends AbstractJetIT {
 
-    /*XXXprivate static PythonServiceConfig pythonServiceConfig;
+    private static PythonServiceConfig pythonServiceConfig;
 
     @BeforeClass
     public static void beforeClass2() throws Exception {
         pythonServiceConfig =
             MLChurnDetector.getPythonServiceConfig(MLChurnDetector.PYTHON_MODULE);
-    }*/
+    }
 
     /**
-     * FIXME failsafe test, no classpath issue
-     * XXX
+     * <p>At this point, the Python module is just counting characters
+     * in words.
+     * </p>
      */
     @Test
     public void helloWorld() throws Exception {
-        //List<String> input = List.of("hello", "world");
-        //List<String> expected = List.of("5", "5");
+        List<String> input = List.of("Hello", "World!");
+        List<String> expected = List.of("5", "6");
 
-        Pipeline pipeline = null;
-        /*FIXME Pipeline.create();
+        Pipeline pipeline = Pipeline.create();
 
         BatchStage<String> output =
                 pipeline
@@ -66,14 +64,9 @@ public class MyChurnDetectorIT extends AbstractJetIT {
 
         output.writeTo(Sinks.logger());
         output.writeTo(AssertionSinks.assertOrdered(expected));
-        */
 
-        MLChurnDetector mlChurnDetector = new MLChurnDetector(System.currentTimeMillis());
-
-        //JobConfig jobConfig = new JobConfig();
-        //jobConfig.setName(super.testName.getMethodName());
-        JobConfig jobConfig = mlChurnDetector.getJobConfig();
-        pipeline = mlChurnDetector.getPipeline();
+        JobConfig jobConfig = new JobConfig();
+        jobConfig.setName(super.testName.getMethodName());
 
         jetInstance.newJob(pipeline, jobConfig).join();
     }
