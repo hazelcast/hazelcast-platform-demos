@@ -41,6 +41,7 @@ public class ApplicationInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInitializer.class);
     private static final long TWO_MINUTES = 120L;
     private static final int LOOPS = 10;
+    private static final int ENTRIES_MAX = 5;
 
     @Autowired
     private JetInstance jetInstance;
@@ -68,9 +69,7 @@ public class ApplicationInitializer {
                 this.launchNeededJobs(isLocalhost);
             }
             for (int k = 0 ; k < LOOPS ; k++) {
-                LOGGER.error("SLEEP");
-                TimeUnit.SECONDS.sleep(TWO_MINUTES);
-                LOGGER.error("AWAKE");
+                LOGGER.error("SLEEP {}/{}", (k + 1), LOOPS);
                 LOGGER.error("====");
                 for (DistributedObject distributedObject : this.jetInstance.getHazelcastInstance().getDistributedObjects()) {
                     if (!distributedObject.getName().startsWith("__")) {
@@ -82,17 +81,20 @@ public class ApplicationInitializer {
                             int j = 0;
                             for (Object key : iMap.keySet()) {
                                 j++;
-                                if (j < 3) {
+                                if (j < ENTRIES_MAX) {
                                     LOGGER.warn("  ::   :: IMap K,V == {},{}", key, iMap.get(key));
                                 }
-                                if (j == 3) {
-                                    LOGGER.warn("  ::   :: etc");
+                                if (j == ENTRIES_MAX) {
+                                    LOGGER.warn("  ::   :: <<etc>>");
                                 }
                             }
                             LOGGER.warn("  :: '{}'.size()=={}", iMap.getName(), iMap.size());
                         }
                     }
                 }
+                LOGGER.error("LOOP {}/{}", (k + 1), LOOPS);
+                TimeUnit.SECONDS.sleep(TWO_MINUTES);
+                LOGGER.error("AWAKE");
             }
             LOGGER.error("====");
         };

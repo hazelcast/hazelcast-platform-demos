@@ -47,6 +47,13 @@ import com.hazelcast.jet.pipeline.Pipeline;
  * </p>
  * </li>
  * <li>
+ * <p>{@link MySqlDebeziumOneWayCDC}</p>
+ * <p>Load changes from MySql into Hazelcast. Hazelcast does not
+ * write back to MySql (unlike Cassandra which it does), so do
+ * not have to catch looping data.
+ * </p>
+ * </li>
+ * <li>
  * <p>{@link MLChurnDetector}</p>
  * <p>XXX
  * </p>
@@ -89,7 +96,7 @@ public class ApplicationInitializer {
                     new CassandraDebeziumCDC(timestamp),
                     new KafkaIngest(timestamp, this.myProperties.getBootstrapServers()),
                     new MLChurnDetector(timestamp),
-                    new MySqlDebeziumCDC(timestamp, this.mySqlUsername, this.mySqlPassword)
+                    new MySqlDebeziumOneWayCDC(timestamp, this.mySqlUsername, this.mySqlPassword)
                     )
             .stream()
             //FIXME Turn off Cassandra and Kafka for testing
