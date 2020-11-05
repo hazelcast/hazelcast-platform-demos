@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories;
@@ -47,6 +48,8 @@ public class CassandraIUpdater implements CommandLineRunner {
 
     @Autowired
     private CallDataRecordRepository callDataRecordRepository;
+    @Value("${spring.application.name}")
+    private String springApplicationName;
 
     /**
      * <p>Update alternate blocks of eight records</p>
@@ -104,11 +107,13 @@ public class CassandraIUpdater implements CommandLineRunner {
 
                 // Possibly tweak call success, otherwise duration
                 if (key.endsWith("0")) {
-                    callDataRecord.setSuccessful(!callDataRecord.getSuccessful());
+                    callDataRecord.setCallSuccessful(!callDataRecord.getCallSuccessful());
                 } else {
                     callDataRecord.setDurationSeconds(callDataRecord.getDurationSeconds()
                             + SECONDS_IN_A_MINUTE);
                 }
+                callDataRecord.setLastModifiedBy(this.springApplicationName);
+                callDataRecord.setLastModifiedDate(System.currentTimeMillis());
 
                 this.callDataRecordRepository.save(callDataRecord);
                 LOGGER.trace("Changed: {}", callDataRecord);

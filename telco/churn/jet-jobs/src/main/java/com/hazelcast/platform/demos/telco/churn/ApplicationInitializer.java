@@ -37,7 +37,7 @@ import com.hazelcast.jet.pipeline.Pipeline;
  * </p>
  * <ol>
  * <li>
- * <p>{@link CassandraDebeziumCDC}</p>
+ * <p>{@link CassandraDebeziumTwoWayCDC}</p>
  * <p>XXX
  * </p>
  * </li>
@@ -59,8 +59,10 @@ import com.hazelcast.jet.pipeline.Pipeline;
  * </p>
  * </li>
  * <li>
- * <p>{@link CassandraDebeziumCDC}</p>
- * <p>XXX
+ * <p>{@link CassandraDebeziumTwoWayCDC}</p>
+ * <p>Load changes from Cassandra into Hazelcast. Hazelcast will
+ * write updates made in Hazelcast to Cassandra, so we have to
+ * cope with CDC records that we originated.
  * </p>
  * </li>
  * </ol>
@@ -93,14 +95,14 @@ public class ApplicationInitializer {
             var timestamp = System.currentTimeMillis();
 
             List.of(
-                    new CassandraDebeziumCDC(timestamp),
+                    new CassandraDebeziumTwoWayCDC(timestamp),
                     new KafkaIngest(timestamp, this.myProperties.getBootstrapServers()),
                     new MLChurnDetector(timestamp),
                     new MySqlDebeziumOneWayCDC(timestamp, this.mySqlUsername, this.mySqlPassword)
                     )
             .stream()
-            //FIXME Turn off Cassandra and Kafka for testing
-            .filter(jobWrapper -> jobWrapper.getJobConfig().getName().startsWith("MySql"))
+            //FIXME Turn off some jobs for testing
+            .filter(jobWrapper -> jobWrapper.getJobConfig().getName().contains("CDC"))
             .forEach(this::trySubmit);
 
             LOGGER.info("-=-=-=-=-  END  {}  END  -=-=-=-=-=-", hazelcastInstance.getName());

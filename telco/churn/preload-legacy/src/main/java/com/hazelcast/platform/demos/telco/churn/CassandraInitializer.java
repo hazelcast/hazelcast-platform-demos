@@ -19,6 +19,7 @@ package com.hazelcast.platform.demos.telco.churn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories;
@@ -38,6 +39,8 @@ public class CassandraInitializer implements CommandLineRunner {
 
     @Autowired
     private CallDataRecordRepository callDataRecordRepository;
+    @Value("${spring.application.name}")
+    private String springApplicationName;
 
     /**
      * XXX
@@ -46,26 +49,8 @@ public class CassandraInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         LOGGER.debug("BEFORE: count()=={}", this.callDataRecordRepository.count());
 
-        CallDataRecord cdr0 = new CallDataRecord();
-        cdr0.setId("a");
-        cdr0.setCallerTelno("a1");
-        cdr0.setCallerMastId("a2");
-        cdr0.setCalleeTelno("a3");
-        cdr0.setCalleeMastId("a4");
-        cdr0.setDurationSeconds(1);
-        cdr0.setStartTimestamp(Long.MIN_VALUE);
-        cdr0.setSuccessful(false);
-        this.callDataRecordRepository.save(cdr0);
-        CallDataRecord cdr1 = new CallDataRecord();
-        cdr1.setId("b");
-        cdr1.setCallerTelno("b1");
-        cdr1.setCallerMastId("b2");
-        cdr1.setCalleeTelno("b3");
-        cdr1.setCalleeMastId("b4");
-        cdr1.setDurationSeconds(2);
-        cdr1.setStartTimestamp(Long.MAX_VALUE);
-        cdr1.setSuccessful(true);
-        this.callDataRecordRepository.save(cdr1);
+        long now = System.currentTimeMillis();
+
         for (int i = 0 ; i < XXX; i++) {
             CallDataRecord cdr = new CallDataRecord();
             cdr.setId("i" + i);
@@ -75,7 +60,11 @@ public class CassandraInitializer implements CommandLineRunner {
             cdr.setCalleeMastId("i" + i);
             cdr.setDurationSeconds(0);
             cdr.setStartTimestamp(0L);
-            cdr.setSuccessful(true);
+            cdr.setCallSuccessful(true);
+            cdr.setCreatedBy(this.springApplicationName);
+            cdr.setCreatedDate(now);
+            cdr.setLastModifiedBy(this.springApplicationName);
+            cdr.setLastModifiedDate(now);
             this.callDataRecordRepository.save(cdr);
         }
 

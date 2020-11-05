@@ -43,9 +43,11 @@ public class CallDataRecordMapStore implements MapStore<String, HazelcastJsonVal
     private static final Logger LOGGER = LoggerFactory.getLogger(CallDataRecordMapStore.class);
 
     private CallDataRecordRepository callDataRecordRepository;
+    private String modifierFilter;
 
-    CallDataRecordMapStore(CallDataRecordRepository arg0) {
+    CallDataRecordMapStore(CallDataRecordRepository arg0, String arg1) {
         this.callDataRecordRepository = arg0;
+        this.modifierFilter = arg1;
     }
 
     /**
@@ -169,6 +171,9 @@ public class CallDataRecordMapStore implements MapStore<String, HazelcastJsonVal
         LOGGER.trace("store({}, {})", key, value);
         LOGGER.error("store({}, {})", key, value);
         // TODO Auto-generated method stub
+        //FIXME ONLY SAVE IF INCOMING MODIFIED SAME AS PARM!
+        long now = System.currentTimeMillis();
+        LOGGER.error("store needs to add '{}' and '{}'", this.modifierFilter, now);
     }
 
     /**

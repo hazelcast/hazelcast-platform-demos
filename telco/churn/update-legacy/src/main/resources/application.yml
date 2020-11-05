@@ -2,3 +2,5 @@
 my:
   build-timestamp: @maven.build.timestamp@
   build-userName: @user.name@
+
+spring.application.name: '@project.artifactId@'

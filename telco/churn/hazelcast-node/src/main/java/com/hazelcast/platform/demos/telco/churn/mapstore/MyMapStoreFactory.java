@@ -21,6 +21,7 @@ import java.util.Properties;
 import com.hazelcast.map.MapLoader;
 import com.hazelcast.map.MapStoreFactory;
 import com.hazelcast.platform.demos.telco.churn.MyConstants;
+import com.hazelcast.platform.demos.telco.churn.MyProperties;
 import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordRepository;
 import com.hazelcast.platform.demos.telco.churn.domain.CustomerRepository;
 import com.hazelcast.platform.demos.telco.churn.domain.TariffRepository;
@@ -46,6 +47,8 @@ public class MyMapStoreFactory implements MapStoreFactory {
 
     @Autowired
     private ApplicationContext applicationContext;
+    @Autowired
+    private MyProperties myProperties;
 
     /**
      * <p>Return a {@link MapLoader} (legacy into Hazelcast), which may
@@ -62,7 +65,8 @@ public class MyMapStoreFactory implements MapStoreFactory {
         case MyConstants.IMAP_NAME_CDR:
             CallDataRecordRepository callDataRecordRepository =
                 this.applicationContext.getBean(CallDataRecordRepository.class);
-            mapLoader = new CallDataRecordMapStore(callDataRecordRepository);
+            mapLoader = new CallDataRecordMapStore(callDataRecordRepository,
+                    this.myProperties.getProject() + "-" + this.myProperties.getSite());
             break;
         case MyConstants.IMAP_NAME_CUSTOMER:
             CustomerRepository customerRepository =

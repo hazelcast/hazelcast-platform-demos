@@ -41,7 +41,7 @@ public class ApplicationInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInitializer.class);
     private static final long TWO_MINUTES = 120L;
     private static final int LOOPS = 10;
-    private static final int ENTRIES_MAX = 5;
+    private static final int ENTRIES_MAX = 10;
 
     @Autowired
     private JetInstance jetInstance;

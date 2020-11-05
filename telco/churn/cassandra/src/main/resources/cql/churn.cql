@@ -2,6 +2,8 @@ CREATE KEYSPACE @my.other.admin.database@ WITH replication = { 'class' : 'Simple
 
 USE  @my.other.admin.database@;
 
+-- Mirror @CreatedBy, @CreatedDate, @LastModifiedBy, @LastModifiedDate annotations
+
 CREATE TABLE cdr(
   id TEXT,
   caller_telno TEXT,
@@ -10,7 +12,11 @@ CREATE TABLE cdr(
   callee_mast_id TEXT,
   start_timestamp BIGINT,
   duration_seconds INT,
-  successful BOOLEAN,
+  call_successful BOOLEAN,
+  created_by TEXT,
+  created_date BIGINT,
+  last_modified_by TEXT,
+  last_modified_date BIGINT,
   PRIMARY KEY (id)
 ) WITH cdc=true;
 

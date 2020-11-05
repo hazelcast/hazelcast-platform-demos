@@ -46,8 +46,16 @@ public class CallDataRecord {
     private Long startTimestamp;
     @Column(value = "duration_seconds")
     private Integer durationSeconds;
-    @Column(value = "successful")
-    private Boolean successful;
+    @Column(value = "call_successful")
+    private Boolean callSuccessful;
+    @Column(value = "created_by")
+    private String createdBy;
+    @Column(value = "created_date")
+    private Long createdDate;
+    @Column(value = "last_modified_by")
+    private String lastModifiedBy;
+    @Column(value = "last_modified_date")
+    private Long lastModifiedDate;
 
     // Generated code below
 
@@ -93,18 +101,44 @@ public class CallDataRecord {
     public void setDurationSeconds(Integer durationSeconds) {
         this.durationSeconds = durationSeconds;
     }
-    public Boolean getSuccessful() {
-        return successful;
+    public Boolean getCallSuccessful() {
+        return callSuccessful;
     }
-    public void setSuccessful(Boolean successful) {
-        this.successful = successful;
+    public void setCallSuccessful(Boolean callSuccessful) {
+        this.callSuccessful = callSuccessful;
+    }
+    public String getCreatedBy() {
+        return createdBy;
+    }
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+    public Long getCreatedDate() {
+        return createdDate;
+    }
+    public void setCreatedDate(Long createdDate) {
+        this.createdDate = createdDate;
+    }
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+    public Long getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+    public void setLastModifiedDate(Long lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     @Override
     public String toString() {
         return "CallDataRecord [id=" + id + ", callerTelno=" + callerTelno + ", callerMastId=" + callerMastId
                 + ", calleeTelno=" + calleeTelno + ", calleeMastId=" + calleeMastId + ", startTimestamp="
-                + startTimestamp + ", durationSeconds=" + durationSeconds + ", successful=" + successful + "]";
+                + startTimestamp + ", durationSeconds=" + durationSeconds + ", callSuccessful=" + callSuccessful
+                + ", createdBy=" + createdBy + ", createdDate=" + createdDate + ", lastModifiedBy=" + lastModifiedBy
+                + ", lastModifiedDate=" + lastModifiedDate + "]";
     }
 
 }

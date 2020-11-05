@@ -32,14 +32,21 @@ public class CallDataRecordMetadata {
     public static final String CALLEE_MAST_ID = "calleeMastId";
     public static final String START_TIMESTAMP = "startTimestamp";
     public static final String DURATION_SECONDS = "durationSeconds";
-    public static final String SUCCESSFUL = "successful";
+    public static final String CALL_SUCCESSFUL = "callSuccessful";
+    // Mirror @CreatedBy, @CreatedDate, @LastModifiedBy, @LastModifiedDate
+    public static final String CREATED_BY = "createdBy";
+    public static final String CREATED_DATE = "createdDate";
+    public static final String LAST_MODIFIED_BY = "lastModifiedBy";
+    public static final String LAST_MODIFIED_DATE = "lastModifiedDate";
 
     public static final List<String> FIELD_NAMES =
             List.of(ID,
                     CALLER_TELNO, CALLER_MAST_ID,
                     CALLEE_TELNO, CALLEE_MAST_ID,
                     START_TIMESTAMP, DURATION_SECONDS,
-                    SUCCESSFUL
+                    CALL_SUCCESSFUL,
+                    CREATED_BY, CREATED_DATE,
+                    LAST_MODIFIED_BY, LAST_MODIFIED_DATE
                     );
 
 }
