@@ -16,13 +16,18 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
+import java.util.Properties;
+import java.util.UUID;
+
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hazelcast.jet.cdc.ChangeRecord;
+import com.hazelcast.core.HazelcastJsonValue;
+import com.hazelcast.jet.kafka.KafkaSources;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.Sinks;
-import com.hazelcast.jet.pipeline.StreamSource;
 
 /**
  * XXX
@@ -31,9 +36,11 @@ public class CassandraDebeziumTwoWayCDC extends MyJobWrapper {
     private static final Logger LOGGER = LoggerFactory.getLogger(CassandraDebeziumTwoWayCDC.class);
 
     private String myCassandra;
+    private String bootstrapServers;
 
-    CassandraDebeziumTwoWayCDC(long arg0) {
+    CassandraDebeziumTwoWayCDC(long arg0, String arg1) {
         super(arg0);
+        this.bootstrapServers = arg1;
 
         // Configure expected Cassandra address for Docker or Kubernetes
         if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
@@ -52,12 +59,13 @@ public class CassandraDebeziumTwoWayCDC extends MyJobWrapper {
      * </p>
      */
     public Pipeline getPipeline() {
+        Properties kafkaConnectionProperties = buildKafkaConnectionProperties(this.bootstrapServers);
+
         Pipeline pipeline = Pipeline.create();
 
-        StreamSource<ChangeRecord> cassandraCdcStreamSource = buildCassandraCdcStreamSource();
-
         pipeline
-        .readFrom(cassandraCdcStreamSource).withoutTimestamps()
+        .readFrom(KafkaSources.<String, HazelcastJsonValue>kafka(
+                kafkaConnectionProperties, MyConstants.KAFKA_TOPIC_CASSANDRA)).withoutTimestamps()
         //FIXME Which name to exclude, include
         .writeTo(Sinks.logger());
 
@@ -65,11 +73,21 @@ public class CassandraDebeziumTwoWayCDC extends MyJobWrapper {
     }
 
     /**
-     *XXX
-     * @return
+     * <p>Connection properties for Kafka, custom deserializer
+     * for value takes a String and converts to {@link HazelcastJsonValue}
+     * FIXME Serializer
+     * </p>
      */
-    private StreamSource<ChangeRecord> buildCassandraCdcStreamSource() {
-        return null;
+    private static Properties buildKafkaConnectionProperties(String bootstrapServers) {
+        Properties kafkaProperties = new Properties();
+
+        kafkaProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        kafkaProperties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        kafkaProperties.put(ConsumerConfig.GROUP_ID_CONFIG, UUID.randomUUID().toString());
+        kafkaProperties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+        kafkaProperties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, MyKafkaValueDeserializer.class.getCanonicalName());
+
+        return kafkaProperties;
     }
 
 }

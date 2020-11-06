@@ -53,8 +53,8 @@ public class CassandraInitializer implements CommandLineRunner {
 
         for (int i = 0 ; i < XXX; i++) {
             CallDataRecord cdr = new CallDataRecord();
-            cdr.setId("i" + i);
-            cdr.setCallerTelno("i" + i);
+            cdr.setId("id" + i);
+            cdr.setCallerTelno("telno" + i);
             cdr.setCallerMastId("i" + i);
             cdr.setCalleeTelno("i" + i);
             cdr.setCalleeMastId("i" + i);

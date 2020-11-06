@@ -49,6 +49,8 @@ public class MyConstants {
     // To read from Kafka, must match Dockerfile in topic-create module
     public static final String KAFKA_TOPIC_CALLS_NAME = "calls";
     public static final int KAFKA_TOPIC_CALLS_PARTITIONS = 3;
+    // Read from "cassandra" topic, not write, so don't need to know partitioning
+    public static final String KAFKA_TOPIC_CASSANDRA = "cassandra";
 
     // Backing store names, Mongo is derived, others need specified
     public static final String CASSANDRA_TABLE_NAME = "cdr";

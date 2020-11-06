@@ -30,7 +30,8 @@ import org.slf4j.LoggerFactory;
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.map.MapStore;
 import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecord;
-import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordIdOnly;
+import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordKey;
+import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordKeyProjection;
 import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordMetadata;
 import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordRepository;
 
@@ -39,7 +40,7 @@ import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordRepository;
  * Save it back when it changes.
  * </p>
  */
-public class CallDataRecordMapStore implements MapStore<String, HazelcastJsonValue> {
+public class CallDataRecordMapStore implements MapStore<CallDataRecordKey, HazelcastJsonValue> {
     private static final Logger LOGGER = LoggerFactory.getLogger(CallDataRecordMapStore.class);
 
     private CallDataRecordRepository callDataRecordRepository;
@@ -54,13 +55,14 @@ public class CallDataRecordMapStore implements MapStore<String, HazelcastJsonVal
      * <p>Try to load a specific key from Cassandra</p>
      */
     @Override
-    public HazelcastJsonValue load(String key) {
+    public HazelcastJsonValue load(CallDataRecordKey key) {
         LOGGER.trace("load('{}')", key);
 
         HazelcastJsonValue result = null;
+        String id = key.getCsv().split(",")[1];
 
         try {
-            CallDataRecord callDataRecord = this.callDataRecordRepository.findById(key).get();
+            CallDataRecord callDataRecord = this.callDataRecordRepository.findById(id).get();
 
             if (callDataRecord != null) {
                 JSONObject json = new JSONObject(callDataRecord);
@@ -83,12 +85,12 @@ public class CallDataRecordMapStore implements MapStore<String, HazelcastJsonVal
      * </p>
      */
     @Override
-    public Map<String, HazelcastJsonValue> loadAll(Collection<String> keys) {
+    public Map<CallDataRecordKey, HazelcastJsonValue> loadAll(Collection<CallDataRecordKey> keys) {
         int expectedSize = keys.size();
         LOGGER.trace("loadAll({})", expectedSize);
 
-        Map<String, HazelcastJsonValue> result = new HashMap<>();
-        for (String key : keys) {
+        Map<CallDataRecordKey, HazelcastJsonValue> result = new HashMap<>();
+        for (CallDataRecordKey key : keys) {
             HazelcastJsonValue json = null;
             try {
                 json = this.load(key);
@@ -117,16 +119,19 @@ public class CallDataRecordMapStore implements MapStore<String, HazelcastJsonVal
      * </p>
      */
     @Override
-    public Iterable<String> loadAllKeys() {
+    public Iterable<CallDataRecordKey> loadAllKeys() {
         LOGGER.trace("loadAllKeys()");
 
         try {
-            List<CallDataRecordIdOnly> resultsProjection =
+            List<CallDataRecordKeyProjection> resultsProjection =
                     this.callDataRecordRepository.findByIdGreaterThan("");
-            List<String> results = new ArrayList<>(resultsProjection.size());
+            List<CallDataRecordKey> results = new ArrayList<>(resultsProjection.size());
 
-            for (CallDataRecordIdOnly callDataRecordIdOnly : resultsProjection) {
-                results.add(callDataRecordIdOnly.getId());
+            for (CallDataRecordKeyProjection callDataRecordKeyProjection : resultsProjection) {
+                CallDataRecordKey callDataRecordKey = new CallDataRecordKey();
+                callDataRecordKey.setCsv(callDataRecordKeyProjection.getCallerTelno()
+                        + "," + callDataRecordKeyProjection.getId());
+                results.add(callDataRecordKey);
             }
 
             if (results.size() == 0) {
@@ -144,7 +149,7 @@ public class CallDataRecordMapStore implements MapStore<String, HazelcastJsonVal
     }
 
     @Override
-    public void delete(String key) {
+    public void delete(CallDataRecordKey key) {
         LOGGER.trace("delete({})", key);
         LOGGER.error("delete({})", key);
         // TODO Auto-generated method stub
@@ -158,16 +163,16 @@ public class CallDataRecordMapStore implements MapStore<String, HazelcastJsonVal
      * @param keys
      */
     @Override
-    public void deleteAll(Collection<String> keys) {
+    public void deleteAll(Collection<CallDataRecordKey> keys) {
         int expectedSize = keys.size();
         LOGGER.trace("deleteAll({})", expectedSize);
-        for (String key : keys) {
+        for (CallDataRecordKey key : keys) {
             this.delete(key);
         }
     }
 
     @Override
-    public void store(String key, HazelcastJsonValue value) {
+    public void store(CallDataRecordKey key, HazelcastJsonValue value) {
         LOGGER.trace("store({}, {})", key, value);
         LOGGER.error("store({}, {})", key, value);
         // TODO Auto-generated method stub
@@ -184,10 +189,10 @@ public class CallDataRecordMapStore implements MapStore<String, HazelcastJsonVal
      * @param entries
      */
     @Override
-    public void storeAll(Map<String, HazelcastJsonValue> entries) {
+    public void storeAll(Map<CallDataRecordKey, HazelcastJsonValue> entries) {
         int expectedSize = entries.size();
         LOGGER.trace("storeAll({})", expectedSize);
-        for (Map.Entry<String, HazelcastJsonValue> entry : entries.entrySet()) {
+        for (Map.Entry<CallDataRecordKey, HazelcastJsonValue> entry : entries.entrySet()) {
             this.store(entry.getKey(), entry.getValue());
         }
     }

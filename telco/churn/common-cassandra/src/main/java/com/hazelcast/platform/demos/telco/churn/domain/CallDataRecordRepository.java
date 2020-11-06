@@ -23,12 +23,12 @@ import org.springframework.data.cassandra.repository.Query;
 import org.springframework.stereotype.Repository;
 
 /**
- * <p>The projection retuns the domain object, with nulls for non-projected fields</p>
+ * <p>The projection returns the domain object, with nulls for non-projected fields</p>
  */
 @Repository
 public interface CallDataRecordRepository extends CassandraRepository<CallDataRecord, String> {
 
-    @Query("SELECT id FROM cdr")
-    List<CallDataRecordIdOnly> findByIdGreaterThan(String ignored);
+    @Query("SELECT id, caller_telno FROM cdr")
+    List<CallDataRecordKeyProjection> findByIdGreaterThan(String ignored);
 
 }

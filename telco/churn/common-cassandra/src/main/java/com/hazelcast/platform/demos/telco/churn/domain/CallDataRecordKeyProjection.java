@@ -19,8 +19,9 @@ package com.hazelcast.platform.demos.telco.churn.domain;
 /**
  * <p>Domain object for the {@link CallDataRecordRepository} projection query.</p>
  */
-public interface CallDataRecordIdOnly {
+public interface CallDataRecordKeyProjection {
 
     String getId();
+    String getCallerTelno();
 
 }

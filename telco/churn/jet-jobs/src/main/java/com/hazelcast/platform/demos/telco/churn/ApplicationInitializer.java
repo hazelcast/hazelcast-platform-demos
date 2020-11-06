@@ -38,12 +38,18 @@ import com.hazelcast.jet.pipeline.Pipeline;
  * <ol>
  * <li>
  * <p>{@link CassandraDebeziumTwoWayCDC}</p>
- * <p>XXX
+ * <p>Load changes from Cassandra of <u>histroric</u> call
+ * data records into Hazelcast. This data would change if
+ * we made corrrections to call data records for some
+ * reason, such as the mast ID if mast IDs are updated.
  * </p>
  * </li>
  * <li>
  * <p>{@link KafkaIngest}</p>
- * <p>XXX
+ * <p>Read call data records from Kafka direct into Hazelcast.
+ * These are the <u>new</u> calls, happening live, not the
+ * historical calls stored in Cassandra. However they need
+ * stored in Cassandra to become historic calls.
  * </p>
  * </li>
  * <li>
@@ -55,7 +61,9 @@ import com.hazelcast.jet.pipeline.Pipeline;
  * </li>
  * <li>
  * <p>{@link MLChurnDetector}</p>
- * <p>XXX
+ * <p>Use "<i>Machine Learning inference</i>" to detect when
+ * a customer is likely to churn. Runs a Python machine learning
+ * model, which is pre-trained.
  * </p>
  * </li>
  * <li>
@@ -95,14 +103,15 @@ public class ApplicationInitializer {
             var timestamp = System.currentTimeMillis();
 
             List.of(
-                    new CassandraDebeziumTwoWayCDC(timestamp),
-                    new KafkaIngest(timestamp, this.myProperties.getBootstrapServers()),
+                    new CassandraDebeziumTwoWayCDC(timestamp,
+                            this.myProperties.getBootstrapServers()),
+                    new KafkaIngest(timestamp,
+                            this.myProperties.getBootstrapServers()),
                     new MLChurnDetector(timestamp),
-                    new MySqlDebeziumOneWayCDC(timestamp, this.mySqlUsername, this.mySqlPassword)
+                    new MySqlDebeziumOneWayCDC(timestamp,
+                            this.mySqlUsername, this.mySqlPassword)
                     )
             .stream()
-            //FIXME Turn off some jobs for testing
-            .filter(jobWrapper -> jobWrapper.getJobConfig().getName().contains("CDC"))
             .forEach(this::trySubmit);
 
             LOGGER.info("-=-=-=-=-  END  {}  END  -=-=-=-=-=-", hazelcastInstance.getName());

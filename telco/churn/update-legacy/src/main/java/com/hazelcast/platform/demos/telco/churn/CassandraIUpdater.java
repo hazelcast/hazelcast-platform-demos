@@ -31,7 +31,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories;
 
 import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecord;
-import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordIdOnly;
+import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordKeyProjection;
 import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordRepository;
 
 /**
@@ -58,13 +58,13 @@ public class CassandraIUpdater implements CommandLineRunner {
     public void run(String... args) throws Exception {
         LOGGER.debug("BEFORE: count()=={}", this.callDataRecordRepository.count());
 
-        List<CallDataRecordIdOnly> resultsProjection =
+        List<CallDataRecordKeyProjection> resultsProjection =
                 this.callDataRecordRepository.findByIdGreaterThan("");
 
         // stream.sorted() not ideal for scaling, but TreeSet not much better
         SortedSet<String> keysTmp = (SortedSet<String>) resultsProjection
                 .stream()
-                .map(CallDataRecordIdOnly::getId)
+                .map(CallDataRecordKeyProjection::getId)
                 .collect(Collectors.toCollection(TreeSet::new));
         List<String> keys = new ArrayList<>(keysTmp);
 

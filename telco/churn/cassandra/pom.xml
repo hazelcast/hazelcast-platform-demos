@@ -16,8 +16,19 @@
 
 	<properties>
 		<docker.image.name>cassandra</docker.image.name>
+		<docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
+		<!-- Entry point of io.debezium:debezium-connector-cassandra -->
+		<!-- https://github.com/debezium/debezium-incubator/blob/master/debezium-connector-cassandra/pom.xml#L173 -->
+		<main.class>io.debezium.connector.cassandra.CassandraConnectorTask</main.class>
 	</properties>
+	
+	<dependencies>
+		<dependency>
+			<groupId>io.debezium</groupId>
+			<artifactId>debezium-connector-cassandra</artifactId>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<resources>
@@ -28,6 +39,9 @@
 		</resources>
 
 		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+			</plugin>
 			<plugin>
 				<groupId>com.spotify</groupId>
 				<artifactId>dockerfile-maven-plugin</artifactId>
