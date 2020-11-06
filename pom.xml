@@ -30,6 +30,7 @@
 		<spotbugs.skip>true</spotbugs.skip>
 
 		<!-- Version dependencies - ${project.version} should track Hazelcast version -->
+                <cassandra-driver.version>3.10.2</cassandra-driver.version>
                 <debezium-connector-cassandra.version>1.3.0.Final</debezium-connector-cassandra.version>
 		<java-annotation.version>1.3.2</java-annotation.version>
 		<guava.version>29.0-jre</guava.version>
@@ -91,6 +92,12 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+  	                    <groupId>com.datastax.cassandra</groupId>
+    	                    <artifactId>cassandra-driver-core</artifactId>
+                            <version>${cassandra-driver.version}</version>
+			</dependency>
+
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-databind</artifactId>

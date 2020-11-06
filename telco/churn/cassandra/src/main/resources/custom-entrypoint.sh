@@ -2,7 +2,9 @@
 
 # Enable CDC
 mv $CASSANDRA_HOME/conf/cassandra.yaml $CASSANDRA_HOME/conf/cassandra.yaml.orig
-sed 's/cdc_enabled: false/cdc_enabled: true/' < $CASSANDRA_HOME/conf/cassandra.yaml.orig > $CASSANDRA_HOME/conf/cassandra.yaml
+cat $CASSANDRA_HOME/conf/cassandra.yaml.orig \
+ | sed 's/cdc_enabled: false/cdc_enabled: true/' \
+ | grep -v '^enable_sasi_indexes'  > $CASSANDRA_HOME/conf/cassandra.yaml
 grep cdc_enabled $CASSANDRA_HOME/conf/cassandra.yaml
 
 # BACKGROUND SCRIPT, will probe Cassandra until it's ready. Not clean, but seems to be the standard approach
@@ -24,6 +26,14 @@ grep cdc_enabled $CASSANDRA_HOME/conf/cassandra.yaml
   RC=$?
   echo "$0 : background script, applied $ALINE, rc=$RC"
  done
+
+ # Start CDC, with Kafka server addresses from environment
+ mv /debezium-connector-cassandra/debezium-connector-cassandra.conf /debezium-connector-cassandra/debezium-connector-cassandra.conf.orig
+ mkdir /debezium-connector-cassandra/offset_dir
+ cat debezium-connector-cassandra/debezium-connector-cassandra.conf.orig \
+  | sed s/@MY_BOOTSTRAP_SERVERS@/$MY_BOOTSTRAP_SERVERS/ \
+  > debezium-connector-cassandra/debezium-connector-cassandra.conf
+ (cd /debezium-connector-cassandra ;java -Dcassandra.storagedir=$CASSANDRA_HOME/data -jar debezium-connector-cassandra.jar debezium-connector-cassandra.conf)
 ) &
 
 # Start Cassandra
