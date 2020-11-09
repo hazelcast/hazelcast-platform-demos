@@ -63,7 +63,7 @@ public class CustomerMapLoader implements MapLoader<String, HazelcastJsonValue> 
 
             if (customer != null) {
                 JSONObject json = new JSONObject(customer);
-                MapStoreHelpers.validate(json, CustomerMetadata.FIELD_NAMES);
+                MyMapHelpers.validate(json, CustomerMetadata.FIELD_NAMES);
                 result = new HazelcastJsonValue(json.toString());
             }
 

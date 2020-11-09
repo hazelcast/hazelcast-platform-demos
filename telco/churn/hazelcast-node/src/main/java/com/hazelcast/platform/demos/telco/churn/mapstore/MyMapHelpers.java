@@ -24,12 +24,14 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hazelcast.platform.demos.telco.churn.MyProperties;
+
 /**
  * <p>Utilities to share across all map loaders.
  * </p>
  */
-public class MapStoreHelpers {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MapStoreHelpers.class);
+public class MyMapHelpers {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MyMapHelpers.class);
 
     /**
      * <p>Check if the JSON object has the expected fields.
@@ -54,4 +56,15 @@ public class MapStoreHelpers {
         });
     }
 
+    /**
+     * <p>On data records with a "{@code lastModifiedBy}" field,
+     * define the value to use for modifications made by Hazelcast.
+     * </p>
+     *
+     * @param myProperties
+     * @return
+     */
+    public static String getModifiedBy(MyProperties myProperties) {
+        return myProperties.getProject() + "-" + myProperties.getSite();
+    }
 }
