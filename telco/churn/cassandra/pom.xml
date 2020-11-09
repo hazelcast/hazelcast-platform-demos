@@ -25,8 +25,16 @@
 	
 	<dependencies>
 		<dependency>
+	        <groupId>com.datastax.cassandra</groupId>
+    	    <artifactId>cassandra-driver-core</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>io.debezium</groupId>
 			<artifactId>debezium-connector-cassandra</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-tcnative</artifactId>
 		</dependency>
 	</dependencies>
 

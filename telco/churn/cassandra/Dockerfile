@@ -16,6 +16,11 @@ ENV CASSANDRA_PASSWORD=$MY_OTHERPASSWORD
 ENV CASSANDRA_CLUSTER_NAME=$MY_OTHERDATABASE
 ENV MY_BOOTSTRAP_SERVERS "0.0.0.0:9092,0.0.0.0:9093,0.0.0.0:9094"
 
+# To reach bootstrap servers, only 9092 if separate hosts (Kubernetes)
+EXPOSE 9092
+EXPOSE 9093
+EXPOSE 9094
+
 # Setup
 COPY target/classes/cql  /cql
 COPY target/classes/custom-entrypoint.sh  /
