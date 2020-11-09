@@ -66,7 +66,7 @@ public class MyMapStoreFactory implements MapStoreFactory {
             CallDataRecordRepository callDataRecordRepository =
                 this.applicationContext.getBean(CallDataRecordRepository.class);
             mapLoader = new CallDataRecordMapStore(callDataRecordRepository,
-                    this.myProperties.getProject() + "-" + this.myProperties.getSite());
+                    MyMapHelpers.getModifiedBy(this.myProperties));
             break;
         case MyConstants.IMAP_NAME_CUSTOMER:
             CustomerRepository customerRepository =

@@ -66,7 +66,7 @@ public class CallDataRecordMapStore implements MapStore<CallDataRecordKey, Hazel
 
             if (callDataRecord != null) {
                 JSONObject json = new JSONObject(callDataRecord);
-                MapStoreHelpers.validate(json, CallDataRecordMetadata.FIELD_NAMES);
+                MyMapHelpers.validate(json, CallDataRecordMetadata.FIELD_NAMES);
                 result = new HazelcastJsonValue(json.toString());
             }
 

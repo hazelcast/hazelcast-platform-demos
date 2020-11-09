@@ -50,7 +50,8 @@ public class MyConstants {
     public static final String KAFKA_TOPIC_CALLS_NAME = "calls";
     public static final int KAFKA_TOPIC_CALLS_PARTITIONS = 3;
     // Read from "cassandra" topic, not write, so don't need to know partitioning
-    public static final String KAFKA_TOPIC_CASSANDRA = "cassandra";
+    // clusterName.keyspaceName.tableName
+    public static final String KAFKA_TOPIC_CASSANDRA = "churn.churn.cdr";
 
     // Backing store names, Mongo is derived, others need specified
     public static final String CASSANDRA_TABLE_NAME = "cdr";
