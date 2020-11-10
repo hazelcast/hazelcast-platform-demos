@@ -226,7 +226,8 @@ public class MySqlDebeziumOneWayCDC extends MyJobWrapper {
                         new HazelcastJsonValue(stringBuilder.toString()));
             }
         } catch (JSONException e) {
-            LOGGER.error(valueAsJson, e);
+            String message = String.format("%s: %s", valueAsJson, e.getMessage());
+            LOGGER.error(message);
             return null;
         }
     }

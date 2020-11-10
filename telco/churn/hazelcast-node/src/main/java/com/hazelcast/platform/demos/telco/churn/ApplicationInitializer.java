@@ -28,6 +28,8 @@ import org.springframework.context.annotation.Configuration;
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.map.IMap;
+import com.hazelcast.platform.demos.telco.churn.mapstore.CallDataRecordMapInterceptor;
+import com.hazelcast.platform.demos.telco.churn.mapstore.MyMapHelpers;
 
 /**
  * <p>
@@ -39,6 +41,7 @@ import com.hazelcast.map.IMap;
 @Configuration
 public class ApplicationInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInitializer.class);
+    private static final long THIRTY_SECONDS = 30L;
     private static final long TWO_MINUTES = 120L;
     private static final int LOOPS = 10;
     private static final int ENTRIES_MAX = 10;
@@ -68,6 +71,7 @@ public class ApplicationInitializer {
                 this.createNeededObjects();
                 this.launchNeededJobs(isLocalhost);
             }
+            TimeUnit.SECONDS.sleep(THIRTY_SECONDS);
             for (int k = 0 ; k < LOOPS ; k++) {
                 LOGGER.error("SLEEP {}/{}", (k + 1), LOOPS);
                 LOGGER.error("====");
@@ -106,8 +110,17 @@ public class ApplicationInitializer {
      * we'll need to be sure they exist in advance, this doesn't change their
      * behaviour but is useful for reporting.
      * </p>
+     * <p>Intercept changes to the call data record map, to ensure the
+     * "{@code lastModifiedBy}" and "{@code lastModifiedDate}" are set
+     * on writes.
+     * </p>
      */
     private void createNeededObjects() {
+        IMap<?, ?> cdrMap =
+                this.jetInstance.getHazelcastInstance().getMap(MyConstants.IMAP_NAME_CDR);
+        String modifiedBy = MyMapHelpers.getModifiedBy(this.myProperties);
+        cdrMap.addInterceptor(new CallDataRecordMapInterceptor(modifiedBy));
+
         for (String iMapName : MyConstants.IMAP_NAMES) {
             this.jetInstance.getHazelcastInstance().getMap(iMapName);
         }

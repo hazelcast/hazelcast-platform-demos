@@ -60,6 +60,10 @@ cat /debezium-connector-cassandra/debezium-connector-cassandra.conf.orig \
   nodetool flush churn cdr
   echo ls -l $CASSANDRA_HOME/data/cdc_raw
   ls -l $CASSANDRA_HOME/data/cdc_raw
+  echo ls -l $CASSANDRA_HOME/data/commitlog/archive
+  ls -l $CASSANDRA_HOME/data/commitlog/archive
+  echo ls -l $CASSANDRA_HOME/data/commitlog
+  ls -l $CASSANDRA_HOME/data/commitlog
   echo "$0: - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
   sleep 10;
  done
