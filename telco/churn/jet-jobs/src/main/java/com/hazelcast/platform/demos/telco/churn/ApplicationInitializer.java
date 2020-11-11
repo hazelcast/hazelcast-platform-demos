@@ -53,6 +53,11 @@ import com.hazelcast.jet.pipeline.Pipeline;
  * </p>
  * </li>
  * <li>
+ * <p>{@link MongoDebeziumOneWayCDC}</p>
+ * <p>FIXME Placeholder to add Mongo Debezium as a bonus.
+ * </p>
+ * </li>
+ * <li>
  * <p>{@link MySqlDebeziumOneWayCDC}</p>
  * <p>Load changes from MySql into Hazelcast. Hazelcast does not
  * write back to MySql (unlike Cassandra which it does), so do
@@ -101,17 +106,27 @@ public class ApplicationInitializer {
             LOGGER.info("-=-=-=-=- START {} START -=-=-=-=-=-", hazelcastInstance.getName());
 
             var timestamp = System.currentTimeMillis();
+            var bootstrapServers = this.myProperties.getBootstrapServers();
+            LOGGER.debug("Kafka brokers: {}", bootstrapServers);
 
             List.of(
-                    new CassandraDebeziumTwoWayCDC(timestamp,
-                            this.myProperties.getBootstrapServers()),
-                    new KafkaIngest(timestamp,
-                            this.myProperties.getBootstrapServers()),
+                    new CassandraDebeziumTwoWayCDC(timestamp, bootstrapServers),
+                    new KafkaIngest(timestamp, bootstrapServers),
+                    new MongoDebeziumOneWayCDC(timestamp),
                     new MLChurnDetector(timestamp),
                     new MySqlDebeziumOneWayCDC(timestamp,
                             this.mySqlUsername, this.mySqlPassword)
                     )
             .stream()
+            .filter(myJobWrapper -> {
+                //FIXME Turn off til written
+                String jobName = myJobWrapper.getJobConfig().getName();
+                boolean include = !jobName.contains("Mongo");
+                if (!include) {
+                    LOGGER.warn("Skip '{}', not yet written", jobName);
+                }
+                return include;
+            })
             .forEach(this::trySubmit);
 
             LOGGER.info("-=-=-=-=-  END  {}  END  -=-=-=-=-=-", hazelcastInstance.getName());

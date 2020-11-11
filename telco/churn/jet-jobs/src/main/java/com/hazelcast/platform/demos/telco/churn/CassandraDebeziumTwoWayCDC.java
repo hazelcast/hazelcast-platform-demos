@@ -38,9 +38,9 @@ public class CassandraDebeziumTwoWayCDC extends MyJobWrapper {
     private String myCassandra;
     private String bootstrapServers;
 
-    CassandraDebeziumTwoWayCDC(long arg0, String arg1) {
-        super(arg0);
-        this.bootstrapServers = arg1;
+    CassandraDebeziumTwoWayCDC(long timestamp, String bootstrapServers) {
+        super(timestamp);
+        this.bootstrapServers = bootstrapServers;
 
         // Configure expected Cassandra address for Docker or Kubernetes
         if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
@@ -67,6 +67,7 @@ public class CassandraDebeziumTwoWayCDC extends MyJobWrapper {
         .readFrom(KafkaSources.<String, HazelcastJsonValue>kafka(
                 kafkaConnectionProperties, MyConstants.KAFKA_TOPIC_CASSANDRA)).withoutTimestamps()
         //FIXME Which name to exclude, include
+        //FIXME Using MAP with *REMOTE* client ?
         .writeTo(Sinks.logger());
 
         return pipeline;
@@ -85,7 +86,9 @@ public class CassandraDebeziumTwoWayCDC extends MyJobWrapper {
         kafkaProperties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         kafkaProperties.put(ConsumerConfig.GROUP_ID_CONFIG, UUID.randomUUID().toString());
         kafkaProperties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+        //FIXME Add to JobConfig if using
         kafkaProperties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, MyKafkaValueDeserializer.class.getCanonicalName());
+        kafkaProperties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
 
         return kafkaProperties;
     }

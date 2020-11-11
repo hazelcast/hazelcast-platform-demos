@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -69,6 +70,7 @@ public class CassandraIUpdater implements CommandLineRunner {
         List<String> keys = new ArrayList<>(keysTmp);
 
         int count = 0;
+        while (true) {
         for (int i = 0 ; i < keys.size() ; i++) {
             if ((i & MASK_8) != 0) {
                 boolean success = this.update(keys.get(i));
@@ -77,6 +79,11 @@ public class CassandraIUpdater implements CommandLineRunner {
                 }
             }
         }
+        //FIXME Infinite loop
+        System.out.println("@@@@ " + count);
+        TimeUnit.MILLISECONDS.sleep(2);
+        }
+        /*XXX
 
         if (count == 0) {
             LOGGER.error("updates made=={}", count);
@@ -84,7 +91,7 @@ public class CassandraIUpdater implements CommandLineRunner {
             LOGGER.info("updates made=={}", count);
         }
 
-        LOGGER.debug("AFTER:  count()=={}", this.callDataRecordRepository.count());
+        LOGGER.debug("AFTER:  count()=={}", this.callDataRecordRepository.count());*/
     }
 
     /**

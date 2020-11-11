@@ -96,10 +96,10 @@ public class MySqlDebeziumOneWayCDC extends MyJobWrapper {
     private String mySqlUsername;
     private String mySqlPassword;
 
-    MySqlDebeziumOneWayCDC(long arg0, String arg1, String arg2) {
-        super(arg0);
-        this.mySqlUsername = arg1;
-        this.mySqlPassword = arg2;
+    MySqlDebeziumOneWayCDC(long timestamp, String username, String password) {
+        super(timestamp);
+        this.mySqlUsername = username;
+        this.mySqlPassword = password;
 
         // Configure expected MySql address for Docker or Kubernetes
         if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {

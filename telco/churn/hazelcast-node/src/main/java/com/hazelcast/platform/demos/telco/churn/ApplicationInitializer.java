@@ -71,6 +71,7 @@ public class ApplicationInitializer {
                 this.createNeededObjects();
                 this.launchNeededJobs(isLocalhost);
             }
+            LOGGER.error("READY...");
             TimeUnit.SECONDS.sleep(THIRTY_SECONDS);
             for (int k = 0 ; k < LOOPS ; k++) {
                 LOGGER.error("SLEEP {}/{}", (k + 1), LOOPS);

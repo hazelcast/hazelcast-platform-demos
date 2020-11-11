@@ -18,6 +18,7 @@ CREATE TABLE cdr(
   last_modified_by TEXT,
   last_modified_date BIGINT,
   PRIMARY KEY (id)
-) WITH cdc=true;
+) WITH cdc=true
+AND memtable_flush_period_in_ms = 10000;
 
 DESCRIBE TABLE cdr;

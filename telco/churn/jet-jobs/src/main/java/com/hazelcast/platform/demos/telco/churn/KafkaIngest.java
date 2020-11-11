@@ -66,9 +66,9 @@ public class KafkaIngest extends MyJobWrapper {
 
     private String bootstrapServers;
 
-    KafkaIngest(long arg0, String arg1) {
-        super(arg0);
-        this.bootstrapServers = arg1;
+    KafkaIngest(long timestamp, String bootstrapServers) {
+        super(timestamp);
+        this.bootstrapServers = bootstrapServers;
     }
 
     /**
