@@ -1,4 +1,5 @@
-FROM cassandra:3.11.7
+# Debezium 1.4 unclear if works with Cassandra 4.0
+FROM cassandra:3.11.9
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MY_OTHERUSER
@@ -9,6 +10,7 @@ ARG MY_OTHERDATABASE
 ARG JAR_FILE
 COPY target/${JAR_FILE} /debezium-connector-cassandra/debezium-connector-cassandra.jar
 COPY target/classes/debezium-connector-cassandra.conf /debezium-connector-cassandra/debezium-connector-cassandra.conf
+COPY target/classes/log4j.properties /debezium-connector-cassandra/log4j.properties
 
 # ENV uses ARG
 ENV CASSANDRA_USER=$MY_OTHERUSER
@@ -16,14 +18,9 @@ ENV CASSANDRA_PASSWORD=$MY_OTHERPASSWORD
 ENV CASSANDRA_CLUSTER_NAME=$MY_OTHERDATABASE
 ENV MY_BOOTSTRAP_SERVERS "0.0.0.0:9092,0.0.0.0:9093,0.0.0.0:9094"
 
-# To reach bootstrap servers, only 9092 if separate hosts (Kubernetes)
-EXPOSE 9092
-EXPOSE 9093
-EXPOSE 9094
-
 # Setup
 COPY target/classes/cql  /cql
 COPY target/classes/custom-entrypoint.sh  /
 RUN chmod 755 /custom-entrypoint.sh
 ENTRYPOINT ["/custom-entrypoint.sh"]
-CMD ["cassandra", "-f"] 
+#CMD ["cassandra", "-f"] 

@@ -55,7 +55,7 @@ cat /debezium-connector-cassandra/debezium-connector-cassandra.conf.orig \
 
  sleep 3
 
- # Start CDC, with Kafka server addresses from environment
+ # Start CDC, with Kafka server addresses from environment. Container probably Java 8
  (cd /debezium-connector-cassandra ;java -Dlog4j.configurationFile=./log4j.properties -Dcassandra.storagedir=$CASSANDRA_HOME/data -jar debezium-connector-cassandra.jar debezium-connector-cassandra.conf) &
 
  #
@@ -78,4 +78,6 @@ cat /debezium-connector-cassandra/debezium-connector-cassandra.conf.orig \
 # Start Cassandra
 echo Starting Cassandra
 sleep 2
+# Cassandra 3 - /docker-entrypoint.sh
+# Cassandra 4 - /usr/local/bin/docker-entrypoint.sh
 exec /docker-entrypoint.sh "$@"
