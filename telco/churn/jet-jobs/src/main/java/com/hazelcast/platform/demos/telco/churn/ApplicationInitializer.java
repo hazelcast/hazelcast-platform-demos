@@ -38,9 +38,9 @@ import com.hazelcast.jet.pipeline.Pipeline;
  * <ol>
  * <li>
  * <p>{@link CassandraDebeziumTwoWayCDC}</p>
- * <p>Load changes from Cassandra of <u>histroric</u> call
+ * <p>Load changes from Cassandra of <u>historic</u> call
  * data records into Hazelcast. This data would change if
- * we made corrrections to call data records for some
+ * we made corrections to call data records for some
  * reason, such as the mast ID if mast IDs are updated.
  * </p>
  * </li>
@@ -53,7 +53,7 @@ import com.hazelcast.jet.pipeline.Pipeline;
  * </p>
  * </li>
  * <li>
- * <p>{@link MongoDebeziumOneWayCDC}</p>
+ * <p>{@link MongoDebeziumTwoWayCDC}</p>
  * <p>FIXME Placeholder to add Mongo Debezium as a bonus.
  * </p>
  * </li>
@@ -112,7 +112,7 @@ public class ApplicationInitializer {
             List.of(
                     new CassandraDebeziumTwoWayCDC(timestamp, bootstrapServers),
                     new KafkaIngest(timestamp, bootstrapServers),
-                    new MongoDebeziumOneWayCDC(timestamp),
+                    new MongoDebeziumTwoWayCDC(timestamp, bootstrapServers),
                     new MLChurnDetector(timestamp),
                     new MySqlDebeziumOneWayCDC(timestamp,
                             this.mySqlUsername, this.mySqlPassword)

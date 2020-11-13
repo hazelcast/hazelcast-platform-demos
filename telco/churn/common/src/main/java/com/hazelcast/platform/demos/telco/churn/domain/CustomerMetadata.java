@@ -28,8 +28,16 @@ public class CustomerMetadata {
     public static final String FIRSTNAME = "firstName";
     public static final String LASTNAME = "lastName";
     public static final String ACCOUNT_TYPE = "accountType";
+    // Mirror @CreatedBy, @CreatedDate, @LastModifiedBy, @LastModifiedDate
+    public static final String CREATED_BY = "createdBy";
+    public static final String CREATED_DATE = "createdDate";
+    public static final String LAST_MODIFIED_BY = "lastModifiedBy";
+    public static final String LAST_MODIFIED_DATE = "lastModifiedDate";
 
     public static final List<String> FIELD_NAMES =
-            List.of(ID, FIRSTNAME, LASTNAME, ACCOUNT_TYPE);
+            List.of(ID, FIRSTNAME, LASTNAME, ACCOUNT_TYPE,
+                    CREATED_BY, CREATED_DATE,
+                    LAST_MODIFIED_BY, LAST_MODIFIED_DATE
+                    );
 
 }

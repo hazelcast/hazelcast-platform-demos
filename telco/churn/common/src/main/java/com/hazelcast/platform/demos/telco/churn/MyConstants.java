@@ -35,6 +35,9 @@ public class MyConstants {
     public static final List<String> IMAP_NAMES =
             List.of(IMAP_NAME_CDR, IMAP_NAME_CUSTOMER,
                     IMAP_NAME_TARIFF);
+    // Maps updated by CDC feeds that hav MapStore
+    public static final List<String> CDC_MAPSTORE_NAMES =
+            List.of(IMAP_NAME_CDR, IMAP_NAME_CUSTOMER);
 
     // Topic names, for eager creation
     public static final String ITOPIC_NAME_SLACK  = "slack";
@@ -49,9 +52,11 @@ public class MyConstants {
     // To read from Kafka, must match Dockerfile in topic-create module
     public static final String KAFKA_TOPIC_CALLS_NAME = "calls";
     public static final int KAFKA_TOPIC_CALLS_PARTITIONS = 3;
-    // Read from "cassandra" topic, not write, so don't need to know partition count
-    // See debezium-connector-cassandra.conf and topic-create/Dockerfile
-    public static final String KAFKA_TOPIC_CASSANDRA = "debezium.churn.cdr";
+    // Read from "cassandra" & "mongo", not write, so don't need to know partition count
+    // See debezium-connector-cassandra.conf and debezium-connector-mongo.conf
+    // And topic-create/Dockerfile
+    public static final String KAFKA_TOPIC_CASSANDRA = "debezium-cassandra.churn.cdr";
+    public static final String KAFKA_TOPIC_MONGO = "debezium-mongo.churn.customer";
 
     // Backing store names, Mongo is derived, others need specified
     public static final String CASSANDRA_TABLE_NAME = "cdr";

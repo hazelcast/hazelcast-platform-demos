@@ -19,7 +19,6 @@
 		<docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 		<!-- Entry point of io.debezium:debezium-connector-cassandra -->
-		<!-- https://github.com/debezium/debezium-incubator/blob/master/debezium-connector-cassandra/pom.xml#L173 -->
 		<main.class>io.debezium.connector.cassandra.CassandraConnectorTask</main.class>
 	</properties>
 	

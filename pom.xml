@@ -31,7 +31,9 @@
 
 		<!-- Version dependencies - ${project.version} should track Hazelcast version -->
                 <cassandra-driver.version>3.10.2</cassandra-driver.version>
+                <debezium-connector-cassandra.version>1.4.0-SNAPSHOT</debezium-connector-cassandra.version>
                 <debezium-connector-cassandra.version>1.4.0.Alpha1</debezium-connector-cassandra.version>
+                <debezium-connector-mongodb.version>1.3.1.Final</debezium-connector-mongodb.version>
 		<java-annotation.version>1.3.2</java-annotation.version>
 		<guava.version>29.0-jre</guava.version>
                 <!-- Matches banking/credit-value-adjustment/cpp/Dockerfile2 -->
@@ -180,6 +182,11 @@
 				<groupId>io.debezium</groupId>
 				<artifactId>debezium-connector-cassandra</artifactId>
 				<version>${debezium-connector-cassandra.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.debezium</groupId>
+				<artifactId>debezium-connector-mongodb</artifactId>
+				<version>${debezium-connector-mongodb.version}</version>
 			</dependency>
 
 			<dependency>

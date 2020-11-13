@@ -71,7 +71,8 @@ public class MyMapStoreFactory implements MapStoreFactory {
         case MyConstants.IMAP_NAME_CUSTOMER:
             CustomerRepository customerRepository =
                 this.applicationContext.getBean(CustomerRepository.class);
-            mapLoader = new CustomerMapLoader(customerRepository);
+            mapLoader = new CustomerMapStore(customerRepository,
+                    MyMapHelpers.getModifiedBy(this.myProperties));
             break;
         case MyConstants.IMAP_NAME_TARIFF:
             TariffRepository tariffRepository =

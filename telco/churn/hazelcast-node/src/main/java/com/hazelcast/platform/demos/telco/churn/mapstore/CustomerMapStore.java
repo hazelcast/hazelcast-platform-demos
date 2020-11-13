@@ -28,23 +28,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hazelcast.core.HazelcastJsonValue;
-import com.hazelcast.map.MapLoader;
-import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordMetadata;
+import com.hazelcast.map.MapStore;
 import com.hazelcast.platform.demos.telco.churn.domain.Customer;
 import com.hazelcast.platform.demos.telco.churn.domain.CustomerMetadata;
 import com.hazelcast.platform.demos.telco.churn.domain.CustomerRepository;
 
 /**
  * <p>Load a {@link Customer} object from Mongo and turn it into JSON.
+ * Save it back when it changes.
  * </p>
  */
-public class CustomerMapLoader implements MapLoader<String, HazelcastJsonValue> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CustomerMapLoader.class);
+public class CustomerMapStore implements MapStore<String, HazelcastJsonValue> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomerMapStore.class);
 
     private CustomerRepository customerRepository;
+    private String modifierFilter;
 
-    CustomerMapLoader(CustomerRepository arg0) {
+    CustomerMapStore(CustomerRepository arg0, String arg1) {
         this.customerRepository = arg0;
+        this.modifierFilter = arg1;
     }
 
     /**
@@ -126,7 +128,7 @@ public class CustomerMapLoader implements MapLoader<String, HazelcastJsonValue> 
             for (Object result : resultsProjection) {
                 JSONObject json = new JSONObject(result.toString());
                 // The projection prefixes the projected field name with "_"
-                results.add(json.get("_" + CallDataRecordMetadata.ID).toString());
+                results.add(json.get("_" + CustomerMetadata.ID).toString());
             }
 
             if (results.size() == 0) {
@@ -140,6 +142,55 @@ public class CustomerMapLoader implements MapLoader<String, HazelcastJsonValue> 
         } catch (Exception e) {
             LOGGER.error("loadAllKeys()", e);
             return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public void delete(String key) {
+        LOGGER.trace("delete({})", key);
+        LOGGER.error("delete({})", key);
+        // TODO Auto-generated method stub
+    }
+
+    /**
+     * <p>Use easy iterating delete, could do bulk delete
+     * if available.
+     * </p>
+     *
+     * @param keys
+     */
+    @Override
+    public void deleteAll(Collection<String> keys) {
+        int expectedSize = keys.size();
+        LOGGER.trace("deleteAll({})", expectedSize);
+        for (String key : keys) {
+            this.delete(key);
+        }
+    }
+
+    @Override
+    public void store(String key, HazelcastJsonValue value) {
+        LOGGER.trace("store({}, {})", key, value);
+        LOGGER.error("store({}, {})", key, value);
+        // TODO Auto-generated method stub
+        //FIXME ONLY SAVE IF INCOMING MODIFIED SAME AS PARM!
+        long now = System.currentTimeMillis();
+        LOGGER.error("store needs to add '{}' and '{}'", this.modifierFilter, now);
+    }
+
+    /**
+     * <p>Use easy iterating store, could do bulk store
+     * if available.
+     * </p>
+     *
+     * @param entries
+     */
+    @Override
+    public void storeAll(Map<String, HazelcastJsonValue> entries) {
+        int expectedSize = entries.size();
+        LOGGER.trace("storeAll({})", expectedSize);
+        for (Map.Entry<String, HazelcastJsonValue> entry : entries.entrySet()) {
+            this.store(entry.getKey(), entry.getValue());
         }
     }
 

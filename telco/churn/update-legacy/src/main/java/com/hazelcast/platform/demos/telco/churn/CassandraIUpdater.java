@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -46,6 +45,7 @@ public class CassandraIUpdater implements CommandLineRunner {
     // 2^3
     private static final int MASK_8 = 0x0008;
     private static final int SECONDS_IN_A_MINUTE = 60;
+    private static final int LOOPS_MAX = 1000;
 
     @Autowired
     private CallDataRecordRepository callDataRecordRepository;
@@ -70,20 +70,17 @@ public class CassandraIUpdater implements CommandLineRunner {
         List<String> keys = new ArrayList<>(keysTmp);
 
         int count = 0;
-        while (true) {
-        for (int i = 0 ; i < keys.size() ; i++) {
-            if ((i & MASK_8) != 0) {
-                boolean success = this.update(keys.get(i));
-                if (success) {
-                    count++;
+        int loop = 0;
+        while (loop++ < LOOPS_MAX) {
+            for (int i = 0 ; i < keys.size() ; i++) {
+                if ((i & MASK_8) != 0) {
+                    boolean success = this.update(keys.get(i));
+                    if (success) {
+                        count++;
+                    }
                 }
             }
         }
-        //FIXME Infinite loop
-        System.out.println("@@@@ " + count);
-        TimeUnit.MILLISECONDS.sleep(2);
-        }
-        /*XXX
 
         if (count == 0) {
             LOGGER.error("updates made=={}", count);
@@ -91,7 +88,7 @@ public class CassandraIUpdater implements CommandLineRunner {
             LOGGER.info("updates made=={}", count);
         }
 
-        LOGGER.debug("AFTER:  count()=={}", this.callDataRecordRepository.count());*/
+        LOGGER.debug("AFTER:  count()=={}", this.callDataRecordRepository.count());
     }
 
     /**

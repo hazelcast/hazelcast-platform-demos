@@ -27,6 +27,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
@@ -48,6 +49,8 @@ public class MongoUpdater implements CommandLineRunner {
 
     @Autowired
     private CustomerRepository customerRepository;
+    @Value("${spring.application.name}")
+    private String springApplicationName;
 
     /**
      * <p>Alternate capitalisation</p>
@@ -114,6 +117,8 @@ public class MongoUpdater implements CommandLineRunner {
                     customer.setLastName(customer.getLastName().toLowerCase(Locale.ROOT));
                     customer.setFirstName(customer.getFirstName().toLowerCase(Locale.ROOT));
                 }
+                customer.setLastModifiedBy(this.springApplicationName);
+                customer.setLastModifiedDate(System.currentTimeMillis());
 
                 this.customerRepository.save(customer);
                 LOGGER.trace("Changed: {}", customer);

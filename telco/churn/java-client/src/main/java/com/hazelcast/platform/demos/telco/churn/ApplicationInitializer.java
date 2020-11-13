@@ -32,8 +32,10 @@ import org.springframework.context.annotation.Configuration;
 
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.map.IMap;
+import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordKey;
 //FIXME import com.hazelcast.sql.SqlResult;
 import com.hazelcast.topic.ITopic;
 
@@ -89,6 +91,10 @@ public class ApplicationInitializer {
                                     if (iMap.getName().equals("neil")) {
                                         LOGGER.info("Topic {}.publish('{}')", topic.getName(), message);
                                         topic.publish(message);
+                                    }
+                                    if (iMap.getName().equals(MyConstants.IMAP_NAME_CDR)) {
+                                        this.gamma((IMap<CallDataRecordKey, HazelcastJsonValue>) iMap,
+                                                (CallDataRecordKey) key);
                                     }
                                     TimeUnit.SECONDS.sleep(3L);
                                 } catch (Exception e) {
@@ -183,4 +189,18 @@ public class ApplicationInitializer {
             LOGGER.error("XXX", e);
         }*/
     }
+
+    /**
+     * XXX Test BETABETA code
+     * @param hazelcastInstance
+     */
+    public void gamma(IMap<CallDataRecordKey, HazelcastJsonValue> iMap, CallDataRecordKey key) {
+        Set<CallDataRecordKey> keys = new HashSet<>();
+        keys.add(key);
+        CompletionStage<Map<CallDataRecordKey, String>> completionStage =
+                iMap.submitToKeys(keys, new MyXXXEntryProcessor2());
+
+        completionStage.thenAccept(System.out::println);
+    }
+
 }

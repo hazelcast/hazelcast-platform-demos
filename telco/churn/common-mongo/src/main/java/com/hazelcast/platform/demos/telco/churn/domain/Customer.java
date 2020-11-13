@@ -31,6 +31,10 @@ public class Customer {
     private String firstName;
     private String lastName;
     private String accountType;
+    private String createdBy;
+    private Long createdDate;
+    private String lastModifiedBy;
+    private Long lastModifiedDate;
 
     // Generated code below
 
@@ -58,11 +62,36 @@ public class Customer {
     public void setAccountType(String accountType) {
         this.accountType = accountType;
     }
+    public String getCreatedBy() {
+        return createdBy;
+    }
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+    public Long getCreatedDate() {
+        return createdDate;
+    }
+    public void setCreatedDate(Long createdDate) {
+        this.createdDate = createdDate;
+    }
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+    public Long getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+    public void setLastModifiedDate(Long lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
 
     @Override
     public String toString() {
         return "Customer [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", accountType="
-                + accountType + "]";
+                + accountType + ", createdBy=" + createdBy + ", createdDate=" + createdDate + ", lastModifiedBy="
+                + lastModifiedBy + ", lastModifiedDate=" + lastModifiedDate + "]";
     }
 
 }

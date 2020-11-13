@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Configuration;
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.map.IMap;
-import com.hazelcast.platform.demos.telco.churn.mapstore.CallDataRecordMapInterceptor;
+import com.hazelcast.platform.demos.telco.churn.mapstore.UpdatedByMapInterceptor;
 import com.hazelcast.platform.demos.telco.churn.mapstore.MyMapHelpers;
 
 /**
@@ -111,16 +111,18 @@ public class ApplicationInitializer {
      * we'll need to be sure they exist in advance, this doesn't change their
      * behaviour but is useful for reporting.
      * </p>
-     * <p>Intercept changes to the call data record map, to ensure the
+     * <p>Intercept changes to the call data record and customer maps, to ensure the
      * "{@code lastModifiedBy}" and "{@code lastModifiedDate}" are set
      * on writes.
      * </p>
      */
     private void createNeededObjects() {
-        IMap<?, ?> cdrMap =
-                this.jetInstance.getHazelcastInstance().getMap(MyConstants.IMAP_NAME_CDR);
         String modifiedBy = MyMapHelpers.getModifiedBy(this.myProperties);
-        cdrMap.addInterceptor(new CallDataRecordMapInterceptor(modifiedBy));
+        for (String iMapName : MyConstants.CDC_MAPSTORE_NAMES) {
+            IMap<?, ?> iMap =
+                    this.jetInstance.getHazelcastInstance().getMap(iMapName);
+            iMap.addInterceptor(new UpdatedByMapInterceptor(modifiedBy));
+        }
 
         for (String iMapName : MyConstants.IMAP_NAMES) {
             this.jetInstance.getHazelcastInstance().getMap(iMapName);

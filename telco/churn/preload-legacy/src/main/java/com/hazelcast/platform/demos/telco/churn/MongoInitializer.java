@@ -19,6 +19,7 @@ package com.hazelcast.platform.demos.telco.churn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
@@ -37,6 +38,8 @@ public class MongoInitializer implements CommandLineRunner {
 
     @Autowired
     private CustomerRepository customerRepository;
+    @Value("${spring.application.name}")
+    private String springApplicationName;
 
     /**
      * XXX
@@ -45,11 +48,17 @@ public class MongoInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         LOGGER.debug("BEFORE: count()=={}", this.customerRepository.count());
 
+        long now = System.currentTimeMillis();
+
         Customer c0 = new Customer();
         c0.setAccountType("?");
         c0.setFirstName("n");
         c0.setLastName("s");
         c0.setId("b");
+        c0.setCreatedBy(this.springApplicationName);
+        c0.setCreatedDate(now);
+        c0.setLastModifiedBy(this.springApplicationName);
+        c0.setLastModifiedDate(now);
         this.customerRepository.save(c0);
 
         Customer c1 = new Customer();
@@ -57,6 +66,10 @@ public class MongoInitializer implements CommandLineRunner {
         c1.setFirstName("neil");
         c1.setLastName("stevenson");
         c1.setId("a");
+        c1.setCreatedBy(this.springApplicationName);
+        c1.setCreatedDate(now);
+        c1.setLastModifiedBy(this.springApplicationName);
+        c1.setLastModifiedDate(now);
         this.customerRepository.save(c1);
 
 
