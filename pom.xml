@@ -50,6 +50,7 @@
 		<junit.version>4.13.1</junit.version>
 		<jython.version>2.7.2rc1</jython.version>
 		<kafka-clients.version>2.4.0</kafka-clients.version>
+		<kafka-connect.version>2.6.0</kafka-connect.version>
  		<mongo-java-driver.version>3.12.7</mongo-java-driver.version>
 		<poi-ooxml.version>4.1.2</poi-ooxml.version>
                 <!-- Run same version with 'protoc - -grpc_out=. - -plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin' 
@@ -204,6 +205,12 @@
     	        <groupId>javax.annotation</groupId>
         	    <artifactId>javax.annotation-api</artifactId>
         	    <version>${java-annotation.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.kafka</groupId>
+				<artifactId>connect-api</artifactId>
+				<version>${kafka-connect.version}</version>
 			</dependency>
 
 			<dependency>
