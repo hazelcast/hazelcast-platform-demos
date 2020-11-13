@@ -57,7 +57,7 @@ cat /debezium-connector-cassandra/debezium-connector-cassandra.conf.orig \
 
  # Start CDC, with Kafka server addresses from environment. Container probably Java 8
  (cd /debezium-connector-cassandra ;java -Dlog4j.configurationFile=./log4j.properties -Dcassandra.storagedir=$CASSANDRA_HOME/data -jar debezium-connector-cassandra.jar debezium-connector-cassandra.conf) &
-
+ #
  #
  while true 
  do 
@@ -65,12 +65,14 @@ cat /debezium-connector-cassandra/debezium-connector-cassandra.conf.orig \
   echo "$0: - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
   echo "$0 : background script, confirm CDC to disk"
   # Presence of this directory is proof of CDC is enabled at node level.
+  if [ ! -d $CASSANDRA_HOME/data/cdc_raw ]
+  then
+   echo "$0 : "$CASSANDRA_HOME/data/cdc_raw MISSING
+  fi
   # If Debezium runs, it's filewatcher should empty this directory
-  echo ls -l $CASSANDRA_HOME/data/cdc_raw
-  ls -l $CASSANDRA_HOME/data/cdc_raw
   # Should be two commit logs, given log size and total size configured above
-  echo ls -l $CASSANDRA_HOME/data/commitlog
-  ls -l $CASSANDRA_HOME/data/commitlog
+  echo "$0 : "ls -l \$CASSANDRA_HOME/data/\*/CommitLog\*
+  ls -l $CASSANDRA_HOME/data/*/CommitLog*
   echo "$0: - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
  done
 ) &

@@ -1,4 +1,6 @@
-CREATE KEYSPACE @my.other.admin.database@ WITH replication = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+CREATE KEYSPACE @my.other.admin.database@ 
+WITH replication = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 }
+AND durable_writes = true;
 
 USE  @my.other.admin.database@;
 
