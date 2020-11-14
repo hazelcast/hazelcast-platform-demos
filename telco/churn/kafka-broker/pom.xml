@@ -12,7 +12,7 @@
 	<artifactId>churn-kafka-broker</artifactId>
 
 	<name>Hazelcast Platform - Churn - Kafka Broker</name>
-	<description>Telco Churn - Re-package Kafka Brokerp</description>
+	<description>Telco Churn - Re-package Kafka Broker</description>
 
 	<properties>
 		<docker.image.name>kafka-broker</docker.image.name>

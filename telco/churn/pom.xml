@@ -41,6 +41,7 @@
 		<module>grafana</module>
 		<module>kafdrop</module>
 		<module>kafka-broker</module>
+		<module>kafka-connect</module>
 		<module>prometheus</module>
 		<module>mongo</module>
 		<module>mysql</module>
