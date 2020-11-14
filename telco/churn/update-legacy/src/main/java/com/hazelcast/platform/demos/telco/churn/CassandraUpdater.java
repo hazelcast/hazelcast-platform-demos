@@ -39,13 +39,14 @@ import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordRepository;
  */
 @Configuration
 @EnableCassandraRepositories(basePackageClasses = CallDataRecordRepository.class)
-public class CassandraIUpdater implements CommandLineRunner {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CassandraIUpdater.class);
+public class CassandraUpdater implements CommandLineRunner {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CassandraUpdater.class);
 
     // 2^3
     private static final int MASK_8 = 0x0008;
     private static final int SECONDS_IN_A_MINUTE = 60;
-    private static final int LOOPS_MAX = 1000;
+    // Cassandra 3 outputs CDC on volume threshold. Cassandra 4 uses time threshold also.
+    private static final int LOOPS_MAX = 100;
 
     @Autowired
     private CallDataRecordRepository callDataRecordRepository;
@@ -72,6 +73,9 @@ public class CassandraIUpdater implements CommandLineRunner {
         int count = 0;
         int loop = 0;
         while (loop++ < LOOPS_MAX) {
+            if (loop > 1) {
+                LOGGER.info("Loop {}", loop);
+            }
             for (int i = 0 ; i < keys.size() ; i++) {
                 if ((i & MASK_8) != 0) {
                     boolean success = this.update(keys.get(i));

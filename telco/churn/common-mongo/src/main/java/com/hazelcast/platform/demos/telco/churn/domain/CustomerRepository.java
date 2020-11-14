@@ -28,7 +28,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CustomerRepository extends MongoRepository<Customer, String> {
 
-    @Query(value = "{}", fields = "{id : 1, firstName: 0, lastName: 0, accountType: 0, _class: 0}")
+    // Mongo 4.4 allows inclusion and exclusion
+    //@Query(value = "{}", fields = "{id : 1, firstName: 0, lastName: 0, accountType: 0, _class: 0}")
+    @Query(value = "{}", fields = "{id : 1}")
     List<String> findOnlyId();
 
 }

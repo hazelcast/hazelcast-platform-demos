@@ -12,7 +12,9 @@ ENV MONGO_INITDB_DATABASE=$MY_OTHERDATABASE
 
 # "Options set by command line","attr":{"options":{"net":{"bindIp":"*"}}}}
 COPY target/classes/mongod.conf      /etc
-#COPY xxx.js /docker-entrypoint-initdb.d/
+#COPY target/classes/roles.js /docker-entrypoint-initdb.d/
+COPY target/classes/roles.sh /docker-entrypoint-initdb.d/
+RUN chmod 755 /docker-entrypoint-initdb.d/roles.sh
 
 # Override /usr/local/bin/docker-
 COPY target/classes/custom-entrypoint.sh  /
