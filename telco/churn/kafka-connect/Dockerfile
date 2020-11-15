@@ -25,5 +25,6 @@ ENV NOTUSED_PLACEHOLDER_DATABASE=$MY_OTHERDATABASE
 # Specialised start-up script, plus config for Mongo connector
 COPY target/classes/mongo.json /
 COPY target/classes/custom-entrypoint.sh  /
+COPY target/classes/log4j.properties $KAFKA_HOME/config/log4j.properties
 ENTRYPOINT ["/bin/bash", "/custom-entrypoint.sh"]
 CMD ["start"]

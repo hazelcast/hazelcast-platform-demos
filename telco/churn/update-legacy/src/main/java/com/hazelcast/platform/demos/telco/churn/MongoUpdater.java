@@ -47,7 +47,7 @@ public class MongoUpdater implements CommandLineRunner {
     private static final String ALPHABET_LOWER_CASE =
             "abcdefghijklmnopqrstuvwxyz".toLowerCase(Locale.ROOT);
     // Connector outputs in batches, ensure enough changes to exceed "mongo.json" queue
-    private static final int LOOPS_MAX = 10;
+    private static final int LOOPS_MAX = 100;
 
     @Autowired
     private CustomerRepository customerRepository;
