@@ -51,8 +51,5 @@ Why `jet-jobs/src/test/java/com/hazelcast/platform/demos/telco/churn/MyChurnDete
 ## Mongo
 Add Mongo Debezium One-Way CDC
 
-## Cassandra
-Use `org.apache.kafka.connect.json.JsonConverter` ?
-
 Make Cassandra automatically flush cdc to disk, use Cassandra 4.0 once Debezium supports
 https://issues.apache.org/jira/browse/CASSANDRA-12148
