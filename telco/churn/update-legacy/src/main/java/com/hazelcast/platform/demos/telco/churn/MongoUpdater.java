@@ -46,6 +46,8 @@ public class MongoUpdater implements CommandLineRunner {
 
     private static final String ALPHABET_LOWER_CASE =
             "abcdefghijklmnopqrstuvwxyz".toLowerCase(Locale.ROOT);
+    // Connector outputs in batches, ensure enough changes to exceed "mongo.json" queue
+    private static final int LOOPS_MAX = 10;
 
     @Autowired
     private CustomerRepository customerRepository;
@@ -73,11 +75,17 @@ public class MongoUpdater implements CommandLineRunner {
         List<String> keys = new ArrayList<>(keysTmp);
 
         int count = 0;
-        for (int i = 0 ; i < keys.size() ; i++) {
-            if ((i % 2) == 0) {
-                boolean success = this.update(keys.get(i));
-                if (success) {
-                    count++;
+        int loop = 0;
+        while (loop++ < LOOPS_MAX) {
+            if (loop > 1) {
+                LOGGER.info("Loop {}", loop);
+            }
+            for (int i = 0 ; i < keys.size() ; i++) {
+                if ((i % 2) == 0) {
+                    boolean success = this.update(keys.get(i));
+                    if (success) {
+                        count++;
+                    }
                 }
             }
         }

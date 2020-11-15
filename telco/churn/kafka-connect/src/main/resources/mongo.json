@@ -4,10 +4,13 @@
     "connector.class": "io.debezium.connector.mongodb.MongoDbConnector"
     ,"_comment": "Format of hosts is replica set name from Dockerfile/hostname:port"
     ,"mongodb.hosts": "churn/mongo:27017"
-    ,"_ignore_database.include.list": "admin"
-    ,"_ignore_collection.include.list": "customer"
+    ,"database.include.list": "admin"
+    ,"collection.include.list": "customer"
     ,"mongodb.name": "debezium-mongo"
     ,"mongodb.user": "@my.other.admin.user@"
     ,"mongodb.password": "@my.other.admin.password@"
+    ,"mongodb.members​.auto.discover": "false"
+    ,"max.queue.size": "4"
+    ,"max.batch.size": "2"
   }
 }
