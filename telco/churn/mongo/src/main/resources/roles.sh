@@ -7,7 +7,7 @@ echo use config\; >> $FILENAME
 echo db.createUser\( >> $FILENAME
 echo \{ user: \'@my.other.admin.user@\', >> $FILENAME  
 echo pwd: \'@my.other.admin.password@\', >> $FILENAME  
-echo roles: \[ \{ role: \"readWrite\", db: \"config\" \}, \{ role: \"readWrite\", db: \"listCollections\" \} \] >> $FILENAME
+echo roles: \[ \{ role: \"readWrite\", db: \"config\" \}, \{ role: \"readWrite\", db: \"listCollections\", \{ role: \"readWrite\", db: \"listDatabases\" \} \] >> $FILENAME
 echo \} \) >> $FILENAME
 echo db.getUser\(\"@my.other.admin.user@\"\) >> $FILENAME
 echo show collections >> $FILENAME
