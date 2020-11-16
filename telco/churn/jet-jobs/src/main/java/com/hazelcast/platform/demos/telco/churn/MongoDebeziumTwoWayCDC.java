@@ -45,12 +45,12 @@ public class MongoDebeziumTwoWayCDC extends MyJobWrapper {
         // Configure expected MySql address for Docker or Kubernetes
         if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
             this.myMongo =
-                 System.getProperty("my.project") + "-mysql.default.svc.cluster.local";
+                 System.getProperty("my.project") + "-mongo.default.svc.cluster.local";
 
-            LOGGER.info("Kubernetes configuration: mysql host: '{}'", this.myMongo);
+            LOGGER.info("Kubernetes configuration: mongo host: '{}'", this.myMongo);
         } else {
             this.myMongo = "mongo";
-            LOGGER.info("Non-Kubernetes configuration: mysql host: '{}'", this.myMongo);
+            LOGGER.info("Non-Kubernetes configuration: mongo host: '{}'", this.myMongo);
         }
     }
 
