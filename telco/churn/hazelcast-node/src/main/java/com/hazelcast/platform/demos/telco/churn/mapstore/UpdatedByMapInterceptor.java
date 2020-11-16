@@ -16,9 +16,11 @@
 
 package com.hazelcast.platform.demos.telco.churn.mapstore;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.map.EntryProcessor;
 import com.hazelcast.map.MapInterceptor;
 
@@ -41,15 +43,26 @@ public class UpdatedByMapInterceptor implements MapInterceptor {
     }
 
     /**
-     * <p>Pre-call intercept, eensure "{@code lastModifiedBy}" and
-     * "{@code lastModifiedDate}" are set if needed.
+     * <p>Pre-call intercept, ensure "{@code lastModifiedBy}" and
+     * "{@code lastModifiedDate}" are set.
      * </p>
      */
     @Override
     public Object interceptPut(Object oldValue, Object newValue) {
         LOGGER.trace("interceptPut({}, {})", oldValue, newValue);
-        LOGGER.error("interceptPut({}, {})", oldValue, newValue);
-        //FIXME potential amend newValue
+        if (newValue instanceof HazelcastJsonValue) {
+            try {
+                JSONObject json = new JSONObject(newValue.toString());
+                long now = System.currentTimeMillis();
+
+                json.put("lastModifiedBy", this.modifier);
+                json.put("lastModifiedDate", now);
+
+                return new HazelcastJsonValue(json.toString());
+            } catch (Exception exception) {
+                LOGGER.error("interceptPut('{}'), EXCEPTION: {}", newValue, exception.getMessage());
+            }
+        }
         return newValue;
     }
 

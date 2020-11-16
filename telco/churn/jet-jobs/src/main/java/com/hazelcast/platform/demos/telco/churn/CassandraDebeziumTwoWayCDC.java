@@ -244,10 +244,10 @@ public class CassandraDebeziumTwoWayCDC extends MyJobWrapper {
         stringBuilder.append(", \"callerMastId\" : \"" + callerMastId + "\"");
         stringBuilder.append(", \"callerTelno\" : \"" + callerTelno + "\"");
         stringBuilder.append(", \"createdBy\" : \"" + createdBy + "\"");
-        stringBuilder.append(", \"createdDate\" : \"" + createdDate);
+        stringBuilder.append(", \"createdDate\" : " + createdDate);
         stringBuilder.append(", \"durationSeconds\" : " + durationSeconds);
         stringBuilder.append(", \"lastModifiedBy\" : \"" + lastModifiedBy + "\"");
-        stringBuilder.append(", \"lastModifiedDate\" : \"" + lastModifiedDate);
+        stringBuilder.append(", \"lastModifiedDate\" : " + lastModifiedDate);
         stringBuilder.append(", \"startTimestamp\" : " + startTimestamp);
         stringBuilder.append(" }");
 

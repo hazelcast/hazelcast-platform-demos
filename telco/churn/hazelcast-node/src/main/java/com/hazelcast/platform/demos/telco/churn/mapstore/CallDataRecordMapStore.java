@@ -148,11 +148,15 @@ public class CallDataRecordMapStore implements MapStore<CallDataRecordKey, Hazel
         }
     }
 
+    /**
+     * <p>CDRs shouldn't be deleted from Hazelcast (could expire out if
+     * too many) and certainly shouldn't be deleted from system of
+     * record.
+     * </p>
+     */
     @Override
     public void delete(CallDataRecordKey key) {
-        LOGGER.trace("delete({})", key);
-        LOGGER.error("delete({})", key);
-        // TODO Auto-generated method stub
+        LOGGER.error("delete({}) should not be called", key);
     }
 
     /**
@@ -175,10 +179,33 @@ public class CallDataRecordMapStore implements MapStore<CallDataRecordKey, Hazel
     public void store(CallDataRecordKey key, HazelcastJsonValue value) {
         LOGGER.trace("store({}, {})", key, value);
         LOGGER.error("store({}, {})", key, value);
-        // TODO Auto-generated method stub
-        //FIXME ONLY SAVE IF INCOMING MODIFIED SAME AS PARM!
-        long now = System.currentTimeMillis();
-        LOGGER.error("store needs to add '{}' and '{}'", this.modifierFilter, now);
+
+        CallDataRecord callDataRecord = new CallDataRecord();
+        try {
+            JSONObject json = new JSONObject(value.toString());
+            callDataRecord.setId(json.getString("id"));
+            callDataRecord.setCallSuccessful(json.getBoolean("callSuccessful"));
+            callDataRecord.setCalleeMastId(json.getString("calleeMastId"));
+            callDataRecord.setCalleeTelno(json.getString("calleeTelno"));
+            callDataRecord.setCallerMastId(json.getString("callerMastId"));
+            callDataRecord.setCallerTelno(json.getString("callerTelno"));
+            callDataRecord.setCreatedBy(json.getString("createdBy"));
+            callDataRecord.setCreatedDate(json.getLong("createdDate"));
+            callDataRecord.setDurationSeconds(json.getInt("durationSeconds"));
+            callDataRecord.setLastModifiedBy(json.getString("lastModifiedBy"));
+            callDataRecord.setLastModifiedDate(json.getLong("lastModifiedDate"));
+            callDataRecord.setStartTimestamp(json.getLong("startTimestamp"));
+
+            if (!this.modifierFilter.equals(callDataRecord.getLastModifiedBy())) {
+                LOGGER.error("store({}, {}), saving change by '{}' when we are '{}'",
+                        key, value, callDataRecord.getLastModifiedBy(), this.modifierFilter);
+            }
+
+            this.callDataRecordRepository.save(callDataRecord);
+
+        } catch (Exception exception) {
+            LOGGER.error("store('{}', '{}'), EXCEPTION: {}", key, value, exception.getMessage());
+        }
     }
 
     /**

@@ -2,8 +2,12 @@
 
 # BACKGROUND SCRIPT, give Mongo some time to start then initiate CDC
 (
- sleep 3
+ sleep 10
  echo "$0: ::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+ echo "$0 : background script, start mongos"
+ echo TODO TODO TODO
+ echo TODO mongos --configdb churn/mongo:27019
+ echo TODO TODO TODO
  sleep 10
  echo "$0: ::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
 
