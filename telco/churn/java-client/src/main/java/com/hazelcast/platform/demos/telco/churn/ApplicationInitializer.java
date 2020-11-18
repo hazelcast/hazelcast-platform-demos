@@ -158,7 +158,7 @@ public class ApplicationInitializer {
                     personMap.submitToKeys(targetKeys, new MyXXXEntryProcessor());
 
             completionStage.thenAccept(map -> {
-                System.out.println((map.getClass()) + " map size ==" + map.size());
+                LOGGER.info("{} map size =={}", map.getClass(), map.size());
                 /*XXX
                 for (@SuppressWarnings("rawtypes") Map.Entry entry : map.entrySet()) {
                     System.out.println("Entry key1 " + entry.getKey().getClass());
@@ -180,9 +180,12 @@ public class ApplicationInitializer {
         //String query = "SELECT firstName from Person WHERE lastName = ‘Stevenson’";
         query = MyUtils.makeUTF8(query);
         try {
+            TimeUnit.SECONDS.sleep(1);
+            System.out.println("");
             System.out.println(query);
             SqlResult sqlResult = hazelcastInstance.getSql().execute(query);
             System.out.println(MyUtils.prettyPrintSqlResult(sqlResult));
+            System.out.println("");
         } catch (Exception e) {
             String message = String.format("getMap(%s) SQL '%s'", mapName, query);
             LOGGER.warn(message + ": " + e.getMessage());
