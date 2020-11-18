@@ -21,20 +21,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 /**
  * <p>Entry point, "{@code main()}" method.
  * </p>
+ * <p>We use module "{@code common-cassandra}" for domain object, but
+ * don't connect to Cassandra so exclude repository bean which would
+ * fail if instantiated.
+ * </p>
  */
 @SpringBootApplication(exclude = {
-        DataSourceAutoConfiguration.class,
-        CassandraAutoConfiguration.class,
-        HibernateJpaAutoConfiguration.class,
-        MongoAutoConfiguration.class
+        CassandraAutoConfiguration.class
         })
 @EnableConfigurationProperties(MyProperties.class)
 public class Application {

@@ -17,11 +17,6 @@
 package com.hazelcast.platform.demos.telco.churn;
 
 import java.util.concurrent.TimeUnit;
-import java.util.UUID;
-//XXX import java.util.Arrays;
-//XXX import java.util.List;
-//XXX import java.util.concurrent.CountDownLatch;
-//XXX import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
@@ -29,12 +24,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecord;
 
 /**
  * XXX
@@ -43,7 +40,6 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 public class ApplicationRunner implements CommandLineRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationRunner.class);
     private static final int DEFAULT_BATCH_SIZE = 100;
-    private static final int INDENT = 4;
     private static final long LOG_THRESHOLD = 10_000L;
     private static final int MAX_BATCH_SIZE = 16 * 1024;
 
@@ -52,6 +48,7 @@ public class ApplicationRunner implements CommandLineRunner {
     private static AtomicLong onFailureCount = new AtomicLong(0);
 
     private final MyCallback myCallback = new MyCallback();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private int batchSize = DEFAULT_BATCH_SIZE;
 
@@ -79,24 +76,38 @@ src/main/java/com/hazelcast/platform/demos/banking/trademonitor/ApplicationRunne
         LOGGER.info("Producing {} call records in a batch per second", this.batchSize);
 
         long count = 0;
+        long now = System.currentTimeMillis();
         long reportEvery = 1;
 
         // create some CDRs, wait, repeat
         try {
             while (true) {
                 for (int i = 0; i < this.batchSize; i++) {
-                    //FIXME CDR
-                    String id = UUID.randomUUID().toString();
-                    String value = "{account: \"" + i + "\", id: \"" + id + "\"}";
+
+                    int id = Integer.MIN_VALUE + i;
+
+                    CallDataRecord cdr = new CallDataRecord();
+                    cdr.setId("id" + id);
+                    cdr.setCallerTelno("telno" + id);
+                    cdr.setCallerMastId("i" + id);
+                    cdr.setCalleeTelno("i" + id);
+                    cdr.setCalleeMastId("i" + id);
+                    cdr.setDurationSeconds(0);
+                    cdr.setStartTimestamp(0L);
+                    cdr.setCallSuccessful(true);
+                    cdr.setCreatedBy(this.springApplicationName);
+                    cdr.setCreatedDate(now);
+                    cdr.setLastModifiedBy(this.springApplicationName);
+                    cdr.setLastModifiedDate(now);
 
                     // Report 0, 2, 4, 8, 16... until every 10,000
                     if (count == 0 || count % reportEvery == 0) {
                         if (reportEvery < LOG_THRESHOLD) {
                             reportEvery += reportEvery;
                         }
-                        this.write(value, count, true);
+                        this.write(cdr, count, true);
                     } else {
-                        this.write(value, count, false);
+                        this.write(cdr, count, false);
                     }
                     count++;
                 }
@@ -145,20 +156,21 @@ src/main/java/com/hazelcast/platform/demos/banking/trademonitor/ApplicationRunne
      * <p>Write a single object to Kafka.
      * </p>
      *
-     * @param value
+     * @param callDataRecord
      * @param count
      * @param logIt
      * @throws Exception
      */
-     private void write(String value, long count, boolean logIt) throws Exception {
-         JSONObject jsonObject = new JSONObject(value);
-         String key = jsonObject.getString("account");
+     private void write(CallDataRecord callDataRecord, long count, boolean logIt) throws Exception {
+         String key = "{ \"id\": \"" + callDataRecord.getId() + "\" }";
+         String value = objectMapper.writeValueAsString(callDataRecord);
 
-         int partition = key.hashCode() % MyConstants.KAFKA_TOPIC_CALLS_PARTITIONS;
+         int partition = callDataRecord.getId().hashCode() % MyConstants.KAFKA_TOPIC_CALLS_PARTITIONS;
+         partition = Math.abs(partition);
 
          if (logIt) {
              LOGGER.info("CDR {}: key '{}' partition {} JSON => '{}'",
-                     count, key, partition, jsonObject.toString(INDENT));
+                     count, key, partition, value);
          }
 
          ListenableFuture<SendResult<String, String>> sendResult =

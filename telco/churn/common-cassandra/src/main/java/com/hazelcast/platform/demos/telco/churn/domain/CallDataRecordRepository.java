@@ -18,6 +18,8 @@ package com.hazelcast.platform.demos.telco.churn.domain;
 
 import java.util.List;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.data.cassandra.repository.CassandraRepository;
 import org.springframework.data.cassandra.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Repository;
  * <p>The projection returns the domain object, with nulls for non-projected fields</p>
  */
 @Repository
+@ConditionalOnBean(CassandraTemplate.class)
 public interface CallDataRecordRepository extends CassandraRepository<CallDataRecord, String> {
 
     @Query("SELECT id, caller_telno FROM cdr")
