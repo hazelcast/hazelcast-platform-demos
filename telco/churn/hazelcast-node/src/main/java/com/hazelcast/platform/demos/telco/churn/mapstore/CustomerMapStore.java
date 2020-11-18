@@ -145,11 +145,15 @@ public class CustomerMapStore implements MapStore<String, HazelcastJsonValue> {
         }
     }
 
+    /**
+     * <p>Customers shouldn't be deleted from Hazelcast
+     * and certainly shouldn't be deleted from system of
+     * record.
+     * </p>
+     */
     @Override
     public void delete(String key) {
-        LOGGER.trace("delete({})", key);
-        LOGGER.error("delete({})", key);
-        // TODO Auto-generated method stub
+        LOGGER.error("delete({}) should not be called", key);
     }
 
     /**
@@ -168,11 +172,13 @@ public class CustomerMapStore implements MapStore<String, HazelcastJsonValue> {
         }
     }
 
+    /**
+     * <p>Reformat and save.
+     * </p>
+     */
     @Override
     public void store(String key, HazelcastJsonValue value) {
-        LOGGER.trace("store({}, {})", key, value);
-        LOGGER.error("store({}, {})", key, value);
-        // TODO Auto-generated method stub
+        LOGGER.debug("store({}, {})", key, value);
         //FIXME ONLY SAVE IF INCOMING MODIFIED SAME AS PARM!
         long now = System.currentTimeMillis();
         LOGGER.error("store needs to add '{}' and '{}'", this.modifierFilter, now);

@@ -21,6 +21,7 @@ import java.util.Map;
 
 import com.hazelcast.config.ClasspathYamlConfig;
 import com.hazelcast.config.Config;
+import com.hazelcast.config.EventJournalConfig;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MapStoreConfig;
 import com.hazelcast.config.NearCacheConfig;
@@ -43,6 +44,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ApplicationConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
+    private static final int CDR_JOURNAL_CAPACITY = 271 * 100_000;
 
     public ApplicationConfig(MyProperties myProperties) {
         // Already validated in Application.main
@@ -72,7 +74,15 @@ public class ApplicationConfig {
         cdrMapStoreConfig.setFactoryImplementation(myMapStoreFactory);
         cdrMapConfig.setMapStoreConfig(cdrMapStoreConfig);
 
+        // Keep a log of CDR changes, log has limited capacity but Jet can read
+        EventJournalConfig cdrEventJournalConfig = new EventJournalConfig();
+        cdrEventJournalConfig.setEnabled(true);
+        cdrEventJournalConfig.setCapacity(CDR_JOURNAL_CAPACITY);
+        cdrMapConfig.setEventJournalConfig(cdrEventJournalConfig);
+
         config.getMapConfigs().put(cdrMapConfig.getName(), cdrMapConfig);
+        LOGGER.info("Map '{}' has journal enabled with capacity {}",
+                cdrMapConfig.getName(), cdrMapConfig.getEventJournalConfig().getCapacity());
 
         // Customer records - Mongo
         MapConfig customerMapConfig = new MapConfig(MyConstants.IMAP_NAME_CUSTOMER);

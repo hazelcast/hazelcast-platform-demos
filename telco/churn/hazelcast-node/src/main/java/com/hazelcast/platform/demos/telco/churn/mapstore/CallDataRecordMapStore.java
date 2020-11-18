@@ -175,10 +175,13 @@ public class CallDataRecordMapStore implements MapStore<CallDataRecordKey, Hazel
         }
     }
 
+    /**
+     * <p>Reformat and save.
+     * </p>
+     */
     @Override
     public void store(CallDataRecordKey key, HazelcastJsonValue value) {
-        LOGGER.trace("store({}, {})", key, value);
-        LOGGER.error("store({}, {})", key, value);
+        LOGGER.debug("store({}, {})", key, value);
 
         CallDataRecord callDataRecord = new CallDataRecord();
         try {
