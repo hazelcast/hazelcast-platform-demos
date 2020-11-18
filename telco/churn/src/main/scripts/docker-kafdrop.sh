@@ -25,8 +25,8 @@ DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
 MY_BOOTSTRAP_SERVERS=kafka-broker0:9092,kafka-broker1:9093,kafka-broker2:9094
 
-# External port 8084, save 8083 for Kafka Connect
-CMD="docker run -e KAFKA_BROKERCONNECT=$MY_BOOTSTRAP_SERVERS -p 8084:9000 --name=${MODULE} --network=${PROJECT} ${DOCKER_IMAGE}"
+# External port 8082
+CMD="docker run -e KAFKA_BROKERCONNECT=$MY_BOOTSTRAP_SERVERS -p 8082:9000 --name=${MODULE} --network=${PROJECT} ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD

@@ -28,7 +28,6 @@ import com.hazelcast.map.EntryProcessor;
 import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordKey;
 
 /**
- * XXX
  * FIXME remove this class, just to test
  */
 public class MyXXXEntryProcessor2 implements EntryProcessor<CallDataRecordKey, HazelcastJsonValue, String>, Serializable {

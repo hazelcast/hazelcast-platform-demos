@@ -26,7 +26,6 @@ import com.hazelcast.map.EntryProcessor;
 //FIXME import com.hazelcast.nio.serialization.GenericRecord;
 
 /**
- * XXX
  * FIXME remove this class, just to test Generic Record
  */
 public class MyXXXEntryProcessor implements EntryProcessor<Integer, Object, String>, Serializable {

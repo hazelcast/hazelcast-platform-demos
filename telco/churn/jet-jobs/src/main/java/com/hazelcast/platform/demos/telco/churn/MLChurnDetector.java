@@ -22,17 +22,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hazelcast.jet.config.JobConfig;
+import com.hazelcast.jet.pipeline.JournalInitialPosition;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.Sinks;
-import com.hazelcast.jet.pipeline.test.TestSources;
+import com.hazelcast.jet.pipeline.Sources;
 import com.hazelcast.jet.python.PythonServiceConfig;
-import com.hazelcast.jet.python.PythonTransforms;
+//import com.hazelcast.jet.python.PythonTransforms;
 
 /**
  * XXX
@@ -64,11 +64,11 @@ public class MLChurnDetector extends MyJobWrapper {
         Pipeline pipeline = Pipeline.create();
 
         pipeline
-        //XXX.readFrom(TestSources.itemStream(1)).withoutTimestamps()
-        .readFrom(TestSources.items(List.of("hello", "world")))
+        .readFrom(Sources.mapJournal(MyConstants.IMAP_NAME_CDR,
+                JournalInitialPosition.START_FROM_OLDEST)).withoutTimestamps()
         //.map(event -> event.getClass().toString())
         //XXX .apply(PythonTransforms.mapUsingPython(getPythonServiceConfig(PYTHON_MODULE)))
-        .apply(PythonTransforms.mapUsingPythonBatch(getPythonServiceConfig(PYTHON_MODULE)))
+        //XXX.apply(PythonTransforms.mapUsingPythonBatch(getPythonServiceConfig(PYTHON_MODULE)))
         .writeTo(Sinks.logger());
 
         return pipeline;
