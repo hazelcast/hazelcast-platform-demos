@@ -36,6 +36,7 @@ import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.map.IMap;
 import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordKey;
+import com.hazelcast.sql.SqlResult;
 //FIXME import com.hazelcast.sql.SqlResult;
 import com.hazelcast.topic.ITopic;
 
@@ -57,6 +58,7 @@ public class ApplicationInitializer {
      * <p>XXX
      * </p>
      */
+    @SuppressWarnings("unchecked")
     @Bean
     public CommandLineRunner commandLineRunner() {
         return args -> {
@@ -177,17 +179,15 @@ public class ApplicationInitializer {
         String query = "SELECT firstName FROM Person WHERE lastName = “Stevenson”";
         //String query = "SELECT firstName from Person WHERE lastName = ‘Stevenson’";
         query = MyUtils.makeUTF8(query);
-        //FIXME
-        LOGGER.error("Needs IMDG 4.1 for {}", query);
-        /*FIXME needs IMDG 4.1
         try {
+            System.out.println(query);
             SqlResult sqlResult = hazelcastInstance.getSql().execute(query);
             System.out.println(MyUtils.prettyPrintSqlResult(sqlResult));
         } catch (Exception e) {
             String message = String.format("getMap(%s) SQL '%s'", mapName, query);
             LOGGER.warn(message + ": " + e.getMessage());
             LOGGER.error("XXX", e);
-        }*/
+        }
     }
 
     /**
