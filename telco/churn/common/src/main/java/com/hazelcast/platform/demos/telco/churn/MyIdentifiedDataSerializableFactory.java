@@ -24,10 +24,13 @@ import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.platform.demos.telco.churn.security.MyCredentials;
 
 /**
- * XXX Required?
  * <p>A factory to create objects that are
  * {@link com.hazelcast.nio.serialization.IdentifiedDataSerializable IdentifiedDataSerializable}
  * based on the type code received.
+ * </p>
+ * <p>This is not currently used. It is present to demonstrate how credentials could
+ * be provided from non-Java clients.
+ * </p>
  */
 public class MyIdentifiedDataSerializableFactory implements DataSerializableFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MyIdentifiedDataSerializableFactory.class);

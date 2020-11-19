@@ -50,20 +50,27 @@ public class JpaInitializer implements CommandLineRunner {
      */
     @Override
     public void run(String... args) throws Exception {
-        LOGGER.debug("BEFORE: count()=={}", this.tariffRepository.count());
+        long before = this.tariffRepository.count();
+        LOGGER.info("BEFORE: count()=={}", before);
 
         int year = LocalDate.now().getYear();
 
         List<String> listNow = this.tariffRepository.findThisYearsTariffs(year);
         List<String> listFuture = this.tariffRepository.findThisYearsTariffs(year + 1);
 
+        int insert = 0;
         if ((listNow.size() + listFuture.size()) != 0) {
             LOGGER.error("Tariffs already loaded, ignoring");
         } else {
-            this.saveTariffs(year);
+            insert = this.saveTariffs(year);
         }
 
-        LOGGER.debug("AFTER:  count()=={}", this.tariffRepository.count());
+        long after = this.tariffRepository.count();
+        if ((before + insert) == after) {
+            LOGGER.info("AFTER:  count()=={}", after);
+        } else {
+            LOGGER.warn("AFTER:  count()=={}, but {} inserts", after, insert);
+        }
     }
 
     /**
@@ -72,7 +79,7 @@ public class JpaInitializer implements CommandLineRunner {
      *
      * @param year Base for offset.
      */
-    private void saveTariffs(int currentYear) {
+    private int saveTariffs(int currentYear) {
         int count = 0;
         Set<Integer> years = new TreeSet<>();
 
@@ -96,6 +103,7 @@ public class JpaInitializer implements CommandLineRunner {
         }
 
         LOGGER.info("Wrote {} records for years {}", count, years);
+        return count;
     }
 
 }

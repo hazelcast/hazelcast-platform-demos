@@ -66,8 +66,7 @@ public class MongoDebeziumTwoWayCDC extends MyJobWrapper {
         pipeline
         .readFrom(KafkaSources.<String, HazelcastJsonValue>kafka(
                 kafkaConnectionProperties, MyConstants.KAFKA_TOPIC_MONGO)).withoutTimestamps()
-        //FIXME Which name to exclude, include
-        //FIXME Using MAP with *REMOTE* client ?
+        //FIXME Sink to Customer map
         .writeTo(Sinks.logger());
 
         return pipeline;

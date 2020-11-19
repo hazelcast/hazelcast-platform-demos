@@ -25,9 +25,9 @@ import com.hazelcast.platform.demos.telco.churn.MyConstants;
 import com.hazelcast.security.Credentials;
 
 /**
- * XXX Required?
- * XXX say must be IDS so native clients can use
- * TODO could use SimpleTokenCredentials instead ?
+ * <p>This is not currently used. It is present to demonstrate how credentials could
+ * be provided from non-Java clients.
+ * </p>
  */
 public class MyCredentials implements Credentials, IdentifiedDataSerializable {
     private static final long serialVersionUID = 1L;

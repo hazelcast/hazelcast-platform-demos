@@ -35,9 +35,9 @@ public class MyLoggingSecurityInterceptor implements SecurityInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(MyLoggingSecurityInterceptor.class);
 
     /**
-     * <p>Logging specific operations, here just what is happening on topics.
+     * <p>Logging specific operations, here just what is happening with topics
+     * and queries.
      * </p>
-     * FIXME Add 'sqlService'
      *
      * @param credentials From the client
      * @param objectType Which server service, "{@code mapService}", "{@code topicService}", etc
@@ -52,22 +52,13 @@ public class MyLoggingSecurityInterceptor implements SecurityInterceptor {
                     String objectName, String methodName,
                     Parameters parameters) throws AccessControlException {
 
-        if (objectType.endsWith("topicService")) {
-            LOGGER.warn("before({},{}, {}, {}, {})", credentials, objectType,
+        if (objectType.endsWith("topicService") || objectType.endsWith("sqlService")) {
+            LOGGER.info("before({},{}, {}, {}, {})", credentials, objectType,
             objectName, methodName, parameters);
             Iterator iterator = parameters.iterator();
             while (iterator.hasNext()) {
                 Object param = iterator.next();
-                LOGGER.warn("  ==> PARAMS {}", param);
-            }
-        }
-        if (objectType.endsWith("sqlService")) {
-            LOGGER.warn("before({},{}, {}, {}, {})", credentials, objectType,
-            objectName, methodName, parameters);
-            Iterator iterator = parameters.iterator();
-            while (iterator.hasNext()) {
-                Object param = iterator.next();
-                LOGGER.warn("  ==> PARAMS {}", param);
+                LOGGER.info("  ==> PARAMS {}", param);
             }
         }
     }

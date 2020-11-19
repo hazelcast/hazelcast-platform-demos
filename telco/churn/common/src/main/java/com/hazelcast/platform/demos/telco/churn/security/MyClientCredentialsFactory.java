@@ -98,8 +98,6 @@ public class MyClientCredentialsFactory implements ICredentialsFactory {
 
             LOGGER.info("newCredentials => {}", token);
             this.myCredentials = new SimpleTokenCredentials(token.getBytes(StandardCharsets.UTF_8));
-            //XXX this.myCredentials = new UsernamePasswordCredentials("n", "s");
-            //FIXME temp
             LOGGER.info("newCredentials => '{}'", this.myCredentials.getName());
         }
         return this.myCredentials;

@@ -26,9 +26,11 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 import com.hazelcast.platform.demos.telco.churn.domain.Customer;
 import com.hazelcast.platform.demos.telco.churn.domain.CustomerRepository;
+import com.hazelcast.platform.demos.telco.churn.testdata.CustomerTestdata;
+import com.hazelcast.platform.demos.telco.churn.testdata.TariffTestdata;
 
 /**
- * <p>Inserts customer records into Mongo
+ * <p>Inserts 100 customer records into Mongo
  * </p>
  */
 @Configuration
@@ -42,38 +44,46 @@ public class MongoInitializer implements CommandLineRunner {
     private String springApplicationName;
 
     /**
-     * XXX
+     * <p>Generate one customer from each combination of
+     * first name and last name.
+     * </p>
      */
     @Override
     public void run(String... args) throws Exception {
-        LOGGER.debug("BEFORE: count()=={}", this.customerRepository.count());
-
         long now = System.currentTimeMillis();
+        long before = this.customerRepository.count();
+        LOGGER.info("BEFORE: count()=={}", before);
 
-        Customer c0 = new Customer();
-        c0.setAccountType("?");
-        c0.setFirstName("n");
-        c0.setLastName("s");
-        c0.setId("b");
-        c0.setCreatedBy(this.springApplicationName);
-        c0.setCreatedDate(now);
-        c0.setLastModifiedBy(this.springApplicationName);
-        c0.setLastModifiedDate(now);
-        this.customerRepository.save(c0);
+        // Alternate tariffs from current year
+        Object[][] tariffs = TariffTestdata.getTariffs();
+        String[] tariffName = new String[2];
+        tariffName[0] = tariffs[0][1].toString();
+        tariffName[1] = tariffs[1][1].toString();
 
-        Customer c1 = new Customer();
-        c1.setAccountType("?");
-        c1.setFirstName("neil");
-        c1.setLastName("stevenson");
-        c1.setId("a");
-        c1.setCreatedBy(this.springApplicationName);
-        c1.setCreatedDate(now);
-        c1.setLastModifiedBy(this.springApplicationName);
-        c1.setLastModifiedDate(now);
-        this.customerRepository.save(c1);
+        int insert = 0;
+        for (String firstName : CustomerTestdata.getFirstNames()) {
+            for (String lastName : CustomerTestdata.getLastNames()) {
+                Customer customer = new Customer();
+                customer.setAccountType(tariffName[insert % 2]);
+                customer.setFirstName(firstName);
+                customer.setLastName(lastName);
+                customer.setId(MyUtils.getAccountId(insert));
+                customer.setCreatedBy(this.springApplicationName);
+                customer.setCreatedDate(now);
+                customer.setLastModifiedBy(this.springApplicationName);
+                customer.setLastModifiedDate(now);
 
+                this.customerRepository.save(customer);
+                insert++;
+            }
+        }
 
-        LOGGER.debug("AFTER:  count()=={}", this.customerRepository.count());
+        long after = this.customerRepository.count();
+        if ((before + insert) == after) {
+            LOGGER.info("AFTER:  count()=={}", after);
+        } else {
+            LOGGER.warn("AFTER:  count()=={}, but {} inserts", after, insert);
+        }
     }
 
 }

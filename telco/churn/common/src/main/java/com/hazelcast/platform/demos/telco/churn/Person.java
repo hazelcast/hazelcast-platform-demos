@@ -25,11 +25,10 @@ import com.hazelcast.nio.serialization.PortableWriter;
 /**
  * XXX Temporary for SQL and GenericRecord.
  */
-public class Person implements /*XXX java.io.Serializable*/ Portable {
+public class Person implements Portable {
     /**
      *
      */
-    //private static final long serialVersionUID = 1L;
     public static final int NINENINENINE = 999;
     private String firstName;
     private String lastName;

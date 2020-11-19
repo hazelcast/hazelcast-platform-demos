@@ -1,11 +1,13 @@
 #
 .classpath
 .factorypath
+.idea
 .project
 .settings
 .vscode
 #
 *.code-workspace
+*.iml
 #
 dependency-reduced-pom.xml
 target

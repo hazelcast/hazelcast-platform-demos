@@ -37,7 +37,6 @@ import com.hazelcast.jet.JetInstance;
 import com.hazelcast.map.IMap;
 import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordKey;
 import com.hazelcast.sql.SqlResult;
-//FIXME import com.hazelcast.sql.SqlResult;
 import com.hazelcast.topic.ITopic;
 
 /**
@@ -47,7 +46,6 @@ import com.hazelcast.topic.ITopic;
 @Configuration
 public class ApplicationInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInitializer.class);
-    private static final long TEN_MINUTES = 600L;
 
     @Value("${spring.application.name}")
     private String springApplicationName;
@@ -118,8 +116,6 @@ public class ApplicationInitializer {
             LOGGER.info("-=-=-=  MIDDLE  {}  MIDDLE  =-=-=-=-", hazelcastInstance.getName());
             this.beta(hazelcastInstance);
             LOGGER.info("-=-=-=-=-  END  {}  END  -=-=-=-=-=-", hazelcastInstance.getName());
-            TimeUnit.SECONDS.sleep(TEN_MINUTES);
-            hazelcastInstance.shutdown();
         };
     }
 
@@ -159,13 +155,12 @@ public class ApplicationInitializer {
 
             completionStage.thenAccept(map -> {
                 LOGGER.info("{} map size =={}", map.getClass(), map.size());
-                /*XXX
                 for (@SuppressWarnings("rawtypes") Map.Entry entry : map.entrySet()) {
                     System.out.println("Entry key1 " + entry.getKey().getClass());
                     System.out.println("Entry key2 " + entry.getKey());
                     System.out.println("Entry val1 " + entry.getValue().getClass());
                     System.out.println("Entry val2 " + entry.getValue());
-                }*/
+                }
             });
 
         } catch (Exception e) {

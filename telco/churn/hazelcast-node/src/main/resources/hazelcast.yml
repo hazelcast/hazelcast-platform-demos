@@ -40,3 +40,6 @@ hazelcast:
     data-serializable-factories:
       - factory-id: 1000
         class-name: com.hazelcast.platform.demos.telco.churn.MyIdentifiedDataSerializableFactory
+    portable-factories:
+      - factory-id: 2000
+        class-name: com.hazelcast.platform.demos.telco.churn.MyPortableFactory  

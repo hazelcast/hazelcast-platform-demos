@@ -16,6 +16,7 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
+import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -43,6 +44,8 @@ public class MyUtils {
     private static final String[] ALPHABETS = { ALPHABET_UC, ALPHABET_LC };
     private static final int ALPHABET_LENGTH = ALPHABET_UC.length();
     private static final int HALF_ALPHABET_LENGTH = ALPHABET_LENGTH / 2;
+    private static final DecimalFormat PADDED_SIX_ZEROES = new DecimalFormat("000000");
+    private static final DecimalFormat PADDED_TEN_ZEROES = new DecimalFormat("0000000000");
 
     /**
      * <p>The classic 13 character rotation encryption.
@@ -196,4 +199,74 @@ public class MyUtils {
         return stringBuilder.toString();
     }
 
+    /**
+     * <p>Create an account id, padded and with the correct prefix.
+     * </p>
+     *
+     * @param Actual account number
+     * @return Same, formatted
+     */
+    public static String getAccountId(int i) {
+        return "AC" + PADDED_SIX_ZEROES.format(i);
+    }
+
+    /**
+     * <p>Manufacture rather than lookup a phone number for an account,
+     * using a deterministic creation method.
+     * </p>
+     *
+     * @param i
+     * @return
+     */
+    @SuppressWarnings("checkstyle:magicnumber")
+    public static String getTelno(Integer i) {
+        String atLeastTen = makeTenDigits(i);
+
+        // Don't want leading zeroes
+        atLeastTen = atLeastTen.substring(atLeastTen.length() - 10);
+        if (atLeastTen.charAt(0) == '0') {
+            atLeastTen = atLeastTen.charAt(9) + atLeastTen;
+            if (atLeastTen.charAt(0) == '0') {
+                atLeastTen = "5" + atLeastTen;
+            }
+        }
+
+        // US style telno format
+        return "(" + atLeastTen.substring(0, 3) + ")-"
+                + atLeastTen.substring(3, 6) + "-"
+                + atLeastTen.substring(6, 10);
+    }
+
+    /**
+     * <p>Generate the mast for the call. Each person only calls
+     * from a fixed subset of masts in their area.
+     * <p>
+     *
+     * @param caller
+     * @param call
+     * @return
+     */
+    @SuppressWarnings("checkstyle:magicnumber")
+    public static String getMastId(int caller, int call) {
+        int mast = (caller * caller) + ((call * call) % (caller + 1));
+
+        String atLeastTen = makeTenDigits(mast);
+
+        return "MAST" + atLeastTen.substring(4, 10);
+    }
+
+    /**
+     * <p>Turn a number into a String, but try to avoid many zeroes
+     * but hopefully generating other digits.
+     * </p>
+     *
+     * @param i
+     * @return
+     */
+    private static String makeTenDigits(int i) {
+        long l = Integer.toUnsignedLong(String.valueOf(Integer.MAX_VALUE - (i * i)).hashCode());
+        l = Math.abs((l * l) + l);
+
+        return PADDED_TEN_ZEROES.format(l);
+    }
 }
