@@ -102,8 +102,6 @@ public class CassandraInitializer implements CommandLineRunner {
         for (int call = 0 ; call < calls ; call++) {
 
             CallDataRecord cdr = new CallDataRecord();
-            UUID uuid = new UUID(Long.valueOf(account), Long.valueOf(call));
-            cdr.setId(uuid.toString());
 
             cdr.setCallerTelno(myTelno);
             cdr.setCallerMastId(MyUtils.getMastId(account, call));
@@ -123,6 +121,9 @@ public class CassandraInitializer implements CommandLineRunner {
             long when = callDateTime.atZone(ZoneId.systemDefault()).toEpochSecond();
 
             cdr.setStartTimestamp(when);
+
+            UUID uuid = new UUID(Long.valueOf(account), Long.valueOf(when));
+            cdr.setId(uuid.toString());
 
             // Fake every 10th call as unsuccessful.
             if (call % TEN == 0) {

@@ -84,6 +84,11 @@
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>net.minidev</groupId>
+			<artifactId>json-smart</artifactId>
+		</dependency>
+
 		<!-- Validates configuration properties -->
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>

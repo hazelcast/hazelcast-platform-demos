@@ -21,12 +21,15 @@ import java.util.UUID;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.json.JSONObject;
 
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.jet.config.JobConfig;
+import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.kafka.KafkaSources;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.Sinks;
+import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordKey;
 
 /**
  * <p>A job to simply upload from Kafka into Hazelcast.
@@ -34,6 +37,12 @@ import com.hazelcast.jet.pipeline.Sinks;
  * <pre>
  *                +------( 1 )------+
  *                |  Kafka Source   |
+ *                +-----------------+
+ *                         |
+ *                         |
+ *                         |
+ *                +------( 3 )------+
+ *                |  Reformat Key   |
  *                +-----------------+
  *                         |
  *                         |
@@ -51,6 +60,13 @@ import com.hazelcast.jet.pipeline.Sinks;
  * Kafka source
  * </p>
  * <p>Read all messages from the beginning from a Kafka topic.
+ * </p>
+ * </li>
+ * <li>
+ * <p>
+ * Reformat key
+ * </p>
+ * <p>Make the compound key from JSON fields.
  * </p>
  * </li>
  * <li>
@@ -96,6 +112,12 @@ public class KafkaIngest extends MyJobWrapper {
         pipeline
         .readFrom(KafkaSources.<String, HazelcastJsonValue>kafka(
                 kafkaConnectionProperties, MyConstants.KAFKA_TOPIC_CALLS_NAME)).withoutTimestamps()
+        .map(entry -> {
+            JSONObject jsonObject = new JSONObject(entry.getValue().toString());
+            CallDataRecordKey newKey = new CallDataRecordKey();
+            newKey.setCsv(jsonObject.getString("callerTelno") + "," + jsonObject.getString("id"));
+            return Tuple2.tuple2(newKey, entry.getValue());
+        })
         .writeTo(Sinks.map(MyConstants.IMAP_NAME_CDR));
 
         return pipeline;

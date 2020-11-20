@@ -67,7 +67,7 @@ public class MongoInitializer implements CommandLineRunner {
                 customer.setAccountType(tariffName[insert % 2]);
                 customer.setFirstName(firstName);
                 customer.setLastName(lastName);
-                customer.setId(MyUtils.getAccountId(insert));
+                customer.setId(MyUtils.getTelno(insert));
                 customer.setCreatedBy(this.springApplicationName);
                 customer.setCreatedDate(now);
                 customer.setLastModifiedBy(this.springApplicationName);

@@ -31,20 +31,20 @@
 
 		<!-- Version dependencies - ${project.version} should track Hazelcast version -->
                 <cassandra-driver.version>3.5.0</cassandra-driver.version>
-                <debezium-connector-cassandra.version>1.4.0-SNAPSHOT</debezium-connector-cassandra.version>
                 <debezium-connector-cassandra.version>1.4.0.Alpha1</debezium-connector-cassandra.version>
                 <debezium-connector-mongodb.version>1.3.1.Final</debezium-connector-mongodb.version>
 		<java-annotation.version>1.3.2</java-annotation.version>
 		<guava.version>29.0-jre</guava.version>
                 <!-- Matches banking/credit-value-adjustment/cpp/Dockerfile2 -->
 		<grpc.version>1.31.1</grpc.version>
-		<hazelcast.version>4.1</hazelcast.version>
+		<hazelcast.version>4.1.1-SNAPSHOT</hazelcast.version>
 		<hazelcast-jet.version>4.4-SNAPSHOT</hazelcast-jet.version>
 		<hazelcast-jet-spring-boot-starter.version>2.0.0</hazelcast-jet-spring-boot-starter.version>
 		<hazelcast-kubernetes.version>2.0.2</hazelcast-kubernetes.version>
 		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
 		<jackson.version>2.10.2</jackson.version>
 		<json.version>20190722</json.version>
+                <json-smart.version>2.3</json-smart.version>
 		<junit.version>4.13.1</junit.version>
 		<jython.version>2.7.2rc1</jython.version>
 		<kafka-clients.version>2.4.0</kafka-clients.version>
@@ -54,7 +54,7 @@
                 <!-- Run same version with 'protoc - -grpc_out=. - -plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin' 
                      banking/credit-value-adjustment/common/src/main/proto/JetToCpp.proto -->
 		<protobuf.version>3.12.2</protobuf.version>
-		<spring-boot.version>2.3.5.RELEASE</spring-boot.version>
+		<spring-boot.version>2.3.6.RELEASE</spring-boot.version>
 		<springfox-swagger.version>2.9.2</springfox-swagger.version>
 
 		<!-- Plugins -->
@@ -172,6 +172,11 @@
 				<version>${hazelcast-jet.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>com.hazelcast.jet</groupId>
+				<artifactId>hazelcast-jet-sql</artifactId>
+				<version>${hazelcast-jet.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>com.hazelcast.jet.contrib</groupId>
 				<artifactId>hazelcast-jet-spring-boot-starter</artifactId>
 				<version>${hazelcast-jet-spring-boot-starter.version}</version>
@@ -203,6 +208,12 @@
     	        <groupId>javax.annotation</groupId>
         	    <artifactId>javax.annotation-api</artifactId>
         	    <version>${java-annotation.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>net.minidev</groupId>
+				<artifactId>json-smart</artifactId>
+				<version>${json-smart.version}</version>
 			</dependency>
 
 			<dependency>

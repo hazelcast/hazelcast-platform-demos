@@ -42,7 +42,6 @@ import com.hazelcast.platform.demos.telco.churn.testdata.CustomerTestdata;
 @Configuration
 public class ApplicationRunner implements CommandLineRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationRunner.class);
-    private static final int DEFAULT_BATCH_SIZE = 100;
     private static final long LOG_THRESHOLD = 60L;
     private static final int FIVE = 5;
     private static final int TEN = 10;
@@ -53,8 +52,6 @@ public class ApplicationRunner implements CommandLineRunner {
 
     private final MyCallback myCallback = new MyCallback();
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    private int batchSize = DEFAULT_BATCH_SIZE;
 
     @Value("${spring.application.name}")
     private String springApplicationName;
@@ -74,7 +71,7 @@ public class ApplicationRunner implements CommandLineRunner {
         int accounts = CustomerTestdata.getFirstNames().length
                 * CustomerTestdata.getLastNames().length;
 
-        LOGGER.info("Producing {} call records one per second", this.batchSize);
+        LOGGER.info("Producing one call record per second");
 
         int insert = 0;
         long reportEvery = 1;
@@ -133,8 +130,6 @@ public class ApplicationRunner implements CommandLineRunner {
      */
     private CallDataRecord makeCallDataRecord(int account, int accounts, long now, int call) {
         CallDataRecord cdr = new CallDataRecord();
-        UUID uuid = new UUID(Long.valueOf(account), Long.valueOf(call));
-        cdr.setId(uuid.toString());
 
         String myTelno = MyUtils.getTelno(account);
         cdr.setCallerTelno(myTelno);
@@ -157,6 +152,9 @@ public class ApplicationRunner implements CommandLineRunner {
         // Start time is before now, based on call duration plus a lag
         long when = now - ((cdr.getDurationSeconds() + FIVE) * MILLIS_TO_SECONDS);
         cdr.setStartTimestamp(when);
+
+        UUID uuid = new UUID(Long.valueOf(account), Long.valueOf(when));
+        cdr.setId(uuid.toString());
 
         cdr.setCreatedBy(this.springApplicationName);
         cdr.setCreatedDate(now);

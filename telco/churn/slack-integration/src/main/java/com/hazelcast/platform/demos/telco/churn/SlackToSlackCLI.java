@@ -20,9 +20,9 @@ import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
-import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.function.BiFunctionEx;
 import com.hazelcast.function.FunctionEx;
+import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.datamodel.Tuple2;
 
 import org.slf4j.Logger;
@@ -134,9 +134,9 @@ public class SlackToSlackCLI {
      * in client-server mode.
      * </p>
      */
-    private static BiFunctionEx<? super HazelcastInstance, ? super Tuple2<Boolean, String>, ? extends CompletableFuture<String>>
+    private static BiFunctionEx<? super JetInstance, ? super Tuple2<Boolean, String>, ? extends CompletableFuture<String>>
         mapAsyncSqlFn() {
-        return (hazelcastInstance, tuple2) -> {
+        return (jetInstance, tuple2) -> {
             return CompletableFuture.supplyAsync(new Supplier<String>() {
                 @Override
                 public String get() {
@@ -147,7 +147,7 @@ public class SlackToSlackCLI {
                     stringBuilder.append("Query: ").append(query).append(MyUtils.NEWLINE);
 
                     try {
-                        SqlResult sqlResult = hazelcastInstance.getSql().execute(query);
+                        SqlResult sqlResult = jetInstance.getSql().execute(query);
 
                         stringBuilder.append(MyUtils.prettyPrintSqlResult(sqlResult));
                     } catch (Exception e) {
@@ -172,8 +172,8 @@ public class SlackToSlackCLI {
     public static Pipeline buildPipeline(Properties properties, String projectName) {
         String channel = properties.getProperty(MyConstants.SLACK_CHANNEL_NAME);
 
-        ServiceFactory<?, HazelcastInstance> hazelcastInstanceService =
-                ServiceFactories.sharedService(ctx -> ctx.jetInstance().getHazelcastInstance());
+        ServiceFactory<?, JetInstance> jetInstanceService =
+                ServiceFactories.sharedService(ctx -> ctx.jetInstance());
 
         Pipeline pipeline = Pipeline.create();
 
@@ -202,7 +202,7 @@ public class SlackToSlackCLI {
         StreamStage<String> handledInput =
                 possibleSqlStatement
                 .filter(tuple2 -> tuple2.f0())
-                .mapUsingServiceAsync(hazelcastInstanceService, mapAsyncSqlFn())
+                .mapUsingServiceAsync(jetInstanceService, mapAsyncSqlFn())
                 .setLocalParallelism(1)
                 .setName("is-an-sql-statement");
 
