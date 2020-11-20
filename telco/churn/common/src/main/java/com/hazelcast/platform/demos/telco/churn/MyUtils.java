@@ -24,6 +24,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.Job;
 import com.hazelcast.jet.core.JobStatus;
@@ -37,6 +40,7 @@ import com.hazelcast.sql.SqlRowMetadata;
  * </p>
  */
 public class MyUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MyUtils.class);
     public static final String NEWLINE = System.getProperty("line.separator");
 
     private static final String ALPHABET_UC = "abcdefghijklmnopqrstuvwxyz".toUpperCase(Locale.ROOT);
@@ -167,6 +171,11 @@ public class MyUtils {
      * @return
      */
     public static String prettyPrintSqlResult(SqlResult sqlResult) {
+        if (sqlResult.isRowSet()) {
+            LOGGER.error("prettyPrintSqlResult() called for rowSet");
+            return "sqlResult.isRowSet()==true" + NEWLINE;
+        }
+
         StringBuilder stringBuilder = new StringBuilder();
         String format = "%15s";
 
