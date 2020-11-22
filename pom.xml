@@ -54,6 +54,8 @@
                 <!-- Run same version with 'protoc - -grpc_out=. - -plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin' 
                      banking/credit-value-adjustment/common/src/main/proto/JetToCpp.proto -->
 		<protobuf.version>3.12.2</protobuf.version>
+	 	<!-- See https://github.com/hazelcast/hazelcast-jet-contrib/issues/99 -->
+		<spring-boot.version>2.4.0</spring-boot.version>
 		<spring-boot.version>2.3.6.RELEASE</spring-boot.version>
 		<springfox-swagger.version>2.9.2</springfox-swagger.version>
 
