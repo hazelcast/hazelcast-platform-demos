@@ -68,6 +68,10 @@ public class ApplicationInitializer {
             if (this.myProperties.getInitSize() > currentSize) {
                 LOGGER.info("Cluster size {}, not initializing until {}", currentSize, this.myProperties.getInitSize());
             } else {
+                // For SQL against Kafka
+                var bootstrapServers = this.myProperties.getBootstrapServers();
+                LOGGER.debug("Kafka brokers: {}", bootstrapServers);
+                this.kafkaDefine(bootstrapServers);
                 this.createNeededObjects();
                 this.launchNeededJobs(isLocalhost);
             }
@@ -138,6 +142,44 @@ public class ApplicationInitializer {
      * <p>
      */
     private void launchNeededJobs(boolean isLocalhost) {
+    }
+    /**
+     * <p>Define Kafka streams so can be directly used as a
+     * querying source by SQL.
+     * </p>
+     *
+     * @param bootstrapServers
+     */
+    private void kafkaDefine(String bootstrapServers) {
+        // Since only run once, don't need 'CREATE OR REPLACE'
+        String definition = "CREATE EXTERNAL MAPPING public "
+                + MyConstants.KAFKA_TOPIC_CALLS_NAME
+                + " ( "
+                + " id           VARCHAR, "
+                + " callerTelno  VARCHAR, "
+                + " callerMastId VARCHAR, "
+                + " calleeTelno  VARCHAR, "
+                + " calleeMastId VARCHAR, "
+                + " startTimestamp BIGINT, "
+                + " durationSeconds INTEGER, "
+                + " callSuccessful BOOLEAN, "
+                + " createdBy VARCHAR, "
+                + " createdDate BIGINT, "
+                + " lastModifiedBy VARCHAR, "
+                + " lastModifiedDate BIGINT "
+                + ") "
+                + "TYPE Kafka "
+                + "OPTIONS ( "
+                + " valueFormat 'json',"
+                + " \"auto.offset.reset\" 'earliest',"
+                + " \"bootstrap.servers\" '" + bootstrapServers + "'"
+                + ")";
+        LOGGER.info("Definition '{}'", definition);
+        try {
+            this.jetInstance.getSql().execute(definition);
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
+        }
     }
 
 }
