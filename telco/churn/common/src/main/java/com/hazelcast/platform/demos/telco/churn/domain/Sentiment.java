@@ -69,4 +69,35 @@ public class Sentiment implements Portable {
         writer.writeDouble("previous", this.previous);
     }
 
+    // Generated code below
+
+    public LocalDateTime getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(LocalDateTime updated) {
+        this.updated = updated;
+    }
+
+    public double getCurrent() {
+        return current;
+    }
+
+    public void setCurrent(double current) {
+        this.current = current;
+    }
+
+    public double getPrevious() {
+        return previous;
+    }
+
+    public void setPrevious(double previous) {
+        this.previous = previous;
+    }
+
+    @Override
+    public String toString() {
+        return "Sentiment [updated=" + updated + ", current=" + current + ", previous=" + previous + "]";
+    }
+
 }

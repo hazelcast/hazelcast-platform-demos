@@ -55,13 +55,13 @@ hazelcast:
           actions:
             - all
         #
-        - name: "neil"
+        - name: "customer"
           principal: churn-java-client
           actions:
-            - all
+            - read
         #actions: []
         #
-        - name: "Person"
+        - name: "sentiment"
           principal: churn-java-client
           actions:
 #            - create

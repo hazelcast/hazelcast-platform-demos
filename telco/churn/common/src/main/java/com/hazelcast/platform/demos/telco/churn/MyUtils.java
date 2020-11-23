@@ -202,6 +202,11 @@ public class MyUtils {
                 stringBuilder.append(String.format(format, sqlRow.getObject(j).toString()));
             }
             stringBuilder.append(NEWLINE);
+            if (count == MyConstants.SQL_RESULT_THRESHOLD) {
+                sqlResult.close();
+                stringBuilder.append("-- truncated at count " + count + NEWLINE);
+                break;
+            }
         }
 
         stringBuilder.append("[").append(count).append(count == 1 ? " row]" : " rows]").append(NEWLINE);

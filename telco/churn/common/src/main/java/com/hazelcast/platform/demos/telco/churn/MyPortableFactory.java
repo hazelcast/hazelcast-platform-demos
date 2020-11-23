@@ -37,8 +37,6 @@ public class MyPortableFactory implements PortableFactory {
         switch (typeId) {
             case MyConstants.CLASS_ID_SENTIMENT:
                 return new Sentiment();
-            case Person.NINENINENINE:
-                return new Person();
             default:
                 LOGGER.error("Unknown typeId: {}", typeId);
                 return null;

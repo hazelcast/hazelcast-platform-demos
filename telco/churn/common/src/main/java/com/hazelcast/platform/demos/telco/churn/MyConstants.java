@@ -66,4 +66,6 @@ public class MyConstants {
     public static final String MYSQL_SCHEMA_NAME = "churn";
     public static final String MYSQL_TABLE_NAME = "tariff";
 
+    // For demonstration of queries
+    public static final int SQL_RESULT_THRESHOLD = 10;
 }
