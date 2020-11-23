@@ -152,7 +152,7 @@ public class ApplicationInitializer {
      */
     private void kafkaDefine(String bootstrapServers) {
         // Since only run once, don't need 'CREATE OR REPLACE'
-        String definition = "CREATE EXTERNAL MAPPING public "
+        String definition = "CREATE EXTERNAL MAPPING "
                 + MyConstants.KAFKA_TOPIC_CALLS_NAME
                 + " ( "
                 + " id           VARCHAR, "
