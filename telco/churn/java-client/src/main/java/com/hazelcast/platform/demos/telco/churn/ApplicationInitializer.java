@@ -16,10 +16,9 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
-import java.util.HashSet;
-import java.util.Map;
+import java.time.LocalDateTime;
 import java.util.Set;
-import java.util.concurrent.CompletionStage;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -32,20 +31,23 @@ import org.springframework.context.annotation.Configuration;
 
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.map.IMap;
-import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordKey;
+import com.hazelcast.platform.demos.telco.churn.domain.Sentiment;
 import com.hazelcast.sql.SqlResult;
-import com.hazelcast.topic.ITopic;
 
 /**
- * <p>XXX
+ * <p>This Java client is mainly a bridge between "{@code React.js}" web front
+ * end and the Hazelcast grid. However, also run some data operations to
+ * demonstate security and querying.
  * </p>
  */
 @Configuration
 public class ApplicationInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInitializer.class);
+
+    //FIXME
+    private static final int XXX = 20;
 
     @Value("${spring.application.name}")
     private String springApplicationName;
@@ -53,152 +55,128 @@ public class ApplicationInitializer {
     private JetInstance jetInstance;
 
     /**
-     * <p>XXX
+     * <p>Starts, runs some demonstration queries, then the "{@code @Bean}"
+     * ends but the Hazelcast client stays running for web front-end.
+     * </p>
+     * <p>Runs the GA features, then the new 4.1 features, SQL which is
+     * in Beta state
      * </p>
      */
-    @SuppressWarnings("unchecked")
     @Bean
     public CommandLineRunner commandLineRunner() {
         return args -> {
             HazelcastInstance hazelcastInstance = this.jetInstance.getHazelcastInstance();
             LOGGER.info("-=-=-=-=- START {} START -=-=-=-=-=-", hazelcastInstance.getName());
-
-            for (DistributedObject distributedObject : hazelcastInstance.getDistributedObjects()) {
-                if (distributedObject instanceof IMap) {
-                    IMap<?, ?> iMap = (IMap<?, ?>) distributedObject;
-                    String mapName = iMap.getName();
-                    if (!mapName.startsWith("__")) {
-                        try {
-                            int size = iMap.size();
-                            LOGGER.info("getMap({}).size()=={}", iMap.getName(), size);
-                        } catch (Exception e) {
-                            String message = String.format("getMap(%s).size()", mapName);
-                            LOGGER.error(message + ":" + e.getMessage());
-                        }
-                        try {
-                            Set<?> keys = iMap.keySet();
-                            LOGGER.info("{}.keySet().size()=={}", iMap.getName(), keys.size());
-                            for (Object key : keys) {
-                                try {
-                                    Object value = iMap.get(key);
-                                    LOGGER.info("Map {}.get({})=={}", iMap.getName(), key, value);
-                                    ITopic<String> topic = hazelcastInstance.getTopic(MyConstants.ITOPIC_NAME_SLACK);
-                                    String payload = "Hello";
-                                    String message = this.springApplicationName
-                                            + " (build: " + key + ", " + value + ")"
-                                            + " '" + payload + "' @ "
-                                            + MyUtils.timestampToISO8601(System.currentTimeMillis());
-                                    if (iMap.getName().equals("neil")) {
-                                        LOGGER.info("Topic {}.publish('{}')", topic.getName(), message);
-                                        topic.publish(message);
-                                    }
-                                    if (iMap.getName().equals(MyConstants.IMAP_NAME_CDR)) {
-                                        this.gamma((IMap<CallDataRecordKey, HazelcastJsonValue>) iMap,
-                                                (CallDataRecordKey) key);
-                                    }
-                                    TimeUnit.SECONDS.sleep(3L);
-                                } catch (Exception e) {
-                                    String message = String.format("%s.get(%s)", mapName, key.toString());
-                                    LOGGER.error(message + ":" + e.getMessage());
-                                }
-                            }
-                        } catch (Exception e) {
-                            String message = String.format("getMap(%s).keySet()", mapName);
-                            LOGGER.error(message + ":" + e.getMessage());
-                        }
-                    }
-                } else {
-                    LOGGER.info("distributedObject '{}' !instanceof IMap, is {}",
-                            distributedObject.getName(), distributedObject.getClass().getName());
-                }
-            }
-
+            this.gaFeatures(hazelcastInstance);
             LOGGER.info("-=-=-=  MIDDLE  {}  MIDDLE  =-=-=-=-", hazelcastInstance.getName());
-            this.beta(hazelcastInstance);
+            this.betaFeatures(this.jetInstance);
             LOGGER.info("-=-=-=-=-  END  {}  END  -=-=-=-=-=-", hazelcastInstance.getName());
         };
     }
 
     /**
-     * XXX Test BETA code
+     * <p>Try some standard map operations against all the maps we can find.
+     * Because security is in place, some operations may be rejected.
+     * </p>
+     *
      * @param hazelcastInstance
      */
-    private void beta(HazelcastInstance hazelcastInstance) {
-        String mapName = Person.class.getSimpleName();
-
-        Person person1 = new Person();
-        Person person2 = new Person();
-        Person person3 = new Person();
-
-        person1.setFirstName("Neil");
-        person1.setLastName("Stevenson");
-        person2.setFirstName("Xxx");
-        person2.setLastName("Stevenson");
-        person3.setFirstName("Neil");
-        person3.setLastName("Zzz");
-
-        try {
-            IMap<Integer, Object> personMap = hazelcastInstance.getMap(mapName);
-            personMap.put(1,  person1);
-            personMap.put(2,  person2);
-            personMap.put(3,  person3);
-
-            Set<Integer> keys = personMap.keySet();
-            LOGGER.info("{}.keySet().size()=={}", personMap.getName(), keys.size());
-
-            Set<Integer> targetKeys = new HashSet<>();
-            targetKeys.add(1);
-            targetKeys.add(3);
-
-            CompletionStage<Map<Integer, String>> completionStage =
-                    personMap.submitToKeys(targetKeys, new MyXXXEntryProcessor());
-
-            completionStage.thenAccept(map -> {
-                LOGGER.info("{} map size =={}", map.getClass(), map.size());
-                for (@SuppressWarnings("rawtypes") Map.Entry entry : map.entrySet()) {
-                    System.out.println("Entry key1 " + entry.getKey().getClass());
-                    System.out.println("Entry key2 " + entry.getKey());
-                    System.out.println("Entry val1 " + entry.getValue().getClass());
-                    System.out.println("Entry val2 " + entry.getValue());
+    private void gaFeatures(HazelcastInstance hazelcastInstance) {
+        for (DistributedObject distributedObject : hazelcastInstance.getDistributedObjects()) {
+            // Hide system objects
+            if (!distributedObject.getName().startsWith("__")) {
+                if (distributedObject instanceof IMap) {
+                    IMap<?, ?> iMap = (IMap<?, ?>) distributedObject;
+                    String mapName = iMap.getName();
+                    try {
+                        int size = iMap.size();
+                        LOGGER.info("getMap({}).size()=={}", iMap.getName(), size);
+                        // Pause so logger messages don't cross
+                        TimeUnit.SECONDS.sleep(1L);
+                    } catch (Exception e) {
+                        String message = String.format("getMap(%s).size()", mapName);
+                        LOGGER.error(message + ":" + e.getMessage());
+                    }
+                    try {
+                        Set<?> keys = iMap.keySet();
+                        LOGGER.info("{}.keySet().size()=={}", iMap.getName(), keys.size());
+                        // Pause so logger messages don't cross
+                        TimeUnit.SECONDS.sleep(1L);
+                        // Sort if possible
+                        if (keys.size() > 0
+                                && keys.iterator().next() instanceof Comparable) {
+                            keys = new TreeSet<>(keys);
+                        }
+                        int count = 0;
+                        for (Object key : keys) {
+                            count++;
+                            if (count == MyConstants.SQL_RESULT_THRESHOLD) {
+                                LOGGER.info("-- truncated at count {}", count);
+                                break;
+                            }
+                            try {
+                                Object value = iMap.get(key);
+                                LOGGER.info("Map {}.get({})=={}", iMap.getName(), key, value);
+                                // Pause so logger messages don't cross
+                                TimeUnit.SECONDS.sleep(1L);
+                            } catch (Exception e) {
+                                String message = String.format("%s.get(%s)", mapName, key.toString());
+                                LOGGER.error(message + ":" + e.getMessage());
+                            }
+                        }
+                    } catch (Exception e) {
+                        String message = String.format("getMap(%s).keySet()", mapName);
+                        LOGGER.error(message + ":" + e.getMessage());
+                    }
+                } else {
+                    LOGGER.info("distributedObject '{}' !instanceof IMap, is {}",
+                        distributedObject.getName(), distributedObject.getClass().getName());
                 }
-            });
-
-        } catch (Exception e) {
-            String message = String.format("(%s).submitToKeys()", mapName);
-            LOGGER.error(message + ":" + e.getMessage());
-        }
-
-        //String query = "SELECT firstName FROM '" + mapName + "' WHERE lastName = 'Stevenson'";
-        //String query = "SELECT firstName FROM \"" + mapName + "\" WHERE lastName = 'Stevenson'";
-        //String query = "SELECT firstName FROM " + mapName + " WHERE lastName = 'Stevenson'";
-        String query = "SELECT firstName FROM Person WHERE lastName = “Stevenson”";
-        //String query = "SELECT firstName from Person WHERE lastName = ‘Stevenson’";
-        query = MyUtils.makeUTF8(query);
-        try {
-            TimeUnit.SECONDS.sleep(1);
-            System.out.println("");
-            System.out.println(query);
-            SqlResult sqlResult = hazelcastInstance.getSql().execute(query);
-            System.out.println(MyUtils.prettyPrintSqlResult(sqlResult));
-            System.out.println("");
-        } catch (Exception e) {
-            String message = String.format("getMap(%s) SQL '%s'", mapName, query);
-            LOGGER.warn(message + ": " + e.getMessage());
-            LOGGER.error("XXX", e);
+            }
         }
     }
 
     /**
-     * XXX Test BETABETA code
-     * @param hazelcastInstance
+     * <p>Demonstrate beta features in Hazelcast IMDG 4.1 and Jet 4.4, the new
+     * SQL. As these are beta features, they may change in 4.2 and beyond until GA.
+     * </p>
+     *
+     * @param jetInstance
      */
-    public void gamma(IMap<CallDataRecordKey, HazelcastJsonValue> iMap, CallDataRecordKey key) {
-        Set<CallDataRecordKey> keys = new HashSet<>();
-        keys.add(key);
-        CompletionStage<Map<CallDataRecordKey, String>> completionStage =
-                iMap.submitToKeys(keys, new MyXXXEntryProcessor2());
+    private void betaFeatures(JetInstance jetInstance) {
+        //FIXME TEMP until sentiment loaded
+        IMap<String, Sentiment> s = jetInstance.getMap(MyConstants.IMAP_NAME_SENTIMENT);
+        for (int i = 0 ; i < XXX; i++) {
+            Sentiment sentiment = new Sentiment();
+            sentiment.setCurrent(Double.valueOf(i));
+            sentiment.setPrevious(Double.valueOf(i));
+            sentiment.setUpdated(LocalDateTime.now());
+            s.put("" + i, sentiment);
+        }
+        String[] queries = new String[] {
+                // IMap with Portable
+                "SELECT * FROM " + MyConstants.IMAP_NAME_SENTIMENT,
+                // Kafka topic with JSON
+                "SELECT * FROM " + MyConstants.KAFKA_TOPIC_CALLS_NAME,
+        };
 
-        completionStage.thenAccept(System.out::println);
+        int count = 0;
+        for (String query : queries) {
+            query = MyUtils.makeUTF8(query);
+            try {
+                TimeUnit.SECONDS.sleep(1);
+                System.out.println("");
+                count++;
+                System.out.printf("(%d)%n", count);
+                System.out.println(query);
+                SqlResult sqlResult = jetInstance.getSql().execute(query);
+                System.out.println(MyUtils.prettyPrintSqlResult(sqlResult));
+                System.out.println("");
+            } catch (Exception e) {
+                String message = String.format("SQL '%s'", query);
+                LOGGER.error(message + ": " + e.getMessage());
+            }
+        }
     }
 
 }
