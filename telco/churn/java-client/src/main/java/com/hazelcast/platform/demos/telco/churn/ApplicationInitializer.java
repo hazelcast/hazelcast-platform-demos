@@ -16,7 +16,6 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +32,6 @@ import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.map.IMap;
-import com.hazelcast.platform.demos.telco.churn.domain.Sentiment;
 import com.hazelcast.sql.SqlResult;
 
 /**
@@ -45,9 +43,6 @@ import com.hazelcast.sql.SqlResult;
 @Configuration
 public class ApplicationInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInitializer.class);
-
-    //FIXME
-    private static final int XXX = 20;
 
     @Value("${spring.application.name}")
     private String springApplicationName;
@@ -144,15 +139,6 @@ public class ApplicationInitializer {
      * @param jetInstance
      */
     private void betaFeatures(JetInstance jetInstance) {
-        //FIXME TEMP until sentiment loaded
-        IMap<String, Sentiment> s = jetInstance.getMap(MyConstants.IMAP_NAME_SENTIMENT);
-        for (int i = 0 ; i < XXX; i++) {
-            Sentiment sentiment = new Sentiment();
-            sentiment.setCurrent(Double.valueOf(i));
-            sentiment.setPrevious(Double.valueOf(i));
-            sentiment.setUpdated(LocalDateTime.now());
-            s.put("" + i, sentiment);
-        }
         String[] queries = new String[] {
                 // IMap with Portable
                 "SELECT * FROM " + MyConstants.IMAP_NAME_SENTIMENT,
