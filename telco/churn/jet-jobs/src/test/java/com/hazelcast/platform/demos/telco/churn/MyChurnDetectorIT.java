@@ -16,10 +16,20 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import com.hazelcast.core.HazelcastJsonValue;
+import com.hazelcast.jet.datamodel.Tuple4;
+import com.hazelcast.platform.demos.telco.churn.domain.Sentiment;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 
 import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.pipeline.BatchStage;
@@ -37,11 +47,93 @@ import com.hazelcast.jet.python.PythonTransforms;
 public class MyChurnDetectorIT extends AbstractJetIT {
 
     private static PythonServiceConfig pythonServiceConfig;
+    private static long nowMS;
 
-    @BeforeClass
-    public static void beforeClass2() throws Exception {
+    @BeforeAll
+    public static void beforeAll2() throws Exception {
         pythonServiceConfig =
             MLChurnDetector.getPythonServiceConfig(MLChurnDetector.PYTHON_MODULE);
+
+        nowMS = System.currentTimeMillis();
+    }
+
+    @BeforeEach
+    void setUp() throws Exception {
+    }
+
+    /**
+     * <p>Sentiment may be initially null</p>
+     */
+    @DisplayName("format for Python with nulls")
+    @Test
+    //FIXME
+    @Disabled("FIXME")
+    public void formatForPythonWithNulls(TestInfo testInfo) {
+        String callerTelno = testInfo.getDisplayName();
+        HazelcastJsonValue cdr = makeCDR(callerTelno);
+        HazelcastJsonValue customer = makeCustomer(callerTelno);
+        Sentiment sentiment = null;
+
+        Tuple4<String, HazelcastJsonValue, HazelcastJsonValue, Sentiment> tuple4
+                = Tuple4.tuple4(callerTelno, cdr, customer, sentiment);
+        List<Tuple4<String, HazelcastJsonValue, HazelcastJsonValue, Sentiment>> input =
+                List.of(tuple4);
+        List<String> expected = List.of(",,,");
+
+        Pipeline pipeline = Pipeline.create();
+
+        BatchStage<String> output =
+                pipeline
+                        .readFrom(TestSources.items(input))
+                        .map(MLChurnDetector.formatForPython())
+                ;
+
+        output.writeTo(Sinks.logger());
+        output.writeTo(AssertionSinks.assertOrdered(expected));
+
+        JobConfig jobConfig = new JobConfig();
+        jobConfig.setName(testInfo.getDisplayName());
+
+        jetInstance.newJob(pipeline, jobConfig).join();
+    }
+
+    /**
+     * <p>Sentiment will ideally not be null</p>
+     */
+    @DisplayName("format for Python without nulls")
+    @Test
+    //FIXME
+    @Disabled("FIXME")
+    public void formatForPythonWithoutNulls(TestInfo testInfo) {
+        String callerTelno = testInfo.getDisplayName();
+        HazelcastJsonValue cdr = makeCDR(callerTelno);
+        HazelcastJsonValue customer = makeCustomer(callerTelno);
+        Sentiment sentiment = new Sentiment();
+        sentiment.setCurrent(1.0d);
+        sentiment.setPrevious(0.9d);
+        sentiment.setUpdated(LocalDate.now().atStartOfDay());
+
+        Tuple4<String, HazelcastJsonValue, HazelcastJsonValue, Sentiment> tuple4
+                = Tuple4.tuple4(callerTelno, cdr, customer, sentiment);
+        List<Tuple4<String, HazelcastJsonValue, HazelcastJsonValue, Sentiment>> input =
+                List.of(tuple4);
+        List<String> expected = List.of(",,,");
+
+        Pipeline pipeline = Pipeline.create();
+
+        BatchStage<String> output =
+                pipeline
+                        .readFrom(TestSources.items(input))
+                        .map(MLChurnDetector.formatForPython())
+                ;
+
+        output.writeTo(Sinks.logger());
+        output.writeTo(AssertionSinks.assertOrdered(expected));
+
+        JobConfig jobConfig = new JobConfig();
+        jobConfig.setName(testInfo.getDisplayName());
+
+        jetInstance.newJob(pipeline, jobConfig).join();
     }
 
     /**
@@ -49,8 +141,11 @@ public class MyChurnDetectorIT extends AbstractJetIT {
      * in words.
      * </p>
      */
+    @DisplayName("call Python")
     @Test
-    public void helloWorld() throws Exception {
+    //FIXME
+    @Disabled("FIXME")
+    public void helloWorld(TestInfo testInfo) throws Exception {
         List<String> input = List.of("Hello", "World!");
         List<String> expected = List.of("5", "6");
 
@@ -66,8 +161,46 @@ public class MyChurnDetectorIT extends AbstractJetIT {
         output.writeTo(AssertionSinks.assertOrdered(expected));
 
         JobConfig jobConfig = new JobConfig();
-        jobConfig.setName(super.testName.getMethodName());
+        jobConfig.setName(testInfo.getDisplayName());
 
         jetInstance.newJob(pipeline, jobConfig).join();
+    }
+
+    /**
+     * <p>Helper to make call data record</p>
+     */
+    private HazelcastJsonValue makeCDR(String callerTelno) {
+        StringBuilder stringBuilder = new StringBuilder("{ ");
+        stringBuilder.append("\"id\" : \"").append(UUID.randomUUID()).append("\"");
+        stringBuilder.append(",\"callerTelno\" : \"").append(callerTelno).append("\"");
+        stringBuilder.append(",\"callerMastId\" : \"").append("callerMastId".toUpperCase()).append("\"");
+        stringBuilder.append(",\"calleeTelno\" : \"").append("calleeTelno".toUpperCase()).append("\"");
+        stringBuilder.append(",\"calleeMastId\" : \"").append("calleeMastId".toUpperCase()).append("\"");
+        stringBuilder.append(",\"startTimestamp\" : ").append(nowMS);
+        stringBuilder.append(",\"durationSeconds\" : ").append(0);
+        stringBuilder.append(",\"callSuccessful\" : ").append(false);
+        stringBuilder.append(",\"createdBy\" : \"").append("createdBy".toUpperCase()).append("\"");
+        stringBuilder.append(",\"createdDate\" : ").append(nowMS);
+        stringBuilder.append(",\"lastModifiedBy\" : \"").append("lastModifiedBy".toUpperCase()).append("\"");
+        stringBuilder.append(",\"lastModifiedDate\" : ").append(nowMS);
+        stringBuilder.append(" }");
+        return new HazelcastJsonValue(stringBuilder.toString());
+    }
+
+    /**
+     * <p>Helper to make customer</p>
+     */
+    private HazelcastJsonValue makeCustomer(String callerTelno) {
+        StringBuilder stringBuilder = new StringBuilder("{ ");
+        stringBuilder.append("\"id\" : \"").append(callerTelno).append("\"");
+        stringBuilder.append(",\"firstName\" : \"").append("firstName".toUpperCase()).append("\"");
+        stringBuilder.append(",\"lastName\" : \"").append("lastName".toUpperCase()).append("\"");
+        stringBuilder.append(",\"accountType\" : \"").append("accountType".toUpperCase()).append("\"");
+        stringBuilder.append(",\"createdBy\" : \"").append("createdBy".toUpperCase()).append("\"");
+        stringBuilder.append(",\"createdDate\" : ").append(nowMS);
+        stringBuilder.append(",\"lastModifiedBy\" : \"").append("lastModifiedBy".toUpperCase()).append("\"");
+        stringBuilder.append(",\"lastModifiedDate\" : ").append(nowMS);
+        stringBuilder.append(" }");
+        return new HazelcastJsonValue(stringBuilder.toString());
     }
 }
