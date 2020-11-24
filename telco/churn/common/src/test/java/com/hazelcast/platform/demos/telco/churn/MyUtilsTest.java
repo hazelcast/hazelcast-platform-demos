@@ -18,7 +18,7 @@ package com.hazelcast.platform.demos.telco.churn;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * <p>Test {@link MUtils}, could ultimately split to one file per

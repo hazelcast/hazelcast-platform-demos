@@ -45,9 +45,6 @@ module.
 
 # TODO
 
-## Failsafte
-Why `jet-jobs/src/test/java/com/hazelcast/platform/demos/telco/churn/MyChurnDetectorIT.java` not run with "-Prelease" ?
-
 ## Mongo
 Add Mongo Debezium One-Way CDC
 

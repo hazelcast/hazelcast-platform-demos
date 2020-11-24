@@ -15,13 +15,14 @@
 	<description>Credit Value Adjustment - C++ Pricer</description>
 
 	<properties>
-		<docker.image.name>cva-cpp</docker.image.name>
+		<docker.image.name>cpp</docker.image.name>
 		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 
-		<tmp.docker.image1>hazelcast-cva/${docker.image.name}-tmp1</tmp.docker.image1>
-		<tmp.docker.image2>hazelcast-cva/${docker.image.name}-tmp2</tmp.docker.image2>
-		<tmp.docker.image3>hazelcast-cva/${docker.image.name}-tmp3</tmp.docker.image3>
+		<tmp.docker.image1>hazelcast-platform-demos/${docker.image.prefix}-${docker.image.name}-tmp1</tmp.docker.image1>
+		<tmp.docker.image2>hazelcast-platform-demos/${docker.image.prefix}-${docker.image.name}-tmp2</tmp.docker.image2>
+		<tmp.docker.image3>hazelcast-platform-demos/${docker.image.prefix}-${docker.image.name}-tmp3</tmp.docker.image3>
+		<final.docker.image>hazelcast-platform-demos/${docker.image.prefix}-${docker.image.name}</final.docker.image>
 	</properties>
 
 	<!-- Multi-step Dockerfile build -->
@@ -81,7 +82,7 @@
 						<configuration>
 							<dockerfile>Dockerfile4</dockerfile>
 							<pullNewerImage>false</pullNewerImage>
-							<repository>hazelcast-${docker.image.prefix}/${docker.image.name}</repository>
+							<repository>${final.docker.image}</repository>
 							<tag>latest</tag>
 						</configuration>
 					</execution>

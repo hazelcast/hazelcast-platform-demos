@@ -1,6 +1,6 @@
-FROM hazelcast-cva/cva-cpp-tmp1:latest
+FROM hazelcast-platform-demos/cva-cpp-tmp1:latest
 
-RUN git clone https://github.com/grpc/grpc.git \
+RUN git clone https://github.com/grpc/grpc.git -b v1.31.1  \
   && mkdir -p grpc/cmake/build \
   && cd grpc \
   && git submodule update --init

@@ -34,7 +34,7 @@
 		<module>hazelcast-node-site1</module>
 		<module>hazelcast-node-site2</module>
 		<module>abstract-hazelcast-client</module>
-		<module>cva-cpp</module>
+		<module>cpp</module>
 		<module>data-loader</module>
 		<module>jet-jobs</module>
 		<module>webapp</module>
@@ -95,6 +95,17 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
 			<scope>test</scope>
 		</dependency>
 

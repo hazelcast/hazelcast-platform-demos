@@ -18,8 +18,9 @@ package com.hazelcast.platform.demos.ml.ri;
 
 import java.util.List;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.pipeline.Pipeline;
@@ -36,8 +37,8 @@ public class Pi1IT extends AbstractJetIT {
 
     private static PythonServiceConfig pythonServiceConfig;
 
-    @BeforeClass
-    public static void beforeClass2() throws Exception {
+    @BeforeAll
+    public static void beforeAll2() throws Exception {
         pythonServiceConfig = MyUtils.getPythonServiceConfig("pi1");
     }
 
@@ -48,7 +49,7 @@ public class Pi1IT extends AbstractJetIT {
      * </p>
      */
     @Test
-    public void originInsideCircle() throws Exception {
+    public void originInsideCircle(TestInfo testInfo) throws Exception {
         double x = 0.0d;
         double y = 0.0d;
         double pi = 4.0d;
@@ -64,7 +65,7 @@ public class Pi1IT extends AbstractJetIT {
         .writeTo(AssertionSinks.assertOrdered(expected));
 
         JobConfig jobConfig = new JobConfig();
-        jobConfig.setName(super.testName.getMethodName());
+        jobConfig.setName(testInfo.getDisplayName());
 
         jetInstance.newJob(pipeline, jobConfig).join();
     }
@@ -76,7 +77,7 @@ public class Pi1IT extends AbstractJetIT {
      * </p>
      */
     @Test
-    public void apexOutsideCircle() throws Exception {
+    public void apexOutsideCircle(TestInfo testInfo) throws Exception {
         double x = 1.0d;
         double y = 1.0d;
         double pi = 0d;
@@ -92,7 +93,7 @@ public class Pi1IT extends AbstractJetIT {
         .writeTo(AssertionSinks.assertOrdered(expected));
 
         JobConfig jobConfig = new JobConfig();
-        jobConfig.setName(this.testName.getMethodName());
+        jobConfig.setName(testInfo.getDisplayName());
 
         jetInstance.newJob(pipeline, jobConfig).join();
     }
@@ -107,7 +108,7 @@ public class Pi1IT extends AbstractJetIT {
      * </p>
      */
     @Test
-    public void piIsRefinedGradually() throws Exception {
+    public void piIsRefinedGradually(TestInfo testInfo) throws Exception {
         double x1 = 0.0d;
         double y1 = 0.0d;
         double x2 = 1.0d;
@@ -129,7 +130,7 @@ public class Pi1IT extends AbstractJetIT {
         .writeTo(AssertionSinks.assertOrdered(expected));
 
         JobConfig jobConfig = new JobConfig();
-        jobConfig.setName(this.testName.getMethodName());
+        jobConfig.setName(testInfo.getDisplayName());
 
         jetInstance.newJob(pipeline, jobConfig).join();
     }

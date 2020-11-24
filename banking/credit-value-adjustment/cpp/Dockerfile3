@@ -1,4 +1,4 @@
-FROM hazelcast-cva/cva-cpp-tmp2:latest
+FROM hazelcast-platform-demos/cva-cpp-tmp2:latest
 
 RUN apt-get install -y libboost-all-dev && \
   wget https://bintray.com/quantlib/releases/download_file?file_path=QuantLib-1.18.tar.gz && \

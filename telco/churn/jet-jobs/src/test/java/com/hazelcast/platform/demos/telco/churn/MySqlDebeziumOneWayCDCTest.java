@@ -21,9 +21,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.jet.cdc.Operation;
@@ -47,6 +48,7 @@ public class MySqlDebeziumOneWayCDCTest {
     void setUp() throws Exception {
     }
 
+    @DisplayName("Null input")
     @Test
     public void testNull() throws Exception {
         String input = null;
@@ -57,6 +59,7 @@ public class MySqlDebeziumOneWayCDCTest {
                 });
     }
 
+    @DisplayName("Valid input")
     @Test
     public void testComplete() throws Exception {
         String input = "{\"id\":\"abc\",\"year\":2020,\"name\":\"def\""
@@ -82,6 +85,7 @@ public class MySqlDebeziumOneWayCDCTest {
         assertThat(output.getValue()).as("value").isEqualTo(expectedValue);
     }
 
+    @DisplayName("No key")
     @Test
     public void testIncompleteNoKey() throws Exception {
         String input = "{\"year\":2020,\"name\":\"def\""
@@ -94,6 +98,7 @@ public class MySqlDebeziumOneWayCDCTest {
         assertThat(output).as("entry").isNull();
     }
 
+    @DisplayName("No year")
     @Test
     public void testIncompleteNoYear() throws Exception {
         String input = "{\"id\":\"abc\",\"name\":\"def\""

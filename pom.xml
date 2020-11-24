@@ -45,7 +45,8 @@
 		<jackson.version>2.10.2</jackson.version>
 		<json.version>20190722</json.version>
                 <json-smart.version>2.3</json-smart.version>
-		<junit.version>4.13.1</junit.version>
+		<junit-jupiter.version>5.7.0</junit-jupiter.version>
+		<junit-vintage.version>5.7.0</junit-vintage.version>
 		<jython.version>2.7.2rc1</jython.version>
 		<kafka-clients.version>2.4.0</kafka-clients.version>
 		<kafka-connect.version>2.6.0</kafka-connect.version>
@@ -69,10 +70,11 @@
 		<maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
-		<maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
+		<maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
 		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
 		<maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
 		<maven-shade-plugin.version>3.2.2</maven-shade-plugin.version>
+		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
 		<os-maven-plugin.version>1.6.2</os-maven-plugin.version>
 		<protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
 		<spotbugs-maven-plugin.version>3.1.12.2</spotbugs-maven-plugin.version>
@@ -86,9 +88,9 @@
 	<dependencies>
 		<!-- scope==test -->
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>${junit-jupiter.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -243,6 +245,13 @@
 			</dependency>
 
 			<dependency>
+				<groupId>org.junit.vintage</groupId>
+				<artifactId>junit-vintage-engine</artifactId>
+				<version>${junit-vintage.version}</version>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
 				<groupId>org.mongodb</groupId>
 				<artifactId>mongo-java-driver</artifactId>
 				<version>${mongo-java-driver.version}</version>
@@ -345,6 +354,10 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire-plugin.version}</version>
 			</plugin>
 			<plugin>
 				<groupId>com.github.spotbugs</groupId>
