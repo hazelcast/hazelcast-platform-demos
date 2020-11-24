@@ -68,11 +68,15 @@ public class ApplicationInitializer {
             if (this.myProperties.getInitSize() > currentSize) {
                 LOGGER.info("Cluster size {}, not initializing until {}", currentSize, this.myProperties.getInitSize());
             } else {
-                // For SQL against Kafka
                 var bootstrapServers = this.myProperties.getBootstrapServers();
                 LOGGER.debug("Kafka brokers: {}", bootstrapServers);
-                this.kafkaDefine(bootstrapServers);
+                // Create maps before defining their metadata
                 this.createNeededObjects();
+                // For SQL against Kafka
+                this.defineKafka(bootstrapServers);
+                // For SQL against empty Imap
+                this.defineIMap();
+                // Do jobs last, in case they use SQL
                 this.launchNeededJobs(isLocalhost);
             }
             LOGGER.error("READY...");
@@ -143,6 +147,7 @@ public class ApplicationInitializer {
      */
     private void launchNeededJobs(boolean isLocalhost) {
     }
+
     /**
      * <p>Define Kafka streams so can be directly used as a
      * querying source by SQL.
@@ -150,9 +155,9 @@ public class ApplicationInitializer {
      *
      * @param bootstrapServers
      */
-    private void kafkaDefine(String bootstrapServers) {
+    private void defineKafka(String bootstrapServers) {
         // Since only run once, don't need 'CREATE OR REPLACE'
-        String definition = "CREATE EXTERNAL MAPPING "
+        String definition1 = "CREATE EXTERNAL MAPPING "
                 + MyConstants.KAFKA_TOPIC_CALLS_NAME
                 + " ( "
                 + " id           VARCHAR, "
@@ -167,18 +172,50 @@ public class ApplicationInitializer {
                 + " createdDate BIGINT, "
                 + " lastModifiedBy VARCHAR, "
                 + " lastModifiedDate BIGINT "
-                + ") "
-                + "TYPE Kafka "
-                + "OPTIONS ( "
-                + " valueFormat 'json',"
-                + " \"auto.offset.reset\" 'earliest',"
-                + " \"bootstrap.servers\" '" + bootstrapServers + "'"
-                + ")";
-        LOGGER.info("Definition '{}'", definition);
+                + " ) "
+                + " TYPE Kafka "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'json',"
+                + " 'valueFormat' = 'json',"
+                + " 'auto.offset.reset' = 'earliest',"
+                + " 'bootstrap.servers' = '" + bootstrapServers + "'"
+                + " )";
+        this.define(definition1);
+    }
+
+    /**
+     * <p>Without this metadata, cannot query an empty
+     * {@link IMap}.
+     * </p>
+     */
+    private void defineIMap() {
+        // Since only run once, don't need 'CREATE OR REPLACE'
+        String definition1 = "CREATE MAPPING "
+                + MyConstants.IMAP_NAME_SENTIMENT
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'portable',"
+                + " 'valueJavaClass' = 'com.hazelcast.platform.demos.telco.churn.domain.Sentiment',"
+                + " 'valuePortableFactoryId' = '" + MyConstants.CLASS_ID_MYPORTABLEFACTORY + "',"
+                + " 'valuePortableClassId' = '" + MyConstants.CLASS_ID_SENTIMENT + "'"
+                + " )";
+        this.define(definition1);
+    }
+
+    /**
+     * <p>Generic handler to loading definitions
+     * </p>
+     *
+     * @param definition
+     */
+    private void define(String definition) {
+        LOGGER.trace("Definition '{}'", definition);
         try {
             this.jetInstance.getSql().execute(definition);
         } catch (Exception e) {
-            e.printStackTrace(System.out);
+            LOGGER.error(definition, e);
         }
     }
 

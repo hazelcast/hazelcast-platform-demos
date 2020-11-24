@@ -28,6 +28,8 @@ import com.hazelcast.config.NearCacheConfig;
 import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.config.TcpIpConfig;
 import com.hazelcast.jet.config.JetConfig;
+import com.hazelcast.nio.serialization.ClassDefinition;
+import com.hazelcast.nio.serialization.ClassDefinitionBuilder;
 import com.hazelcast.platform.demos.telco.churn.mapstore.MyMapStoreFactory;
 
 import org.slf4j.Logger;
@@ -65,6 +67,8 @@ public class ApplicationConfig {
     @Bean
     public Config config(MyMapStoreFactory myMapStoreFactory) {
         Config config = new ClasspathYamlConfig("hazelcast.yml");
+
+        this.addClassDefinitions(config);
 
         // Call data records - Cassandra
         MapConfig cdrMapConfig = new MapConfig(MyConstants.IMAP_NAME_CDR);
@@ -105,6 +109,23 @@ public class ApplicationConfig {
         config.getMapConfigs().put(tariffMapConfig.getName(), tariffMapConfig);
 
         return config;
+    }
+
+    /**
+     * <p>Until <a href="https://github.com/hazelcast/hazelcast-jet/issues/2706">this</a> is fixed.</p>
+     *
+     * @param config
+     */
+    private void addClassDefinitions(Config config) {
+        ClassDefinition sentimentClassDefinition =
+                new ClassDefinitionBuilder(MyConstants.CLASS_ID_MYPORTABLEFACTORY,
+                        MyConstants.CLASS_ID_SENTIMENT)
+                .addLongField("updated")
+                .addDoubleField("current")
+                .addDoubleField("previous")
+                .build();
+
+        config.getSerializationConfig().addClassDefinition(sentimentClassDefinition);
     }
 
     /**
