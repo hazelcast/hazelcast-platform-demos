@@ -55,17 +55,18 @@ public class UpdatedByMapInterceptor implements MapInterceptor {
                 JSONObject json = new JSONObject(newValue.toString());
                 long now = System.currentTimeMillis();
 
-                // Don't regard data feed as changed in Hazelcast
-                if (!"churn-data-feed".equals(json.getString("lastModifiedBy"))) {
+                // Don't regard data feed or legacy update as changed in Hazelcast
+                String lastModifiedBy = json.getString("lastModifiedBy");
+                if (!lastModifiedBy.equals("churn-data-feed")
+                        && !lastModifiedBy.equals("churn-update-legacy")) {
+
                     json.put("lastModifiedBy", this.modifier);
                     json.put("lastModifiedDate", now);
-                }
 
-                return new HazelcastJsonValue(json.toString());
+                    return new HazelcastJsonValue(json.toString());
+                }
             } catch (Exception exception) {
                 LOGGER.error("interceptPut('{}'), EXCEPTION: {}", newValue, exception.getMessage());
-                //XXX
-                System.out.println("EXCEPTION " + exception.getMessage());
             }
         }
         return newValue;

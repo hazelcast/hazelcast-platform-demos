@@ -68,7 +68,7 @@ public class CallDataRecordMapStore implements MapStore<CallDataRecordKey, Hazel
                 JSONObject json = new JSONObject(callDataRecord);
                 MyMapHelpers.validate(json, CallDataRecordMetadata.FIELD_NAMES);
                 result = new HazelcastJsonValue(json.toString());
-            }
+         }
 
         } catch (Exception exception) {
             LOGGER.error("load('{}'), EXCEPTION: {}", key, exception.getMessage());
@@ -181,7 +181,7 @@ public class CallDataRecordMapStore implements MapStore<CallDataRecordKey, Hazel
      */
     @Override
     public void store(CallDataRecordKey key, HazelcastJsonValue value) {
-        LOGGER.debug("store({}, {})", key, value);
+        long now = System.currentTimeMillis();
 
         CallDataRecord callDataRecord = new CallDataRecord();
         try {
@@ -195,16 +195,20 @@ public class CallDataRecordMapStore implements MapStore<CallDataRecordKey, Hazel
             callDataRecord.setCreatedBy(json.getString("createdBy"));
             callDataRecord.setCreatedDate(json.getLong("createdDate"));
             callDataRecord.setDurationSeconds(json.getInt("durationSeconds"));
-            callDataRecord.setLastModifiedBy(json.getString("lastModifiedBy"));
-            callDataRecord.setLastModifiedDate(json.getLong("lastModifiedDate"));
+            // Regard everything saved by Hazelcast as changed by Hazelcast
+            String previousLastModifiedBy = json.getString("lastModifiedBy");
+            callDataRecord.setLastModifiedBy(this.modifierFilter);
+            callDataRecord.setLastModifiedDate(now);
             callDataRecord.setStartTimestamp(json.getLong("startTimestamp"));
 
-            if (!this.modifierFilter.equals(callDataRecord.getLastModifiedBy())) {
-                LOGGER.error("store({}, {}), saving change by '{}' when we are '{}'",
-                        key, value, callDataRecord.getLastModifiedBy(), this.modifierFilter);
+            if ("churn-update-legacy".equals(previousLastModifiedBy)) {
+                LOGGER.trace("store({}, {}) not stored as LastModifiedBy='{}'",
+                        key, value, previousLastModifiedBy);
+            } else {
+                LOGGER.debug("store({}, {}) with LastModifiedDate={}, LastModifiedBy='{}'",
+                        key, value, now, this.modifierFilter);
+                this.callDataRecordRepository.save(callDataRecord);
             }
-
-            this.callDataRecordRepository.save(callDataRecord);
 
         } catch (Exception exception) {
             LOGGER.error("store('{}', '{}'), EXCEPTION: {}", key, value, exception.getMessage());

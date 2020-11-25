@@ -68,7 +68,7 @@ public class ApplicationInitializer {
     public CommandLineRunner commandLineRunner() {
         return args -> {
             HazelcastInstance hazelcastInstance = this.jetInstance.getHazelcastInstance();
-            LOGGER.info("-=-=-=-=- START {} START -=-=-=-=-=-", hazelcastInstance.getName());
+            LOGGER.info("-=-=-=-=- START '{}' START -=-=-=-=-=-", hazelcastInstance.getName());
 
             long timestamp = System.currentTimeMillis();
             String timestampStr = MyUtils.timestampToISO8601(timestamp);
@@ -123,7 +123,7 @@ public class ApplicationInitializer {
                 this.trySubmit(jobNamePrefixSlackToSlackCLI, jobConfigSlackToSlackCLI, pipelineSlackToSlackCLI);
             }
 
-            LOGGER.info("-=-=-=-=-  END  {}  END  -=-=-=-=-=-", hazelcastInstance.getName());
+            LOGGER.info("-=-=-=-=-  END  '{}'  END  -=-=-=-=-=-", hazelcastInstance.getName());
             hazelcastInstance.shutdown();
         };
     }

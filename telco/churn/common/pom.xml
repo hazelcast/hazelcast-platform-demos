@@ -19,6 +19,11 @@
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+		</dependency>
+
 		<!-- scope==provided -->
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>

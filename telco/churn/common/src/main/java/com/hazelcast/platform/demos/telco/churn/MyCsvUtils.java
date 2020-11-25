@@ -16,26 +16,116 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
+import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.platform.demos.telco.churn.domain.Sentiment;
+
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * <p>Utility functions for convenient CSV conversion
  * </p>
+ * <p><b>Alphabetical order</b></p>
  */
 public class MyCsvUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(MyCsvUtils.class);
 
     /**
+     * <p>Takes a JSON format CallDataRecord</p>
+     */
+    public static String toCSVCallDataRecord(HazelcastJsonValue hazelcastJsonValue) {
+        String empty = ",,,,,,,,,,,";
+        if (hazelcastJsonValue == null) {
+            LOGGER.error("CallDataRecord is null");
+            return empty;
+        } else {
+            try {
+                JSONObject json = new JSONObject(hazelcastJsonValue.toString());
+                String calleeMastId = json.getString("calleeMastId");
+                String calleeTelno = json.getString("calleeTelno");
+                String callerMastId = json.getString("callerMastId");
+                String callerTelno = json.getString("callerTelno");
+                String callSuccessful = String.valueOf(json.getBoolean("callSuccessful"));
+                String createdBy = json.getString("createdBy");
+                String createdDate = String.valueOf(json.getLong("createdDate"));
+                String durationSeconds = String.valueOf(json.getInt("durationSeconds"));
+                String id = json.getString("id");
+                String lastModifiedBy = json.getString("lastModifiedBy");
+                String lastModifiedDate = String.valueOf(json.getLong("lastModifiedDate"));
+                String startTimestamp = String.valueOf(json.getLong("startTimestamp"));
+
+                // Alphabetical order on field name
+                return calleeMastId + ","
+                        + calleeTelno + ","
+                        + callerMastId + ","
+                        + callerTelno + ","
+                        + callSuccessful + ","
+                        + createdBy + ","
+                        + createdDate + ","
+                        + durationSeconds + ","
+                        + id + ","
+                        + lastModifiedBy + ","
+                        + lastModifiedDate + ","
+                        + startTimestamp
+                        ;
+            } catch (Exception e) {
+                LOGGER.error(hazelcastJsonValue.toString(), e);
+                return empty;
+            }
+        }
+    }
+
+    /**
+     * <p>Takes a JSON format Customer</p>
+     */
+    public static String toCSVCustomer(HazelcastJsonValue hazelcastJsonValue) {
+        String empty = ",,,,,,,";
+        if (hazelcastJsonValue == null) {
+            LOGGER.error("Customer is null");
+            return empty;
+        } else {
+            try {
+                JSONObject json = new JSONObject(hazelcastJsonValue.toString());
+                String accountType = json.getString("accountType");
+                String createdBy = json.getString("createdBy");
+                String createdDate = String.valueOf(json.getLong("createdDate"));
+                String firstName = json.getString("firstName");
+                String id = json.getString("id");
+                String lastModifiedBy = json.getString("lastModifiedBy");
+                String lastModifiedDate = String.valueOf(json.getLong("lastModifiedDate"));
+                String lastName = json.getString("lastName");
+
+                // Alphabetical order on field name
+                return accountType + ","
+                        + createdBy + ","
+                        + createdDate + ","
+                        + firstName + ","
+                        + id + ","
+                        + lastModifiedBy + ","
+                        + lastModifiedDate + ","
+                        + lastName
+                        ;
+            } catch (Exception e) {
+                LOGGER.error(hazelcastJsonValue.toString(), e);
+                return empty;
+            }
+        }
+    }
+
+    /**
      * <p>For {@link Sentiment}</p>
      */
     public static String toCSVSentiment(Sentiment sentiment) {
-        if (sentiment == null) {
-            return ",,";
+        String empty = ",,";
+        if (sentiment == null || sentiment.getUpdated() == null) {
+            return empty;
         } else {
-            return sentiment.getUpdated() + "," + sentiment.getCurrent() + ","
-                    + sentiment.getPrevious();
+            // Alphabetical order on field name
+            return sentiment.getCurrent() + ","
+                    + sentiment.getPrevious() + ","
+                    + sentiment.getUpdated();
         }
     }
+
 }

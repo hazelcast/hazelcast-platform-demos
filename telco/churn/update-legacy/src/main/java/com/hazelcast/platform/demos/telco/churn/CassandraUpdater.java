@@ -46,7 +46,7 @@ public class CassandraUpdater implements CommandLineRunner {
     private static final int MASK_8 = 0x0008;
     private static final int SECONDS_IN_A_MINUTE = 60;
     // Cassandra 3 outputs CDC on volume threshold. Cassandra 4 uses time threshold also.
-    private static final int LOOPS_MAX = 100;
+    private static final int LOOPS_MAX = 2;
 
     @Autowired
     private CallDataRecordRepository callDataRecordRepository;
@@ -73,11 +73,9 @@ public class CassandraUpdater implements CommandLineRunner {
         int count = 0;
         int loop = 0;
         while (loop++ < LOOPS_MAX) {
-            if (loop > 1) {
-                LOGGER.info("Loop {}", loop);
-            }
+            LOGGER.info("Loop {}", loop);
             for (int i = 0 ; i < keys.size() ; i++) {
-                if ((i & MASK_8) != 0) {
+                if ((i & MASK_8) == 0) {
                     boolean success = this.update(keys.get(i));
                     if (success) {
                         count++;

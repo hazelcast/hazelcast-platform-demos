@@ -209,18 +209,19 @@ public class MLChurnDetector extends MyJobWrapper {
 
             // Telno
             stringBuilder.append(tuple4.f0());
-            stringBuilder.append(",");
+            stringBuilder.append("|");
 
             // CDR
-            //XXX stringBuilder.append(csvFromCallDataRecord(tuple4.f1()));
-            stringBuilder.append(",");
+            stringBuilder.append(MyCsvUtils.toCSVCallDataRecord(tuple4.f1()));
+            stringBuilder.append("|");
 
             // Customer
-            //XXX stringBuilder.append(csvFromCustomer(tuple4.f2()));
-            stringBuilder.append(",");
+            stringBuilder.append(MyCsvUtils.toCSVCustomer(tuple4.f2()));
+            stringBuilder.append("|");
 
             // Sentiment
             stringBuilder.append(MyCsvUtils.toCSVSentiment(tuple4.f3()));
+            stringBuilder.append(tuple4.f3());
 
             return stringBuilder.toString();
         };

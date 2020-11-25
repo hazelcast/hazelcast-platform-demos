@@ -66,7 +66,7 @@ public class ApplicationRunner implements CommandLineRunner {
      */
     @Override
     public void run(String... args) throws Exception {
-        LOGGER.info("-=-=-=-=- START {} START -=-=-=-=-=-", this.springApplicationName);
+        LOGGER.info("-=-=-=-=- START '{}' START -=-=-=-=-=-", this.springApplicationName);
 
         int accounts = CustomerTestdata.getFirstNames().length
                 * CustomerTestdata.getLastNames().length;
@@ -114,7 +114,7 @@ public class ApplicationRunner implements CommandLineRunner {
 
         }
 
-        LOGGER.info("-=-=-=-=-  END  {}  END  -=-=-=-=-=-", this.springApplicationName);
+        LOGGER.info("-=-=-=-=-  END  '{}'  END  -=-=-=-=-=-", this.springApplicationName);
     }
 
 

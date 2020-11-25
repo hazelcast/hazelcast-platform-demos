@@ -61,11 +61,11 @@ public class ApplicationInitializer {
     public CommandLineRunner commandLineRunner() {
         return args -> {
             HazelcastInstance hazelcastInstance = this.jetInstance.getHazelcastInstance();
-            LOGGER.info("-=-=-=-=- START {} START -=-=-=-=-=-", hazelcastInstance.getName());
+            LOGGER.info("-=-=-=-=- START '{}' START -=-=-=-=-=-", hazelcastInstance.getName());
             this.gaFeatures(hazelcastInstance);
-            LOGGER.info("-=-=-=  MIDDLE  {}  MIDDLE  =-=-=-=-", hazelcastInstance.getName());
+            LOGGER.info("-=-=-=  MIDDLE  '{}'  MIDDLE  =-=-=-=-", hazelcastInstance.getName());
             this.betaFeatures(this.jetInstance);
-            LOGGER.info("-=-=-=-=-  END  {}  END  -=-=-=-=-=-", hazelcastInstance.getName());
+            LOGGER.info("-=-=-=-=-  END  '{}'  END  -=-=-=-=-=-", hazelcastInstance.getName());
         };
     }
 

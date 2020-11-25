@@ -77,9 +77,7 @@ public class MongoUpdater implements CommandLineRunner {
         int count = 0;
         int loop = 0;
         while (loop++ < LOOPS_MAX) {
-            if (loop > 1) {
-                LOGGER.info("Loop {}", loop);
-            }
+            LOGGER.info("Loop {}", loop);
             for (int i = 0 ; i < keys.size() ; i++) {
                 if ((i % 2) == 0) {
                     boolean success = this.update(keys.get(i));

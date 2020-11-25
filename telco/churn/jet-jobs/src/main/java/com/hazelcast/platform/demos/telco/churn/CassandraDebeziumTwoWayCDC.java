@@ -177,9 +177,13 @@ public class CassandraDebeziumTwoWayCDC extends MyJobWrapper {
             JSONObject startTimestampJson = json.getJSONObject("start_timestamp");
 
             String lastModifiedBy = lastModifiedByJson.getString("value");
-            if (!lastModifiedBy.contains("legacy")) {
-                LOGGER.info("Exclude change made by '{}'", lastModifiedBy);
+            // Only accept changes from disk by `churn-update-legacy`
+            if (!lastModifiedBy.contains("update")) {
+                LOGGER.trace("Exclude change made by '{}'", lastModifiedBy);
                 return null;
+            } else {
+                LOGGER.debug("Include change made by '{}' to Id '{}'",
+                        lastModifiedBy, idJson.getString("value"));
             }
 
             // Extract the new value

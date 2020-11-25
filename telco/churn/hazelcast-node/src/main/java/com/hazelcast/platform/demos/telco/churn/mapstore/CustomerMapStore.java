@@ -178,10 +178,13 @@ public class CustomerMapStore implements MapStore<String, HazelcastJsonValue> {
      */
     @Override
     public void store(String key, HazelcastJsonValue value) {
-        LOGGER.debug("store({}, {})", key, value);
-        //FIXME ONLY SAVE IF INCOMING MODIFIED SAME AS PARM!
         long now = System.currentTimeMillis();
-        LOGGER.error("store needs to add '{}' and '{}'", this.modifierFilter, now);
+        LOGGER.debug("store({}, {}) with LastModifiedDate={}, LastModifiedBy='{}'",
+                key, value, now, this.modifierFilter);
+        //FIXME Must save modified by
+        //FIXME Must save modified by
+        //FIXME Must save modified by
+        LOGGER.error("NOT YET IMPLEMENTED");
     }
 
     /**

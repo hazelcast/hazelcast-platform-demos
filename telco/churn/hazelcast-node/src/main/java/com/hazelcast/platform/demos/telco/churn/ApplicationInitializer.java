@@ -16,8 +16,6 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
-import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +23,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.hazelcast.core.DistributedObject;
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.map.IMap;
 import com.hazelcast.platform.demos.telco.churn.mapstore.UpdatedByMapInterceptor;
@@ -41,10 +38,11 @@ import com.hazelcast.platform.demos.telco.churn.mapstore.MyMapHelpers;
 @Configuration
 public class ApplicationInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInitializer.class);
-    private static final long THIRTY_SECONDS = 30L;
+    /*XXX private static final long THIRTY_SECONDS = 30L;
     private static final long TWO_MINUTES = 120L;
     private static final int LOOPS = 10;
     private static final int ENTRIES_MAX = 10;
+    */
 
     @Autowired
     private JetInstance jetInstance;
@@ -68,6 +66,8 @@ public class ApplicationInitializer {
             if (this.myProperties.getInitSize() > currentSize) {
                 LOGGER.info("Cluster size {}, not initializing until {}", currentSize, this.myProperties.getInitSize());
             } else {
+                LOGGER.info("Cluster size {}, -=-=-=-=- START initialize by '{}' START -=-=-=-=-=-",
+                        currentSize, this.jetInstance.getName());
                 var bootstrapServers = this.myProperties.getBootstrapServers();
                 LOGGER.debug("Kafka brokers: {}", bootstrapServers);
                 // Create maps before defining their metadata
@@ -78,7 +78,10 @@ public class ApplicationInitializer {
                 this.defineIMap();
                 // Do jobs last, in case they use SQL
                 this.launchNeededJobs(isLocalhost);
+                LOGGER.info("Cluster size {}, -=-=-=-=-  END  initialize by '{}'  END  -=-=-=-=-=-",
+                        currentSize, this.jetInstance.getName());
             }
+            /*XXX
             LOGGER.error("READY...");
             TimeUnit.SECONDS.sleep(THIRTY_SECONDS);
             for (int k = 0 ; k < LOOPS ; k++) {
@@ -110,6 +113,7 @@ public class ApplicationInitializer {
                 LOGGER.error("AWAKE");
             }
             LOGGER.error("====");
+            */
         };
     }
 

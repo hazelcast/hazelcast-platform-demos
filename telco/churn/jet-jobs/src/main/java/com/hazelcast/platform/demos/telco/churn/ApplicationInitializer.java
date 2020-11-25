@@ -103,7 +103,7 @@ public class ApplicationInitializer {
     public CommandLineRunner commandLineRunner() {
         return args -> {
             HazelcastInstance hazelcastInstance = this.jetInstance.getHazelcastInstance();
-            LOGGER.info("-=-=-=-=- START {} START -=-=-=-=-=-", hazelcastInstance.getName());
+            LOGGER.info("-=-=-=-=- START '{}' START -=-=-=-=-=-", hazelcastInstance.getName());
 
             var timestamp = System.currentTimeMillis();
             var bootstrapServers = this.myProperties.getBootstrapServers();
@@ -129,7 +129,7 @@ public class ApplicationInitializer {
             })
             .forEach(this::trySubmit);
 
-            LOGGER.info("-=-=-=-=-  END  {}  END  -=-=-=-=-=-", hazelcastInstance.getName());
+            LOGGER.info("-=-=-=-=-  END  '{}'  END  -=-=-=-=-=-", hazelcastInstance.getName());
             hazelcastInstance.shutdown();
         };
     }
