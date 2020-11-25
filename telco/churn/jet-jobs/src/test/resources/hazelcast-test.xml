@@ -33,4 +33,13 @@
         </join>
     </network>
 
+    <serialization>
+        <data-serializable-factories>
+            <data-serializable-factory factory-id="1000">com.hazelcast.platform.demos.telco.churn.MyIdentifiedDataSerializableFactory</data-serializable-factory>
+        </data-serializable-factories>
+        <portable-factories>
+            <portable-factory factory-id="2000">com.hazelcast.platform.demos.telco.churn.MyPortableFactory</portable-factory>
+        </portable-factories>
+    </serialization>
+
 </hazelcast>
