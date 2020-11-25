@@ -18,8 +18,44 @@ def assess(items):
 
     results = []
 
-    # Temp - WordCount!!!
+    # Simple ML, each dropped call doubles the churn likelyhood.
+    # Better algorithms exist, substitute your own.
     for item in items:
-      results.append(str(len(item)))
+      csv = item.split(",")
+
+      # Call dropped
+      dropped_str = csv[5]
+      if dropped_str.lower() == "true":
+        dropped = True
+      else:
+        dropped = False
+
+      # Current sentiment
+      current_str = csv[21]
+      if current_str == "":
+        current_pct = float(0.0)
+      else:
+        current_pct = float(current_str)
+
+      # Previous sentiment
+      previous_str = csv[22]
+      if previous_str == "":
+        previous_pct = float(0.0)
+      else:
+        previous_pct = float(previous_str)
+
+      #####################################
+      # Business logic
+      # Step up by more annoyance each time
+      if dropped:
+        old_annoyance = current_pct - previous_pct
+        new_annoyance = float(1) + old_annoyance + current_pct
+      else:
+        # Unchanged if call not dropped, though perhaps the customer will be happier
+        new_annoyance = current_pct
+      #####################################
+
+      # Append new_annoyance level to original input, plus the input current annoyance becomes output previous annoyance
+      results.append(item +  "," + str(new_annoyance) + "," + str(current_pct))
 
     return results

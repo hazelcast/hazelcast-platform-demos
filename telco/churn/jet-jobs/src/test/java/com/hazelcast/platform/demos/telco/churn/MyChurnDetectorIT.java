@@ -66,7 +66,7 @@ public class MyChurnDetectorIT extends AbstractJetIT {
      */
     @DisplayName("format for Python with nulls")
     @Test
-    //FIXME
+    //FIXME See https://github.com/hazelcast/hazelcast-jet/issues/2710
     @Disabled("FIXME")
     public void formatForPythonWithNulls(TestInfo testInfo) {
         String callerTelno = testInfo.getDisplayName();
@@ -78,6 +78,7 @@ public class MyChurnDetectorIT extends AbstractJetIT {
                 = Tuple4.tuple4(callerTelno, cdr, customer, sentiment);
         List<Tuple4<String, HazelcastJsonValue, HazelcastJsonValue, Sentiment>> input =
                 List.of(tuple4);
+        //FIXME Correct
         List<String> expected = List.of(",,,");
 
         Pipeline pipeline = Pipeline.create();
@@ -102,12 +103,14 @@ public class MyChurnDetectorIT extends AbstractJetIT {
      */
     @DisplayName("format for Python without nulls")
     @Test
-    //FIXME
+    //FIXME See https://github.com/hazelcast/hazelcast-jet/issues/2710
+    //FIXME see alsp hazelcast-test.xml
     @Disabled("FIXME")
     public void formatForPythonWithoutNulls(TestInfo testInfo) {
         String callerTelno = testInfo.getDisplayName();
         HazelcastJsonValue cdr = makeCDR(callerTelno);
         HazelcastJsonValue customer = makeCustomer(callerTelno);
+
         Sentiment sentiment = new Sentiment();
         sentiment.setCurrent(1.0d);
         sentiment.setPrevious(0.9d);
@@ -117,6 +120,7 @@ public class MyChurnDetectorIT extends AbstractJetIT {
                 = Tuple4.tuple4(callerTelno, cdr, customer, sentiment);
         List<Tuple4<String, HazelcastJsonValue, HazelcastJsonValue, Sentiment>> input =
                 List.of(tuple4);
+        //FIXME Correct
         List<String> expected = List.of(",,,");
 
         Pipeline pipeline = Pipeline.create();
@@ -137,17 +141,60 @@ public class MyChurnDetectorIT extends AbstractJetIT {
     }
 
     /**
-     * <p>At this point, the Python module is just counting characters
-     * in words.
+     * <p>Pass a record to Python to evaluate.
      * </p>
      */
     @DisplayName("call Python")
     @Test
-    //FIXME
-    @Disabled("FIXME")
     public void helloWorld(TestInfo testInfo) throws Exception {
-        List<String> input = List.of("Hello", "World!");
-        List<String> expected = List.of("5", "6");
+        String key = "(123)-456-7890";
+        String callDataRecordDropped =
+                ",,,,true,,,,,,,";
+        String callDataRecordNotDropped =
+                ",,,,false,,,,,,,";
+        String customer = MyCsvUtils.toCSVCustomer(null);
+        String sentimentNotExisting =
+                MyCsvUtils.toCSVSentiment(null);
+        String sentimentExisting =
+                "5.5,2.2,";
+
+        String inputDroppedWSentiment = key
+                + "," + callDataRecordDropped
+                + "," + customer
+                + "," + sentimentExisting;
+        String inputDroppedWoSentiment = key
+                + "," + callDataRecordDropped
+                + "," + customer
+                + "," + sentimentNotExisting;
+        String inputNotDroppedWSentiment = key
+                + "," + callDataRecordNotDropped
+                + "," + customer
+                + "," + sentimentExisting;
+        String inputNotDroppedWoSentiment = key
+                + "," + callDataRecordNotDropped
+                + "," + customer
+                + "," + sentimentNotExisting;
+        List<String> input =
+                List.of(inputDroppedWSentiment,
+                        inputDroppedWoSentiment,
+                        inputNotDroppedWSentiment,
+                        inputNotDroppedWoSentiment
+                );
+
+        String expectedDroppedWSentiment =
+                inputDroppedWSentiment + ",9.8,5.5";
+        String expectedDroppedWoSentiment =
+                inputDroppedWoSentiment + ",1.0,0.0";
+        String expectedNotDroppedWSentiment =
+                inputNotDroppedWSentiment + ",5.5,5.5";
+        String expectedNotDroppedWoSentiment =
+                inputNotDroppedWoSentiment + ",0.0,0.0";
+        List<String> expected =
+                List.of(expectedDroppedWSentiment,
+                        expectedDroppedWoSentiment,
+                        expectedNotDroppedWSentiment,
+                        expectedNotDroppedWoSentiment
+                );
 
         Pipeline pipeline = Pipeline.create();
 

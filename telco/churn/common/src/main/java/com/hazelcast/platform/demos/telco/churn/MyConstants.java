@@ -47,6 +47,9 @@ public class MyConstants {
     public static final List<String> ITOPIC_NAMES =
             List.of(ITOPIC_NAME_SLACK);
 
+    // Alerting threshold for sentiment analysis
+    public static final double SENTIMENT_THESHOLD_FOR_ALERTING_75_PCT = 75.0d;
+
     // For Jet job that writes to Slack
     public static final String SLACK_ACCESS_TOKEN = "accessToken";
     public static final String SLACK_CHANNEL_ID = "channelId";

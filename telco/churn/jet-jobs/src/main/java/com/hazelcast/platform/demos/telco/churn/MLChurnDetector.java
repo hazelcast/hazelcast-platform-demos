@@ -22,6 +22,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Map.Entry;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -36,6 +39,7 @@ import com.hazelcast.jet.pipeline.JournalInitialPosition;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.pipeline.Sources;
+import com.hazelcast.jet.pipeline.StreamStage;
 import com.hazelcast.jet.python.PythonServiceConfig;
 import com.hazelcast.jet.python.PythonTransforms;
 import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordKey;
@@ -70,7 +74,7 @@ import com.hazelcast.platform.demos.telco.churn.domain.Sentiment;
  *                         |
  *                         |
  *                +------( 5 )------+
- *                |   Re-format     |
+ *                |   Re-format IN  |
  *                +-----------------+
  *                         |
  *                         |
@@ -78,7 +82,24 @@ import com.hazelcast.platform.demos.telco.churn.domain.Sentiment;
  *                +------( 6 )------+
  *                |     Python      |
  *                +-----------------+
- * XXX
+ *                         |
+ *                         |
+ *                         |
+ *                +------( 7 )------+
+ *                |   Re-format OUT |
+ *                +-----------------+
+ *                    /         \
+ *                   /           \
+ *                  /             \
+ *    +------( 8 )------+     +------( 9 )------+
+ *    |     Filter      |     |  Save to IMap   |
+ *    +-----------------+     +-----------------+
+ *             |
+ *             |
+ *             |
+ *    +------( 10)------+
+ *    | Alert to Topic  |
+ *    +-----------------+
  * </pre>
  * <p>
  * The steps:
@@ -134,11 +155,39 @@ import com.hazelcast.platform.demos.telco.churn.domain.Sentiment;
  * </li>
  * <li>
  * <p>
- * XXX source
+ * Reformat from Python
  * </p>
- * <p>XXX
+ * <p>Turn the output from Python into a "{@link Sentiment}" map
+ * entry.
  * </p>
  * </li>
+ * <li>
+ * <p>
+ * Filter
+ * </p>
+ * <p>On the alerting leg of processing, discard "{@link Sentiment}"
+ * records where the customer is not perceived as likely to churn.
+ * </p>
+ * </li>
+ * <li>
+ * <p>
+ * Save to IMap
+ * </p>
+ * <p>Save the "{@link Sentiment}" record into an "{@link IMap}",
+ * using a simple save to overwrite the content. We could use
+ * a more clever "{@link EntryProcessor}" if we needed custom logic to
+ * merge rather than replace.
+ * </p>
+ * </li>
+ * <li>
+ * <p>
+ * Alert
+ * </p>
+ * <p>Produce an alert to a "{@link ITopic}", this customer is at
+ * risk of churning.
+ * </p>
+ * </li>
+ * </ol>
  */
 public class MLChurnDetector extends MyJobWrapper {
     protected static final String PYTHON_HANDLER_FN = "assess";
@@ -159,7 +208,7 @@ public class MLChurnDetector extends MyJobWrapper {
     public Pipeline getPipeline() {
         Pipeline pipeline = Pipeline.create();
 
-        pipeline
+        StreamStage<Entry<String, Sentiment>> sentimentStream = pipeline
         .readFrom(Sources.<CallDataRecordKey, HazelcastJsonValue>mapJournal(MyConstants.IMAP_NAME_CDR,
                 JournalInitialPosition.START_FROM_OLDEST)).withoutTimestamps()
         .filter(entry -> {
@@ -183,12 +232,27 @@ public class MLChurnDetector extends MyJobWrapper {
             .setName("reformat for Python")
         .apply(PythonTransforms.mapUsingPython(getPythonServiceConfig(PYTHON_MODULE)))
             .setName(PYTHON_MODULE)
-        .map(str -> {
-            //XXX Debug
-            System.out.println("@@@5 " + str);
-            return null;
-        })
+        .map(MLChurnDetector::makeSentimentEntry)
+            .setName("reformat for Sentiment");
+
+        // Branch the sentiment stream, always saving, possibly alerting
+
+        // Step 8 & 10 above
+        sentimentStream
+        .filter(entry -> {
+            Sentiment sentiment = entry.getValue();
+            // Crossed threshold
+            return (sentiment.getPrevious() <= MyConstants.SENTIMENT_THESHOLD_FOR_ALERTING_75_PCT
+                    && sentiment.getCurrent() > MyConstants.SENTIMENT_THESHOLD_FOR_ALERTING_75_PCT);
+        }).setName("filter for at-risk-of-churn customers")
+        //XXX FIXME add topic
+        //XXX FIXME add topic
+        //XXX FIXME add topic
+        //XXX FIXME add topic
         .writeTo(Sinks.logger());
+
+        // Step 9 above
+        sentimentStream.writeTo(Sinks.map(MyConstants.IMAP_NAME_SENTIMENT));
 
         return pipeline;
     }
@@ -289,4 +353,24 @@ public class MLChurnDetector extends MyJobWrapper {
         return targetDirectory.toFile();
     }
 
+    /**
+     * XXX
+     *
+     * @param csv From Python, first is key, last two are sentiment
+     * @return
+     */
+    private static Entry<String, Sentiment> makeSentimentEntry(String csv) {
+        String[] tokens = csv.split(",");
+        if (tokens.length != 0) {
+            //XXX
+            LOGGER.error("CSV from Python has {} tokens", tokens.length);
+            return null;
+        }
+        String key = tokens[0];
+        Sentiment value = new Sentiment();
+        //FIXME current
+        //FIXME previous
+        value.setUpdated(LocalDateTime.now());
+        return new SimpleImmutableEntry<String, Sentiment>(key, value);
+    }
 }

@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Configuration;
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.map.IMap;
 import com.hazelcast.platform.demos.telco.churn.mapstore.UpdatedByMapInterceptor;
+import com.hazelcast.topic.ITopic;
 import com.hazelcast.platform.demos.telco.churn.mapstore.MyMapHelpers;
 
 /**
@@ -140,7 +141,10 @@ public class ApplicationInitializer {
             this.jetInstance.getHazelcastInstance().getMap(iMapName);
         }
         for (String iTopicName : MyConstants.ITOPIC_NAMES) {
-            this.jetInstance.getHazelcastInstance().getTopic(iTopicName);
+            ITopic<Object> iTopic =
+                    this.jetInstance.getHazelcastInstance().getTopic(iTopicName);
+            // Log on the topics added
+            iTopic.addMessageListener(new MyLoggingTopicListener());
         }
     }
 
