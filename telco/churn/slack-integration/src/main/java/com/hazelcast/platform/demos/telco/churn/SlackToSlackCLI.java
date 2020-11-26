@@ -140,7 +140,11 @@ public class SlackToSlackCLI {
             return CompletableFuture.supplyAsync(new Supplier<String>() {
                 @Override
                 public String get() {
+                    //FIXME trace?
+                    LOGGER.debug("Raw query.....: '{}'", tuple2.f1());
                     String query = MyUtils.makeUTF8(tuple2.f1());
+                    //FIXME trace?
+                    LOGGER.debug("Cooked query..: '{}'", query);
 
                     StringBuilder stringBuilder = new StringBuilder();
                     stringBuilder.append("```");
