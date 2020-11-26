@@ -180,6 +180,12 @@ import com.hazelcast.platform.demos.telco.churn.domain.Sentiment;
  * a more clever "{@link EntryProcessor}" if we needed custom logic to
  * merge rather than replace.
  * </p>
+ * <p>Note there is a race condition here. We read in step 4 from
+ * a map and write to it in step 9. If there were two records in
+ * a row, this would present a race. If the first is a dropped
+ * call, duration 0 seconds, it is possible the caller would attempt
+ * the call again immediately, so two records for the same {@link Sentiment}
+ * key is possible.
  * </li>
  * <li>
  * <p>
@@ -250,7 +256,7 @@ public class MLChurnDetector extends MyJobWrapper {
         }).setName("filter for at-risk-of-churn customers")
         .writeTo(MLChurnDetector.myTopicSink(MyConstants.ITOPIC_NAME_SLACK));
 
-        // Step 9 above
+        // Step 9 above, but see comment on race condition
         sentimentStream.writeTo(Sinks.map(MyConstants.IMAP_NAME_SENTIMENT));
 
         return pipeline;
@@ -376,6 +382,7 @@ public class MLChurnDetector extends MyJobWrapper {
             value.setUpdated(LocalDateTime.now());
             value.setCurrent(current);
             value.setPrevious(previous);
+            LOGGER.debug("{} {}", key, value);
             return new SimpleImmutableEntry<String, Sentiment>(key, value);
         } catch (Exception e) {
             LOGGER.error(csv, e);
