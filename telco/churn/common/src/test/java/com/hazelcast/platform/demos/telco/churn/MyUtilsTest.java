@@ -128,4 +128,30 @@ public class MyUtilsTest {
         assertThat(output).isEqualTo(expected);
     }
 
+    @Test
+    public void testMakeUTF8GreaterThanLessThan() throws Exception {
+        String input = "SELECT id, callerTelno, calleeTelno, callSuccessful"
+                + " FROM calls WHERE durationSeconds &gt; 0 AND durationSeconds &lt; 2";
+        String expected = "SELECT id, callerTelno, calleeTelno, callSuccessful"
+                + " FROM calls WHERE durationSeconds > 0 AND durationSeconds < 2";
+        String output = MyUtils.makeUTF8(input);
+        System.out.println("input=='" + input + "' output=='" + output + "'");
+
+        assertThat(output).isNotNull();
+        assertThat(output).isInstanceOf(String.class);
+        assertThat(output).isEqualTo(expected);
+    }
+
+    @Test
+    public void testMakeUTF8() throws Exception {
+        String input = "SELECT __key, FLOOR(“current”) || ‘%’ AS “Churn Risk” FROM sentiment";
+        String expected = "SELECT __key, FLOOR(\"current\") || '%' AS \"Churn Risk\" FROM sentiment";
+        String output = MyUtils.makeUTF8(input);
+        System.out.println("input=='" + input + "' output=='" + output + "'");
+
+        assertThat(output).isNotNull();
+        assertThat(output).isInstanceOf(String.class);
+        assertThat(output).isEqualTo(expected);
+    }
+
 }

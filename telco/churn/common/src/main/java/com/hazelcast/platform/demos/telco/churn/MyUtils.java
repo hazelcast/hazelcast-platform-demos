@@ -16,6 +16,7 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -34,6 +35,9 @@ import com.hazelcast.sql.SqlColumnMetadata;
 import com.hazelcast.sql.SqlResult;
 import com.hazelcast.sql.SqlRow;
 import com.hazelcast.sql.SqlRowMetadata;
+
+import org.springframework.web.util.HtmlUtils;
+import org.springframework.web.util.UriUtils;
 
 /**
  * <p>Utility functions that may be useful to more than one module.
@@ -141,10 +145,12 @@ public class MyUtils {
             return null;
         }
 
-        char[] output = new char[input.length()];
+        String decoded = HtmlUtils.htmlUnescape(UriUtils.decode(input, StandardCharsets.UTF_8));
 
-        for (int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
+        char[] output = new char[decoded.length()];
+
+        for (int i = 0; i < decoded.length(); i++) {
+            char c = decoded.charAt(i);
 
             switch (c) {
             case '‘':
