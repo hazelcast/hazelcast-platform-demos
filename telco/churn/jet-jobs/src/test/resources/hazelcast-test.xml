@@ -33,6 +33,7 @@
         </join>
     </network>
 
+	<!-- FIXME : Surefire doesn't find classes despite classpath
     <serialization>
         <data-serializable-factories>
             <data-serializable-factory factory-id="1000">com.hazelcast.platform.demos.telco.churn.MyIdentifiedDataSerializableFactory</data-serializable-factory>
@@ -41,5 +42,6 @@
             <portable-factory factory-id="2000">com.hazelcast.platform.demos.telco.churn.MyPortableFactory</portable-factory>
         </portable-factories>
     </serialization>
+    -->
 
 </hazelcast>

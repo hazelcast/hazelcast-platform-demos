@@ -99,8 +99,8 @@ public class MyUtilsTest {
     @Test
     public void testMakeUTF8DoubleQuotes() throws Exception {
         String input1 = "SELECT firstName FROM Person WHERE lastName = “Stevenson”";
-        String input2 = "SELECT firstName FROM Person WHERE lastName = 'Stevenson'";
-        String expected = "SELECT firstName FROM Person WHERE lastName = 'Stevenson'";
+        String input2 = "SELECT firstName FROM Person WHERE lastName = \"Stevenson\"";
+        String expected = "SELECT firstName FROM Person WHERE lastName = \"Stevenson\"";
 
         assertThat(input1).isNotEqualTo(input2);
 

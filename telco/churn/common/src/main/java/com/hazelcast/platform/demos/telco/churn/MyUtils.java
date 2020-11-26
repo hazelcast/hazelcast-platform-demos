@@ -149,9 +149,11 @@ public class MyUtils {
             switch (c) {
             case '‘':
             case '’':
+                c = '\'';
+                break;
             case '“':
             case '”':
-                c = '\'';
+                c = '"';
                 break;
             default:
                 break;

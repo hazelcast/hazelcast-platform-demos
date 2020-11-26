@@ -152,7 +152,7 @@ public class ApplicationInitializer {
                 // Above by with projection, selection
                 "SELECT id, callerTelno, calleeTelno, callSuccessful"
                         + " FROM " + MyConstants.KAFKA_TOPIC_CALLS_NAME
-                        + " WHERE durationSeconds = 0"
+                        + " WHERE durationSeconds > 0"
         };
 
         int count = 0;
