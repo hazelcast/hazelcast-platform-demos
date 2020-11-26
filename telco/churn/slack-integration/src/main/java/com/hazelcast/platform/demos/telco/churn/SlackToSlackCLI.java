@@ -70,7 +70,7 @@ import com.hazelcast.sql.SqlResult;
  *                         |
  *                         |
  *                +------( 6 )------+
- *                |  Slack Source   |
+ *                |   Slack Sink    |
  *                +-----------------+
  * </pre>
  * <p>

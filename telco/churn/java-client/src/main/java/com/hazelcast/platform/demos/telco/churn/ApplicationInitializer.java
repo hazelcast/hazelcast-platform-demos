@@ -142,8 +142,17 @@ public class ApplicationInitializer {
         String[] queries = new String[] {
                 // IMap with Portable
                 "SELECT * FROM " + MyConstants.IMAP_NAME_SENTIMENT,
+                // Above with function, need to escape as current is reserved word
+                "SELECT __key, FLOOR(\"current\") || '%' AS \"Churn Risk\""
+                        + " FROM " + MyConstants.IMAP_NAME_SENTIMENT,
+                        // ORDER BY not yet supported
+                        //+ " ORDER BY \"current\" DESC"
                 // Kafka topic with JSON
                 "SELECT * FROM " + MyConstants.KAFKA_TOPIC_CALLS_NAME,
+                // Above by with projection, selection
+                "SELECT id, callerTelno, calleeTelno, callSuccessful"
+                        + " FROM " + MyConstants.KAFKA_TOPIC_CALLS_NAME
+                        + " WHERE durationSeconds = 0"
         };
 
         int count = 0;

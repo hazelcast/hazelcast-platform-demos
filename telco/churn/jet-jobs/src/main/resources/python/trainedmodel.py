@@ -46,13 +46,19 @@ def assess(items):
 
       #####################################
       # Business logic
+      # --------------
       # Step up by more annoyance each time
+      # a call is dropped. Don't yet reduce
+      # if lots of successful calls
+      #####################################
       if dropped:
         old_annoyance = current_pct - previous_pct
-        new_annoyance = float(1) + old_annoyance + current_pct
+        new_annoyance = float(1.1) + old_annoyance + current_pct
       else:
-        # Unchanged if call not dropped, though perhaps the customer will be happier
         new_annoyance = current_pct
+      #####################################
+      if new_annoyance > float(100.0):
+        new_annoyance = float(100.0)
       #####################################
 
       # Append new_annoyance level to original input, plus the input current annoyance becomes output previous annoyance

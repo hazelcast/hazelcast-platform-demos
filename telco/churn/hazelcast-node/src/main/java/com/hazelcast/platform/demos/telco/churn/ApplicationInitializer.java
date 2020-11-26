@@ -39,11 +39,6 @@ import com.hazelcast.platform.demos.telco.churn.mapstore.MyMapHelpers;
 @Configuration
 public class ApplicationInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInitializer.class);
-    /*XXX private static final long THIRTY_SECONDS = 30L;
-    private static final long TWO_MINUTES = 120L;
-    private static final int LOOPS = 10;
-    private static final int ENTRIES_MAX = 10;
-    */
 
     @Autowired
     private JetInstance jetInstance;
@@ -82,39 +77,6 @@ public class ApplicationInitializer {
                 LOGGER.info("Cluster size {}, -=-=-=-=-  END  initialize by '{}'  END  -=-=-=-=-=-",
                         currentSize, this.jetInstance.getName());
             }
-            /*XXX
-            LOGGER.error("READY...");
-            TimeUnit.SECONDS.sleep(THIRTY_SECONDS);
-            for (int k = 0 ; k < LOOPS ; k++) {
-                LOGGER.error("SLEEP {}/{}", (k + 1), LOOPS);
-                LOGGER.error("====");
-                for (DistributedObject distributedObject : this.jetInstance.getHazelcastInstance().getDistributedObjects()) {
-                    if (!distributedObject.getName().startsWith("__")) {
-                        LOGGER.warn("distributedObject '{}' '{}'",
-                                distributedObject.getName(), distributedObject.getClass().getName());
-                        if (distributedObject instanceof IMap) {
-                            IMap<?, ?> iMap = (IMap<?, ?>) distributedObject;
-                            LOGGER.warn("  :: IMap '{}'", iMap.getName());
-                            int j = 0;
-                            for (Object key : iMap.keySet()) {
-                                j++;
-                                if (j < ENTRIES_MAX) {
-                                    LOGGER.warn("  ::   :: IMap K,V == {},{}", key, iMap.get(key));
-                                }
-                                if (j == ENTRIES_MAX) {
-                                    LOGGER.warn("  ::   :: <<etc>>");
-                                }
-                            }
-                            LOGGER.warn("  :: '{}'.size()=={}", iMap.getName(), iMap.size());
-                        }
-                    }
-                }
-                LOGGER.error("LOOP {}/{}", (k + 1), LOOPS);
-                TimeUnit.SECONDS.sleep(TWO_MINUTES);
-                LOGGER.error("AWAKE");
-            }
-            LOGGER.error("====");
-            */
         };
     }
 
