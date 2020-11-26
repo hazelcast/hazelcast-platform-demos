@@ -184,9 +184,9 @@ public class MyChurnDetectorIT extends AbstractJetIT {
                 );
 
         String expectedDroppedWSentiment =
-                inputDroppedWSentiment + ",9.9,5.5";
+                inputDroppedWSentiment + ",11.9,5.5";
         String expectedDroppedWoSentiment =
-                inputDroppedWoSentiment + ",1.1,0.0";
+                inputDroppedWoSentiment + ",3.1,0.0";
         String expectedNotDroppedWSentiment =
                 inputNotDroppedWSentiment + ",5.5,5.5";
         String expectedNotDroppedWoSentiment =

@@ -37,6 +37,8 @@ import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.jet.datamodel.Tuple4;
 import com.hazelcast.jet.pipeline.JournalInitialPosition;
 import com.hazelcast.jet.pipeline.Pipeline;
+import com.hazelcast.jet.pipeline.Sink;
+import com.hazelcast.jet.pipeline.SinkBuilder;
 import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.pipeline.Sources;
 import com.hazelcast.jet.pipeline.StreamStage;
@@ -193,6 +195,7 @@ public class MLChurnDetector extends MyJobWrapper {
     protected static final String PYTHON_HANDLER_FN = "assess";
     protected static final String PYTHON_MODULE = "trainedmodel";
     protected static final String PYTHON_SUBDIR = "python";
+    protected static final int PYTHON_OUTPUT_COMMAS = 26;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MLChurnDetector.class);
 
@@ -245,11 +248,7 @@ public class MLChurnDetector extends MyJobWrapper {
             return (sentiment.getPrevious() <= MyConstants.SENTIMENT_THESHOLD_FOR_ALERTING_75_PCT
                     && sentiment.getCurrent() > MyConstants.SENTIMENT_THESHOLD_FOR_ALERTING_75_PCT);
         }).setName("filter for at-risk-of-churn customers")
-        //XXX FIXME add topic
-        //XXX FIXME add topic
-        //XXX FIXME add topic
-        //XXX FIXME add topic
-        .writeTo(Sinks.logger());
+        .writeTo(MLChurnDetector.myTopicSink(MyConstants.ITOPIC_NAME_SLACK));
 
         // Step 9 above
         sentimentStream.writeTo(Sinks.map(MyConstants.IMAP_NAME_SENTIMENT));
@@ -285,7 +284,6 @@ public class MLChurnDetector extends MyJobWrapper {
 
             // Sentiment
             stringBuilder.append(MyCsvUtils.toCSVSentiment(tuple4.f3()));
-            stringBuilder.append(tuple4.f3());
 
             return stringBuilder.toString();
         };
@@ -354,23 +352,58 @@ public class MLChurnDetector extends MyJobWrapper {
     }
 
     /**
-     * XXX
+     * <p>Python works of a CSV line, the first of which is the
+     * customer's key. It appends the derived current and previous
+     * sentiment values. The output previous is the same as the
+     * input current, so it is somewhere else in the output, but
+     * easier to find if it's the last two values.
+     * </p>
      *
      * @param csv From Python, first is key, last two are sentiment
      * @return
      */
     private static Entry<String, Sentiment> makeSentimentEntry(String csv) {
         String[] tokens = csv.split(",");
-        if (tokens.length != 0) {
-            //XXX
-            LOGGER.error("CSV from Python has {} tokens", tokens.length);
+        if (tokens.length != PYTHON_OUTPUT_COMMAS) {
+            LOGGER.error("CSV from Python has {} tokens, {}", tokens.length, csv);
             return null;
         }
-        String key = tokens[0];
-        Sentiment value = new Sentiment();
-        //FIXME current
-        //FIXME previous
-        value.setUpdated(LocalDateTime.now());
-        return new SimpleImmutableEntry<String, Sentiment>(key, value);
+        try {
+            String key = tokens[0];
+            Sentiment value = new Sentiment();
+            double current = Double.valueOf(tokens[tokens.length - 2]);
+            double previous = Double.valueOf(tokens[tokens.length - 1]);
+            value.setUpdated(LocalDateTime.now());
+            value.setCurrent(current);
+            value.setPrevious(previous);
+            return new SimpleImmutableEntry<String, Sentiment>(key, value);
+        } catch (Exception e) {
+            LOGGER.error(csv, e);
+            return null;
+        }
+    }
+
+    /**
+     * <p>Create a simple sink, posts an entry to a topic.
+     * </p>
+     *
+     * @param topicName will always be "{@code slack}".
+     */
+    private static Sink<Entry<String, Sentiment>> myTopicSink(String topicName) {
+        return SinkBuilder.sinkBuilder(
+                    "topicSink-" + topicName,
+                    context -> context.jetInstance().getHazelcastInstance().<String>getTopic(topicName)
+                )
+                .<Entry<String, Sentiment>>receiveFn(
+                        (iTopic, entry) -> {
+                            String message =
+                                    String.format("Churn risk, customer '%s', at %.0f%%",
+                                            entry.getKey(), entry.getValue().getCurrent());
+                            LOGGER.info("Publish on '{}': '{}' : {}",
+                                    iTopic.getName(), message, entry.getValue());
+                            iTopic.publish(message);
+                        })
+                .preferredLocalParallelism(1)
+                .build();
     }
 }
