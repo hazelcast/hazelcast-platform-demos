@@ -105,17 +105,32 @@ Configuration:
           additivity: false
           AppenderRef:
             ref: ConsoleGreen
-        - name: org.springframework.data
-          level: warn
-          additivity: false
-          AppenderRef:
-            ref: ConsoleGreen
         # Useful to see the selected web port
         - name: org.springframework.boot.web.embedded.tomcat.TomcatWebServer
           level: info
           additivity: false
           AppenderRef:
             ref: ConsoleBlue
+        - name: org.springframework.data
+          level: warn
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+        - name: org.springframework.messaging
+          level: warn
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+        - name: org.springframework.scheduling
+          level: warn
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+        - name: org.springframework.web
+          level: warn
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
     Root:
       level: info
       AppenderRef:

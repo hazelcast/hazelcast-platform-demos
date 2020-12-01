@@ -72,8 +72,10 @@ hazelcast:
       topic:
         #
         - name: "slack"
+          principal: churn-java-client
           actions:
-            - publish
+#            - publish
+            - listen
       # For unique job ids
       flake-id-generator:
         - name: "__*"

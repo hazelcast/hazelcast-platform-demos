@@ -42,7 +42,7 @@
 		<hazelcast-jet-spring-boot-starter.version>2.0.0</hazelcast-jet-spring-boot-starter.version>
 		<hazelcast-kubernetes.version>2.0.2</hazelcast-kubernetes.version>
 		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
-		<jackson.version>2.10.2</jackson.version>
+		<jackson.version>2.11.3</jackson.version>
 		<json.version>20190722</json.version>
                 <json-smart.version>2.3</json-smart.version>
 		<junit-jupiter.version>5.7.0</junit-jupiter.version>

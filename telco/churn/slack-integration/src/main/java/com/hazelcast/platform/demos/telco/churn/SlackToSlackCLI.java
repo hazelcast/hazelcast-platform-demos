@@ -16,6 +16,7 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -24,6 +25,7 @@ import com.hazelcast.function.BiFunctionEx;
 import com.hazelcast.function.FunctionEx;
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.datamodel.Tuple2;
+import com.hazelcast.jet.datamodel.Tuple3;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,7 +155,20 @@ public class SlackToSlackCLI {
                     try {
                         SqlResult sqlResult = jetInstance.getSql().execute(query);
 
-                        stringBuilder.append(MyUtils.prettyPrintSqlResult(sqlResult));
+                        Tuple3<String, String, List<String>> result =
+                                MyUtils.prettyPrintSqlResult(sqlResult);
+                        if (result.f0().length() > 0) {
+                            // Error
+                            stringBuilder.append(result.f0());
+                        } else {
+                            // Actual data
+                            result.f2().stream().forEach(stringBuilder::append);
+                            if (result.f1().length() > 0) {
+                                // Warning
+                                stringBuilder.append(result.f1());
+                            }
+                        }
+
                     } catch (Exception e) {
                         LOGGER.error("Query: {} gave {}", tuple2.f1(), e.getMessage());
                         stringBuilder.append("FAILED: ").append(e.getMessage()).append(MyUtils.NEWLINE);
