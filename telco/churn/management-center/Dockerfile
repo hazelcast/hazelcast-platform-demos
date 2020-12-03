@@ -1,4 +1,4 @@
-FROM hazelcast/management-center:4.2020.10
+FROM hazelcast/management-center:4.2020.11-BETA-1
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MC_LICENSE
@@ -32,13 +32,13 @@ CMD ["bash", "-c", "set -euo pipefail \
       && export JAVA_OPTS=-Dmy.password=unset \
       && echo JAVA_OPTS: $JAVA_OPTS \
 #      && echo @@@@@@@@@@@@@@@@@@@@ \
-#      && echo ./mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_ADDRESSLIST} \
-#      && ./mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_ADDRESSLIST} \
+#      && echo bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_ADDRESSLIST} \
+#      && bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_ADDRESSLIST} \
 #      && echo @@@@@@@@@@@@@@@@@@@@ \
       && echo @@@@@@@@@@@@@@@@@@@@ \
-      && echo ./mc-conf.sh cluster add -H=${MC_DATA} --client-config=/hazelcast-client-cluster1.xml \
-      && ./mc-conf.sh cluster add -H=${MC_DATA} --client-config=/hazelcast-client-cluster1.xml \
+      && echo bin/mc-conf.sh cluster add -H=${MC_DATA} --client-config=/hazelcast-client-cluster1.xml \
+      && bin/mc-conf.sh cluster add -H=${MC_DATA} --client-config=/hazelcast-client-cluster1.xml \
       && echo @@@@@@@@@@@@@@@@@@@@ \
-      && echo /mc-start.sh \
-      && /mc-start.sh \
+      && echo bin/mc-start.sh \
+      && bin/mc-start.sh \
      "]

@@ -27,5 +27,6 @@ public class MyLocalConstants {
     // Web Sockets
     public static final String WEBSOCKET_ENDPOINT = "hazelcast";
     public static final String WEBSOCKET_TOPICS_PREFIX = "topics";
+    public static final String WEBSOCKET_SIZES_SUFFIX = "sizes";
 
 }

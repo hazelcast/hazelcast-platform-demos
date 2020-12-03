@@ -70,6 +70,7 @@ public class MySocketTopicListener implements MessageListener<String> {
         stringBuilder.append(" }");
 
         String result = stringBuilder.toString();
+        // Debug not trace as an alert
         LOGGER.debug("Sending to websocket '{}'", result);
 
         this.simpMessagingTemplate.convertAndSend(DESTINATION, result);
