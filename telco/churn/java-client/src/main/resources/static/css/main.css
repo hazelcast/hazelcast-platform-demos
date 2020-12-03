@@ -35,6 +35,19 @@ h1, h2 {
 	font-family: "Courier New", Courier, monospace;
 }
 
+.sqlBlueLight {
+    color: var(--hazelcast-blue-light);
+}
+.sqlRed {
+	color: red;
+}
+.sqlWhite {
+	color: white;
+}
+.sqlYellow {
+	color: yellow;
+}
+
 h3 {
 	color: silver;
 }
