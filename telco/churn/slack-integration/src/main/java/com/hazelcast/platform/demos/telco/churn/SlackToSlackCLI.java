@@ -142,31 +142,22 @@ public class SlackToSlackCLI {
             return CompletableFuture.supplyAsync(new Supplier<String>() {
                 @Override
                 public String get() {
-                    //FIXME trace?
-                    LOGGER.debug("Raw query.....: '{}'", tuple2.f1());
+                    LOGGER.debug("Query.....: '{}'", tuple2.f1());
                     String query = MyUtils.makeUTF8(tuple2.f1());
-                    //FIXME trace?
-                    LOGGER.debug("Cooked query..: '{}'", query);
 
                     StringBuilder stringBuilder = new StringBuilder();
-                    stringBuilder.append("```");
-                    stringBuilder.append("Query: ").append(query).append(MyUtils.NEWLINE);
+                    stringBuilder.append("```Query: ").append(query).append(MyUtils.NEWLINE);
 
                     try {
                         SqlResult sqlResult = jetInstance.getSql().execute(query);
 
-                        Tuple3<String, String, List<String>> result =
-                                MyUtils.prettyPrintSqlResult(sqlResult);
+                        // F0 error, F1 warning, F2 result
+                        Tuple3<String, String, List<String>> result = MyUtils.prettyPrintSqlResult(sqlResult);
                         if (result.f0().length() > 0) {
-                            // Error
                             stringBuilder.append(result.f0());
                         } else {
-                            // Actual data
                             result.f2().stream().forEach(stringBuilder::append);
-                            if (result.f1().length() > 0) {
-                                // Warning
-                                stringBuilder.append(result.f1());
-                            }
+                            stringBuilder.append(result.f1());
                         }
 
                     } catch (Exception e) {
