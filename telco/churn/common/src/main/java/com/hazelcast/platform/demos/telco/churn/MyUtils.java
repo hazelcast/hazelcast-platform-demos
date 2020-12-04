@@ -22,6 +22,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -31,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.Job;
 import com.hazelcast.jet.core.JobStatus;
+import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.sql.SqlColumnMetadata;
 import com.hazelcast.sql.SqlResult;
 import com.hazelcast.sql.SqlRow;
@@ -145,7 +147,11 @@ public class MyUtils {
             return null;
         }
 
-        String decoded = HtmlUtils.htmlUnescape(UriUtils.decode(input, StandardCharsets.UTF_8));
+        // Slack does not use '%' for encoded '%%', but does use '&gt;'
+        String decodedTmp1 = input.replaceAll("%", "%%");
+        String decodedTmp2 = UriUtils.decode(decodedTmp1, StandardCharsets.UTF_8);
+        String decodedTmp3 = decodedTmp2.replaceAll("%%", "%");
+        String decoded = HtmlUtils.htmlUnescape(decodedTmp3);
 
         char[] output = new char[decoded.length()];
 
@@ -175,16 +181,21 @@ public class MyUtils {
      * <p>Pretty-print an SQL result.
      * </p>
      *
-     * @param sqlResult
+     * @param 3-Tuple of error message, warning message, success rows
      * @return
      */
-    public static String prettyPrintSqlResult(SqlResult sqlResult) {
+    public static Tuple3<String, String, List<String>> prettyPrintSqlResult(SqlResult sqlResult) {
+        String error = "";
+        String warning = "";
+        List<String> rows = new ArrayList<>();
+
         if (!sqlResult.isRowSet()) {
             LOGGER.error("prettyPrintSqlResult() called for !rowSet");
-            return "sqlResult.isRowSet()==" + sqlResult.isRowSet() + NEWLINE;
+            error = "sqlResult.isRowSet()==" + sqlResult.isRowSet();
+            return Tuple3.tuple3(error, "", new ArrayList<>());
         }
 
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder line = new StringBuilder();
         String format = "%15s";
 
         // Column headers in capitals
@@ -193,32 +204,35 @@ public class MyUtils {
         int i = 0;
         for (SqlColumnMetadata sqlColumnMetadatum : sqlColumnMetadata) {
             if (i != 0) {
-                stringBuilder.append(',');
+                line.append(',');
             }
-            stringBuilder.append(String.format(format, sqlColumnMetadatum.getName().toUpperCase(Locale.ROOT)));
+            line.append(String.format(format, sqlColumnMetadatum.getName().toUpperCase(Locale.ROOT)));
             i++;
         }
-        stringBuilder.append(NEWLINE);
+        rows.add(line.toString());
 
         int count = 0;
         for (SqlRow sqlRow : sqlResult) {
+            line = new StringBuilder();
             count++;
             for (int j = 0; j < sqlColumnMetadata.size() ; j++) {
                 if (j != 0) {
-                    stringBuilder.append(',');
+                    line.append(',');
                 }
-                stringBuilder.append(String.format(format, sqlRow.getObject(j).toString()));
+                line.append(String.format(format, sqlRow.getObject(j).toString()));
             }
-            stringBuilder.append(NEWLINE);
+            rows.add(line.toString());
             if (count == MyConstants.SQL_RESULT_THRESHOLD) {
                 sqlResult.close();
-                stringBuilder.append("-- truncated at count " + count + NEWLINE);
+                warning = "-- truncated at count " + count;
                 break;
             }
         }
 
-        stringBuilder.append("[").append(count).append(count == 1 ? " row]" : " rows]").append(NEWLINE);
-        return stringBuilder.toString();
+        line = new StringBuilder();
+        line.append("[").append(count).append(count == 1 ? " row]" : " rows]");
+        rows.add(line.toString());
+        return Tuple3.tuple3("", warning, rows);
     }
 
     /**
@@ -290,5 +304,17 @@ public class MyUtils {
         l = Math.abs((l * l) + l);
 
         return PADDED_TEN_ZEROES.format(l);
+    }
+
+    /**
+     * <p>No double-quotes in a string that will become a
+     * JSON string field's value.
+     * </p>
+     *
+     * @param input
+     * @return
+     */
+    public static String safeForJsonStr(String input) {
+        return input.replaceAll("\"", "'");
     }
 }
