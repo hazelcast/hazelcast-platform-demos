@@ -56,7 +56,7 @@ def assess(items):
       #####################################
       if dropped:
         old_annoyance = current_pct - previous_pct
-        new_annoyance = float(3.1) + old_annoyance + current_pct + random.uniform(0, 1)
+        new_annoyance = float(3.1) + old_annoyance + current_pct + random.random()
       else:
         new_annoyance = current_pct
       #####################################
