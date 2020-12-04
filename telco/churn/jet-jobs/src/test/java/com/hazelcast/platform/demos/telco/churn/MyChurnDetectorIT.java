@@ -147,8 +147,9 @@ public class MyChurnDetectorIT extends AbstractJetIT {
     @DisplayName("call Python")
     @Test
     //FIXME Failsafe not finding classpath ??
+    //FIXME Result will have random variation of 0 to 1.
     @Disabled("FIXME")
-    public void helloWorld(TestInfo testInfo) throws Exception {
+    public void passRecordToPython(TestInfo testInfo) throws Exception {
         String key = "(123)-456-7890";
         String callDataRecordDropped =
                 ",,,,true,,,,,,,";

@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import random
 
 def assess(items):
 
@@ -49,11 +50,13 @@ def assess(items):
       # --------------
       # Step up by more annoyance each time
       # a call is dropped. Don't yet reduce
-      # if lots of successful calls
+      # level if lots of successful calls.
+      # Add some randomness so all data
+      # not the exact same.
       #####################################
       if dropped:
         old_annoyance = current_pct - previous_pct
-        new_annoyance = float(3.1) + old_annoyance + current_pct
+        new_annoyance = float(3.1) + old_annoyance + current_pct + random.uniform(0, 1)
       else:
         new_annoyance = current_pct
       #####################################
