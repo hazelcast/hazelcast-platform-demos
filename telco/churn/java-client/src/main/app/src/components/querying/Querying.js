@@ -235,7 +235,8 @@ class Querying extends Component {
                         	<form>
                                 <label for="query">Query:</label>
                                 <input type="text" 
-                                 id="query" name="query" defaultValue={this.state.query}/>
+                                 id="query" name="query" defaultValue={this.state.query}
+                                 onChange={this.handleChange}/>
                                 <button onClick={this.handleSubmit}>Submit</button>
                           	</form>
                     	</div>
