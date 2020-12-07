@@ -1,25 +1,9 @@
 ---
-# Service DNS for Management Center will be "churn-management-center.default.svc.cluster.local".
 # Service DNS for Hazelcast grid will be "churn-sanmateo-hazelcast.default.svc.cluster.local".
 ---
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 # $$$$$$$$$$$$$$$$$$$$$ SERVICE DEFINITIONS $$$$$$$$$$$$$$$$$$$$$
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
----
-# Service for Management Center
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: churn-management-center
-spec:
-  selector:
-    app: churn-management-center
-  ports:
-    - name: management-center
-      port: 8080
-      targetPort: 8080
-  type: LoadBalancer
 ---
 # Service for Hazelcast grid
 ---
@@ -38,35 +22,7 @@ spec:
 # $$$$$$$$$$$$$$$$$$$$$$$ POD DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 ---
-# Pods for Management Center, only need one
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: churn-management-center
-spec:
-  selector:
-    matchLabels:
-      app: churn-management-center
-  template:
-    metadata:
-      labels:
-        app: churn-management-center
-    spec:
-      containers:
-        - image: "hazelcast-platform-demos/churn-management-center"
-          imagePullPolicy: Never
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 8081
-          name: churn-management-center-container
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 8081
----
-# Pods for Hazelcast grid, a stateful set sized at two
+# Pods for Hazelcast grid
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -100,3 +56,4 @@ spec:
             httpGet:
               path: /hazelcast/health/ready
               port: 5701
+---

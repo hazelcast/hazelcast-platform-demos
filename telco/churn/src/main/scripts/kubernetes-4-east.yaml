@@ -1,6 +1,7 @@
 ---
 # Service DNS for Prometheus will be "churn-prometheus.default.svc.cluster.local".
 # Service DNS for Grafana will be "churn-grafana.default.svc.cluster.local".
+# Service DNS for Management Center will be "churn-management-center.default.svc.cluster.local".
 ---
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 # $$$$$$$$$$$$$$$$$$$$$ SERVICE DEFINITIONS $$$$$$$$$$$$$$$$$$$$$
@@ -36,11 +37,26 @@ spec:
       targetPort: 3000
   type: LoadBalancer
 ---
+# Service for Management Center
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: churn-management-center
+spec:
+  selector:
+    app: churn-management-center
+  ports:
+    - name: management-center
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer
+---
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 # $$$$$$$$$$$$$$$$$$$$$$$ POD DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 ---
-# Pods for Prometheus, only need one
+# Pod for Prometheus
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -60,7 +76,7 @@ spec:
           imagePullPolicy: Never
           name: churn-prometheus-container
 ---
-# Pods for Grafana, only need one
+# Pod for Grafana
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -79,4 +95,43 @@ spec:
         - image: "hazelcast-platform-demos/churn-grafana"
           imagePullPolicy: Never
           name: churn-grafana-container
+---
+# Pod for Management Center
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churn-management-center
+spec:
+  selector:
+    matchLabels:
+      app: churn-management-center
+  template:
+    metadata:
+      labels:
+        app: churn-management-center
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/churn-management-center"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+          name: churn-management-center-container
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+          resources:
+            requests:
+              memory: "4096Mi"
+            limits:
+              memory: "12288Mi"
 ---
