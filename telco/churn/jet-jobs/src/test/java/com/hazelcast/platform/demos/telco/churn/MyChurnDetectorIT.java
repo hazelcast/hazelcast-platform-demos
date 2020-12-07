@@ -81,7 +81,7 @@ public class MyChurnDetectorIT extends AbstractJetIT {
                 List.of(inputDroppedWSentiment, inputDroppedWoSentiment,
                         inputNotDroppedWSentiment, inputNotDroppedWoSentiment);
 
-        List<Double> expectedCurrent = List.of(11.5D, 3.1D, 5.5D, 0.0D);
+        List<Double> expectedCurrent = List.of(11.9D, 3.1D, 5.5D, 0.0D);
         List<Double> expectedPrevious = List.of(5.5D, 0.0D, 5.5D, 0.0D);
 
         Pipeline pipeline = Pipeline.create();
@@ -105,8 +105,10 @@ public class MyChurnDetectorIT extends AbstractJetIT {
             Double newCurrent = Double.valueOf(tokens[tokens.length - 2]);
             Double newPrevious = Double.valueOf(tokens[tokens.length - 1]);
 
-            // Exact match on previous, allow variance for previous
+            // Exact match on previous, allow variance for current
             assertThat(newPrevious).isEqualTo(expectedPrevious.get(i));
+            // old_annoyance = current_pct - previous_pct
+            // new_annoyance = float(3.1) + old_annoyance + current_pct + random.random()
             assertThat(newCurrent).isGreaterThanOrEqualTo(expectedCurrent.get(i));
             assertThat(newCurrent).isLessThan(expectedCurrent.get(i) + 1.0d);
             System.out.println(expectedCurrent.get(i) + " new Current " + newCurrent);
