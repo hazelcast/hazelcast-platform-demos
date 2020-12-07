@@ -156,7 +156,7 @@ public class SlackToSlackCLI {
                         if (result.f0().length() > 0) {
                             stringBuilder.append(result.f0());
                         } else {
-                            result.f2().stream().forEach(stringBuilder::append);
+                            result.f2().stream().forEach(row -> stringBuilder.append(row +  MyUtils.NEWLINE));
                             stringBuilder.append(result.f1());
                         }
 

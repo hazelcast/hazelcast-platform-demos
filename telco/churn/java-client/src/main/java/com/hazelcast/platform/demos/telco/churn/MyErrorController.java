@@ -71,7 +71,6 @@ public class MyErrorController implements ErrorController {
         // This app hasn't faulted, it could be user typed in a bad URL.
         LOGGER.warn("error(): {} for {}", statusCode, path);
 
-        //TODO Improve!
-        return "<html><body>Sorry</body></html>";
+        return "<html><body>An error has occurred, details are in the logs</body></html>";
     }
 }

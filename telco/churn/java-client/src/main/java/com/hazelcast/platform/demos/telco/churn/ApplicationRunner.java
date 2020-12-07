@@ -189,8 +189,7 @@ public class ApplicationRunner {
     private void betaFeatures(JetInstance jetInstance) {
         String[] queries = new String[] {
                 // IMap with Portable
-                "SELECT * FROM " + MyConstants.IMAP_NAME_SENTIMENT
-                /*XXX Tmp,
+                "SELECT * FROM " + MyConstants.IMAP_NAME_SENTIMENT,
                 // Above with function, need to escape as current is reserved word
                 "SELECT __key, FLOOR(\"current\") || '%' AS \"Churn Risk\""
                         + " FROM " + MyConstants.IMAP_NAME_SENTIMENT,
@@ -202,7 +201,6 @@ public class ApplicationRunner {
                 "SELECT id, callerTelno, calleeTelno, callSuccessful"
                         + " FROM " + MyConstants.KAFKA_TOPIC_CALLS_NAME
                         + " WHERE durationSeconds > 0"
-                        */
         };
 
         int count = 0;
