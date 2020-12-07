@@ -18,7 +18,6 @@ package com.hazelcast.platform.demos.telco.churn;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -144,17 +143,28 @@ public class MyUtilsTest {
     }
 
     @Test
-    //XXX FIX WHY THIS TEST FAILS
-    @Disabled
     public void testMakeUTF8() {
-        String input = "SELECT __key, FLOOR(“current”) || ‘%’ AS “Churn Risk” FROM sentiment";
-        String expected = "SELECT __key, FLOOR(\"current\") || '%' AS \"Churn Risk\" FROM sentiment";
-        String output = MyUtils.makeUTF8(input);
-        System.out.println("input=='" + input + "' output=='" + output + "'");
+        String input1 = "SELECT * FROM sentiment";
+        String input2 = "SELECT __key, FLOOR(“current”) || ‘%’ AS “Churn Risk” FROM sentiment";
+        String input3 = "SELECT * FROM calls";
+        String input4 = "SELECT id, callerTelno, calleeTelno, callSuccessful FROM calls"
+                + " WHERE durationSeconds &gt; 0";
+        String expected1 = "SELECT * FROM sentiment";
+        String expected2 = "SELECT __key, FLOOR(\"current\") || '%' AS \"Churn Risk\" FROM sentiment";
+        String expected3 = "SELECT * FROM calls";
+        String expected4 = "SELECT id, callerTelno, calleeTelno, callSuccessful FROM calls"
+                + " WHERE durationSeconds > 0";
 
-        assertThat(output).isNotNull();
-        assertThat(output).isInstanceOf(String.class);
-        assertThat(output).isEqualTo(expected);
+        String[] inputs = new String[] { input1, input2, input3, input4 };
+        String[] expecteds = new String[] { expected1, expected2, expected3, expected4 };
+
+        for (int i = 0; i < inputs.length; i++) {
+            String output = MyUtils.makeUTF8(inputs[i]);
+
+            assertThat(output).isNotNull();
+            assertThat(output).isInstanceOf(String.class);
+            assertThat(output).isEqualTo(expecteds[i]);
+        }
     }
 
     @Test

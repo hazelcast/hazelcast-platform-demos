@@ -16,7 +16,6 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
-import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -39,7 +38,6 @@ import com.hazelcast.sql.SqlRow;
 import com.hazelcast.sql.SqlRowMetadata;
 
 import org.springframework.web.util.HtmlUtils;
-import org.springframework.web.util.UriUtils;
 
 /**
  * <p>Utility functions that may be useful to more than one module.
@@ -147,16 +145,11 @@ public class MyUtils {
             return null;
         }
 
-        // Slack does not use '%' for encoded '%%', but does use '&gt;'
-        String decodedTmp1 = input.replaceAll("%", "%%");
-        String decodedTmp2 = UriUtils.decode(decodedTmp1, StandardCharsets.UTF_8);
-        String decodedTmp3 = decodedTmp2.replaceAll("%%", "%");
-        String decoded = HtmlUtils.htmlUnescape(decodedTmp3);
+        // First pass - charset replacements
+        char[] firstPass = new char[input.length()];
 
-        char[] output = new char[decoded.length()];
-
-        for (int i = 0; i < decoded.length(); i++) {
-            char c = decoded.charAt(i);
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
 
             switch (c) {
             case '‘':
@@ -171,10 +164,16 @@ public class MyUtils {
                 break;
             }
 
-            output[i] = c;
+            firstPass[i] = c;
         }
 
-        return new String(output);
+        // Placeholder for any replacements
+        String secondPass = new String(firstPass);
+        //.replaceAll("%", "%%");
+
+        String thirdPass = HtmlUtils.htmlUnescape(secondPass);
+
+        return thirdPass;
     }
 
     /**
