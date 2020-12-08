@@ -16,6 +16,11 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
+import java.util.Properties;
+import java.util.Map.Entry;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -27,6 +32,30 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @SpringBootApplication
 @EnableConfigurationProperties(MyProperties.class)
 public class Application {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
+
+    static {
+        Properties properties = new Properties();
+        if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
+            properties.put("spring.data.cassandra.contact-points",
+                    "churn-cassandra.default.svc.cluster.local");
+            properties.put("spring.data.mongodb.host",
+                    "churn-mongo.default.svc.cluster.local");
+            properties.put("spring.datasource.url",
+                    "jdbc:mysql://churn-mysql.default.svc.cluster.local:3306/churn"
+                    + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC");
+        } else {
+            properties.put("spring.data.cassandra.contact-points", "cassandra");
+            properties.put("spring.data.mongodb.host", "mongo");
+            properties.put("spring.datasource.url",
+                    "jdbc:mysql://mysql:3306/churn"
+                    + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC");
+        }
+        for (Entry<Object, Object> entry : properties.entrySet()) {
+            LOGGER.info("'{}'=='{}'", entry.getKey(), entry.getValue());
+            System.setProperty(entry.getKey().toString(), entry.getValue().toString());
+        }
+    }
 
     /**
      * <p>Use Spring to invoke separate runner classes.

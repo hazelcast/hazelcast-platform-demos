@@ -1,21 +1,208 @@
 ---
-# Service DNS for ? will be "churn-?.default.svc.cluster.local".
+# Service DNS for Cassandra will be "churn-cassandra.default.svc.cluster.local".
+# Service DNS for Kafka Connect will be "churn-kafka-connect.default.svc.cluster.local".
+# Service DNS for Mongo will be "churn-mongo.default.svc.cluster.local".
+# Service DNS for MySql will be "churn-mysql.default.svc.cluster.local".
 ---
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 # $$$$$$$$$$$$$$$$$$$$$ SERVICE DEFINITIONS $$$$$$$$$$$$$$$$$$$$$
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 ---
-# Service for ?
+# Service for Cassandra
 ---
-
-
+apiVersion: v1
+kind: Service
+metadata:
+  name: churn-cassandra
+spec:
+  clusterIP: None
+  selector:
+    app: churn-cassandra
+  ports:
+  - port: 9042
+---
+# Service for Kafka Connect
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: churn-kafka-connect
+spec:
+  clusterIP: None
+  selector:
+    app: churn-kafka-connect
+  ports:
+  - port: 8083
+---
+# Service for Mongo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: churn-mongo
+spec:
+  clusterIP: None
+  selector:
+    app: churn-mongo
+  ports:
+  - port: 27017
+---
+# Service for MySql
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: churn-mysql
+spec:
+  clusterIP: None
+  selector:
+    app: churn-mysql
+  ports:
+  - port: 8083
 ---
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 # $$$$$$$$$$$$$$$$$$$$$$$ POD DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 ---
-# Pods for ?
+# Pod for Cassandra
 ---
-
-
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churn-cassandra
+spec:
+  selector:
+    matchLabels:
+      app: churn-cassandra
+  template:
+    metadata:
+      labels:
+        app: churn-cassandra
+    spec:
+      containers:
+        - env:
+          - name: "MY_BOOTSTRAP_SERVERS"
+            value: "churn-kafka-broker-0.churn-kafka-broker.default.svc.cluster.local:9092,churn-kafka-broker-1.churn-kafka-broker.default.svc.cluster.local:9092,churn-kafka-broker-2.churn-kafka-broker.default.svc.cluster.local:9092"
+          image: "hazelcast-platform-demos/churn-cassandra"
+          imagePullPolicy: Never
+          name: churn-cassandra-container
+---
+# Pod for Kafka Connect
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churn-kafka-connect
+spec:
+  selector:
+    matchLabels:
+      app: churn-kafka-connect
+  template:
+    metadata:
+      labels:
+        app: churn-kafka-connect
+    spec:
+      initContainers:
+        - name: wait-for-pod-mongo
+          image: busybox
+          command: ['sh', '-c', 'sleep 300']
+      containers:
+        - env:
+          - name: "BOOTSTRAP_SERVERS"
+            value: "churn-kafka-broker-0.churn-kafka-broker.default.svc.cluster.local:9092,churn-kafka-broker-1.churn-kafka-broker.default.svc.cluster.local:9092,churn-kafka-broker-2.churn-kafka-broker.default.svc.cluster.local:9092"
+          image: "hazelcast-platform-demos/churn-kafka-connect"
+          imagePullPolicy: Never
+          name: churn-kafka-connect-container
+          ports:
+            - containerPort: 8083
+---
+# Pod for Mongo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churn-mongo
+spec:
+  selector:
+    matchLabels:
+      app: churn-mongo
+  template:
+    metadata:
+      labels:
+        app: churn-mongo
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/churn-mongo"
+          imagePullPolicy: Never
+          name: churn-mongo-container
+---
+# Pod for MySql
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churn-mysql
+spec:
+  selector:
+    matchLabels:
+      app: churn-mysql
+  template:
+    metadata:
+      labels:
+        app: churn-mysql
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/churn-mysql"
+          imagePullPolicy: Never
+          name: churn-mysql-container
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$ JOB DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Job for topic creation
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: churn-job-preload-legacy
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: churn-job-preload-legacy
+    spec:
+      initContainers:
+        - name: wait-for-pod-cassandra
+          image: busybox
+          command: ['sh', '-c', 'sleep 120']
+      containers:
+        - image: "hazelcast-platform-demos/churn-preload-legacy"
+          imagePullPolicy: Never
+          name: churn-job-preload-legacy-container
+      restartPolicy: Never
+---
+# Job for update legacy
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: churn-job-update-legacy
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: churn-job-update-legacy
+    spec:
+      initContainers:
+        - name: wait-for-pod-preload-legacy
+          image: busybox
+          command: ['sh', '-c', 'sleep 600']
+      containers:
+        - image: "hazelcast-platform-demos/churn-update-legacy"
+          imagePullPolicy: Never
+          name: churn-job-update-legacy-container
+      restartPolicy: Never
 ---
