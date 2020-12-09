@@ -1,0 +1,39 @@
+---
+# Service DNS will be "grafana-service.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-service
+spec:
+  selector:
+    app: cva-grafana
+  ports:
+    - name: grafana
+      port: 80
+      targetPort: 80
+    - name: graphite
+      port: 2004
+      targetPort: 2004
+  type: LoadBalancer
+---
+# Only need 1 grafana
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cva-grafana
+spec:
+  selector:
+    matchLabels:
+      app: cva-grafana
+  template:
+    metadata:
+      labels:
+        app: cva-grafana
+    spec:
+      containers:
+        - image: "hazelcast-cva/grafana"
+          imagePullPolicy: Never
+          name: grafana-container
+---
