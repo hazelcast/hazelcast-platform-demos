@@ -5,7 +5,7 @@ ARG JAR_FILE
 COPY target/${JAR_FILE} application.jar
 
 # Default values provided
-ENV MY_CPP_SERVICE "cpp-service"
+ENV MY_CPP_SERVICE "cva-cpp"
 ENV MY_KUBERNETES_ENABLED "true"
 ENV MY_SITE ""
 

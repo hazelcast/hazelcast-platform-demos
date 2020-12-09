@@ -7,7 +7,7 @@ CLONE=0
 BASEDIR=`dirname $0`
 cd $BASEDIR/../../../$MODULE
 
-DOCKER_IMAGE=hazelcast-${PROJECT}/${MODULE}
+DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
 PORT=$(($CLONE + 9092))
 

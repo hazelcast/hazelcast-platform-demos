@@ -47,6 +47,7 @@ import org.springframework.context.annotation.Configuration;
 public class ApplicationConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
 
+    private final String project;
     private final Site site;
     private final Site remoteSite;
 
@@ -55,8 +56,10 @@ public class ApplicationConfig {
 
     public ApplicationConfig(MyProperties myProperties) {
         // From Maven, application.yml, wouldn't be in environment by default.
+        this.project = myProperties.getProject();
         this.remoteSite = myProperties.getRemoteSite();
         this.site = myProperties.getSite();
+        System.setProperty("my.project", this.project);
         System.setProperty("my.remote.site", this.remoteSite.toString());
         System.setProperty("my.site", this.site.toString());
     }

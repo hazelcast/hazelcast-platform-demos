@@ -5,14 +5,14 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   labels:
-    app: cva-data-loader-site1
-  name: cva-data-loader-site1
+    app: cva-job-site1-data-loader
+  name: cva-job-site1-data-loader
 spec:
   backoffLimit: 0
   template:
     metadata:
       labels:
-        app: cva-data-loader-site1
+        app: cva-job-site1-data-loader
     spec:
       containers:
         - env:
@@ -20,8 +20,8 @@ spec:
             value: "site1"
           - name: "MY_THRESHOLD"
             value: "500"
-          image: "hazelcast-cva/data-loader"
+          image: "hazelcast-platform-demos/cva-data-loader"
           imagePullPolicy: Never
-          name: container-data-loader-site1
+          name: cva-job-site1-data-loader-container
       restartPolicy: Never
 ---

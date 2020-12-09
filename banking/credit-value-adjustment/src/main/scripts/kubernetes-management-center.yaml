@@ -1,15 +1,15 @@
 ---
-# Service DNS will be "mancenter-service.default.svc.cluster.local".
+# Service DNS will be "cva-management-center.default.svc.cluster.local".
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: management-center-service
+  name: cva-management-center
 spec:
   selector:
     app: cva-management-center
   ports:
-    - name: management-center
+    - name: cva-management-center
       port: 8080
       targetPort: 8080
   type: LoadBalancer
@@ -30,13 +30,13 @@ spec:
         app: cva-management-center
     spec:
       containers:
-        - image: "hazelcast-cva/management-center"
+        - image: "hazelcast-platform-demos/cva-management-center"
           imagePullPolicy: Never
           livenessProbe:
             httpGet:
               path: /health
               port: 8081
-          name: mancenter-container
+          name: cva-management-center-container
           readinessProbe:
             httpGet:
               path: /health

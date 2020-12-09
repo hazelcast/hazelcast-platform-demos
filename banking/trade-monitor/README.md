@@ -8,7 +8,11 @@ An example showing continuous aggregation of stock market trades, providing
 a UI for inspection of the aggregated values with the ability to drill-down
 to see the trades contained in each aggregation.
 
-This example uses open-source Hazelcast only.
+[Watch The Video](https://hazelcast.com/resources/continuous-query-with-drill-down-demo/)
+
+This example only requires open-source Hazelcast.
+
+There are modules for monitoring which involve licensing, but these are optional.
 
 Input is simulated and injected into a Kafka topic. Hazelcast reads from
 this topic to present via  a reactive web UI, but is not aware how of
@@ -44,13 +48,16 @@ Docker exists and build container images for deployment.
 
 ## Modules
 
-There are 8 modules in this example, alphabetically:
+There are 11 modules in this example, alphabetically:
 
 ```
 common/
+grafana/
 hazelcast-node/
 kafdrop/
 kafka-broker/
+management-center/
+prometheus/
 topic-create/
 trade-producer/
 webapp/
@@ -247,6 +254,29 @@ the demonstration. The trades for that symbol are listed most recent first, but 
 millions of trades then that means thousands of trades for each stock symbol, so potentially
 a very long list.
 
+### 9. `management-center` (optional)
+
+This is Hazelcast's Management Center, for collating, viewing and controlling a cluster.
+
+This is licensed software, but for the purposes of this demo `management-center`, `prometheus`
+and `grafana` are an optional trio. If you don't want to obtain a license, skip these three.
+
+Register [here](https://hazelcast.com/download/) to request the evaluation license keys you
+need, and put them in your `settings.xml` file as described in [Repository top-level README.md](../../README.md).
+Be sure to mention this is for Trade Monitor so you get a license with the correct capabilities.
+
+### 10. `prometheus` (optional)
+
+Prometheus is an open-source time-series database. It connects to `management-center` for its
+data, so if you choose not to run `management-center` there's no need to bother with
+`prometheus`.
+
+### 11. `grafana` (optional)
+
+Grafana is open-source dashboarding software. If connects to `prometheus` for its data, so
+if you don't run `management-center` and so don't run `prometheus`, don't bother with
+`grafana` either.
+
 ## Running -- sequence
 
 The following sections describe how to run the example on your local machine, on Docker
@@ -267,10 +297,18 @@ created, but it shows the most if the topic exists and is being written to.
 need to be anything being written to the Kafka topic, but if there is no input there is no output from
 a streaming job.
 
-5.`webapp` The web UI is a client of the Hazelcast cluster, so needs Hazelcast node(s) to be runnning.
+5.== `webapp` The web UI is a client of the Hazelcast cluster, so needs Hazelcast node(s) to be runnning.
+
+5.== `management-center` Connects to the cluster in step 4.
+
+6. `prometheus` Connects to the Hazelcast Management Center in step 5.
+
+7. `grafana` Connecs to Prometheus in step 6.
 
 Ignoring the partial ordering, the recommended start sequence would be `zookeeper`, `kafka-broker`,
 `topic-create`, `kafdrop`, `trade-producer`, `hazelcast-node` and finally `webapp`.
+
+If you add the optional monitoring, then `management-center`, `prometheus` and `grafana`.
 
 ## Running -- Localhost
 
@@ -326,6 +364,7 @@ In sequence:
 7. [docker-trade-producer.sh](./src/main/scripts/docker-trade-producer.sh)
 8. [docker-hazelcast-node.sh](./src/main/scripts/docker-hazelcast-node.sh)
 9. [docker-webapp.sh](./src/main/scripts/docker-webapp.sh)
+10. [docker-management-center.sh](./src/main/scripts/docker-management-center.sh)
 
 You should wait for Zookeeper (1) to have started before starting the three Kafka brokers (2,3,4).
 
@@ -335,7 +374,9 @@ Kafdrop (6), the Trade Producer (7) and a Hazelcast node (8) can all be started 
 
 The Web UI (9) is started last, once everything else is ready.
 
-Once started, the `webapp` UI is available as http://localhost:8080/ and `kafdrop` as http://localhost:8083/.
+Once started, the `webapp` UI is available as http://localhost:8081/ and `kafdrop` as http://localhost:8083/.
+
+If you chose to start the `management-center` it is on http://localhost:8080.
 
 ### Host network
 
@@ -356,7 +397,7 @@ Use the command `docker network inspect trade-monitor` if you really wish to see
 1. [kubernetes-zookeeper-kafka.yaml](./src/main/scripts/kubernetes-zookeeper-kafka.yaml)
 2. [kubernetes-trade-producer.yaml](./src/main/scripts/kubernetes-trade-producer.yaml)
 3. [kubernetes-hazelcast-node.yaml](./src/main/scripts/kubernetes-hazelcast-node.yaml)
-4. [kubernetes-webapp.yaml](./src/main/scripts/kubernetes-webapp.yaml)
+4. [kubernetes-webapp-and-monitoring.yaml](./src/main/scripts/kubernetes-webapp-and-monitoring.yaml)
 
 These are deliberately simple Kubernetes deployment file. Resource limits, auto-scaling,
 namespaces, etc could all be added to move towards production quality.
@@ -378,16 +419,19 @@ If all looks well, you should something like this listed for the default namespa
 ```
 $ kubectl get pods
 NAME                                       READY   STATUS      RESTARTS   AGE
-job-topic-create-cs2cv                     0/1     Completed   0          8m12s
-job-trade-producer-fjf76                   1/1     Running     0          3m27s
-trade-monitor-hazelcast-node-0             1/1     Running     0          3m16s
-trade-monitor-hazelcast-node-1             1/1     Running     0          2m37s
-trade-monitor-kafdrop-579b64c495-qbkrv     1/1     Running     2          8m12s
-trade-monitor-kafka-broker-0               1/1     Running     0          8m12s
-trade-monitor-kafka-broker-1               1/1     Running     0          7m22s
-trade-monitor-kafka-broker-2               1/1     Running     0          6m35s
-trade-monitor-webapp-55bcd675d7-kc5vf      1/1     Running     0          78s
-trade-monitor-zookeeper-66f6b4c6d4-8kjns   1/1     Running     0          8m12s
+job-trade-monitor-topic-create-2v2q6               0/1     Completed   0          17m
+job-trade-monitor-trade-producer-t2r2r             1/1     Running     0          9s
+trade-monitor-grafana-b5bd4545b-7tc2b              1/1     Running     0          8m11s
+trade-monitor-hazelcast-node-0                     1/1     Running     0          11m
+trade-monitor-hazelcast-node-1                     1/1     Running     0          10m
+trade-monitor-kafdrop-6c454cf9c4-pbqc4             1/1     Running     0          17m
+trade-monitor-kafka-broker-0                       1/1     Running     0          17m
+trade-monitor-kafka-broker-1                       1/1     Running     0          17m
+trade-monitor-kafka-broker-2                       1/1     Running     0          16m
+trade-monitor-management-center-66b8744ccd-4qlvv   1/1     Running     0          8m11s
+trade-monitor-prometheus-74cc965f6d-4kwhh          1/1     Running     0          8m11s
+trade-monitor-webapp-86c965c5b4-qvjkd              1/1     Running     0          8m11s
+trade-monitor-zookeeper-596bcf6b7c-hhl4z           1/1     Running     0          17m
 ```
 
 All nodes are at "_READY_" status "_1/1_" (exception the topic creation job which has completed).
