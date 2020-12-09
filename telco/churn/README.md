@@ -43,10 +43,11 @@ The settings `my.slack.bot.user.oath.access.token`, `my.slack.bot.channel.name` 
 `my.slack.bot.channel.id` are only needed if you use the [slack-integration](./slack-integration)
 module.
 
-# TODO
-
+# FIXME
 ## Mongo
 Add Mongo Debezium One-Way CDC
+Kafka Connect - "mongo" parameter to Dockerfile
 
+# TODO
 Make Cassandra automatically flush cdc to disk, use Cassandra 4.0 once Debezium supports
 https://issues.apache.org/jira/browse/CASSANDRA-12148
