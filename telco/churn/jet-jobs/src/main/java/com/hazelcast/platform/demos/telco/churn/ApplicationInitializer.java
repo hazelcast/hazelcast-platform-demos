@@ -119,11 +119,11 @@ public class ApplicationInitializer {
                     )
             .stream()
             .filter(myJobWrapper -> {
-                //FIXME Turn off til written
+                // Turn off any that are unwanted
                 String jobName = myJobWrapper.getJobConfig().getName();
-                boolean include = !jobName.contains("Mongo");
+                boolean include = !jobName.contains("FILTER OUT NAME");
                 if (!include) {
-                    LOGGER.warn("Skip '{}', not yet written", jobName);
+                    LOGGER.warn("Skip '{}', not wanted", jobName);
                 }
                 return include;
             })
