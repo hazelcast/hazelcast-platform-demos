@@ -8,10 +8,12 @@ ARG MC_CLUSTER1_NAME
 ARG MC_CLUSTER1_ADDRESSLIST
 
 # To check health, uses port 8081 but internal URL. Preconfigure license, logon/password.
+ENV MY_PASSWORD=unset
 ENV JAVA_OPTS="-Dhazelcast.mc.healthCheck.enable=true \
  -Dhazelcast.mc.auditlog.enabled=true \
  -Dhazelcast.mc.prometheusExporter.enabled=true \
- -Dhazelcast.mc.license=$MC_LICENSE"
+ -Dhazelcast.mc.license=$MC_LICENSE \
+ -Dmy.password=$MY_PASSWORD"
 
 # Used by /mc-start.sh to create admin user, for default security module
 ENV MC_ADMIN_USER=$MC_ADMINUSER
@@ -29,8 +31,8 @@ ENV MC_CLASSPATH=/application.jar
 
 # Start Management Center
 CMD ["bash", "-c", "set -euo pipefail \
-      && export JAVA_OPTS=-Dmy.password=unset \
       && echo JAVA_OPTS: $JAVA_OPTS \
+      && echo MY_PASSWORD: $MY_PASSWORD \
 #      && echo @@@@@@@@@@@@@@@@@@@@ \
 #      && echo bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_ADDRESSLIST} \
 #      && bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_ADDRESSLIST} \
