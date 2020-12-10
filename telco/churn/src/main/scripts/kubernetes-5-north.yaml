@@ -29,15 +29,15 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: churn-site1-java-client
+  name: churn-java-client
 spec:
   selector:
     matchLabels:
-      app: churn-site1-java-client
+      app: churn-java-client
   template:
     metadata:
       labels:
-        app: churn-site1-java-client
+        app: churn-java-client
     spec:
       containers:
         - image: "hazelcast-platform-demos/churn-java-client"
