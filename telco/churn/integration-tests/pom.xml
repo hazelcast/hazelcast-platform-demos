@@ -9,10 +9,10 @@
 		<version>4.0</version>
 	</parent>
 
-	<artifactId>churn-jet-jobs-it</artifactId>
+	<artifactId>churn-integration-tests</artifactId>
 
-	<name>Hazelcast Platform - Churn - Jet Jobs</name>
-	<description>Telco Churn - Jet jobs - Integration tests</description>
+	<name>Hazelcast Platform - Churn - Integration Tests</name>
+	<description>Telco Churn - Integration tests</description>
 
 	<properties>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
@@ -20,10 +20,34 @@
 
 	<!-- Use hazelcast-jet instead of hazelcast-jet-enterprise -->
 	<!-- so integration tests do not need a license key.       -->
+
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
+			<artifactId>churn-abstract-client</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.hazelcast.jet</groupId>
+					<artifactId>hazelcast-jet-enterprise</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet-python</artifactId>
+		</dependency>
+		
+		<!-- scope==test -->
+		<dependency>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>churn-jet-jobs</artifactId>
+			<scope>test</scope>
 			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
@@ -34,12 +58,6 @@
 		</dependency>
 
 		<!-- scope==test -->
-		<dependency>
-			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet</artifactId>
-			<scope>test</scope>
-		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -57,19 +75,59 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
+	
 	<build>
-		<testResources>
-			<testResource>
-				<directory>src/test/resources</directory>
-				<filtering>true</filtering>
-			</testResource>
-		</testResources>
-
 		<plugins>
+			<plugin>	
+				<artifactId>maven-dependency-plugin</artifactId>
+		        <executions>
+        			<execution>
+			            <phase>compile</phase>
+            			<goals>
+              				<goal>unpack</goal>
+            			</goals>
+            			<configuration>
+		               		<artifactItems>
+                 				<artifactItem>
+              						<groupId>${project.groupId}</groupId>
+              						<artifactId>churn-jet-jobs</artifactId>
+              						<version>${project.version}</version>
+                   					<overWrite>false</overWrite>
+                   					<outputDirectory>${project.build.directory}/unpacked</outputDirectory>
+                   					<includes>BOOT-INF/classes/python/**,BOOT-INF/classes/com/hazelcast/platform/demos/**/*.class</includes>
+                 				</artifactItem>
+               				</artifactItems>
+			            </configuration>
+          			</execution>
+        		</executions>				
+			</plugin>
+			<plugin>	
+				<artifactId>maven-resources-plugin</artifactId>
+		        <executions>
+        			<execution>
+			            <phase>compile</phase>
+            			<goals>
+              				<goal>copy-resources</goal>
+            			</goals>
+				        <configuration>
+              				<outputDirectory>${project.build.outputDirectory}</outputDirectory>
+              				<resources>          
+                				<resource>
+                  					<directory>${project.build.directory}/unpacked/BOOT-INF/classes</directory>
+                  					<filtering>false</filtering>
+                				</resource>
+              				</resources>              
+        				</configuration>
+           			</execution>
+        		</executions>				
+			</plugin>
 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
+        		<artifactId>maven-failsafe-plugin</artifactId>
+        		<configuration>
+					<additionalClasspathElements>
+            			<additionalClasspathElement>${project.build.directory}/target/churn-integration-tests-4.0-failsafe.jar</additionalClasspathElement>	
+					</additionalClasspathElements>
+        		</configuration>
 			</plugin>
 		</plugins>
 	</build>

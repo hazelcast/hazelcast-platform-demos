@@ -36,6 +36,8 @@ import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.pipeline.test.TestSources;
 import com.hazelcast.jet.python.PythonServiceConfig;
 import com.hazelcast.jet.python.PythonTransforms;
+import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordKey;
+import com.hazelcast.platform.demos.telco.churn.domain.Sentiment;
 
 /**
  * <p>Test the correctness of "trainedmodel.py" for various inputs
@@ -95,6 +97,10 @@ public class MyChurnDetectorIT extends AbstractJetIT {
 
         JobConfig jobConfig = new JobConfig();
         jobConfig.setName(testInfo.getDisplayName());
+        jobConfig.addClass(MyJobWrapper.class);
+        jobConfig.addClass(MLChurnDetector.class);
+        jobConfig.addClass(CallDataRecordKey.class);
+        jobConfig.addClass(Sentiment.class);
         jetInstance.newJob(pipeline, jobConfig).join();
 
         IList<String> iList = jetInstance.getList(SINK_ILIST_NAME);
