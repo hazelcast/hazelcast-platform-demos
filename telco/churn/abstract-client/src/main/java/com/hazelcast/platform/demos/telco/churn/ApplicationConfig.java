@@ -88,7 +88,7 @@ public class ApplicationConfig {
             kubernetesConfig.setProperty("service-dns",
                     System.getProperty("my.project") + "-"
                     + System.getProperty("my.site") + "-"
-                    + "-hazelcast.default.svc.cluster.local");
+                    + "hazelcast.default.svc.cluster.local");
 
             clientNetworkConfig.setKubernetesConfig(kubernetesConfig);
 
