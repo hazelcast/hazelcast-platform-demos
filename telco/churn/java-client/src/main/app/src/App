@@ -1,0 +1,24 @@
+import React, { Component } from 'react';
+import Alerts from './components/alerts'
+import Querying from './components/querying'
+import Sizes from './components/sizes'
+
+class App extends Component {
+        render() {
+                return (
+                                <div>
+                                        <div class="minor_pane">
+						<Querying />
+                                        </div>
+                                        <div class="minor_pane">
+						<Sizes />
+                                        </div>
+                                        <div class="minor_pane">
+						<Alerts />
+                                        </div>
+                                </div>
+                )
+        }
+}
+
+export default App;

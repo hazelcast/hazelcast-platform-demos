@@ -13,6 +13,7 @@ using namespace grpc;
 
 // Record the last member, should be one per C++ module.
 string jetMember = "";
+string lastTrade = "";
 long jetMemberChanges = 0;
 
 void getMTM(string jsonBundle, string* mtmjson) {
@@ -55,8 +56,13 @@ void getMTM(string jsonBundle, string* mtmjson) {
     Value& fixing = d["fixing"];
     boost::shared_ptr<Fixing> fixings = jsonHandler.jsonToFixing(fixing.GetString());
     /**
-     * Track if calling member changes
+     * Track if trade id or calling member changes
      */
+    if (swapTrade->tradeid().compare(lastTrade) != 0) {
+        std::cout << " New Trade Id '" << swapTrade->tradeid()
+          << "' Curve '" << ircurve->curvename() << "'" << std::endl;
+        lastTrade = swapTrade->tradeid();
+    }
     bool debugExists = d.HasMember("debug");
     if (debugExists) {
         Value& debug = d["debug"]; 
@@ -77,8 +83,15 @@ void getMTM(string jsonBundle, string* mtmjson) {
      * Get MtM
      */
     Pricer pricer;
-    boost::shared_ptr<FlumaionQL::MTM> mtm = pricer.fetchMTMs(ircurve, fixings, swapTrade, calcDate);
-    jsonHandler.MtmToJson(mtm, mtmjson);
+    try {
+        boost::shared_ptr<FlumaionQL::MTM> mtm = pricer.fetchMTMs(ircurve, fixings, swapTrade, calcDate);
+        jsonHandler.MtmToJson(mtm, mtmjson);
+    } catch(std::exception &e) {
+        std::cout << "fetchMTM EXCEPTION:" << std::endl;
+        std::cout << "fetchMTM EXCEPTION:" << e.what() << std::endl;
+        std::cout << "fetchMTM EXCEPTION: Trade Id '" << swapTrade->tradeid()
+          << "' Curve '" << ircurve->curvename() << "'" << std::endl;
+    }
 }
 
 class JetToCppServiceImpl final : public JetToCpp::Service {
@@ -111,11 +124,11 @@ class JetToCppServiceImpl final : public JetToCpp::Service {
                 std::cout << "Batch number " << std::setfill(' ') << std::setw(4) << countBatch;
                 std::cout << " @ " << std::put_time(std::localtime(&now), "%FT%T")
                     << ", batch size " << batchSize 
-                    << ", thread " << threadId
+                    // << ", thread " << threadId
                     << ", member '" << jetMember << "' (changes: " << jetMemberChanges << ")"
                     << ", total processed " << std::setfill(' ') << std::setw(5) << countTotal 
                     << std::endl;
-                if (reportEvery < 10000) {
+                if (reportEvery < 100) {
                     reportEvery += reportEvery;
                 }
             }

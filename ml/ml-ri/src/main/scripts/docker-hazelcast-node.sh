@@ -30,7 +30,3 @@ $CMD
 RC=$?
 echo RC=${RC}
 exit ${RC}
-<<<<<<< HEAD
-
-=======
->>>>>>> master

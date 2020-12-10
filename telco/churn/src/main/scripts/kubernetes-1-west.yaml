@@ -1,0 +1,239 @@
+---
+# Service DNS for Kafdrop will be "churn-kafdrop.default.svc.cluster.local".
+# Service DNS for Kafka Broker will be "churn-kafka-broker.default.svc.cluster.local".
+# Service DNS for Zookeeper will be "churn-zookeeper.default.svc.cluster.local".
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$ SERVICE DEFINITIONS $$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Service for Zookeeper
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: churn-zookeeper
+spec:
+  selector:
+    app: churn-zookeeper
+  ports:
+  - port: 2181
+  type: ClusterIP
+---
+# Service for Kafka Broker
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: churn-kafka-broker
+spec:
+  clusterIP: None
+  selector:
+    app: churn-kafka-broker
+  ports:
+  - port: 9092
+---
+# Service for Kafdrop
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: churn-kafdrop
+spec:
+  selector:
+    app: churn-kafdrop
+  ports:
+  - port: 8080
+    targetPort: 9000
+  type: LoadBalancer
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$ POD DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Pod for Zookeeper
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churn-zookeeper
+spec:
+  selector:
+    matchLabels:
+      app: churn-zookeeper
+  template:
+    metadata:
+      labels:
+        app: churn-zookeeper
+    spec:
+      containers:
+        - env:
+          - name: "ALLOW_ANONYMOUS_LOGIN"
+            value: "true"
+          image: "hazelcast-platform-demos/churn-zookeeper"
+          imagePullPolicy: Never
+          livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            tcpSocket:
+              port: 2181
+          name: churn-zookeeper-container
+          ports:
+            - containerPort: 2181
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            tcpSocket:
+              port: 2181
+---
+# Pods for Kafka Broker
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: churn-kafka-broker
+spec:
+  replicas: 3
+  serviceName: churn-kafka-broker
+  selector:
+    matchLabels:
+      app: churn-kafka-broker
+  template:
+    metadata:
+      labels:
+        app: churn-kafka-broker
+    spec:
+      initContainers:
+        - name: wait-for-pod-zookeeper
+          image: busybox
+          command: ['sh', '-c', 'sleep 10']
+      containers:
+        - env:
+          - name: "ALLOW_PLAINTEXT_LISTENER"
+            value: "true"
+          - name: "KAFKA_CFG_ZOOKEEPER_CONNECT"
+            value: "churn-zookeeper.default.svc.cluster.local"
+          - name: "MY_POD_IP"
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: "MY_POD_NAME"
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: "KAFKA_CFG_ADVERTISED_LISTENERS"
+            value: "PLAINTEXT://$(MY_POD_NAME).churn-kafka-broker.default.svc.cluster.local:9092"
+          - name: "POD_NAME"
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          image: "hazelcast-platform-demos/churn-kafka-broker"
+          imagePullPolicy: Never
+          livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            tcpSocket:
+              port: 9092
+          name: churn-kafka-broker-container
+          ports:
+            - containerPort: 9092
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            tcpSocket:
+              port: 9092
+---
+# Pod for Kafdrop
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churn-kafdrop
+spec:
+  selector:
+    matchLabels:
+      app: churn-kafdrop
+  template:
+    metadata:
+      labels:
+        app: churn-kafdrop
+    spec:
+      initContainers:
+        - name: wait-for-pod-zookeeper
+          image: busybox
+          command: ['sh', '-c', 'sleep 300']
+      containers:
+        - env:
+          - name: "KAFKA_BROKERCONNECT"
+            value: "churn-kafka-broker-0.churn-kafka-broker.default.svc.cluster.local:9092,churn-kafka-broker-1.churn-kafka-broker.default.svc.cluster.local:9092,churn-kafka-broker-2.churn-kafka-broker.default.svc.cluster.local:9092"
+          image: "hazelcast-platform-demos/churn-kafdrop"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 9000
+          name: churn-kafdrop-container
+          ports:
+            - containerPort: 9000
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9000
+            initialDelaySeconds: 30
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$ JOB DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Job for topic creation
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: churn-job-topic-create
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: churn-job-topic-create
+    spec:
+      initContainers:
+        - name: wait-for-pod-kafka-broker
+          image: busybox
+          command: ['sh', '-c', 'sleep 240']
+      containers:
+        - env:
+          - name: "MY_ZOOKEEPER"
+            value: "churn-zookeeper.default.svc.cluster.local"
+          image: "hazelcast-platform-demos/churn-topic-create"
+          imagePullPolicy: Never
+          name: churn-job-topic-create-container
+      restartPolicy: Never
+---
+# Job for Kafka data feed
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: churn-job-data-feed
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: churn-job-data-feed
+    spec:
+      initContainers:
+        - name: wait-for-pod-data-feed
+          image: busybox
+          command: ['sh', '-c', 'sleep 300']
+      containers:
+        - env:
+          - name: "MY_BOOTSTRAP_SERVERS"
+            value: "churn-kafka-broker-0.churn-kafka-broker.default.svc.cluster.local:9092,churn-kafka-broker-1.churn-kafka-broker.default.svc.cluster.local:9092,churn-kafka-broker-2.churn-kafka-broker.default.svc.cluster.local:9092"
+          image: "hazelcast-platform-demos/churn-data-feed"
+          imagePullPolicy: Never
+          name: churn-job-data-feed-container
+      restartPolicy: Never
+---

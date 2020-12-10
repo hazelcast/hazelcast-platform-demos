@@ -1,0 +1,182 @@
+---
+# Service DNS for Prometheus will be "churn-prometheus.default.svc.cluster.local".
+# Service DNS for Grafana will be "churn-grafana.default.svc.cluster.local".
+# Service DNS for Management Center will be "churn-management-center.default.svc.cluster.local".
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$ SERVICE DEFINITIONS $$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Service for Prometheus
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: churn-prometheus
+spec:
+  selector:
+    app: churn-prometheus
+  ports:
+    - name: prometheus
+      port: 9090
+      targetPort: 9090
+  type: LoadBalancer
+---
+# Service for Grafana
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: churn-grafana
+spec:
+  selector:
+    app: churn-grafana
+  ports:
+    - name: grafana
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer
+---
+# Service for Management Center
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: churn-management-center
+spec:
+  selector:
+    app: churn-management-center
+  ports:
+    - name: management-center
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$ POD DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Pod for Prometheus
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churn-prometheus
+spec:
+  selector:
+    matchLabels:
+      app: churn-prometheus
+  template:
+    metadata:
+      labels:
+        app: churn-prometheus
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/churn-prometheus"
+          imagePullPolicy: Never
+          name: churn-prometheus-container
+---
+# Pod for Grafana
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churn-grafana
+spec:
+  selector:
+    matchLabels:
+      app: churn-grafana
+  template:
+    metadata:
+      labels:
+        app: churn-grafana
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/churn-grafana"
+          imagePullPolicy: Never
+          name: churn-grafana-container
+---
+# Pod for Management Center
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churn-management-center
+spec:
+  selector:
+    matchLabels:
+      app: churn-management-center
+  template:
+    metadata:
+      labels:
+        app: churn-management-center
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/churn-management-center"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+          name: churn-management-center-container
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+          resources:
+            requests:
+              memory: "4096Mi"
+            limits:
+              memory: "12288Mi"
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$ JOB DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Job for most Jet jobs
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: churn-job-jet-jobs
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: churn-job-jet-jobs
+    spec:
+      containers:
+        - env:
+          - name: "MY_BOOTSTRAP_SERVERS"
+            value: "churn-kafka-broker-0.churn-kafka-broker.default.svc.cluster.local:9092,churn-kafka-broker-1.churn-kafka-broker.default.svc.cluster.local:9092,churn-kafka-broker-2.churn-kafka-broker.default.svc.cluster.local:9092"
+          image: "hazelcast-platform-demos/churn-jet-jobs"
+          imagePullPolicy: Never
+          name: churn-job-jet-jobs-container
+      restartPolicy: Never
+---
+# Job for Jet Slack add-on
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: churn-job-slack-integration
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: churn-job-slack-integration
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/churn-slack-integration"
+          imagePullPolicy: Never
+          name: churn-job-slack-integration-container
+      restartPolicy: Never
+---

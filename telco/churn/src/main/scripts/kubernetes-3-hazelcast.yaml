@@ -1,0 +1,59 @@
+---
+# Service DNS for Hazelcast grid will be "churn-sanmateo-hazelcast.default.svc.cluster.local".
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$ SERVICE DEFINITIONS $$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Service for Hazelcast grid
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: churn-sanmateo-hazelcast
+spec:
+  clusterIP: None
+  selector:
+    app: churn-sanmateo-hazelcast
+  ports:
+  - port: 5701
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$ POD DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Pods for Hazelcast grid
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: churn-sanmateo-hazelcast
+spec:
+  replicas: 2
+  serviceName: churn-sanmateo-hazelcast
+  selector:
+    matchLabels:
+      app: churn-sanmateo-hazelcast
+  template:
+    metadata:
+      labels:
+        app: churn-sanmateo-hazelcast
+    spec:
+      containers:
+        - env:
+          - name: "MY_BOOTSTRAP_SERVERS"
+            value: "churn-kafka-broker-0.churn-kafka-broker.default.svc.cluster.local:9092,churn-kafka-broker-1.churn-kafka-broker.default.svc.cluster.local:9092,churn-kafka-broker-2.churn-kafka-broker.default.svc.cluster.local:9092"
+          - name: "MY_INITSIZE"
+            value: "2"
+          image: "hazelcast-platform-demos/churn-hazelcast-node"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /hazelcast/health/node-state
+              port: 5701
+          name: churn-sanmateo-hazelcast-container
+          readinessProbe:
+            httpGet:
+              path: /hazelcast/health/ready
+              port: 5701
+---

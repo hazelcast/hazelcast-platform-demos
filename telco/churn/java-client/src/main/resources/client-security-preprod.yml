@@ -1,0 +1,9 @@
+ hazelcast-client:
+  security:
+    credentials-factory:
+      class-name: com.hazelcast.platform.demos.telco.churn.security.MyClientCredentialsFactory
+      properties:
+        buildTimestamp: ${my.build-timestamp}
+        moduleName: '@project.artifactId@'
+        userName: ${my.build-userName}
+        

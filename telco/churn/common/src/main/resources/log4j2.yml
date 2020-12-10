@@ -1,0 +1,137 @@
+Configuration:
+
+  Appenders:
+    Console:
+      - name: ConsoleBlue
+        target: SYSTEM_OUT
+        PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %blue{%msg%n}"
+      - name: ConsoleCyan
+        target: SYSTEM_OUT
+        PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %cyan{%msg%n}"
+      - name: ConsoleGreen
+        target: SYSTEM_OUT
+        PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %green{%msg%n}"
+      - name: ConsoleMagenta
+        target: SYSTEM_OUT
+        PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %magenta{%msg%n}"
+      - name: ConsoleRed
+        target: SYSTEM_OUT
+        PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %red{%msg%n}"
+      - name: ConsoleYellow
+        target: SYSTEM_OUT
+        PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %yellow{%msg%n}"
+ 
+  Loggers:
+    logger:
+        - name: com.datastax
+          level: warn
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+        - name: com.hazelcast
+          level: info
+          additivity: false
+          AppenderRef:
+            ref: ConsoleCyan
+        - name: com.hazelcast.enterprise.security
+          level: trace
+          additivity: false
+          AppenderRef:
+            ref: ConsoleYellow
+        - name: com.hazelcast.jet.impl.connector.WriteLoggerP
+          level: trace
+          additivity: false
+          AppenderRef:
+            ref: ConsoleBlue
+        - name: com.hazelcast.security
+          level: trace
+          additivity: false
+          AppenderRef:
+            ref: ConsoleYellow
+        - name: com.hazelcast.platform.demos
+          level: debug
+          additivity: false
+          AppenderRef:
+            ref: ConsoleMagenta
+        - name: com.hazelcast.platform.demos.telco.churn.MySlackSink
+          level: trace
+          additivity: false
+          AppenderRef:
+            ref: ConsoleBlue
+        - name: com.hazelcast.platform.demos.telco.churn.security
+          level: debug
+          additivity: false
+          AppenderRef:
+            ref: ConsoleRed
+        - name: com.zaxxer
+          level: warn
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+        - name: io.debezium
+          level: warn
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+        - name: org.apache
+          level: warn
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+        # Hide irrelevant warnings from Hibernate Validator
+        - name: org.hibernate
+          level: error
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+        - name: org.mongodb
+          level: warn
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+        - name: org.springframework
+          level: info
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+        - name: org.springframework.boot.actuate
+          level: warn
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+        # Useful to see the selected web port
+        - name: org.springframework.boot.web.embedded.tomcat.TomcatWebServer
+          level: info
+          additivity: false
+          AppenderRef:
+            ref: ConsoleBlue
+        - name: org.springframework.data
+          level: warn
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+        - name: org.springframework.messaging
+          level: warn
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+        - name: org.springframework.scheduling
+          level: warn
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+        - name: org.springframework.web
+          level: warn
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+    Root:
+      level: info
+      AppenderRef:
+        ref: ConsoleGreen

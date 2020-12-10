@@ -1,0 +1,23 @@
+hazelcast-client:
+  import:
+    - client-labels.yml
+    - client-security-${my.environment}.yml
+  # Replaced by Maven
+  cluster-name: '@my.cluster.name@'
+  # Replaced by Maven
+  instance-name: '@project.artifactId@'
+  properties:
+    hazelcast.client.statistics.enabled: true
+  network:
+    # Default, but make it obvious webapp can multiplex
+    smart-routing: true
+
+  # Value must match MyConstants.java
+  serialization:
+    data-serializable-factories:
+      - factory-id: 1000
+        class-name: com.hazelcast.platform.demos.telco.churn.MyIdentifiedDataSerializableFactory  
+    portable-factories:
+      - factory-id: 2000
+        class-name: com.hazelcast.platform.demos.telco.churn.MyPortableFactory  
+

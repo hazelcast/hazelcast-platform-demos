@@ -26,10 +26,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  * <p>Tests for conversion part of
@@ -70,11 +69,8 @@ public class ExposureToCvaExposureConvertTest {
     private static List<Double> expectedHazardRatesList;
     private static List<Double> expectedSpreadRatesList;
 
-    @Rule
-    public TestName testName = new TestName();
-
-    @BeforeClass
-    public static void beforeClass() throws Exception {
+    @BeforeAll
+    public static void beforeAll() throws Exception {
         input1CdsRecoveryRate = (float) INPUT1_CDS_RECOVERY;
 
         input1CdsSpreadPeriodsList = new ArrayList<>();
@@ -103,31 +99,31 @@ public class ExposureToCvaExposureConvertTest {
     }
 
     @Test
-    public void testSpreadRates() {
+    public void testSpreadRates(TestInfo testInfo) {
         List<Double> actual = ExposureToCvaExposure.getSpreadRates(input1CdsSpreadsList,
                 input1CdsSpreadPeriodsList, input1ExposureLegFractionsList);
-        this.verifyDoubleList(actual, expectedSpreadRatesList);
+        this.verifyDoubleList(actual, expectedSpreadRatesList, testInfo);
     }
 
     @Test
-    public void testHazardRates() {
+    public void testHazardRates(TestInfo testInfo) {
         List<Double> actual = ExposureToCvaExposure.getHazardRates(expectedSpreadRatesList, input1ExposureLegFractionsList,
                 input1CdsRecoveryRate);
-        this.verifyDoubleList(actual, expectedHazardRatesList);
+        this.verifyDoubleList(actual, expectedHazardRatesList, testInfo);
     }
 
     @Test
-    public void testDefaultProb() {
+    public void testDefaultProb(TestInfo testInfo) {
         List<Double> actual = ExposureToCvaExposure.getDefaultProbabilities(expectedHazardRatesList,
                 input1ExposureLegFractionsList);
-        this.verifyDoubleList(actual, expectedDefaultProbList);
+        this.verifyDoubleList(actual, expectedDefaultProbList, testInfo);
     }
 
     @Test
-    public void testCvaExposureByLeg() {
+    public void testCvaExposureByLeg(TestInfo testInfo) {
         List<Double> actual = ExposureToCvaExposure.getCvaExposureByLeg(expectedDefaultProbList,
                 input1ExposureExposuresList, input1ExposureDiscountFactorsList, input1CdsRecoveryRate);
-        this.verifyDoubleList(actual, expectedCvaExposureByLegList);
+        this.verifyDoubleList(actual, expectedCvaExposureByLegList, testInfo);
     }
 
     @Test
@@ -140,17 +136,17 @@ public class ExposureToCvaExposureConvertTest {
      * <p>Helper function for comparing double lists.
      * </p>
      */
-    private void verifyDoubleList(List<Double> actual, List<Double> expected) {
-        assertThat(this.testName.getMethodName(), actual, notNullValue());
-        assertThat(this.testName.getMethodName() + ".size", actual.size(), equalTo(expected.size()));
+    private void verifyDoubleList(List<Double> actual, List<Double> expected, TestInfo testInfo) {
+        assertThat(testInfo.getDisplayName(), actual, notNullValue());
+        assertThat(testInfo.getDisplayName() + ".size", actual.size(), equalTo(expected.size()));
 
         for (int i = 0 ; i < actual.size() ; i++) {
             Object actualI = actual.get(i);
             Double expectedI = expected.get(i);
 
-            assertThat(this.testName.getMethodName() + "." + i, actualI, notNullValue());
-            assertThat(this.testName.getMethodName() + "." + i, actualI, instanceOf(Double.class));
-            assertThat(this.testName.getMethodName() + "." + i,
+            assertThat(testInfo.getDisplayName() + "." + i, actualI, notNullValue());
+            assertThat(testInfo.getDisplayName() + "." + i, actualI, instanceOf(Double.class));
+            assertThat(testInfo.getDisplayName() + "." + i,
                     actualI, equalTo(expectedI));
         }
     }
