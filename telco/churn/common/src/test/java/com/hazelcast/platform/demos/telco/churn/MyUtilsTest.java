@@ -19,6 +19,9 @@ package com.hazelcast.platform.demos.telco.churn;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>Test {@link MUtils}, could ultimately split to one file per
@@ -26,22 +29,25 @@ import org.junit.jupiter.api.Test;
  * </p>
  */
 public class MyUtilsTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MyUtilsTest.class);
 
     @Test
-    public void testRot13Null() throws Exception {
+    public void testRot13Null(TestInfo testInfo) throws Exception {
         String input = null;
         String output = MyUtils.rot13(input);
-        System.out.println("input=='" + input + "' output=='" + output + "'");
+        LOGGER.info("{} :: input=='{}', output=='{}'",
+                testInfo.getDisplayName(), input, output);
 
         assertThat(output).isNull();
     }
 
     @Test
-    public void testRot13Blank() throws Exception {
+    public void testRot13Blank(TestInfo testInfo) throws Exception {
         String input = "";
         String expected = "";
         String output = MyUtils.rot13(input);
-        System.out.println("input=='" + input + "' output=='" + output + "'");
+        LOGGER.info("{} :: input=='{}', output=='{}'",
+                testInfo.getDisplayName(), input, output);
 
         assertThat(output).isNotNull();
         assertThat(output).isInstanceOf(String.class);
@@ -49,11 +55,12 @@ public class MyUtilsTest {
     }
 
     @Test
-    public void testRot13Once() throws Exception {
+    public void testRot13Once(TestInfo testInfo) throws Exception {
         String input = "hello";
         String expected = "uryyb";
         String output = MyUtils.rot13(input);
-        System.out.println("input=='" + input + "' output=='" + output + "'");
+        LOGGER.info("{} :: input=='{}', output=='{}'",
+                testInfo.getDisplayName(), input, output);
 
         assertThat(output).isNotNull();
         assertThat(output).isInstanceOf(String.class);
@@ -61,12 +68,13 @@ public class MyUtilsTest {
     }
 
     @Test
-    public void testRot13Twice() throws Exception {
+    public void testRot13Twice(TestInfo testInfo) throws Exception {
         String input = "hello";
         String expected = input;
         String output1 = MyUtils.rot13(input);
         String output2 = MyUtils.rot13(output1);
-        System.out.println("input=='" + input + "' output1=='" + output1 + "' output2=='" + output2 + "'");
+        LOGGER.info("{} :: input=='{}', output1=='{}', output2=='{}'",
+                testInfo.getDisplayName(), input, output1, output2);
 
         assertThat(output1).isNotNull();
         assertThat(output2).isNotNull();
@@ -76,20 +84,22 @@ public class MyUtilsTest {
     }
 
     @Test
-    public void testMakeUTF8Null() throws Exception {
+    public void testMakeUTF8Null(TestInfo testInfo) throws Exception {
         String input = null;
         String output = MyUtils.makeUTF8(input);
-        System.out.println("input=='" + input + "' output=='" + output + "'");
+        LOGGER.info("{} :: input=='{}', output=='{}'",
+                testInfo.getDisplayName(), input, output);
 
         assertThat(output).isNull();
     }
 
     @Test
-    public void testMakeUTF8Blank() throws Exception {
+    public void testMakeUTF8Blank(TestInfo testInfo) throws Exception {
         String input = "";
         String expected = "";
         String output = MyUtils.makeUTF8(input);
-        System.out.println("input=='" + input + "' output=='" + output + "'");
+        LOGGER.info("{} :: input=='{}', output=='{}'",
+                testInfo.getDisplayName(), input, output);
 
         assertThat(output).isNotNull();
         assertThat(output).isInstanceOf(String.class);
@@ -97,7 +107,7 @@ public class MyUtilsTest {
     }
 
     @Test
-    public void testMakeUTF8DoubleQuotes() throws Exception {
+    public void testMakeUTF8DoubleQuotes(TestInfo testInfo) throws Exception {
         String input1 = "SELECT firstName FROM Person WHERE lastName = “Stevenson”";
         String input2 = "SELECT firstName FROM Person WHERE lastName = \"Stevenson\"";
         String expected = "SELECT firstName FROM Person WHERE lastName = \"Stevenson\"";
@@ -108,7 +118,8 @@ public class MyUtilsTest {
 
         for (String input : inputs) {
             String output = MyUtils.makeUTF8(input);
-            System.out.println("input=='" + input + "' output=='" + output + "'");
+            LOGGER.info("{} :: input=='{}', output=='{}'",
+                    testInfo.getDisplayName(), input, output);
 
             assertThat(output).isNotNull();
             assertThat(output).isInstanceOf(String.class);
@@ -117,11 +128,12 @@ public class MyUtilsTest {
     }
 
     @Test
-    public void testMakeUTF8SingleQuotes() throws Exception {
+    public void testMakeUTF8SingleQuotes(TestInfo testInfo) throws Exception {
         String input = "SELECT firstName FROM Person WHERE lastName = ‘Stevenson’";
         String expected = "SELECT firstName FROM Person WHERE lastName = 'Stevenson'";
         String output = MyUtils.makeUTF8(input);
-        System.out.println("input=='" + input + "' output=='" + output + "'");
+        LOGGER.info("{} :: input=='{}', output=='{}'",
+                testInfo.getDisplayName(), input, output);
 
         assertThat(output).isNotNull();
         assertThat(output).isInstanceOf(String.class);
@@ -129,13 +141,14 @@ public class MyUtilsTest {
     }
 
     @Test
-    public void testMakeUTF8GreaterThanLessThan() throws Exception {
+    public void testMakeUTF8GreaterThanLessThan(TestInfo testInfo) throws Exception {
         String input = "SELECT id, callerTelno, calleeTelno, callSuccessful"
                 + " FROM calls WHERE durationSeconds &gt; 0 AND durationSeconds &lt; 2";
         String expected = "SELECT id, callerTelno, calleeTelno, callSuccessful"
                 + " FROM calls WHERE durationSeconds > 0 AND durationSeconds < 2";
         String output = MyUtils.makeUTF8(input);
-        System.out.println("input=='" + input + "' output=='" + output + "'");
+        LOGGER.info("{} :: input=='{}', output=='{}'",
+                testInfo.getDisplayName(), input, output);
 
         assertThat(output).isNotNull();
         assertThat(output).isInstanceOf(String.class);
@@ -143,7 +156,7 @@ public class MyUtilsTest {
     }
 
     @Test
-    public void testMakeUTF8() {
+    public void testMakeUTF8(TestInfo testInfo) {
         String input1 = "SELECT * FROM sentiment";
         String input2 = "SELECT __key, FLOOR(“current”) || ‘%’ AS “Churn Risk” FROM sentiment";
         String input3 = "SELECT * FROM calls";
@@ -160,6 +173,8 @@ public class MyUtilsTest {
 
         for (int i = 0; i < inputs.length; i++) {
             String output = MyUtils.makeUTF8(inputs[i]);
+            LOGGER.info("{} :: input=='{}', output=='{}'",
+                    testInfo.getDisplayName(), inputs[i], output);
 
             assertThat(output).isNotNull();
             assertThat(output).isInstanceOf(String.class);
@@ -168,11 +183,12 @@ public class MyUtilsTest {
     }
 
     @Test
-    public void testSafeForJson() {
+    public void testSafeForJson(TestInfo testInfo) {
         String input = "Permission (\"MapPermission\" \"mapName\" \"read\") denied!";
         String expected = "Permission ('MapPermission' 'mapName' 'read') denied!";
         String output = MyUtils.safeForJsonStr(input);
-        System.out.println("input=='" + input + "' output=='" + output + "'");
+        LOGGER.info("{} :: input=='{}', output=='{}'",
+                testInfo.getDisplayName(), input, output);
 
         assertThat(output).isNotNull();
         assertThat(output).isInstanceOf(String.class);

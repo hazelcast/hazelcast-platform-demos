@@ -345,7 +345,7 @@ public class MLChurnDetector extends MyJobWrapper {
             String relativeResourceToCopy = sourceDirectory + File.separator + resourceToCopy;
             try (InputStream inputStream = classLoader.getResourceAsStream(relativeResourceToCopy)) {
                 if (inputStream == null) {
-                    System.out.println(relativeResourceToCopy + ": not found in Jar's src/main/resources");
+                    LOGGER.error(relativeResourceToCopy + ": not found in Jar's src/main/resources");
                 } else {
                     LOGGER.trace("{}", relativeResourceToCopy);
                     Path targetFile = Paths.get(targetDirectory + File.separator + resourceToCopy);

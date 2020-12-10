@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,6 +42,7 @@ import com.hazelcast.jet.python.PythonTransforms;
  * <p>
  */
 public class MyChurnDetectorIT extends AbstractJetIT {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MyChurnDetectorIT.class);
 
     private static PythonServiceConfig pythonServiceConfig;
     private static final String SINK_ILIST_NAME = "junit";
@@ -111,7 +114,9 @@ public class MyChurnDetectorIT extends AbstractJetIT {
             // new_annoyance = float(3.1) + old_annoyance + current_pct + random.random()
             assertThat(newCurrent).isGreaterThanOrEqualTo(expectedCurrent.get(i));
             assertThat(newCurrent).isLessThan(expectedCurrent.get(i) + 1.0d);
-            System.out.println(expectedCurrent.get(i) + " new Current " + newCurrent);
+            LOGGER.info("{} :: expected range=={} to {}, actual=={}",
+                    testInfo.getDisplayName(),
+                    expectedCurrent.get(i), expectedCurrent.get(i) + 1.0d, newCurrent);
         }
     }
 
