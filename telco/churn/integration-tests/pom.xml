@@ -1,0 +1,76 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hazelcast.platform.demos.telco.churn</groupId>
+		<artifactId>churn-root</artifactId>
+		<version>4.0</version>
+	</parent>
+
+	<artifactId>churn-jet-jobs-it</artifactId>
+
+	<name>Hazelcast Platform - Churn - Jet Jobs</name>
+	<description>Telco Churn - Jet jobs - Integration tests</description>
+
+	<properties>
+		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
+	</properties>
+
+	<!-- Use hazelcast-jet instead of hazelcast-jet-enterprise -->
+	<!-- so integration tests do not need a license key.       -->
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>churn-jet-jobs</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.hazelcast.jet</groupId>
+					<artifactId>hazelcast-jet-enterprise</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- scope==test -->
+		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

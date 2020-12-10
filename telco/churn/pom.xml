@@ -65,6 +65,7 @@
 		<module>java-client</module>
 		<module>jet-jobs</module>
 		<module>slack-integration</module>
+		<module>integration-tests</module>
 		<module>management-center</module>
 	</modules>
 
