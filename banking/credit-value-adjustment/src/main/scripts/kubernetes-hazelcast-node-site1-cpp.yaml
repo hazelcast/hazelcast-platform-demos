@@ -1,0 +1,62 @@
+---
+# Service DNS will be "cva-site1-hazelcast.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cva-site1-hazelcast
+spec:
+  clusterIP: None
+  selector:
+    app: cva-site1-hazelcast
+  ports:
+  - port: 5701
+---
+# Creates 2 pods, hazelcast-node-0 and hazelcast-node-1 in a stateful set.
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cva-site1-hazelcast
+spec:
+  replicas: 2
+  serviceName: cva-site1-hazelcast
+  selector:
+    matchLabels:
+      app: cva-site1-hazelcast
+  template:
+    metadata:
+      labels:
+        app: cva-site1-hazelcast
+    spec:
+      containers:
+        - env:
+          - name: "MY_GRAFANA_SERVICE"
+            value: "cva-grafana.default.svc.cluster.local"
+          - name: "MY_INITSIZE"
+            value: "2"
+          - name: "MY_PARTITIONS"
+            value: "271"
+          args: ["50001", "2"]
+          image: "hazelcast-platform-demos/cva-hazelcast-node-site1-cpp"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /hazelcast/health/node-state
+              port: 5701
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 10
+          name: cva-site1-hazelcast-container
+          readinessProbe:
+            httpGet:
+              path: /hazelcast/health/ready
+              port: 5701
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 10
+---
