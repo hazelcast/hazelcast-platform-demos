@@ -46,10 +46,14 @@ public class MyProperties {
     private String buildTimestamp;
     @NotNull
     private String project;
-
     @NotNull
     private Site site;
+    @NotNull
     private Site remoteSite;
+    @NotNull
+    private int partitions;
+    @NotNull
+    private int initSize;
 
     public String getBuildTimestamp() {
         return this.buildTimestamp;
@@ -57,6 +61,20 @@ public class MyProperties {
     public void setBuildTimestamp(String buildTimestamp) {
         this.buildTimestamp = buildTimestamp;
         LOGGER.info("myProperties.buildTimestamp=='{}'", this.buildTimestamp);
+    }
+    public int getInitSize() {
+        return this.initSize;
+    }
+    public void setInitSize(int initSize) {
+        this.initSize = initSize;
+        LOGGER.info("myProperties.initSize=='{}'", this.initSize);
+    }
+    public int getPartitions() {
+        return this.partitions;
+    }
+    public void setPartitions(int partitions) {
+        this.partitions = partitions;
+        LOGGER.info("myProperties.partitions=='{}'", this.partitions);
     }
     public String getProject() {
         return this.project;
