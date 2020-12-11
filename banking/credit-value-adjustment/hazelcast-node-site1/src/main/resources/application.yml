@@ -1,3 +1,5 @@
 # Replaced by Maven
 my:
+#  initsize: @my.init.size@
+#  partitions: @my.partitions@
   site: '@my.site@'
