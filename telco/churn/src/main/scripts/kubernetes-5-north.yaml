@@ -1,0 +1,55 @@
+---
+# Service DNS for Java Client will be "churn-java-client.default.svc.cluster.local".
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$ SERVICE DEFINITIONS $$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Service for ?
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: churn-java-client
+spec:
+  selector:
+    app: churn-java-client
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: LoadBalancer
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$ POD DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Pod for Java Client
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churn-java-client
+spec:
+  selector:
+    matchLabels:
+      app: churn-java-client
+  template:
+    metadata:
+      labels:
+        app: churn-java-client
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/churn-java-client"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /rest/k8s
+              port: 8080
+          name: churn-java-client-container
+          readinessProbe:
+            httpGet:
+              path: /rest/k8s
+              port: 8080
+            initialDelaySeconds: 30
+---

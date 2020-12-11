@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - args: ["pi2.py"]
-          image: "hazelcast-ml-ri/python-job"
+          image: "hazelcast-platform-demos/ml-ri-python-job"
           imagePullPolicy: IfNotPresent
           name: container-job
       restartPolicy: Never

@@ -1,0 +1,77 @@
+:root {
+	--hazelcast-blue: #012168;
+	--hazelcast-blue-dark: #0b2a35;
+	--hazelcast-blue-light: #2e7de1;
+	--hazelcast-orange: #ff5f00;
+}
+
+body {
+	background: lightsteelblue;
+}
+
+h1, h2 {
+	text-align: center;
+	color: var(--hazelcast-blue);
+}
+
+.greenInputBox {
+	border: 4px solid black;
+}
+.greenOutputBox {
+	border: 4px solid black;
+	overflow: scroll;	
+}
+.greenOuterBox {
+	border: 4px solid DarkGray;
+	background-color: black;
+	color: #F0FFF0;
+	font-family: monospace;
+}
+
+.whiteBox {
+	border: 4px solid DarkGray;
+	background-color: white;	
+	color: black;
+	font-family: "Courier New", Courier, monospace;
+}
+
+.sqlBlueLight {
+    color: var(--hazelcast-blue-light);
+}
+.sqlRed {
+	color: red;
+}
+.sqlWhite {
+	color: white;
+}
+.sqlYellow {
+	color: yellow;
+}
+
+h3 {
+	color: silver;
+}
+
+.headerfooter {
+	text-align: center;
+	color: var(--hazelcast-blue-light);
+	font-family: "Courier New", Courier, monospace;
+	font-size: 80%;
+}
+.headerfooterline {
+	color: var(--hazelcast-orange);
+}
+
+.major_pane {
+	border-size: 5px;
+	border-style: solid;
+	border-color: var(--hazelcast-blue-dark);
+	padding: 5px 5px 5px 5px;
+}
+
+.minor_pane {
+	border-top: 1px dashed;
+	border-color: var(--hazelcast-blue-light);
+	overflow-y: scroll;
+	vertical-align: top;
+}

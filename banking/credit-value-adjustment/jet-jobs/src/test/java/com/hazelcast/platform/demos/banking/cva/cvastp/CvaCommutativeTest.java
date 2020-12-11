@@ -22,7 +22,7 @@ import static org.hamcrest.CoreMatchers.not;
 
 import java.math.BigDecimal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * <p>Confirm which Java numeric types adhere to the laws of mathematics,

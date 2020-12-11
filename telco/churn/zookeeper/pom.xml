@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hazelcast.platform.demos.telco.churn</groupId>
+		<artifactId>churn-root</artifactId>
+		<version>4.0</version>
+	</parent>
+
+	<artifactId>churn-zookeeper</artifactId>
+
+	<name>Hazelcast Platform - Churn - Zookeeper</name>
+	<description>Telco Churn - Re-package Zookeeper</description>
+
+	<properties>
+		<docker.image.name>zookeeper</docker.image.name>
+		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
+	</properties>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>dockerfile-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

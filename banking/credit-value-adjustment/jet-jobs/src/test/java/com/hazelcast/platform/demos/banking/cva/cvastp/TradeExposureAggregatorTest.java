@@ -23,10 +23,9 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 
 import java.util.Arrays;
 
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 
@@ -85,11 +84,8 @@ public class TradeExposureAggregatorTest {
     private static Tuple3<String, String, String> firstExposure;
     private static Tuple3<String, String, String> secondExposure;
 
-    @Rule
-    public TestName testName = new TestName();
-
-    @BeforeClass
-    public static void beforeClass() throws Exception {
+    @BeforeAll
+    public static void beforeAll() throws Exception {
         String input1Curvename = CURVENAME + "1";
         String input2Curvename = CURVENAME + "2";
         input1 = buildTestExposure(input1Curvename, INPUT1_CVAEXPOSURE, INPUT1_SPREADRATES, INPUT1_HAZARDRATES,
@@ -126,13 +122,13 @@ public class TradeExposureAggregatorTest {
      * @throws Exception
      */
     @Test
-    public void testEndToEnd() throws Exception {
+    public void testEndToEnd(TestInfo testInfo) throws Exception {
         TradeExposureAggregator tradeExposureAggregator = new TradeExposureAggregator();
 
         tradeExposureAggregator.accumulate(firstExposure);
         tradeExposureAggregator.accumulate(secondExposure);
 
-        this.verifyEndToEnd(tradeExposureAggregator.exportFinish());
+        this.verifyEndToEnd(tradeExposureAggregator.exportFinish(), testInfo);
     }
 
     /**
@@ -142,30 +138,30 @@ public class TradeExposureAggregatorTest {
      * @throws Exception
      */
     @Test
-    public void testEndToEndReverseOrder() throws Exception {
+    public void testEndToEndReverseOrder(TestInfo testInfo) throws Exception {
         TradeExposureAggregator tradeExposureAggregator = new TradeExposureAggregator();
 
         tradeExposureAggregator.accumulate(secondExposure);
         tradeExposureAggregator.accumulate(firstExposure);
 
-        this.verifyEndToEnd(tradeExposureAggregator.exportFinish());
+        this.verifyEndToEnd(tradeExposureAggregator.exportFinish(), testInfo);
     }
 
-    public void verifyEndToEnd(Tuple2<String, String> result) throws Exception {
-        assertThat(this.testName.getMethodName(), result, notNullValue());
+    public void verifyEndToEnd(Tuple2<String, String> result, TestInfo testInfo) throws Exception {
+        assertThat(testInfo.getDisplayName(), result, notNullValue());
 
         String resultCounterparty = result.f0();
-        assertThat(this.testName.getMethodName() + ".counterparty", resultCounterparty, equalTo(COUNTERPARTY));
+        assertThat(testInfo.getDisplayName() + ".counterparty", resultCounterparty, equalTo(COUNTERPARTY));
 
         JSONObject resultJson = new JSONObject(result.f1());
         JSONArray resultFieldNames = resultJson.names();
 
-        assertThat(this.testName.getMethodName() + ".names()",
+        assertThat(testInfo.getDisplayName() + ".names()",
                 expectedOutputJsonFieldNames.length(), equalTo(resultFieldNames.length()));
 
         for (int i = 0 ; i < expectedOutputJsonFieldNames.length() ; i++) {
             String fieldName = expectedOutputJsonFieldNames.getString(i);
-            assertThat(this.testName.getMethodName() + ".has " + fieldName, resultJson.has(fieldName));
+            assertThat(testInfo.getDisplayName() + ".has " + fieldName, resultJson.has(fieldName));
         }
 
         for (int i = 0 ; i < expectedOutputJsonFieldNames.length() ; i++) {
@@ -173,21 +169,21 @@ public class TradeExposureAggregatorTest {
             Object expectedField = expectedOutputJson.get(fieldName);
             Object actualField = resultJson.get(fieldName);
             if (expectedField instanceof JSONArray) {
-                assertThat(this.testName.getMethodName() + "." + fieldName,
+                assertThat(testInfo.getDisplayName() + "." + fieldName,
                         actualField, instanceOf(JSONArray.class));
 
                 JSONArray expectedFieldArray = (JSONArray) expectedField;
                 JSONArray actualFieldArray = (JSONArray) actualField;
 
-                assertThat(this.testName.getMethodName() + ".length " + fieldName,
+                assertThat(testInfo.getDisplayName() + ".length " + fieldName,
                         actualFieldArray.length(), equalTo(expectedFieldArray.length()));
 
                 for (int j = 0 ; j < actualFieldArray.length() ; j++) {
-                    assertThat(this.testName.getMethodName() + "." + fieldName + "[" + j + "]",
+                    assertThat(testInfo.getDisplayName() + "." + fieldName + "[" + j + "]",
                             actualFieldArray.get(j), equalTo(expectedFieldArray.get(j)));
                 }
             } else {
-                assertThat(this.testName.getMethodName() + "." + fieldName,
+                assertThat(testInfo.getDisplayName() + "." + fieldName,
                         actualField.toString(), equalTo(expectedField.toString()));
             }
         }

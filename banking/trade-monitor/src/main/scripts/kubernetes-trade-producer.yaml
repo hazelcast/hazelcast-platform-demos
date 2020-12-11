@@ -10,7 +10,6 @@ metadata:
   labels:
     app: trade-monitor-job-trade-producer
   name: trade-monitor-job-trade-producer
-spec:
   backoffLimit: 0
   template:
     metadata:

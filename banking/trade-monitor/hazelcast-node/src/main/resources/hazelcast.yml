@@ -29,4 +29,3 @@ hazelcast:
         - type: HASH
           attributes:
             - 'symbol'
-          
