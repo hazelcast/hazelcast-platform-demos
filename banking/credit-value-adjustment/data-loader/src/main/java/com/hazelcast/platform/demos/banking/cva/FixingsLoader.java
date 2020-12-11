@@ -26,9 +26,12 @@ import org.springframework.stereotype.Component;
  * <p>We don't need "{@code @Order}" annotation, won't matter
  * if this is before or after other maps.
  * </p>
+ * <p>Do fixings last, so cannot kick off a run while data loader
+ * is running. Only one fixing, but without it there's no run.
+ * </p>
  */
 @Component
-@Order(value = 2)
+@Order(value = 3)
 public class FixingsLoader implements CommandLineRunner {
 
     private static final boolean PARTIAL_OK = true;

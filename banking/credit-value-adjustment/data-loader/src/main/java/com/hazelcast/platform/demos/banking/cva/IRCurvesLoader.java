@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  * </p>
  */
 @Component
-@Order(value = 3)
+@Order(value = 2)
 public class IRCurvesLoader implements CommandLineRunner {
 
     private static final boolean PARTIAL_OK = true;

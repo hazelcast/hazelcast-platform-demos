@@ -187,7 +187,7 @@ public class JsonLoaderService {
                         }
                         String line = scanner.nextLine();
                         this.read++;
-                        if (!line.startsWith("#")) {
+                        if (!line.startsWith("#") && !line.contains("\"settlement_date\":\"0\"")) {
                             try {
                                 HazelcastJsonValue value = new HazelcastJsonValue(line);
 
