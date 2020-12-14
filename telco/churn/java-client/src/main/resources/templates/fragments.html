@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="head">
+<link rel="shortcut icon" th:href="@{/images/favicon.ico}">
+<link rel="stylesheet" type="text/css" th:href="@{/css/main.css}" />
+<title th:text="'@my.webapp.title@'">?</title>
+</head>
+
+<body th:fragment="header">
+	<div class="headerfooter">
+		<div class="whiteBox">
+			<h5>Build @maven.build.timestamp@</h5>
+		</div>
+		<hr class="headerfooterline"/>
+	</div>
+</body>
+
+<body th:fragment="footer">
+	<div class="headerfooter">
+		<hr class="headerfooterline"/>
+		<p th:text="'&copy; Hazelcast ' + ${#dates.year(#dates.createNow())}" />
+	</div>
+</body>
+
+</html>

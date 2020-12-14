@@ -21,23 +21,39 @@
 		<docker.image.prefix>cva</docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
 		<!-- Live, probably -->
+		<my.cluster1.init.size>20</my.cluster1.init.size>
 		<my.cluster1.name>site1</my.cluster1.name>
+		<my.cluster1.partitions>25057</my.cluster1.partitions>
+		<my.cluster1.partitions>1999</my.cluster1.partitions>
 		<!-- DR, probably, unless you alternate -->
+		<my.cluster2.init.size>3</my.cluster2.init.size>
 		<my.cluster2.name>site2</my.cluster2.name>
+		<my.cluster2.partitions>271</my.cluster2.partitions>
+
+		<!-- Common logons for Management Center, Grafana, Prometheus -->
+		<my.other.admin.user>admin</my.other.admin.user>
+		<my.other.admin.password>password1</my.other.admin.password>
+
+		<!-- So Grafana can find Prometheus service, must match K8S YAML -->
+		<my.prometheus.name>${docker.image.prefix}-prometheus</my.prometheus.name>
+		<my.prometheus.port>9090</my.prometheus.port>
+		<my.management.center.name>${docker.image.prefix}-management-center</my.management.center.name>
 	</properties>
 
 	<modules>
 		<module>grafana</module>
+		<module>prometheus</module>
 		<module>management-center</module>
 		<module>common</module>
 		<module>abstract-hazelcast-node</module>
 		<module>hazelcast-node-site1</module>
 		<module>hazelcast-node-site2</module>
 		<module>abstract-hazelcast-client</module>
-		<module>cva-cpp</module>
+		<module>cpp</module>
 		<module>data-loader</module>
 		<module>jet-jobs</module>
 		<module>webapp</module>
+		<module>hazelcast-node-site1-cpp</module>
 	</modules>
 
 	<dependencies>
@@ -50,11 +66,11 @@
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-yaml</artifactId>
 		</dependency>
-		
+
 		<!-- Validates configuration properties -->
 		<dependency>
-  	 		<groupId>org.hibernate.validator</groupId>
-   			<artifactId>hibernate-validator</artifactId>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
 		</dependency>
 
 		<!-- Use specific (latest) gRPC -->
@@ -96,6 +112,17 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
@@ -111,20 +138,4 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<configuration>
-					<target>
-						<echo message="=============================================================" />
-						<echo message="See README.md in /management-center module for logon/password"/>
-						<echo message="=============================================================" />
-					</target>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-
 </project>

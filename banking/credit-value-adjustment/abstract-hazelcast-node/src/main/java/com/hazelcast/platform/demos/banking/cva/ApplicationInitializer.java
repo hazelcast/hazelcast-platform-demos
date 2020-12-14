@@ -56,8 +56,15 @@ public class ApplicationInitializer {
                &&
                !System.getProperty("my.kubernetes.enabled", "false").equalsIgnoreCase(Boolean.TRUE.toString());
 
-           this.createNeededObjects();
-           this.launchNeededJobs(isLocalhost);
+           int currentSize = this.jetInstance.getCluster().getMembers().size();
+           if (this.myProperties.getInitSize() > currentSize) {
+               LOGGER.info("Cluster size {}, not initializing until {}",
+                       currentSize, this.myProperties.getInitSize());
+           } else {
+               LOGGER.info("Cluster size {}, initializing", currentSize);
+               this.createNeededObjects();
+               this.launchNeededJobs(isLocalhost);
+           }
        };
     }
 

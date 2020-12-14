@@ -1,14 +1,14 @@
 ---
-# Service DNS will be "trade-monitor-service.default.svc.cluster.local".
+# Service DNS will be "trade-monitor-hazelcast.default.svc.cluster.local".
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: trade-monitor-service
+  name: trade-monitor-grid-hazelcast
 spec:
   clusterIP: None
   selector:
-    app: trade-monitor-hazelcast-node
+    app: trade-monitor-grid-hazelcast
   ports:
   - port: 5701
 ---
@@ -17,29 +17,29 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: trade-monitor-hazelcast-node
+  name: trade-monitor-grid-hazelcast
 spec:
   replicas: 2
-  serviceName: trade-monitor-hazelcast-node-service
+  serviceName: trade-monitor-grid-hazelcast
   selector:
     matchLabels:
-      app: trade-monitor-hazelcast-node
+      app: trade-monitor-grid-hazelcast
   template:
     metadata:
       labels:
-        app: trade-monitor-hazelcast-node
+        app: trade-monitor-grid-hazelcast
     spec:
       containers:
         - env:
           - name: "MY_BOOTSTRAP_SERVERS"
-            value: "trade-monitor-kafka-broker-0.trade-monitor-kafka-broker-service.default.svc.cluster.local:9092,trade-monitor-kafka-broker-1.trade-monitor-kafka-broker-service.default.svc.cluster.local:9092,trade-monitor-kafka-broker-2.trade-monitor-kafka-broker-service.default.svc.cluster.local:9092"
-          image: "hazelcast-trade-monitor/hazelcast-node"
+            value: "trade-monitor-kafka-broker-0.trade-monitor-kafka-broker.default.svc.cluster.local:9092,trade-monitor-kafka-broker-1.trade-monitor-kafka-broker.default.svc.cluster.local:9092,trade-monitor-kafka-broker-2.trade-monitor-kafka-broker.default.svc.cluster.local:9092"
+          image: "hazelcast-platform-demos/trade-monitor-hazelcast-node"
           imagePullPolicy: Never
           livenessProbe:
             httpGet:
               path: /hazelcast/health/node-state
               port: 5701
-          name: hazelcast-node-container
+          name: trade-monitor-grid-hazelcast-container
           readinessProbe:
             httpGet:
               path: /hazelcast/health/ready

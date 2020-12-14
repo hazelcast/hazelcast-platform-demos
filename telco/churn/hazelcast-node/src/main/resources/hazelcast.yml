@@ -1,0 +1,45 @@
+hazelcast:
+  import:
+    # Import for Dev, Test or Prod at runtime
+    - security-${my.environment}.yml
+
+  # Replaces passwords in security-${my.environment}.yml
+  config-replacers:
+    fail-if-value-missing: false
+    replacers:
+      - class-name: com.hazelcast.platform.demos.telco.churn.security.MyDisallowedPasswordConfigReplacer
+        properties:
+          algorithm: rot13
+
+  # Replaced by Maven
+  cluster-name: '@my.cluster.name@'
+  # Replaced by Maven
+  license-key: '@my.jet.license.key@'
+
+  properties:
+    # Graceful shutdown is helpful for Kubernetes scale-down.
+    hazelcast.member.naming.moby.enabled: true
+    hazelcast.shutdownhook.policy: GRACEFUL
+
+  # Assuming Kubernetes, but override from Java code if we detect otherwise
+  network:
+    join:
+      multicast:
+        enabled: false
+      kubernetes:
+        enabled: true
+        service-dns: '@docker.image.prefix@-@my.cluster.name@-hazelcast.default.svc.cluster.local'
+    rest-api:
+      enabled: true
+      endpoint-groups:
+        HEALTH_CHECK:
+          enabled: true
+
+  # Value must match MyConstants.java
+  serialization:
+    data-serializable-factories:
+      - factory-id: 1000
+        class-name: com.hazelcast.platform.demos.telco.churn.MyIdentifiedDataSerializableFactory
+    portable-factories:
+      - factory-id: 2000
+        class-name: com.hazelcast.platform.demos.telco.churn.MyPortableFactory  

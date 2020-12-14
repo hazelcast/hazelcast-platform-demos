@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hazelcast-client xmlns="http://www.hazelcast.com/schema/client-config"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://www.hazelcast.com/schema/client-config
+                  http://www.hazelcast.com/schema/client-config/hazelcast-client-config-4.1.xsd">
+                  
+    <cluster-name>@my.cluster1.name@</cluster-name>
+
+    <properties>
+        <property name="hazelcast.client.statistics.enabled">true</property>
+    </properties>
+
+   	<network>
+   		<!-- Use "cluster-members" and the right address for Docker instead of K8S   -->
+        <!-- 
+        <cluster-members>
+            <address>123.456.789.0123</address>
+        </cluster-members>
+        -->
+        
+        <kubernetes enabled="true">
+            <service-dns>@docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local</service-dns>
+        </kubernetes>        
+    </network>
+
+    <security>
+    	<!-- Connect with username/password or use a factory to generate credentials -->
+    	<!-- (See MyClientLoginModule for acceptance criteria)                       -->
+    	
+		<!-- "credentials-factory" provides correct values, so will be accepted      -->
+ 		<credentials-factory class-name="com.hazelcast.platform.demos.telco.churn.security.MyMCCredentialsFactory"/>
+
+		<!-- "username-password" will be rejected by the cluster as the password     -->
+		<!-- is deliberately wrong. Set the password in the Dockerfile to make work. -->
+		<!-- 
+    	<username-password username="ManagementCenter" password="${my.password}"/>
+		-->
+    </security>	
+    
+</hazelcast-client>

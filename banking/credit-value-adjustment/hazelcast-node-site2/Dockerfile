@@ -10,8 +10,10 @@ ARG JAR_FILE
 COPY target/${JAR_FILE} application.jar
 
 # Default values provided
-ENV MY_GRAFANA_SERVICE "grafana-service"
+ENV MY_GRAFANA_SERVICE "cva-grafana"
 ENV MY_KUBERNETES_ENABLED "true"
+ENV MY_INITSIZE ""
+ENV MY_PARTITIONS ""
 
 ENV JAVA_ARGS ""
 ENV JAVA_HEAP_SIZE "4g"
@@ -22,4 +24,6 @@ ENTRYPOINT exec java $JAVA_ARGS \
  -Dmy.docker.enabled=true \
  -Dmy.grafana.service=$MY_GRAFANA_SERVICE \
  -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+ -Dmy.initSize=$MY_INITSIZE \
+ -Dmy.partitions=$MY_PARTITIONS \
  -jar application.jar

@@ -1,0 +1,90 @@
+hazelcast:
+  security:
+    enabled: true
+    realms:
+      #################################
+      # Server to server security realm
+      # => MyServerLoginModule validates incoming credentials from a server trying to join the cluster
+      # => MyCredentialsFactory provides credentials to send to a cluster we wish to join
+      #################################
+      - name: s2s
+        authentication:
+          jaas:
+            - class-name: com.hazelcast.platform.demos.telco.churn.security.MyServerLoginModule
+              usage: REQUIRED
+              properties:
+                buildTimestamp: ${my.build-timestamp}
+        identity:
+          credentials-factory:
+            class-name: com.hazelcast.platform.demos.telco.churn.security.MyServerCredentialsFactory
+            properties:
+              buildTimestamp: ${my.build-timestamp}
+              moduleName: '@project.artifactId@'
+              userName: ${my.build-userName}
+      #################################
+      # Client to server security realm
+      # => MyClientLoginModule validates incoming credentials from a client trying to connect
+      #################################
+      - name: c2s
+        authentication:
+          jaas:
+            - class-name: com.hazelcast.platform.demos.telco.churn.security.MyClientLoginModule
+              usage: REQUIRED
+              properties:
+                buildTimestamp: ${my.build-timestamp}
+                # 4 disallowed passwords, one is encrypted by MyDisallowedPasswordConfigReplacer
+                blockedPasswordsCsv: $CHURN{yrgzrva},password,Password,PASSWORD
+
+    # Use s2s (server to server) authentication realm between server members
+    member-authentication:
+      realm: s2s
+    # Use c2s (client to server) authentication realm between clients and servers
+    client-authentication:
+      realm: c2s
+
+    client-permissions:
+      map:
+        # Management Center, from hazelcast-client-cluster1.xml, allow everything (limited is better)
+        - name: "*"
+          principal: "ManagementCenter"
+          actions:
+            - all
+        # Job Submission, only allowed to interact with system data, maps with "__" name prefix
+        - name: "__*"
+          principal: "JobSubmitter"
+          actions:
+            - all
+        #
+        - name: "customer"
+          principal: churn-java-client
+          actions:
+            - read
+        #actions: []
+        #
+        - name: "sentiment"
+          principal: churn-java-client
+          actions:
+#            - create
+#            - execute
+#            - put
+#            - read
+            - all
+      topic:
+        #
+        - name: "slack"
+          principal: churn-java-client
+          actions:
+#            - publish
+            - listen
+      # For unique job ids
+      flake-id-generator:
+        - name: "__*"
+          principal: "JobSubmitter"
+          actions:
+            - all
+    client-block-unmapped-actions: false
+    
+    # Doesn't block, just logs
+    security-interceptors:
+      - com.hazelcast.platform.demos.telco.churn.security.MyLoggingSecurityInterceptor
+ 

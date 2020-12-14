@@ -15,6 +15,7 @@
 	<modules>
 		<module>banking</module>
 		<module>ml</module>
+		<module>telco</module>
 	</modules>
 
 	<properties>
@@ -29,22 +30,34 @@
 		<spotbugs.skip>true</spotbugs.skip>
 
 		<!-- Version dependencies - ${project.version} should track Hazelcast version -->
+                <cassandra-driver.version>3.5.0</cassandra-driver.version>
+                <debezium-connector-cassandra.version>1.4.0.Alpha1</debezium-connector-cassandra.version>
+                <debezium-connector-mongodb.version>1.3.1.Final</debezium-connector-mongodb.version>
 		<java-annotation.version>1.3.2</java-annotation.version>
 		<guava.version>29.0-jre</guava.version>
-		<grpc.version>1.31.0</grpc.version>
-		<hazelcast.version>4.0.1</hazelcast.version>
-		<hazelcast-jet.version>4.2</hazelcast-jet.version>
+                <!-- Matches banking/credit-value-adjustment/cpp/Dockerfile2 -->
+		<grpc.version>1.31.1</grpc.version>
+		<hazelcast.version>4.1.1-SNAPSHOT</hazelcast.version>
+		<hazelcast-jet.version>4.4-SNAPSHOT</hazelcast-jet.version>
 		<hazelcast-jet-spring-boot-starter.version>2.0.0</hazelcast-jet-spring-boot-starter.version>
-		<hazelcast-kubernetes.version>2.0.2</hazelcast-kubernetes.version>
+		<hazelcast-kubernetes.version>2.2.1</hazelcast-kubernetes.version>
 		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
-		<jackson.version>2.10.2</jackson.version>
+		<jackson.version>2.11.3</jackson.version>
 		<json.version>20190722</json.version>
-		<junit.version>4.13</junit.version>
+                <json-smart.version>2.3</json-smart.version>
+		<junit-jupiter.version>5.7.0</junit-jupiter.version>
+		<junit-vintage.version>5.7.0</junit-vintage.version>
 		<jython.version>2.7.2rc1</jython.version>
 		<kafka-clients.version>2.4.0</kafka-clients.version>
+		<kafka-connect.version>2.6.0</kafka-connect.version>
+ 		<mongo-java-driver.version>3.12.7</mongo-java-driver.version>
 		<poi-ooxml.version>4.1.2</poi-ooxml.version>
-		<protobuf.version>3.12.4</protobuf.version>
-		<spring-boot.version>2.3.2.RELEASE</spring-boot.version>
+                <!-- Run same version with 'protoc - -grpc_out=. - -plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin' 
+                     banking/credit-value-adjustment/common/src/main/proto/JetToCpp.proto -->
+		<protobuf.version>3.12.2</protobuf.version>
+	 	<!-- See https://github.com/hazelcast/hazelcast-jet-contrib/issues/99 -->
+		<spring-boot.version>2.4.0</spring-boot.version>
+		<spring-boot.version>2.3.6.RELEASE</spring-boot.version>
 		<springfox-swagger.version>2.9.2</springfox-swagger.version>
 
 		<!-- Plugins -->
@@ -57,10 +70,11 @@
 		<maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
-		<maven-failsafe-plugin.version>3.0.0-M4</maven-failsafe-plugin.version>
+		<maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
 		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
 		<maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
 		<maven-shade-plugin.version>3.2.2</maven-shade-plugin.version>
+		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
 		<os-maven-plugin.version>1.6.2</os-maven-plugin.version>
 		<protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
 		<spotbugs-maven-plugin.version>3.1.12.2</spotbugs-maven-plugin.version>
@@ -74,15 +88,21 @@
 	<dependencies>
 		<!-- scope==test -->
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>${junit-jupiter.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+  	                    <groupId>com.datastax.cassandra</groupId>
+    	                    <artifactId>cassandra-driver-core</artifactId>
+                            <version>${cassandra-driver.version}</version>
+			</dependency>
+
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-databind</artifactId>
@@ -116,8 +136,23 @@
 				<version>${hazelcast-kubernetes.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>com.hazelcast</groupId>
+				<artifactId>hazelcast-sql</artifactId>
+				<version>${hazelcast.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>com.hazelcast.jet</groupId>
 				<artifactId>hazelcast-jet</artifactId>
+				<version>${hazelcast-jet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.hazelcast.jet</groupId>
+				<artifactId>hazelcast-jet-cdc-debezium</artifactId>
+				<version>${hazelcast-jet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.hazelcast.jet</groupId>
+				<artifactId>hazelcast-jet-cdc-mysql</artifactId>
 				<version>${hazelcast-jet.version}</version>
 			</dependency>
 			<dependency>
@@ -141,9 +176,25 @@
 				<version>${hazelcast-jet.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>com.hazelcast.jet</groupId>
+				<artifactId>hazelcast-jet-sql</artifactId>
+				<version>${hazelcast-jet.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>com.hazelcast.jet.contrib</groupId>
 				<artifactId>hazelcast-jet-spring-boot-starter</artifactId>
 				<version>${hazelcast-jet-spring-boot-starter.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.debezium</groupId>
+				<artifactId>debezium-connector-cassandra</artifactId>
+				<version>${debezium-connector-cassandra.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.debezium</groupId>
+				<artifactId>debezium-connector-mongodb</artifactId>
+				<version>${debezium-connector-mongodb.version}</version>
 			</dependency>
 
 			<dependency>
@@ -161,6 +212,18 @@
     	        <groupId>javax.annotation</groupId>
         	    <artifactId>javax.annotation-api</artifactId>
         	    <version>${java-annotation.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>net.minidev</groupId>
+				<artifactId>json-smart</artifactId>
+				<version>${json-smart.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.kafka</groupId>
+				<artifactId>connect-api</artifactId>
+				<version>${kafka-connect.version}</version>
 			</dependency>
 
 			<dependency>
@@ -182,10 +245,37 @@
 			</dependency>
 
 			<dependency>
+				<groupId>org.junit.vintage</groupId>
+				<artifactId>junit-vintage-engine</artifactId>
+				<version>${junit-vintage.version}</version>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mongodb</groupId>
+				<artifactId>mongo-java-driver</artifactId>
+				<version>${mongo-java-driver.version}</version>
+			</dependency>
+
+			<dependency>
 				<groupId>org.python</groupId>
 				<artifactId>jython</artifactId>
 				<version>${jython.version}</version>
 			</dependency>
+
+            <!-- scope==test -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <version>${spring-boot.version}</version>
+                <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.junit.vintage</groupId>
+                        <artifactId>junit-vintage-engine</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -203,6 +293,17 @@
 		<repository>
 			<id>Hazelcast Private Snapshot Repository</id>
 			<url>https://repository.hazelcast.com/snapshot/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>interval:720</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>Hazelcast Public Snapshot Repository</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
 			<releases>
 				<enabled>false</enabled>
 			</releases>
@@ -245,12 +346,18 @@
 				</configuration>
 				<executions>
 					<execution>
+						<!-- No default phase to avoid collision with Spring Boot and Dockerfile -->
+						<phase>package</phase>
 						<goals>
 							<goal>integration-test</goal>
 							<goal>verify</goal>
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire-plugin.version}</version>
 			</plugin>
 			<plugin>
 				<groupId>com.github.spotbugs</groupId>
@@ -337,10 +444,14 @@
 							<MC_CLUSTER1_ADDRESSLIST>${my.mc.cluster1.addresslist}</MC_CLUSTER1_ADDRESSLIST>
 							<MC_CLUSTER2_NAME>${my.mc.cluster2.name}</MC_CLUSTER2_NAME>
 							<MC_CLUSTER2_ADDRESSLIST>${my.mc.cluster2.addresslist}</MC_CLUSTER2_ADDRESSLIST>
+                                                        <!-- Dockerfile uses for other tools -->
+                                                        <MY_OTHERUSER>${my.other.admin.user}</MY_OTHERUSER>
+                                                        <MY_OTHERPASSWORD>${my.other.admin.password}</MY_OTHERPASSWORD>
+                                                        <MY_OTHERDATABASE>${my.other.admin.database}</MY_OTHERDATABASE>
 						</buildArgs>
 						<dockerfile>Dockerfile</dockerfile>
 						<pullNewerImage>false</pullNewerImage>
-						<repository>hazelcast-${docker.image.prefix}/${docker.image.name}</repository>
+						<repository>hazelcast-platform-demos/${docker.image.prefix}-${docker.image.name}</repository>
 						<tag>latest</tag>
 					</configuration>
 					<executions>

@@ -16,10 +16,8 @@
 
 package com.hazelcast.platform.demos.ml.ri;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.jet.Jet;
@@ -36,11 +34,8 @@ public abstract class AbstractJetIT {
     protected static JetInstance jetInstance;
     protected static PythonServiceConfig pythonServiceConfig;
 
-    @Rule
-    public TestName testName = new TestName();
-
-    @BeforeClass
-    public static void beforeClass() throws Exception {
+    @BeforeAll
+    public static void beforeAll() throws Exception {
         Config config = new Config();
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
 
@@ -50,8 +45,8 @@ public abstract class AbstractJetIT {
         jetInstance = Jet.newJetInstance(jetConfig);
     }
 
-    @AfterClass
-    public static void afterClass() {
+    @AfterAll
+    public static void afterAll() {
         jetInstance.shutdown();
     }
 

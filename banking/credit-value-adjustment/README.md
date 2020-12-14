@@ -205,6 +205,11 @@ Across the bottle is a table showing the Jet jobs that have run or are running,
 and their status. For CVA jobs that have completed successfully, a download link
 enables you to get the results as a CSV file or Excel spreadsheet.
 
+### 12. `prometheus`
+
+This module creates a Prometheus image for Docker, pre-configured to connect
+to the Management Center in Kubernetes environments only.
+
 ## Running -- sequence
 
 There is a partial sequence to running, and some optional modules depending on the environment
@@ -220,9 +225,9 @@ These should be started first.
  Run as many of each as you want. If you don't wish to use WAN, one cluster is enough,
 and *WAN* is only available in Kubernetes.
 
-* *data-loader*, *management-center* &amp; *webapp* -
+* *data-loader*, *prometheus*, *management-center* &amp; *webapp* -
  These should be started last.
-Management Center is optional.
+Prometheus and Management Center are optional.
 
 ## Running -- Localhost
 
@@ -329,10 +334,10 @@ This is the threshold for the amount of data loaded. Here it would mean 500 curv
 
 Three sets of Kubenetes deployments will set up the CVA example.
 
-First, Grafana, C++, independent of each other. 
+First, Grafana and Prometheus together and also C++, independent of the first two. 
 
 ```
-kubectl create -f kubernetes-grafana.yaml -f kubernetes-cva-cpp.yaml
+kubectl create -f kubernetes-grafana-prometheus.yaml -f kubernetes-cpp.yaml
 ```
 
 Second, the two Hazelcast clusters.

@@ -1,3 +1,6 @@
 # Replaced by Maven
 my:
+# Set these from Kubernetes YAML
+#  initsize: @my.init.size@
+#  partitions: @my.partitions@
   site: '@my.site@'

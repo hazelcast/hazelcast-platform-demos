@@ -6,7 +6,7 @@ MODULE=zookeeper
 BASEDIR=`dirname $0`
 cd $BASEDIR/../../../$MODULE
 
-DOCKER_IMAGE=hazelcast-${PROJECT}/${MODULE}
+DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
 # Private network so can use container names
 docker network rm $PROJECT > /dev/null 2>&1
