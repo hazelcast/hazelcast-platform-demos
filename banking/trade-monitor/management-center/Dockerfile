@@ -1,4 +1,4 @@
-FROM hazelcast/management-center:4.2020.08
+FROM hazelcast/management-center:4.2020.12
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MC_LICENSE
@@ -22,7 +22,8 @@ ENV MC_CLUSTER1_ADDRESSLIST=$MC_CLUSTER1_ADDRESSLIST
 
 # Start Management Center
 CMD ["bash", "-c", "set -euo pipefail \
-      && echo ./mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_ADDRESSLIST} \
-      && ./mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_ADDRESSLIST} \
-      && /mc-start.sh \
+      && echo bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_ADDRESSLIST} \
+      && bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_ADDRESSLIST} \
+      && echo bin/mc-start.sh \
+      && bin/mc-start.sh \
      "]
