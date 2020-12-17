@@ -125,6 +125,7 @@ public class MongoUpdater implements CommandLineRunner {
                 }
                 customer.setLastModifiedBy(this.springApplicationName);
                 customer.setLastModifiedDate(System.currentTimeMillis());
+                customer.setNotes(MyUtils.rot13(customer.getNotes()));
 
                 this.customerRepository.save(customer);
                 LOGGER.trace("Changed: {}", customer);

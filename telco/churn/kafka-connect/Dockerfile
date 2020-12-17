@@ -17,13 +17,14 @@ ENV REST_HOST_NAME=0.0.0.0
 
 # Note, not MY_BOOTSTRAP_SERVERS
 ENV BOOTSTRAP_SERVERS "0.0.0.0:9092,0.0.0.0:9093,0.0.0.0:9094"
-
+# Force override
+ENV MY_MONGO_LOCATION=""
 ENV NOTUSED_PLACEHOLDER_USER=$MY_OTHERUSER
 ENV NOTUSED_PLACEHOLDER_PASSWORD=$MY_OTHERPASSWORD
 ENV NOTUSED_PLACEHOLDER_DATABASE=$MY_OTHERDATABASE
 
 # Specialised start-up script, plus config for Mongo connector
-COPY target/classes/mongo.json /
+COPY target/classes/mongo.json $KAFKA_HOME/config/
 COPY target/classes/custom-entrypoint.sh  /
 COPY target/classes/log4j.properties $KAFKA_HOME/config/log4j.properties
 ENTRYPOINT ["/bin/bash", "/custom-entrypoint.sh"]

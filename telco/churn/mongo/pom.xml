@@ -11,7 +11,7 @@
 
 	<artifactId>churn-mongo</artifactId>
 
-	<name>Hazelcast Platform - Churn - Mongo</name>
+	<name>Hazelcast Platform - Churn - Mongo (1 replica:DEV)</name>
 	<description>Telco Churn - Re-package Mongo</description>
 
 	<properties>

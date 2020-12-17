@@ -25,6 +25,7 @@ import org.springframework.data.annotation.Id;
  * </p>
  */
 public class Customer {
+    private static final int MAX_NOTES_LENGTH = 128;
 
     @Id
     private String id;
@@ -35,6 +36,20 @@ public class Customer {
     private Long createdDate;
     private String lastModifiedBy;
     private Long lastModifiedDate;
+    private String notes;
+
+    // Almost default, don't print all notes if lengthy
+    @Override
+    public String toString() {
+        String notesPrint = (notes == null ? "'" : "'" + notes);
+        if (notesPrint.length() > MAX_NOTES_LENGTH) {
+            notesPrint = notesPrint.substring(0, MAX_NOTES_LENGTH) + "' [TRUNCATED]";
+        }
+        return "Customer [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", accountType="
+                + accountType + ", createdBy=" + createdBy + ", createdDate=" + createdDate + ", lastModifiedBy="
+                + lastModifiedBy + ", lastModifiedDate=" + lastModifiedDate
+                + ", notes=" + notesPrint + "]";
+    }
 
     // Generated code below
 
@@ -86,12 +101,11 @@ public class Customer {
     public void setLastModifiedDate(Long lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
-
-    @Override
-    public String toString() {
-        return "Customer [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", accountType="
-                + accountType + ", createdBy=" + createdBy + ", createdDate=" + createdDate + ", lastModifiedBy="
-                + lastModifiedBy + ", lastModifiedDate=" + lastModifiedDate + "]";
+    public String getNotes() {
+        return notes;
+    }
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
 }

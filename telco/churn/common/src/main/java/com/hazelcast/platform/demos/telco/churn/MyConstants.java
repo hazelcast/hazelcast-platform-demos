@@ -62,7 +62,7 @@ public class MyConstants {
     // See debezium-connector-cassandra.conf and debezium-connector-mongo.conf
     // And topic-create/Dockerfile
     public static final String KAFKA_TOPIC_CASSANDRA = "debezium-cassandra.churn.cdr";
-    public static final String KAFKA_TOPIC_MONGO = "debezium-mongo.admin.customer";
+    public static final String KAFKA_TOPIC_MONGO = "debezium-connector-mongodb.churn.customer";
 
     // Backing store names, Mongo is derived, others need specified
     public static final String CASSANDRA_TABLE_NAME = "cdr";
