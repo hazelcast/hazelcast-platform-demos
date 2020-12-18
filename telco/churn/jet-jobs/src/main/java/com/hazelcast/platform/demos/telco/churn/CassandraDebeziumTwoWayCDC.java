@@ -39,6 +39,10 @@ import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordMetadata;
  * to "{@code <CallDataRecordKey, HazelcastJsonValue>}", keep those
  * that didn't originate from Hazelcast, and save to Hazelcast.
  * </p>
+ * <p>Similar to {@link MongoDebeziumTwoWayCDC}, different topic
+ * input, different map output, different reformmating, but
+ * the same idea overall.
+ * </p>
  * <pre>
  *                +------( 1 )------+
  *                |Cassandra Source |
@@ -72,7 +76,7 @@ import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordMetadata;
  * <p>
  * Reformat & filter
  * </p>
- * <p>Turn the CDC record into a "{@code Map<String, HazelcastJsonValue}"
+ * <p>Turn the CDC record into a "{@code Map<CallDataRecordKey, HazelcastJsonValue}"
  * record. Filter out (by returning "{@code null}") and that didn't
  * originate external to Hazelcast.
  * </p>

@@ -8,26 +8,27 @@
 
  # Replica set name "churn" set in Dockerfile
  echo "$0: - - - - - - - - - - - - - - - - - - - - - - - - - - 1/7"
- sleep 10
+ sleep 2
  echo "$0 : background script, ensure replica set (of one) is active"
  echo 'rs.initiate()'
  echo 'rs.initiate()' | mongo -u @my.other.admin.user@ -p @my.other.admin.password@
  echo "$0: - - - - - - - - - - - - - - - - - - - - - - - - - - 2/7"
- sleep 10
+ sleep 2
  echo "$0 : background script, reduce OpLog size to 990MB, minimum allowed"
  echo 'db.adminCommand({replSetResizeOplog: 1, size: 990})'
  echo 'db.adminCommand({replSetResizeOplog: 1, size: 990})' | mongo -u @my.other.admin.user@ -p @my.other.admin.password@
  echo "$0: - - - - - - - - - - - - - - - - - - - - - - - - - - 3/7"
- sleep 10
+ sleep 2
  echo "$0 : background script, confirm replica set (of one) is active"
  echo 'rs.status()'
  echo 'rs.status()' | mongo -u @my.other.admin.user@ -p @my.other.admin.password@
  echo "$0: - - - - - - - - - - - - - - - - - - - - - - - - - - 4/7"
- sleep 10
+ sleep 2
  echo "$0 : background script, confirm replica set (of one) configuration"
  echo 'rs.conf()'
  echo 'rs.conf()' | mongo -u @my.other.admin.user@ -p @my.other.admin.password@
  echo "$0: - - - - - - - - - - - - - - - - - - - - - - - - - - 5/7"
+ sleep 2
  echo "$0 : background script, create collection"
  echo 'db.createCollection("customer", {})'
 mongo -u @my.other.admin.user@ -p @my.other.admin.password@ << EOF
@@ -36,7 +37,7 @@ db.createCollection("customer", {})
 show dbs
 EOF
  echo "$0: - - - - - - - - - - - - - - - - - - - - - - - - - - 6/7"
- sleep 10
+ sleep 2
  echo "$0 : background script, replication should be active"
  echo "$0: - - - - - - - - - - - - - - - - - - - - - - - - - - 7/7"
  while [ true ]

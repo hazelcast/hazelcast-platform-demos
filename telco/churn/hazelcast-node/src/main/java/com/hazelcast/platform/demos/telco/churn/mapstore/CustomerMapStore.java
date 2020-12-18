@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -179,12 +180,39 @@ public class CustomerMapStore implements MapStore<String, HazelcastJsonValue> {
     @Override
     public void store(String key, HazelcastJsonValue value) {
         long now = System.currentTimeMillis();
-        LOGGER.debug("store({}, {}) with LastModifiedDate={}, LastModifiedBy='{}'",
-                key, value, now, this.modifierFilter);
-        //FIXME Must save modified by
-        //FIXME Must save modified by
-        //FIXME Must save modified by
-        LOGGER.error("NOT YET IMPLEMENTED");
+
+        Customer customer = new Customer();
+        try {
+            JSONObject json = new JSONObject(value.toString());
+            customer.setId(json.getString(CustomerMetadata.ID));
+            customer.setFirstName(json.getString(CustomerMetadata.FIRSTNAME));
+            customer.setLastName(json.getString(CustomerMetadata.LASTNAME));
+            customer.setAccountType(json.getString(CustomerMetadata.ACCOUNT_TYPE));
+            customer.setCreatedBy(json.getString(CustomerMetadata.CREATED_BY));
+            customer.setCreatedDate(json.getLong(CustomerMetadata.CREATED_DATE));
+            // Regard everything saved by Hazelcast as changed by Hazelcast
+            String previousLastModifiedBy = json.getString(CustomerMetadata.LAST_MODIFIED_BY);
+            customer.setLastModifiedBy(this.modifierFilter);
+            customer.setLastModifiedDate(now);
+            JSONArray notesArray = json.getJSONArray(CustomerMetadata.NOTES);
+            String[] notes = new String[notesArray.length()];
+            for (int i = 0; i < notes.length; i++) {
+                notes[i] = notesArray.get(i).toString();
+            }
+            customer.setNotes(notes);
+
+            if ("churn-update-legacy".equals(previousLastModifiedBy)) {
+                LOGGER.trace("store({}, {}) not stored as LastModifiedBy='{}'",
+                        key, value, previousLastModifiedBy);
+            } else {
+                LOGGER.debug("store({}, {}) with LastModifiedDate={}, LastModifiedBy='{}'",
+                        key, value, now, this.modifierFilter);
+                this.customerRepository.save(customer);
+            }
+
+        } catch (Exception exception) {
+            LOGGER.error("store('{}', '{}'), EXCEPTION: {}", key, value, exception.getMessage());
+        }
     }
 
     /**

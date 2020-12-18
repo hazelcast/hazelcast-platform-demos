@@ -105,19 +105,16 @@ public class MongoInitializer implements CommandLineRunner {
      * @param max How many lines
      * @return A big String
      */
-    public String createNotes(int insert, int max) {
+    public String[] createNotes(int insert, int max) {
         TreeSet<String> notes = new TreeSet<>(Collections.reverseOrder());
 
         for (int i = max ; i > 0 ; i--) {
             LocalDateTime when = LocalDateTime.now().minusDays(i);
-            notes.add(String.format("(%d, %s) : ", i, when));
-            for (int j = 1 ; j < PAD_LINES ; j++) {
+            for (int j = 0 ; j < PAD_LINES ; j++) {
                 notes.add(String.format("(%d, %s) : padding %d yada yada yada", i, when, (0 - j)));
             }
         }
 
-        StringBuffer result = new StringBuffer();
-        notes.stream().forEach(note -> result.append(note).append(MyUtils.NEWLINE));
-        return result.toString();
+        return notes.toArray(new String[notes.size()]);
     }
 }

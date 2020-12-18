@@ -54,7 +54,9 @@ import com.hazelcast.jet.pipeline.Pipeline;
  * </li>
  * <li>
  * <p>{@link MongoDebeziumTwoWayCDC}</p>
- * <p>FIXME Placeholder to add Mongo Debezium as a bonus.
+ * <p>Load changes from Mongo made to customers into
+ * Hazelcast. Other applications may be updating Mongo,
+ * and we get these changes on a Kafka topic.
  * </p>
  * </li>
  * <li>

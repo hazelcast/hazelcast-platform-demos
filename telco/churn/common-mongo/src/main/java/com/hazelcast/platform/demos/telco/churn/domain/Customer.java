@@ -18,6 +18,8 @@ package com.hazelcast.platform.demos.telco.churn.domain;
 
 import org.springframework.data.annotation.Id;
 
+import com.hazelcast.platform.demos.telco.churn.MyUtils;
+
 /**
  * <p>Java representation of a customer in Mongo.
  * As this is mapped to Json, fields don't need "{@code @Column}"
@@ -36,12 +38,20 @@ public class Customer {
     private Long createdDate;
     private String lastModifiedBy;
     private Long lastModifiedDate;
-    private String notes;
+    private String[] notes = {};
 
     // Almost default, don't print all notes if lengthy
     @Override
     public String toString() {
-        String notesPrint = (notes == null ? "'" : "'" + notes);
+        String notesPrint = "";
+        if (notes != null) {
+            for (String note : notes) {
+                if (notesPrint.length() > 0) {
+                    notesPrint = notesPrint + MyUtils.NEWLINE;
+                }
+                notesPrint = notesPrint + note;
+            }
+        }
         if (notesPrint.length() > MAX_NOTES_LENGTH) {
             notesPrint = notesPrint.substring(0, MAX_NOTES_LENGTH) + "' [TRUNCATED]";
         }
@@ -101,11 +111,11 @@ public class Customer {
     public void setLastModifiedDate(Long lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
-    public String getNotes() {
-        return notes;
+    public String[] getNotes() {
+        return notes.clone();
     }
-    public void setNotes(String notes) {
-        this.notes = notes;
+    public void setNotes(String[] notes) {
+        this.notes = notes.clone();
     }
 
 }
