@@ -78,6 +78,8 @@ public class MyCsvUtils {
 
     /**
      * <p>Takes a JSON format Customer</p>
+     * <p><b>Deliberately exclude the "{@code notes}" field.</p>
+     * TODO: Should "{@code notes}" be included ?
      */
     public static String toCSVCustomer(HazelcastJsonValue hazelcastJsonValue) {
         String empty = ",,,,,,,";

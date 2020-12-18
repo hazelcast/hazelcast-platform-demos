@@ -47,7 +47,7 @@ public class MongoUpdater implements CommandLineRunner {
     private static final String ALPHABET_LOWER_CASE =
             "abcdefghijklmnopqrstuvwxyz".toLowerCase(Locale.ROOT);
     // Connector outputs in batches, ensure enough changes to exceed "mongo.json" queue
-    private static final int LOOPS_MAX = 100;
+    private static final int LOOPS_MAX = 5;
 
     @Autowired
     private CustomerRepository customerRepository;
@@ -125,6 +125,11 @@ public class MongoUpdater implements CommandLineRunner {
                 }
                 customer.setLastModifiedBy(this.springApplicationName);
                 customer.setLastModifiedDate(System.currentTimeMillis());
+                String[] notes = customer.getNotes();
+                for (int i = 0; i < notes.length; i++) {
+                    notes[i] = MyUtils.rot13(notes[i]);
+                }
+                customer.setNotes(notes);
 
                 this.customerRepository.save(customer);
                 LOGGER.trace("Changed: {}", customer);

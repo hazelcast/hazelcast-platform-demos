@@ -110,6 +110,8 @@ spec:
         - env:
           - name: "BOOTSTRAP_SERVERS"
             value: "churn-kafka-broker-0.churn-kafka-broker.default.svc.cluster.local:9092,churn-kafka-broker-1.churn-kafka-broker.default.svc.cluster.local:9092,churn-kafka-broker-2.churn-kafka-broker.default.svc.cluster.local:9092"
+          - name: "MY_MONGO_LOCATION"
+            value: "churn-mongo.default.svc.cluster.local"
           image: "hazelcast-platform-demos/churn-kafka-connect"
           imagePullPolicy: Never
           name: churn-kafka-connect-container

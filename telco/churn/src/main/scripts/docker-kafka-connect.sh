@@ -23,10 +23,11 @@ docker network create $PROJECT --driver bridge > /dev/null 2>&1
 
 # Note, not MY_BOOTSTRAP_SERVERS
 BOOTSTRAP_SERVERS=kafka-broker0:9092,kafka-broker1:9093,kafka-broker2:9094
+MY_MONGO_LOCATION=mongo
 
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
-CMD="docker run -e BOOTSTRAP_SERVERS=$BOOTSTRAP_SERVERS -p 8083:8083 --name=${MODULE} --network=${PROJECT} ${DOCKER_IMAGE}"
+CMD="docker run -e BOOTSTRAP_SERVERS=$BOOTSTRAP_SERVERS -e MY_MONGO_LOCATION=$MY_MONGO_LOCATION -p 8083:8083 --name=${MODULE} --network=${PROJECT} ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD

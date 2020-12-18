@@ -33,11 +33,12 @@ public class CustomerMetadata {
     public static final String CREATED_DATE = "createdDate";
     public static final String LAST_MODIFIED_BY = "lastModifiedBy";
     public static final String LAST_MODIFIED_DATE = "lastModifiedDate";
+    public static final String NOTES = "notes";
 
     public static final List<String> FIELD_NAMES =
             List.of(ID, FIRSTNAME, LASTNAME, ACCOUNT_TYPE,
                     CREATED_BY, CREATED_DATE,
-                    LAST_MODIFIED_BY, LAST_MODIFIED_DATE
+                    LAST_MODIFIED_BY, LAST_MODIFIED_DATE, NOTES
                     );
 
 }

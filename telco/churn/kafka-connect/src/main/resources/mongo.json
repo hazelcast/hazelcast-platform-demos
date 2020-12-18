@@ -2,14 +2,14 @@
   "name": "debezium-connector-mongodb", 
   "config": {
     "connector.class": "io.debezium.connector.mongodb.MongoDbConnector"
-    ,"_comment": "Format of hosts is replica set name from Dockerfile/hostname:port"
-    ,"mongodb.hosts": "churn/mongo:27017"
-    ,"database.include.list": "admin"
-    ,"collection.include.list": "customer"
-    ,"mongodb.name": "debezium-mongo"
+    ,"_comment": "Format below of hosts is replica set name from Dockerfile/hostname:port"
+    ,"mongodb.hosts": "churn/MY_MONGO_LOCATION:27017"
+    ,"collection.include.list": "churn.customer"
+    ,"_comment2": "Kafka topic prefix below"
+    ,"mongodb.name": "debezium-connector-mongodb"
     ,"mongodb.user": "@my.other.admin.user@"
     ,"mongodb.password": "@my.other.admin.password@"
-    ,"mongodb.members​.auto.discover": "false"
+    ,"mongodb.members.auto.discover": "false"
     ,"max.queue.size": "4"
     ,"max.batch.size": "2"
   }

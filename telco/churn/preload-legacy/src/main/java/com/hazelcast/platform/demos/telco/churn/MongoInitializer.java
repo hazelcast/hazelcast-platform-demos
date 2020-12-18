@@ -16,6 +16,10 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.TreeSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +41,7 @@ import com.hazelcast.platform.demos.telco.churn.testdata.TariffTestdata;
 @EnableMongoRepositories(basePackageClasses = CustomerRepository.class)
 public class MongoInitializer implements CommandLineRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(MongoInitializer.class);
+    private static final int PAD_LINES = 3;
 
     @Autowired
     private CustomerRepository customerRepository;
@@ -61,6 +66,7 @@ public class MongoInitializer implements CommandLineRunner {
         tariffName[1] = tariffs[1][1].toString();
 
         int insert = 0;
+        int maxNotes = CustomerTestdata.getFirstNames().length;
         for (String firstName : CustomerTestdata.getFirstNames()) {
             for (String lastName : CustomerTestdata.getLastNames()) {
                 Customer customer = new Customer();
@@ -73,6 +79,7 @@ public class MongoInitializer implements CommandLineRunner {
                 customer.setLastModifiedBy(this.springApplicationName);
                 customer.setLastModifiedDate(now);
 
+                customer.setNotes(this.createNotes(insert, 1 + (insert % maxNotes)));
                 this.customerRepository.save(customer);
                 insert++;
             }
@@ -86,4 +93,28 @@ public class MongoInitializer implements CommandLineRunner {
         }
     }
 
+    /**
+     * <p>Create some notes on the customer, to simulate what Call Center
+     * staff members may have logged each time the customer calls.
+     * </p>
+     * <p>As a lengthy String, this pushed the frequency of Mongo CDC
+     * oplog rollovers up. Minimum oplog size is 1GB in Mongo 4.2.
+     * </p>
+     *
+     * @param insert Insert number
+     * @param max How many lines
+     * @return A big String
+     */
+    public String[] createNotes(int insert, int max) {
+        TreeSet<String> notes = new TreeSet<>(Collections.reverseOrder());
+
+        for (int i = max ; i > 0 ; i--) {
+            LocalDateTime when = LocalDateTime.now().minusDays(i);
+            for (int j = 0 ; j < PAD_LINES ; j++) {
+                notes.add(String.format("(%d, %s) : padding %d yada yada yada", i, when, (0 - j)));
+            }
+        }
+
+        return notes.toArray(new String[notes.size()]);
+    }
 }
