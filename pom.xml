@@ -37,7 +37,7 @@
 		<guava.version>29.0-jre</guava.version>
                 <!-- Matches banking/credit-value-adjustment/cpp/Dockerfile2 -->
 		<grpc.version>1.31.1</grpc.version>
-		<hazelcast.version>4.1.1-SNAPSHOT</hazelcast.version>
+		<hazelcast.version>4.1.1</hazelcast.version>
 		<hazelcast-jet.version>4.4-SNAPSHOT</hazelcast-jet.version>
 		<hazelcast-jet-spring-boot-starter.version>2.0.0</hazelcast-jet-spring-boot-starter.version>
 		<hazelcast-kubernetes.version>2.2.1</hazelcast-kubernetes.version>
