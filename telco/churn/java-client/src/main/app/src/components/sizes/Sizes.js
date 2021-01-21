@@ -268,7 +268,7 @@ class Sizes extends Component {
                         url={WS_URL}
                                 topics={WS_TOPICS}
                                 onMessage={this.handleData}
-                                debug={false} />
+                                debug={true} />
         			<Styles>
                     	<Table columns={columns} data={this.state.data} />
                     </Styles>
