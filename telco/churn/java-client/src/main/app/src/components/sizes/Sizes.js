@@ -123,7 +123,7 @@ class Sizes extends Component {
     
     getData(){
     	console.log("Sizes.js", "getData()");
-    	setImmediate(() => {
+    	setTimeout(() => {
         	var client = rest.wrap(mime);
             var self = this;
                 
@@ -164,7 +164,7 @@ class Sizes extends Component {
                 });
                         
             });
-        })
+        }, 0)
     }
  
     componentDidMount(){
@@ -268,7 +268,7 @@ class Sizes extends Component {
                         url={WS_URL}
                                 topics={WS_TOPICS}
                                 onMessage={this.handleData}
-                                debug={false} />
+                                debug={true} />
         			<Styles>
                     	<Table columns={columns} data={this.state.data} />
                     </Styles>

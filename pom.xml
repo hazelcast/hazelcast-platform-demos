@@ -37,9 +37,9 @@
 		<guava.version>29.0-jre</guava.version>
                 <!-- Matches banking/credit-value-adjustment/cpp/Dockerfile2 -->
 		<grpc.version>1.31.1</grpc.version>
-		<hazelcast.version>4.1.1-SNAPSHOT</hazelcast.version>
-		<hazelcast-jet.version>4.4-SNAPSHOT</hazelcast-jet.version>
-		<hazelcast-jet-spring-boot-starter.version>2.0.0</hazelcast-jet-spring-boot-starter.version>
+		<hazelcast.version>4.1.1</hazelcast.version>
+		<hazelcast-jet.version>4.4</hazelcast-jet.version>
+		<hazelcast-jet-spring-boot-starter.version>2.0.1</hazelcast-jet-spring-boot-starter.version>
 		<hazelcast-kubernetes.version>2.2.1</hazelcast-kubernetes.version>
 		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
 		<jackson.version>2.11.3</jackson.version>
@@ -77,7 +77,7 @@
 		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
 		<os-maven-plugin.version>1.6.2</os-maven-plugin.version>
 		<protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
-		<spotbugs-maven-plugin.version>3.1.12.2</spotbugs-maven-plugin.version>
+		<spotbugs-maven-plugin.version>4.2.0</spotbugs-maven-plugin.version>
 
 		<!-- Environments -->
 		<!-- Google Cloud -->

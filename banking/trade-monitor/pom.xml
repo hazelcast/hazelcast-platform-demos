@@ -23,7 +23,7 @@
 		<my.cluster1.name>grid</my.cluster1.name>
 
 		<!-- Project specific versions -->
-		<javalin.version>3.7.0</javalin.version>
+		<javalin.version>3.13.0</javalin.version>
 
                 <!-- Common logons for Management Center, Grafana, Prometheus -->
                 <my.other.admin.user>admin</my.other.admin.user>
