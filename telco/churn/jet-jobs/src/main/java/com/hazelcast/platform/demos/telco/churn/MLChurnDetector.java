@@ -377,8 +377,8 @@ public class MLChurnDetector extends MyJobWrapper {
         try {
             String key = tokens[0];
             Sentiment value = new Sentiment();
-            double current = Double.valueOf(tokens[tokens.length - 2]);
-            double previous = Double.valueOf(tokens[tokens.length - 1]);
+            double current = Double.parseDouble(tokens[tokens.length - 2]);
+            double previous = Double.parseDouble(tokens[tokens.length - 1]);
             value.setUpdated(LocalDateTime.now());
             value.setCurrent(current);
             value.setPrevious(previous);
