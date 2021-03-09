@@ -1,3 +1,5 @@
+/* These fonts cause errors:
+ * "downloadable font: rejected by sanitizer (font-family: "DIN Next LT Pro" style:normal weight:700 stretch:100 src index:4) source: http://localhost:8080/fonts/DINNextLTPro-Bold.ttf"
 @font-face {
   font-family: 'DIN Next LT Pro';
   src: url('/fonts/DINNextLTPro-Regular.eot');
@@ -41,6 +43,7 @@
   font-weight: 900;
   font-style: normal;
 }
+*/
 
 *, *:before, *:after {
   box-sizing: inherit;

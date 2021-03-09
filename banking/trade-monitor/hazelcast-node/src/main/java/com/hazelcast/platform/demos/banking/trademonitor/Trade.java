@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2020, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,8 @@ public class Trade implements Serializable {
     private String id;
     private long timestamp;
     private String symbol;
-    private int quantity;
-    private int price;
+    private long quantity;
+    private long price;
 
     // Generated getters/setters and toString()
 
@@ -62,19 +62,19 @@ public class Trade implements Serializable {
         this.symbol = symbol;
     }
 
-    public int getQuantity() {
+    public long getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(long quantity) {
         this.quantity = quantity;
     }
 
-    public int getPrice() {
+    public long getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(long price) {
         this.price = price;
     }
 

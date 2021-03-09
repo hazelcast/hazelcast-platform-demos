@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2020, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import java.util.Map.Entry;
 
-import com.hazelcast.function.ToIntFunctionEx;
+import com.hazelcast.function.ToLongFunctionEx;
 import com.hazelcast.jet.accumulator.LongAccumulator;
 import com.hazelcast.jet.accumulator.MutableReference;
 import com.hazelcast.jet.aggregate.AggregateOperation;
@@ -92,13 +92,17 @@ public class AggregateQuery {
                     )
             .withoutTimestamps();
 
-        StreamStage<Entry<String, Tuple3<Long, Long, Integer>>> aggregated =
+        StreamStage<Entry<String, Tuple3<Long, Long, Long>>> aggregated =
             inputSource
+            .mapUsingIMap(MyConstants.IMAP_NAME_SYMBOLS,
+                    Trade::getSymbol,
+                    (Trade trade, SymbolInfo symbolInfo)
+                    -> (symbolInfo.getFinancialStatus() == NasdaqFinancialStatus.NORMAL ? trade : null))
             .groupingKey(Trade::getSymbol)
             .rollingAggregate(AggregateOperations.allOf(
                 AggregateOperations.counting(),
                 AggregateOperations.summingLong(trade -> trade.getPrice() * trade.getQuantity()),
-                latestValue(trade -> Integer.valueOf(trade.getPrice()))
+                latestValue(trade -> Long.valueOf(trade.getPrice()))
                ))
                .setName("aggregate by symbol");
 
@@ -131,15 +135,15 @@ public class AggregateQuery {
      * giving a minor race condition that does not matter here.
      * </p>
      *
-     * @param getIntegerValueFn How to get an "{@code int}" from the Trade
-     * @return An integer
+     * @param getLongValueFn How to get an "{@code long}" from the Trade
+     * @return A long
      */
-    private static AggregateOperation1<Trade, MutableReference<Integer>, Integer> latestValue(
-            ToIntFunctionEx<Trade> getIntegerValueFn) {
+    private static AggregateOperation1<Trade, MutableReference<Long>, Long> latestValue(
+            ToLongFunctionEx<Trade> getLongValueFn) {
         return AggregateOperation
-            .withCreate(() -> new MutableReference<Integer>())
-            .andAccumulate((MutableReference<Integer> reference, Trade trade) -> {
-                reference.set(getIntegerValueFn.applyAsInt(trade));
+            .withCreate(() -> new MutableReference<Long>())
+            .andAccumulate((MutableReference<Long> reference, Trade trade) -> {
+                reference.set(getLongValueFn.applyAsLong(trade));
             })
             .andExportFinish(MutableReference::get);
     }

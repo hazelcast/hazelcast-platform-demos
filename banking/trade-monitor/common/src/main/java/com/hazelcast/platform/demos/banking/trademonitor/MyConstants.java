@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2020, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.util.List;
  */
 public class MyConstants {
 
+    public static final String KAFKA_TOPIC_MAPPING_PREFIX = "kf_";
     public static final String KAFKA_TOPIC_NAME_TRADES = "trades";
 
     public static final String IMAP_NAME_AGGREGATE_QUERY_RESULTS = "AggregateQuery" + "_results";
@@ -35,4 +36,6 @@ public class MyConstants {
 
     public static final String WEBSOCKET_PATH_TRADES = "/trades";
 
+    // For demonstration of queries
+    public static final int SQL_RESULT_THRESHOLD = 10;
 }
