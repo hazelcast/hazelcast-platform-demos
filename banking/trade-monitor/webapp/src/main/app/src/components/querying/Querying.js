@@ -43,7 +43,7 @@ class Querying extends Component {
         super(props);
         this.state = {
 	            browserLanguage: "en",
-				query: 'SELECT * FROM kf_trades',
+				query: 'SELECT k.id, k.symbol, k."timestamp", s.* FROM kf_trades AS k LEFT JOIN symbols AS s ON k.symbol = s.__key',
                 message0: '',
                 message0_style: {
                 	color: 'green',
