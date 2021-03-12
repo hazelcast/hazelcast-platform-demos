@@ -24,8 +24,8 @@ import java.util.List;
  */
 public class MyConstants {
 
-    public static final String KAFKA_TOPIC_MAPPING_PREFIX = "kf_";
-    public static final String KAFKA_TOPIC_NAME_TRADES = "trades";
+    public static final String KAFKA_TOPIC_MAPPING_PREFIX = "";
+    public static final String KAFKA_TOPIC_NAME_TRADES = "kf_trades";
 
     public static final String IMAP_NAME_AGGREGATE_QUERY_RESULTS = "AggregateQuery" + "_results";
     public static final String IMAP_NAME_SYMBOLS = "symbols";

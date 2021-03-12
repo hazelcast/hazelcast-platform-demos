@@ -285,13 +285,22 @@ public class ApplicationRunner {
     private boolean demoSql() {
         boolean didFail = false;
         String[][] queries = new String[][] {
-            //TODO ADD MORE QUERIES
             { "System",  "SELECT * FROM information_schema.mappings" },
             { "System",  "SELECT mapping_name AS name FROM information_schema.mappings" },
             { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS },
             { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_SYMBOLS },
             { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_TRADES },
+            { "IMap",    "SELECT id, symbol, price FROM " + MyConstants.IMAP_NAME_TRADES
+                    + " WHERE symbol LIKE 'AA%' AND price > 2510" },
             { "Kafka",   "SELECT * FROM " + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRADES },
+            // The next 2 have the same execution plan but are declared differently
+            { "Join",    "SELECT * FROM (SELECT id, symbol, \"timestamp\" FROM kf_trades) AS k"
+                    + " LEFT JOIN symbols AS s ON k.symbol = s.__key" },
+            { "Join",    "SELECT k.id, k.symbol, k.\"timestamp\", s.* FROM kf_trades AS k"
+                    + " LEFT JOIN symbols AS s ON k.symbol = s.__key" },
+            // Not yet implmented : "Sub-query not supported on the right side of a join"
+            //{ "Join",    "SELECT * FROM (SELECT id, symbol, \"timestamp\" FROM kf_trades) AS k"
+            //    + " LEFT JOIN (SELECT * FROM symbols) AS s ON k.symbol = s.__key" },
         };
 
         int count = 0;

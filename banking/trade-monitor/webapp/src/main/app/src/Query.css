@@ -5,7 +5,6 @@
   color:   var(--color-midnight-blue);
 }
 
-
 /* When opened */
 .Collapsible-opened {
   background-color:   var(--color-mid-blue);
@@ -18,11 +17,23 @@
   border: 2px solid var(--color-mid-blue);
   color: var(--color-midnight-blue);
 }
+.Collapsible__trigger::before {
+  content: "\21CA \21CA \21CA ";
+}
+.Collapsible__trigger::after {
+  content: " \21CA \21CA \21CA";
+}
 
 /* Trigger when opened */
 .Collapsible__trigger-opened {
   background-color:   var(--color-midnight-blue);
   color:   white;
+}
+.Collapsible__trigger-opened::before {
+  content: "\21C8 \21C8 \21C8 ";
+}
+.Collapsible__trigger-opened::after {
+  content: " \21C8 \21C8 \21C8";
 }
 
 /* Inner */

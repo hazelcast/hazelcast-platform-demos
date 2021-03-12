@@ -44,6 +44,11 @@ class Querying extends Component {
         this.state = {
 	            browserLanguage: "en",
 				query: 'SELECT * FROM kf_trades',
+                message0: '',
+                message0_style: {
+                	color: 'green',
+                    'font-weight': 'bold'
+                },
           	    message1: [],
                 message2: '',
                 message2_style: {
@@ -57,6 +62,14 @@ class Querying extends Component {
 
     componentDidMount(){
         this.setState({browserLanguage: detectBrowserLanguage()})
+		var text0 = '.';
+	    var text0_style = {visibility: 'hidden'};
+		this.setState({	
+            message0: update(this.state.message0, {$set: text0}) 
+        })
+		this.setState({	
+            message0_style: update(this.state.message0_style, {$set: text0_style}) 
+        })
         var rows = [];
         for (var i = 0; i < 12; i++) {
             rows.push('');
@@ -95,15 +108,20 @@ class Querying extends Component {
                         console.log("Querying.js", "handleSubmit()", "response.entity", response.entity);
                         var payload = response.entity;
                         
+                        var text0 = '?';
                         var text1 = [];
                         var text2 = '?';
-                        var text1_style = {};
+                        var text0_style = {};
                         var text2_style = {};
 
 	                    var error_message = payload.error;
 	                    var warning_message = payload.warning;
 	                    var rows_message = payload.rows;
 
+                        var info_style = {
+                        	color: 'green',
+                        	'font-weight': 'bold'
+	                	}
                         var error_style = {
                         	color: 'red',
                         	'font-weight': 'bold'
@@ -112,6 +130,9 @@ class Querying extends Component {
                             color: 'yellow',
                         	'font-weight': 'lighter'
                     	}
+
+	                    text0 = self.state.query;
+                        text0_style = info_style;
 
                         var i = 0;
                         // Lines provided
@@ -139,6 +160,12 @@ class Querying extends Component {
                         }
 
                         self.setState({
+                                message0: update(self.state.message0, {$set: text0}) 
+                        });
+                        self.setState({
+                                message0_style: update(self.state.message0_style, {$set: text0_style}) 
+                        });
+                        self.setState({
                                 message1: update(self.state.message1, {$set: text1})  
                         });
                         self.setState({
@@ -157,9 +184,17 @@ class Querying extends Component {
         			text1.push('');
 				}
                 
+				var text0 = '.';
+	            var text0_style = {visibility: 'hidden'};
 				var text2 = '.';
 	            var text2_style = {visibility: 'hidden'};
 				
+                self.setState({
+                	message0: update(self.state.message0, {$set: text0}) 
+                });
+                self.setState({
+                	message0_style: update(self.state.message0_style, {$set: text0_style}) 
+                });
                 self.setState({
                 	message1: update(self.state.message1, {$set: text1})  
                 });
@@ -187,7 +222,7 @@ class Querying extends Component {
                         <div class="greenInputBox">
                         	<form>
                                 <label for="query">Query:</label>
-                                <input type="text" 
+                                <input type="text" size="64"
                                  id="query" name="query" defaultValue={this.state.query}
                                  onChange={this.handleChange}/>
                                 <button onClick={this.handleSubmit}>Submit</button>
@@ -196,6 +231,7 @@ class Querying extends Component {
                     </div>
                     <div class="greenOuterBox">     
                         <div class="greenOutputBox">
+                        	<p style={this.state.message0_style}>{this.state.message0}</p>
                             <code>
                                 <Styles>
                                 	<pre>
