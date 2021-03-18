@@ -165,7 +165,7 @@ this needs the separate `webapp` module below to visualize.
 This module creates a single Hazelcast node with both in-memory data grid (IMDG) and Jet functionality.
 
 IMDG functionality here is the storage of trade data and trade aggregation results in maps.
-Specifically, [IMap](https://docs.hazelcast.org/docs/4.0/javadoc/com/hazelcast/map/IMap.html) which is
+Specifically, [IMap](https://docs.hazelcast.org/docs/5.0/javadoc/com/hazelcast/map/IMap.html) which is
 a distributed map spread across as many Hazelcast nodes as you have. To increase storage capacity,
 all you need do is run more Hazelcast nodes, and capacity scales linearly.
 
@@ -207,7 +207,7 @@ This job is a simple upload, or _ingest_ of data from Kafka into Hazelcast.
 
 The input stage of the pipeline is a Kafka source, with the topic name "`trades`".
 
-The output stage of the pipeline is an [IMap](https://docs.hazelcast.org/docs/4.0/javadoc/com/hazelcast/map/IMap.html), also called "`trades`".
+The output stage of the pipeline is an [IMap](https://docs.hazelcast.org/docs/5.0/javadoc/com/hazelcast/map/IMap.html), also called "`trades`".
 
 What is read from Kafka is written directly into Hazelcast, without enrichment, depletion, filtering or any
 sophisticated stream processing.
@@ -226,7 +226,7 @@ stock symbol, and for each of the 3000 or so symbols a rolling aggregation updat
 trade count and trade volume (stock price * trade quantity).
 
 For each trade that comes in, the running total for that trade is updated in the
-[IMap](https://docs.hazelcast.org/docs/4.0/javadoc/com/hazelcast/map/IMap.html) called
+[IMap](https://docs.hazelcast.org/docs/5.0/javadoc/com/hazelcast/map/IMap.html) called
 "`AggregateQuery_results`".
 
 Jet job `AggregatedQuery` processes the same input as Jet job `IngestTrades`, and at the same
@@ -506,7 +506,7 @@ every 100,000th after that.
 14:41:55.933 INFO  main c.h.p.d.b.trademonitor.ApplicationRunner - Wrote 0 => "{"id": "eca117f8-c44e-47d2-aad4-b0d358769456","timestamp": 1583934115727,"symbol": "ENTG","price": 2501,"quantity": 99}" 
 ```
 
-`hazelcast-node` has two Jet jobs running, each with a [Logger Sink](https://docs.hazelcast.org/docs/jet/4.0/javadoc/com/hazelcast/jet/pipeline/Sinks.html#logger--). 
+`hazelcast-node` has two Jet jobs running, each with a [Logger Sink](https://docs.hazelcast.org/docs/jet/4.4/javadoc/com/hazelcast/jet/pipeline/Sinks.html#logger--). 
 
 There will be output from the `IngestTrades` job, which is an upload, so the format is the same as the `trade-producer`.
 

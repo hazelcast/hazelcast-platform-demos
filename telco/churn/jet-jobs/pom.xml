@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.telco.churn</groupId>
 		<artifactId>churn-root</artifactId>
-		<version>4.0</version>
+		<version>5.0</version>
 	</parent>
 
 	<artifactId>churn-jet-jobs</artifactId>
