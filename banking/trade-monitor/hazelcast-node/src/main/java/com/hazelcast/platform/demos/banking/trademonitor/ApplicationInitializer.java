@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2020, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 package com.hazelcast.platform.demos.banking.trademonitor;
 
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.config.ProcessingGuarantee;
+import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.map.IMap;
 
@@ -45,6 +48,7 @@ public class ApplicationInitializer {
     public static void initialise(JetInstance jetInstance, String bootstrapServers) throws Exception {
         createNeededObjects(jetInstance);
         loadNeededData(jetInstance);
+        defineQueryableObjects(bootstrapServers, jetInstance);
         launchNeededJobs(jetInstance, bootstrapServers);
     }
 
@@ -69,18 +73,137 @@ public class ApplicationInitializer {
      * </p>
      */
     static void loadNeededData(JetInstance jetInstance) throws Exception {
-        IMap<String, String> symbolsMap = jetInstance.getMap(MyConstants.IMAP_NAME_SYMBOLS);
+        IMap<String, SymbolInfo> symbolsMap =
+                jetInstance.getMap(MyConstants.IMAP_NAME_SYMBOLS);
 
         if (!symbolsMap.isEmpty()) {
             LOGGER.trace("Skip loading '{}', not empty", symbolsMap.getName());
         } else {
-            Map<String, String> localMap = MyUtils.nasdaqListed();
+            Map<String, SymbolInfo> localMap =
+                    MyUtils.nasdaqListed().entrySet().stream()
+                    .collect(Collectors.<Entry<String, Tuple3<String, NasdaqMarketCategory, NasdaqFinancialStatus>>,
+                            String, SymbolInfo>
+                            toUnmodifiableMap(
+                            entry -> entry.getKey(),
+                            entry -> {
+                                SymbolInfo symbolInfo = new SymbolInfo();
+                                symbolInfo.setSecurityName(entry.getValue().f0());
+                                symbolInfo.setMarketCategory(entry.getValue().f1());
+                                symbolInfo.setFinancialStatus(entry.getValue().f2());
+                                return symbolInfo;
+                            }));
 
             symbolsMap.putAll(localMap);
 
             LOGGER.trace("Loaded {} into '{}'", localMap.size(), symbolsMap.getName());
         }
     }
+
+
+    /**
+     * <p>Define Hazelcast maps &amp; Kafka topics for later SQL querying.
+     * </p>
+     */
+    static void defineQueryableObjects(String bootstrapServers, JetInstance jetInstance) {
+        defineKafka(bootstrapServers, jetInstance);
+        defineIMap(jetInstance);
+    }
+
+
+    /**
+     * <p>Define Kafka streams so can be directly used as a
+     * querying source by SQL.
+     * </p>
+     *
+     * @param bootstrapServers
+     */
+    static void defineKafka(String bootstrapServers, JetInstance jetInstance) {
+        String definition1 = "CREATE EXTERNAL MAPPING IF NOT EXISTS "
+                // Name for our SQL
+                + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRADES
+                // Name of the remote object
+                + " EXTERNAL NAME " + MyConstants.KAFKA_TOPIC_NAME_TRADES
+                + " ( "
+                + " id             VARCHAR, "
+                + " price          BIGINT, "
+                + " quantity       BIGINT, "
+                + " symbol         VARCHAR, "
+                // Timestamp is a reserved word, need to escape. Adjust the mapping name so avoiding clash with IMap
+                + " \"timestamp\"  BIGINT "
+                + " ) "
+                + " TYPE Kafka "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'json',"
+                + " 'auto.offset.reset' = 'earliest',"
+                + " 'bootstrap.servers' = '" + bootstrapServers + "'"
+                + " )";
+
+        define(definition1, jetInstance);
+    }
+
+
+    /**
+     * <p>Without this metadata, cannot query an empty
+     * {@link IMap}.
+     * </p>
+     *
+     * @param jetInstance
+     */
+    static void defineIMap(JetInstance jetInstance) {
+        String definition1 = "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = '" + Tuple3.class.getCanonicalName() + "'"
+                + " )";
+
+        String definition2 = "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_SYMBOLS
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = '" + SymbolInfo.class.getCanonicalName() + "'"
+                + " )";
+
+        String definition3 = "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_TRADES
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = '" + Trade.class.getCanonicalName() + "'"
+                + " )";
+
+        define(definition1, jetInstance);
+        define(definition2, jetInstance);
+        define(definition3, jetInstance);
+    }
+
+
+    /**
+     * <p>Generic handler to loading definitions
+     * </p>
+     *
+     * @param definition
+     * @param jetInstance
+     */
+    static void define(String definition, JetInstance jetInstance) {
+        LOGGER.trace("Definition '{}'", definition);
+        try {
+            jetInstance.getSql().execute(definition);
+        } catch (Exception e) {
+            LOGGER.error(definition, e);
+        }
+    }
+
 
     /**
      * <p><i>1</i> Launch a job to read trades from Kafka and place them in a map,

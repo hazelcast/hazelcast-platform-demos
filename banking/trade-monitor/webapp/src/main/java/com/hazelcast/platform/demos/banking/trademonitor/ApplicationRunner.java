@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2020, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,13 @@
 package com.hazelcast.platform.demos.banking.trademonitor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
@@ -33,9 +35,11 @@ import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.map.IMap;
 import com.hazelcast.query.impl.predicates.EqualPredicate;
+import com.hazelcast.sql.SqlResult;
 
 import io.javalin.Javalin;
 import io.javalin.core.JavalinServer;
+import io.javalin.http.HandlerType;
 import io.javalin.websocket.WsCloseHandler;
 import io.javalin.websocket.WsConnectHandler;
 import io.javalin.websocket.WsContext;
@@ -56,8 +60,9 @@ public class ApplicationRunner {
     private static final String DRILL_SYMBOL = "DRILL_SYMBOL";
     private static final String LOAD_SYMBOLS = "LOAD_SYMBOLS";
 
+    private final JetInstance jetInstance;
     private final IMap<String, Tuple3<Long, Long, Integer>> aggregateQueryResultsMap;
-    private final IMap<String, String> symbolsMap;
+    private final IMap<String, SymbolInfo> symbolsMap;
     private final IMap<String, HazelcastJsonValue> tradesMap;
 
 
@@ -65,13 +70,14 @@ public class ApplicationRunner {
      * <p>Obtain references to the maps that are needed.
      * </p>
      */
-    public ApplicationRunner(JetInstance jetInstance) throws Exception {
+    public ApplicationRunner(JetInstance arg0) throws Exception {
+        this.jetInstance = arg0;
         this.aggregateQueryResultsMap =
-            jetInstance.getMap(MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS);
+            this.jetInstance.getMap(MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS);
         this.symbolsMap =
-            jetInstance.getMap(MyConstants.IMAP_NAME_SYMBOLS);
+            this.jetInstance.getMap(MyConstants.IMAP_NAME_SYMBOLS);
         this.tradesMap =
-            jetInstance.getMap(MyConstants.IMAP_NAME_TRADES);
+            this.jetInstance.getMap(MyConstants.IMAP_NAME_TRADES);
     }
 
     /**
@@ -87,25 +93,41 @@ public class ApplicationRunner {
         // Be aware of new trades
         tradesMap.addEntryListener(new TradesMapListener(), true);
 
-        Javalin javalin = Javalin.create();
+        System.out.println("");
+        System.out.println("");
 
-        // ReactJS, see src/main/app
-        javalin.config
-        .addStaticFiles("/app")
-        .addSinglePageRoot("/", "/app/index.html");
+        boolean ok = demoSql();
 
-        // Event types to handle
-        javalin.ws(MyConstants.WEBSOCKET_PATH_TRADES, wsHandler -> {
-            wsHandler.onClose(onClose());
-            wsHandler.onConnect(onConnect());
-            wsHandler.onMessage(onMessage());
-        });
+        System.out.println("");
+        System.out.println("");
 
-        // Start web server on requested port, and wait for termination (if ever)
-        javalin.start(Application.getPort());
-        JavalinServer javalinServer = javalin.server();
-        if (javalinServer != null) {
-            javalinServer.server().join();
+        // If SQL is broken, abort
+        if (!ok) {
+            Javalin javalin = Javalin.create();
+
+            // ReactJS, see src/main/app
+            javalin.config
+            .addStaticFiles("/app")
+            .addSinglePageRoot("/", "/app/index.html");
+
+            // REST
+            MyRestController myRestController = new MyRestController(this.jetInstance);
+            javalin.addHandler(HandlerType.GET, "/rest/", myRestController.handleIndex());
+            javalin.addHandler(HandlerType.GET, "/rest/sql", myRestController.handleSql());
+
+            // Event types to handle
+            javalin.ws(MyConstants.WEBSOCKET_PATH_TRADES, wsHandler -> {
+                wsHandler.onClose(onClose());
+                wsHandler.onConnect(onConnect());
+                wsHandler.onMessage(onMessage());
+            });
+
+            // Start web server on requested port, and wait for termination (if ever)
+            javalin.start(Application.getPort());
+            JavalinServer javalinServer = javalin.server();
+            if (javalinServer != null) {
+                javalinServer.server().join();
+            }
         }
     }
 
@@ -180,7 +202,8 @@ public class ApplicationRunner {
                 JSONObject jsonObject = new JSONObject();
 
                 Map<String, String> allSymbols =
-                        symbolsMap.entrySet().stream().collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+                        symbolsMap.entrySet().stream().collect(
+                                Collectors.toMap(Entry::getKey, entry -> entry.getValue().getSecurityName()));
 
                 // The screen turns cents to dollars for price but not for volume
                 aggregateQueryResultsMap.forEach((key, value) -> {
@@ -251,4 +274,66 @@ public class ApplicationRunner {
         return symbolsToBeUpdated.get(symbol);
     }
 
+
+    /**
+     * <p>Test SQL here, as a demo, so as to provide some examples
+     * to cut &amp; paste into the web client.
+     * </p>
+     *
+     * @return {@code true} if all worked.
+     */
+    private boolean demoSql() {
+        boolean didFail = false;
+        String[][] queries = new String[][] {
+            { "System",  "SELECT * FROM information_schema.mappings" },
+            { "System",  "SELECT mapping_name AS name FROM information_schema.mappings" },
+            { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS },
+            { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_SYMBOLS },
+            { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_TRADES },
+            { "IMap",    "SELECT id, symbol, price FROM " + MyConstants.IMAP_NAME_TRADES
+                    + " WHERE symbol LIKE 'AA%' AND price > 2510" },
+            { "Kafka",   "SELECT * FROM " + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRADES },
+            // The next 2 have the same execution plan but are declared differently
+            { "Join",    "SELECT * FROM (SELECT id, symbol, \"timestamp\" FROM kf_trades) AS k"
+                    + " LEFT JOIN symbols AS s ON k.symbol = s.__key" },
+            { "Join",    "SELECT k.id, k.symbol, k.\"timestamp\", s.* FROM kf_trades AS k"
+                    + " LEFT JOIN symbols AS s ON k.symbol = s.__key" },
+            // Not yet implmented : "Sub-query not supported on the right side of a join"
+            //{ "Join",    "SELECT * FROM (SELECT id, symbol, \"timestamp\" FROM kf_trades) AS k"
+            //    + " LEFT JOIN (SELECT * FROM symbols) AS s ON k.symbol = s.__key" },
+        };
+
+        int count = 0;
+        // Don't break loop on failure, try each to find if more than one fails
+        for (String[] query : queries) {
+            try {
+                TimeUnit.SECONDS.sleep(1);
+                System.out.println("");
+                count++;
+                System.out.printf("(%d) : %s%n", count, query[0]);
+                System.out.println(query[1]);
+                SqlResult sqlResult = jetInstance.getSql().execute(query[1]);
+                Tuple3<String, String, List<String>> result =
+                        MyUtils.prettyPrintSqlResult(sqlResult);
+                if (result.f0().length() > 0) {
+                    // Error
+                    System.out.println(result.f0());
+                } else {
+                    // Actual data
+                    result.f2().stream().forEach(System.out::println);
+                    if (result.f1().length() > 0) {
+                        // Warning
+                        System.out.println(result.f1());
+                    }
+                }
+                System.out.println("");
+            } catch (Exception e) {
+                didFail = true;
+                String message = String.format("SQL '%s'", Arrays.asList(query));
+                LOGGER.error(message + ": " + e.getMessage());
+            }
+        }
+
+        return didFail;
+    }
 }
