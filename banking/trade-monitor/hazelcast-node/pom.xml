@@ -30,7 +30,7 @@
 
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet-enterprise</artifactId>
+			<artifactId>hazelcast-jet</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>

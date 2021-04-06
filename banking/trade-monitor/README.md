@@ -390,6 +390,8 @@ so that the `trade-producer`, `topic-create`, `kafdrop` and `hazelcast-node` mod
 
 Use the command `docker network inspect trade-monitor` if you really wish to see the details of this networking.
 
+If you have multiple network cards on your host machine the scripts won't be able to deduce which one to use. In this case, reduce the network down to one or update the scripts to hardwire in the IP address to use for the host network.
+
 ## Running -- Kubernetes
 
 4 deployment files are provided to run the Trade Monitor in Kubernetes.
@@ -404,8 +406,7 @@ namespaces, etc could all be added to move towards production quality.
 For each file, ensure all the created pods report as being healthy ("_1/1_" in the "_READY_" column)
 before progressing to the next deployment.
 
-The first will create a pod for Zookeeper, three pods for Kafka brokers, run a job to create the needed
-topic, and start a pod for Kafdrop.
+The first will create a pod for Zookeeper, three pods for Kafka brokers, run a job to create the needed topic, and start a pod for Kafdrop.
 
 The second creates a job pod to run the Trade Producer.
 
@@ -454,6 +455,14 @@ trade-monitor-zookeeper-service      ClusterIP      10.104.11.197   <none>      
 
 So here Kafdrop would be available as [http://75.205.164.151:8080/](https://www.youtube.com/watch?v=dQw4w9WgXcQ) and the WebApp as
 [http://75.205.91.17:8080/](https://www.youtube.com/watch?v=dQw4w9WgXcQ).
+
+### Tagging for Kubernetes
+
+`mvn clean install -Prelease` builds the necessary images on your local machine. You need them in your Kubernetes instance so the `image:` and `imagePullPolicy:` tags in the YAML allow them to be found.
+
+You can use `docker save` and `docker load` to export from where built and import to where needed.
+
+Or `docker tag` and `docker push` if you have a direct connection to the remote repository.
 
 ## Running -- Lifecycle
 
