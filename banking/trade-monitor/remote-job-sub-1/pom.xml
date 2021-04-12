@@ -9,55 +9,36 @@
 		<version>4.0</version>
 	</parent>
 
-	<artifactId>trade-monitor-common</artifactId>
+	<artifactId>trade-monitor-remote-job-sub-1</artifactId>
 
-	<name>Hazelcast Platform - Trade Monitor - Common</name>
-	<description>Trade Monitor - Common</description>
+	<name>Hazelcast Platform - Trade Monitor - Remote job sub#1</name>
+	<description>Trade Monitor - optional Jet job #1</description>
 
 	<properties>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
+		<main.class>com.hazelcast.platform.demos.banking.trademonitor.Application</main.class>
 	</properties>
 
 	<dependencies>
 		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>trade-monitor-common</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-
-		<!-- scope==provided -->
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet</artifactId>
-			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet-kafka</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet-python</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet-sql</artifactId>
-			<scope>provided</scope>
 		</dependency>
 	</dependencies>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-parent</artifactId>
-				<type>pom</type>
-				<scope>import</scope>
-				<version>${spring-boot.version}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 	<build>
 		<resources>
@@ -66,5 +47,13 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
+	
+		<plugins>
+            <plugin>
+            	<groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>		
+		</plugins>
 	</build>
+
 </project>

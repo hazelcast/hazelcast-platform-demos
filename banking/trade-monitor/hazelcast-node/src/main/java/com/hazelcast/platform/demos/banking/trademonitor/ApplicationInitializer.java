@@ -17,9 +17,11 @@
 package com.hazelcast.platform.demos.banking.trademonitor;
 
 import java.util.Map;
+import java.util.Properties;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,12 +48,24 @@ public class ApplicationInitializer {
      * </p>
      */
     public static void initialise(JetInstance jetInstance, String bootstrapServers) throws Exception {
+        addListeners(jetInstance);
         createNeededObjects(jetInstance);
-        loadNeededData(jetInstance);
+        loadNeededData(jetInstance, bootstrapServers);
         defineQueryableObjects(bootstrapServers, jetInstance);
         launchNeededJobs(jetInstance, bootstrapServers);
     }
 
+
+    /**
+     * <p>Logging listeners.
+     * </p>
+     *
+     * @param jetInstance
+     */
+    static void addListeners(JetInstance jetInstance) {
+        MyMembershipListener myMembershipListener = new MyMembershipListener(jetInstance.getHazelcastInstance());
+        jetInstance.getHazelcastInstance().getCluster().addMembershipListener(myMembershipListener);
+    }
 
     /**
      * <p>Access the {@link com.hazelcast.map.IMap} and other objects
@@ -67,14 +81,33 @@ public class ApplicationInitializer {
 
 
     /**
+     * <p>Kafka properties can be stashed for ad-hoc jobs to use.
+     * </p>
      * <p>Stock symbols are needed for trade look-up enrichment,
      * the first member to start loads them from a file into
      * a {@link com.hazelcast.map.IMap}.
      * </p>
      */
-    static void loadNeededData(JetInstance jetInstance) throws Exception {
+    static void loadNeededData(JetInstance jetInstance, String bootstrapServers) throws Exception {
+        IMap<String, String> kafkaConfigMap =
+                jetInstance.getMap(MyConstants.IMAP_NAME_KAFKA_CONFIG);
         IMap<String, SymbolInfo> symbolsMap =
                 jetInstance.getMap(MyConstants.IMAP_NAME_SYMBOLS);
+
+        if (!kafkaConfigMap.isEmpty()) {
+            LOGGER.trace("Skip loading '{}', not empty", kafkaConfigMap.getName());
+        } else {
+            Properties properties = ApplicationConfig.kafkaSourceProperties(bootstrapServers);
+
+            kafkaConfigMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                    properties.getProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
+            kafkaConfigMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+                    properties.getProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG));
+            kafkaConfigMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                    properties.getProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG));
+
+            LOGGER.trace("Loaded {} into '{}'", kafkaConfigMap.size(), kafkaConfigMap.getName());
+        }
 
         if (!symbolsMap.isEmpty()) {
             LOGGER.trace("Skip loading '{}', not empty", symbolsMap.getName());
@@ -182,9 +215,20 @@ public class ApplicationInitializer {
                 + " 'valueJavaClass' = '" + Trade.class.getCanonicalName() + "'"
                 + " )";
 
+        String definition4 = "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_KAFKA_CONFIG
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = '" + String.class.getCanonicalName() + "'"
+                + " )";
+
         define(definition1, jetInstance);
         define(definition2, jetInstance);
         define(definition3, jetInstance);
+        define(definition4, jetInstance);
     }
 
 
@@ -219,6 +263,11 @@ public class ApplicationInitializer {
      * </p>
      */
     static void launchNeededJobs(JetInstance jetInstance, String bootstrapServers) {
+        // Only do this for the first node.
+        if (jetInstance.getCluster().getMembers().size() != 1) {
+            return;
+        }
+
         // Trade ingest
         Pipeline pipelineIngestTrades = IngestTrades.buildPipeline(bootstrapServers);
 
