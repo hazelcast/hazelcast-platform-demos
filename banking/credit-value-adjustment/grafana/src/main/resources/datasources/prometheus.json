@@ -1,7 +1,15 @@
-{
- "name":"Prometheus",
- "type":"prometheus",
- "url":"http://@my.prometheus.name@.default.svc.cluster.local:@my.prometheus.port@",
- "access":"proxy",
- "isDefault":false
-}
+apiVersion: 1
+
+deleteDatasources:
+  - name: Prometheus
+    orgId: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    orgId: 1
+    url: http://@my.prometheus.name@.default.svc.cluster.local:@my.prometheus.port@
+    isDefault: true
+    version: 1
+    editable: false

@@ -1,29 +1,20 @@
-FROM hazelcast/docker-grafana-graphite:latest
+FROM grafana/grafana:7.5.3
 
+# Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MY_ADMINUSER
 ARG MY_ADMINPASSWORD
 
-# Remove unwanted dashboards in original image
-RUN rm /src/dashboards/flight-telemetry.json
-RUN rm /src/dashboards/Jet.json
-
 # Add Prometheus datasource
-COPY target/classes/datasources/prometheus.json                          /src/datasources
+COPY target/classes/datasources     /etc/grafana/provisioning/datasources
 
 # Add dashboards for this demo
-COPY target/classes/dashboards/general/CVA-Map-stats-dashboard.json      /src/dashboards
-COPY target/classes/dashboards/general/myhome.json                       /src/dashboards
+COPY target/classes/dashboards      /etc/grafana/provisioning/dashboards
 
-# Admin logon/password
-#############################################
-# TODO Below does not work. Old Grafana 4.6.1
-#############################################
-#RUN echo admin_user=$MY_ADMINUSER >> /opt/grafana/conf/custom.ini
-#RUN echo admin_password=$MY_ADMINPASSWORD >> /opt/grafana/conf/custom.ini
-#RUN cd /src && wizzy init && wizzy set grafana username $MY_ADMINUSER
-#RUN cd /src && wizzy init && wizzy set grafana password $MY_ADMINPASSWORD
+# Set logon/password, override admin_user/admin_password in /etc/grafana/grafana.ini
+ENV GF_SECURITY_ADMIN_USER=$MY_ADMINUSER
+ENV GF_SECURITY_ADMIN_PASSWORD=$MY_ADMINPASSWORD
 
-# Reset home dashboard
-#############################################
-# TODO Old Grafana 4.6.1
-#############################################
+# Change homepage in $GF_PATHS_CONFIG, remove leading semicolong
+RUN sed 's#;default_home_dashboard_path =#default_home_dashboard_path = /etc/grafana/provisioning/dashboards/general/myhome.json#' \
+ /etc/grafana/grafana.ini > /tmp/grafana.ini 
+ENV GF_PATHS_CONFIG=/tmp/grafana.ini

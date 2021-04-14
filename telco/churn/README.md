@@ -3,7 +3,7 @@
 This example shows continuous updates of customer churn prections, in an environment with multiple
 legacy integration points.
 
-You will need a Jet Enterprise license to run it.
+You will need a Enterprise license to run it.
 
 Register [here](https://hazelcast.com/download/) to request the evaluation license keys you
 need, and put them in your `settings.xml` file as described in [Repository top-level README.md](../../README.md).
@@ -11,7 +11,7 @@ Be sure to mention this is for "Telco - Churn Predication" example so you get a 
 
 ## `settings.xml`
 
-You will need a Jet Enterprise license to run this example. If you wish to use alerting to Slack,
+You will need a Enterprise license to run this example. If you wish to use alerting to Slack,
 you will need a Slack access token, plus the channel name and id.
 
 All need to go in your Maven `settings.xml` file, such as the below. You can define other properties.
@@ -29,7 +29,7 @@ All need to go in your Maven `settings.xml` file, such as the below. You can def
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <my.jet.license.key>GOES HERE</my.jet.license.key>
+        <my.license.key>GOES HERE</my.license.key>
 	<my.slack.bot.user.oath.access.token>GOES HERE</my.slack.bot.user.oath.access.token>
 	<my.slack.bot.channel.name>GOES HERE</my.slack.bot.channel.name>
 	<my.slack.bot.channel.id>GOES HERE</my.slack.bot.channel.id>
