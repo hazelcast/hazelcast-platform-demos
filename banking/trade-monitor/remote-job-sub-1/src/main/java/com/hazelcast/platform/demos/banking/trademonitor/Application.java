@@ -49,7 +49,7 @@ public class Application {
 
         JobConfig jobConfigPythonAnalysis = new JobConfig();
         jobConfigPythonAnalysis.addClass(PythonAnalysis.class);
-        jobConfigPythonAnalysis.setName(PythonAnalysis.class.getSimpleName());
+        jobConfigPythonAnalysis.setName(PythonAnalysis.class.getSimpleName() + "@" + buildTimestamp);
 
         // Fails if job exists with same job name, unlike "newJobIfAbsent"
         jetInstance.newJob(pipelinePythonAnalysis, jobConfigPythonAnalysis);

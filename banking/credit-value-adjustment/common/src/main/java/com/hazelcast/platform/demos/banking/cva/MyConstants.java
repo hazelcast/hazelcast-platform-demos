@@ -59,7 +59,7 @@ public class MyConstants {
 
     // For sending data to Grafana/Graphite
     public static final int GRAPHITE_COLLECTION_INTERVAL_SECONDS = 5;
-    public static final int GRAPHITE_PORT = 2004;
+    public static final int GRAPHITE_PORT = 9090;
     public static final char GRAPHITE_SEPARATOR = '.';
 
     // For logging, prefix for important messages (see "log4j2.yml")
