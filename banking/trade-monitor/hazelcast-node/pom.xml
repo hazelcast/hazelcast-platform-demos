@@ -30,11 +30,15 @@
 
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet-enterprise</artifactId>
+			<artifactId>hazelcast-jet</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet-kafka</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet-python</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>

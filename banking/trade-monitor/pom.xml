@@ -41,6 +41,7 @@
 		<module>hazelcast-node</module>
 		<module>trade-producer</module>
 		<module>webapp</module>
+		<module>remote-job-sub-1</module>
 		<module>zookeeper</module>
 		<module>kafka-broker</module>
 		<module>kafdrop</module>

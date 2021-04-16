@@ -2,7 +2,7 @@ hazelcast:
   # Replaced by Maven
   cluster-name: '@my.cluster.name@'
   # Replaced by Maven
-  license-key: '@my.jet.license.key@'
+  license-key: '@my.license.key@'
   #
   # Assuming Kubernetes, but override from Java code if we detect otherwise
   network:

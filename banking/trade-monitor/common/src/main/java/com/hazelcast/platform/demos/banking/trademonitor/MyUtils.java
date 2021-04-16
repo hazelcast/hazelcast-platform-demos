@@ -17,20 +17,28 @@
 package com.hazelcast.platform.demos.banking.trademonitor;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hazelcast.jet.datamodel.Tuple3;
+import com.hazelcast.jet.python.PythonServiceConfig;
 import com.hazelcast.sql.SqlResult;
 import com.hazelcast.sql.SqlRow;
 import com.hazelcast.sql.SqlRowMetadata;
@@ -183,4 +191,84 @@ public class MyUtils {
         return input.replaceAll("\"", "'");
     }
 
+    /**
+     * <p>Configuration for the Python runner. Where to find the Python module,
+     * which is presumed to have a "{@code handle()}" function.
+     *
+     * @param name The job name, eg. "{@code pi1}", used as a folder prefix
+     * @param handler The function in the Python file to call
+     * @return Python configuration for use in a Jet job.
+     */
+    protected static PythonServiceConfig getPythonServiceConfig(String name, String handler) throws Exception {
+        String subdir = "python";
+        File temporaryDir = MyUtils.getTemporaryDir(subdir, name);
+
+        PythonServiceConfig pythonServiceConfig = new PythonServiceConfig();
+        pythonServiceConfig.setBaseDir(temporaryDir.toString());
+        pythonServiceConfig.setHandlerFunction(handler);
+        pythonServiceConfig.setHandlerModule(name);
+
+        System.out.printf("Python module '%s%s.py', calling function '%s()'%n",
+                "classpath:src/main/resources" + File.separator + subdir + File.separator,
+                pythonServiceConfig.handlerModule(),
+                pythonServiceConfig.handlerFunction());
+
+        return pythonServiceConfig;
+    }
+
+    /**
+     * <p>Python files are in "/src/main/resources" and hence in the classpath,
+     * for easy deployment as a Docker image. Copy these to the main filesystem
+     * to make it easier for the Python service to find them and stream them
+     * to the cluster.
+     * <p>
+     *
+     * @param sourceDirectory The directory in "classpath:src/main/resources"
+     * @param name The job name, eg. "{@code noop}", used as a folder prefix
+     * @return A folder containing the Python code copied from the classpath.
+     */
+    protected static File getTemporaryDir(String sourceDirectory, String name) throws Exception {
+
+        Path targetDirectory = Files.createTempDirectory(name);
+        targetDirectory.toFile().deleteOnExit();
+
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
+        String[] resourcesToCopy = { name + ".py", "requirements.txt" };
+        for (String resourceToCopy : resourcesToCopy) {
+            String relativeResourceToCopy = sourceDirectory + File.separator + resourceToCopy;
+            try (InputStream inputStream = classLoader.getResourceAsStream(relativeResourceToCopy)) {
+                if (inputStream == null) {
+                    throw new RuntimeException(relativeResourceToCopy + ": not found in Jar");
+                } else {
+                    LOGGER.trace("{}", relativeResourceToCopy);
+                    Path targetFile = Paths.get(targetDirectory + File.separator + resourceToCopy);
+                    Files.copy(inputStream, targetFile, StandardCopyOption.REPLACE_EXISTING);
+                }
+            }
+        }
+
+        return targetDirectory.toFile();
+    }
+
+    /**
+     * <p>Loads a properties file from the classpath.
+     * </p>
+     *
+     * @param filename
+     * @return
+     */
+    public static Properties loadProperties(String filename) throws Exception {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
+        try (InputStream inputStream = classLoader.getResourceAsStream(filename)) {
+            if (inputStream == null) {
+                throw new RuntimeException(filename + ": not found in Jar");
+            } else {
+                Properties properties = new Properties();
+                properties.load(inputStream);
+                return properties;
+            }
+        }
+    }
 }

@@ -285,6 +285,7 @@ public class ApplicationRunner {
     private boolean demoSql() {
         boolean didFail = false;
         String[][] queries = new String[][] {
+            /*TODO Turn off for now, so Javalin available sooner
             { "System",  "SELECT * FROM information_schema.mappings" },
             { "System",  "SELECT mapping_name AS name FROM information_schema.mappings" },
             { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS },
@@ -301,6 +302,7 @@ public class ApplicationRunner {
             // Not yet implmented : "Sub-query not supported on the right side of a join"
             //{ "Join",    "SELECT * FROM (SELECT id, symbol, \"timestamp\" FROM kf_trades) AS k"
             //    + " LEFT JOIN (SELECT * FROM symbols) AS s ON k.symbol = s.__key" },
+             */
         };
 
         int count = 0;

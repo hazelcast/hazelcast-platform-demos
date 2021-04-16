@@ -22,7 +22,7 @@
 		<!-- Pre-configure the build image -->
 		<my.mc.admin.user>${my.other.admin.user}</my.mc.admin.user>
 		<my.mc.admin.password>${my.other.admin.password}</my.mc.admin.password>
-		<my.mc.license.key>${my.jet.license.key}</my.mc.license.key>
+		<my.mc.license.key>${my.license.key}</my.mc.license.key>
 		<my.mc.cluster1.name>${my.cluster1.name}</my.mc.cluster1.name>
 		<my.mc.cluster1.addresslist>${docker.image.prefix}-${my.cluster1.name}-hazelcast.default.svc.cluster.local</my.mc.cluster1.addresslist>
 	</properties>

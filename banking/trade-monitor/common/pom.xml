@@ -37,6 +37,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet-python</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet-sql</artifactId>
 			<scope>provided</scope>
 		</dependency>
