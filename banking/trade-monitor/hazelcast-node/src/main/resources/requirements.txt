@@ -1,0 +1,2 @@
+# Python requirements to pre-load to server at Docker build-time rather than at run-time. Optional but speeds up deployment.
+grpcio

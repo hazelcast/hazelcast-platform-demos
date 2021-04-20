@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2020, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.hazelcast.platform.demos.banking.trademonitor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -31,6 +32,8 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.hazelcast.jet.datamodel.Tuple3;
 
 /**
  * <p>The main "{@code run()}" method of the application, called
@@ -72,10 +75,17 @@ public class ApplicationRunner {
 
         this.kafkaProducer = new KafkaProducer<>(properties);
 
-        this.symbols = new ArrayList<>(MyUtils.nasdaqListed().keySet());
+        Map<String, Tuple3<String, NasdaqMarketCategory, NasdaqFinancialStatus>>
+            nasdaqListed = MyUtils.nasdaqListed();
 
-        this.symbolToPrice = this.symbols.stream()
-                .collect(Collectors.toMap(symbol -> symbol, symbol -> OPENING_PRICE));
+        this.symbols = new ArrayList<>(nasdaqListed.keySet());
+
+        this.symbolToPrice = nasdaqListed.entrySet().stream()
+                .collect(Collectors.<Entry<String,
+                        Tuple3<String, NasdaqMarketCategory, NasdaqFinancialStatus>>,
+                            String, Integer>toMap(
+                        entry -> entry.getKey(),
+                        entry -> OPENING_PRICE));
     }
 
     /**

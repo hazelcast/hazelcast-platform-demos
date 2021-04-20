@@ -18,12 +18,12 @@ of [Hazelcast Jet](https://hazelcast.org/jet/) and [Hazelcast IMDG](https://haze
 
 ### `settings.xml`
 
-Projects that use commercial features require license keys to operate. 
+Projects that use commercial features require a license key to operate. 
 
-Register [here](https://hazelcast.com/download/) to request the license keys you need.
+Register [here](https://hazelcast.com/download/) to request the license key you need.
 
-Once you have the license keys you need, create a `settings.xml` in your `.m2` folder. Copy
-the example below, and replace the property values. Maven will read this file when you build
+Once you have the license key you need, create a `settings.xml` in your `.m2` folder. Copy
+the example below, and replace the property value. Maven will read this file when you build
 and apply the value in your build.
 
 ```
@@ -39,8 +39,7 @@ and apply the value in your build.
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <my.imdg.license.key>GOES HERE</my.imdg.license.key>
-        <my.jet.license.key>GOES HERE</my.jet.license.key>
+        <my.license.key>GOES HERE</my.license.key>
       </properties>
     </profile>
   </profiles>

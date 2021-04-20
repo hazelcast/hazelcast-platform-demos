@@ -24,6 +24,7 @@
 
 		<!-- Project specific versions -->
 		<javalin.version>3.13.0</javalin.version>
+		<spring-boot.version>2.4.3</spring-boot.version>
 
                 <!-- Common logons for Management Center, Grafana, Prometheus -->
                 <my.other.admin.user>admin</my.other.admin.user>
@@ -40,6 +41,7 @@
 		<module>hazelcast-node</module>
 		<module>trade-producer</module>
 		<module>webapp</module>
+		<module>remote-job-sub-1</module>
 		<module>zookeeper</module>
 		<module>kafka-broker</module>
 		<module>kafdrop</module>
@@ -61,6 +63,12 @@
 				<groupId>org.apache.kafka</groupId>
 				<artifactId>kafka-clients</artifactId>
 				<version>${kafka-clients.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-web</artifactId>
+				<version>${spring-boot.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

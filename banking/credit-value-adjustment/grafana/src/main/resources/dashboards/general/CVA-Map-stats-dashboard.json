@@ -1,34 +1,4 @@
 {
-  "__inputs": [
-    {
-      "name": "DS_LOCAL_GRAPHITE",
-      "label": "Local Graphite",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "graphite",
-      "pluginName": "Graphite"
-    }
-  ],
-  "__requires": [
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "4.6.1"
-    },
-    {
-      "type": "panel",
-      "id": "graph",
-      "name": "Graph",
-      "version": ""
-    },
-    {
-      "type": "datasource",
-      "id": "graphite",
-      "name": "Graphite",
-      "version": "1.0.0"
-    }
-  ],
   "annotations": {
     "list": [
       {
@@ -60,7 +30,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "Local Graphite",
+          "datasource": "Prometheus",
           "description": "IMap \"cva_trades\" in both clusters",
           "fill": 1,
           "id": 1,
@@ -137,7 +107,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "Local Graphite",
+          "datasource": "Prometheus",
           "description": "IMap \"cva_trades\" in both clusters",
           "fill": 1,
           "id": 2,
@@ -229,7 +199,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "Local Graphite",
+          "datasource": "Prometheus",
           "description": "IMap \"cva_cp_cds\" in both clusters",
           "fill": 1,
           "id": 3,
@@ -318,7 +288,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "Local Graphite",
+          "datasource": "Prometheus",
           "description": "IMap \"cva_ircurves\" in both clusters",
           "fill": 1,
           "id": 4,
@@ -395,7 +365,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "Local Graphite",
+          "datasource": "Prometheus",
           "description": "IMap \"cva_ircurves\" in both clusters",
           "fill": 1,
           "id": 5,

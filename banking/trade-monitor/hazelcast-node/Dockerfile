@@ -1,4 +1,14 @@
-FROM library/openjdk:11-jre-slim
+# Use Python 3.7 as Grppcio:1.26.0 is incompatible with Python 3.8.
+# Use Buster (Debian) as Alpine does not work well with wheel packages.
+FROM library/python:3.7-buster
+
+# Add Java
+RUN apt update
+RUN apt install -y openjdk-11-jdk
+
+# Download requirements into image makes start up faster when growing cluster
+COPY target/classes/requirements.txt /
+RUN pip3 install -r ./requirements.txt
 
 # Maven compiled target
 ARG JAR_FILE
@@ -8,7 +18,8 @@ COPY target/${JAR_FILE} application.jar
 ENV MY_BOOTSTRAP_SERVERS "0.0.0.0:9092,0.0.0.0:9093,0.0.0.0:9094"
 ENV MY_KUBERNETES_ENABLED "true"
 
-ENV JAVA_ARGS ""
+ENV JAVA_ARGS "-Dhazelcast.health.monitoring.level=OFF \
+ "
 ENV JAVA_OPTS "--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
 
 ENTRYPOINT exec java $JAVA_ARGS $JAVA_OPTS -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED -jar application.jar
