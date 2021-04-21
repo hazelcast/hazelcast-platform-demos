@@ -22,6 +22,11 @@ MY_BOOTSTRAP_SERVERS=kafka-broker0:9092,kafka-broker1:9093,kafka-broker2:9094
 
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
+# Private network so can use container names
+docker network create $PROJECT --driver bridge > /dev/null 2>&1
+# For easier restarts
+docker container prune --force > /dev/null 2>&1
+
 CMD="docker run -e MY_BOOTSTRAP_SERVERS=$MY_BOOTSTRAP_SERVERS --network=${PROJECT} ${DOCKER_IMAGE}"
 #echo $CMD
 

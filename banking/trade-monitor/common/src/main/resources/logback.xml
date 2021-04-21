@@ -11,10 +11,41 @@
             <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level %thread %logger{40} - %msg) %n</pattern>
         </encoder>
     </appender>
+    <appender name="CYAN" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldCyan(%logger{40} - %msg) %n</pattern>
+        </encoder>
+    </appender>
+    <appender name="MAGENTA" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldMagenta(%logger{40} - %msg) %n</pattern>
+        </encoder>
+    </appender>
+    <appender name="WHITE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldWhite(%logger{40} - %msg) %n</pattern>
+        </encoder>
+    </appender>
 
     <!-- Code for the sample -->
+    <logger name="com.hazelcast.platform.demos.banking.trademonitor.MyMembershipListener" level="trace" additivity="false">
+        <appender-ref ref="CYAN"/>
+    </logger>
     <logger name="com.hazelcast.platform.demos" level="trace" additivity="false">
         <appender-ref ref="HIGHLIGHT"/>
+    </logger>
+    <!-- Tune out some of Hazelcast's normal messages so more of Trade Monitor in logs -->
+    <logger name="com.hazelcast.jet.impl.JobExecutionService" level="warn" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
+    <logger name="com.hazelcast.jet.kafka.impl" level="warn" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
+    <logger name="com.hazelcast.internal.cluster.impl.TcpIpJoiner" level="warn" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
+    <logger name="com.hazelcast.internal.server.tcp.TcpServerConnection" level="warn" additivity="false">
+        <appender-ref ref="NORMAL"/>
     </logger>
     <!-- Webapp -->
     <logger name="io.javalin" level="debug" additivity="false">

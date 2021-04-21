@@ -33,7 +33,7 @@ spec:
       containers:
         - env:
           - name: "MY_GRAFANA_SERVICE"
-            value: "cva-grafana.default.svc.cluster.local"
+            value: "cva-prometheus.default.svc.cluster.local"
           - name: "MY_INITSIZE"
             value: "2"
           - name: "MY_PARTITIONS"

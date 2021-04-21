@@ -1,6 +1,8 @@
 hazelcast:
   # Replaced by Maven
   cluster-name: '@my.cluster1.name@'
+  # Replaced by Maven
+  license-key: '@my.license.key@'
   #
   properties:
     # Graceful shutdown is helpful for Kubernetes scale-down.
