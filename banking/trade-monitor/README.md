@@ -48,7 +48,7 @@ Docker exists and build container images for deployment.
 
 ## Modules
 
-There are 11 modules in this example, alphabetically:
+There are 12 modules in this example, alphabetically:
 
 ```
 common/
@@ -58,6 +58,7 @@ kafdrop/
 kafka-broker/
 management-center/
 prometheus/
+remote-job-sub-1/
 topic-create/
 trade-producer/
 webapp/
@@ -277,6 +278,14 @@ Grafana is open-source dashboarding software. If connects to `prometheus` for it
 if you don't run `management-center` and so don't run `prometheus`, don't bother with
 `grafana` either.
 
+### 12. `remote-job-sub-1` (optional)
+
+The main jobs in this example are started with the cluster automatically.
+
+This module is an optional extra to show how to package and submit from the command line.
+The job involvd is an extra, it does not produce data for the web application. You can
+browse it's output with the Management Center.
+
 ## Running -- sequence
 
 The following sections describe how to run the example on your local machine, on Docker
@@ -303,7 +312,9 @@ a streaming job.
 
 6. `prometheus` Connects to the Hazelcast Management Center in step 5.
 
-7. `grafana` Connecs to Prometheus in step 6.
+7. `grafana` Connects to Prometheus in step 6.
+
+8. `remote-job-sub-1` Launches an additional Jet job from the command line.
 
 Ignoring the partial ordering, the recommended start sequence would be `zookeeper`, `kafka-broker`,
 `topic-create`, `kafdrop`, `trade-producer`, `hazelcast-node` and finally `webapp`.
@@ -390,6 +401,8 @@ so that the `trade-producer`, `topic-create`, `kafdrop` and `hazelcast-node` mod
 
 Use the command `docker network inspect trade-monitor` if you really wish to see the details of this networking.
 
+If you have multiple network cards on your host machine the scripts won't be able to deduce which one to use. In this case, reduce the network down to one or update the scripts to hardwire in the IP address to use for the host network.
+
 ## Running -- Kubernetes
 
 4 deployment files are provided to run the Trade Monitor in Kubernetes.
@@ -404,8 +417,7 @@ namespaces, etc could all be added to move towards production quality.
 For each file, ensure all the created pods report as being healthy ("_1/1_" in the "_READY_" column)
 before progressing to the next deployment.
 
-The first will create a pod for Zookeeper, three pods for Kafka brokers, run a job to create the needed
-topic, and start a pod for Kafdrop.
+The first will create a pod for Zookeeper, three pods for Kafka brokers, run a job to create the needed topic, and start a pod for Kafdrop.
 
 The second creates a job pod to run the Trade Producer.
 
@@ -455,6 +467,14 @@ trade-monitor-zookeeper-service      ClusterIP      10.104.11.197   <none>      
 So here Kafdrop would be available as [http://75.205.164.151:8080/](https://www.youtube.com/watch?v=dQw4w9WgXcQ) and the WebApp as
 [http://75.205.91.17:8080/](https://www.youtube.com/watch?v=dQw4w9WgXcQ).
 
+### Tagging for Kubernetes
+
+`mvn clean install -Prelease` builds the necessary images on your local machine. You need them in your Kubernetes instance so the `image:` and `imagePullPolicy:` tags in the YAML allow them to be found.
+
+You can use `docker save` and `docker load` to export from where built and import to where needed.
+
+Or `docker tag` and `docker push` if you have a direct connection to the remote repository.
+
 ## Running -- Lifecycle
 
 Apart from `topic-create` which is one-off set-up, all the modules here are continuous rather than batch,
@@ -464,6 +484,45 @@ The Jet jobs are requesting the next unread message from the Kafka topic. If the
 one because the `trade-producer` has been paused, that's no different from the stock
 market being closed so no trading or from Jet reading from Kafka faster than the
 producer can produce.
+
+## Running `remote-job-sub-1` from the command line
+
+If you download Jet from [here](https://jet-start.sh/download), there is a utility
+in the `bin` folder called `jet`.
+
+Try this to begin with:
+
+```
+hazelcast-jet-4.4/bin/jet -t grid@1R23.456.789.0 list-jobs
+```
+
+The cluster name here is `grid` but you will need to substitue the IP address of one of
+the member. Once successful, this should list the running jobs in the cluster,
+`AggregateQuery` and `IngestTrades`.
+
+Then do this to launch the additional job
+
+```
+hazelcast-jet-4.4/bin/jet -t grid@1R23.456.789.0 submit target/trade-monitor-remote-job-sub-1-4.0.jar
+```
+
+This will send the job from your machine to wherever in the world the cluster
+is, so long as it can connect. It may take a few seconds to stream all the
+job content.
+
+You can then use the `list-jobs` command again to see three jobs running, and
+look at the map output in the `python_sentiment` map on Management Center.
+
+### Extra step for Kubenetes.
+
+By default Kubernetes will not expose your cluster to the outside world,
+so you will not be able to connect to it from your desktop.
+
+The additional script `src/main/scripts/kubernetes-hazelcast-node-extra.yaml`
+allows access from your desktop to the cluster.
+
+You need to use your Kubernetes console to determine the IP address
+of the Load Balancer.
 
 ## Running -- Expected Output
 

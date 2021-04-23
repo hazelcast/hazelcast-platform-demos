@@ -6,6 +6,7 @@ import detectBrowserLanguage from 'detect-browser-language';
 
 import Page from "../Page";
 import Pagination from "../Pagination";
+import Querying from '../querying'
 import SymbolDetails from "../symbol-details";
 import "../../Table.css";
 
@@ -106,6 +107,7 @@ class Home extends Component {
 
         return (
                     <Page header="Trade Monitor Dashboard">
+                        <Querying/>
                         <ReactTable
                         className="Table-main"
                         data={symbols}

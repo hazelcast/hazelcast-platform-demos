@@ -28,6 +28,12 @@
 			<version>${project.version}</version>
 		</dependency>
 
+                <!-- For Tuple3 utility class -->
+                <dependency>
+                        <groupId>com.hazelcast.jet</groupId>
+                        <artifactId>hazelcast-jet</artifactId>
+                </dependency>
+
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka-clients</artifactId>

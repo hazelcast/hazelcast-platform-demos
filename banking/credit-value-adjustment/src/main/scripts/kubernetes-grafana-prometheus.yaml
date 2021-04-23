@@ -2,6 +2,8 @@
 # Service DNS will be "cva-grafana.default.svc.cluster.local".
 # Service DNS will be "cva-prometheus.default.svc.cluster.local".
 ---
+# Service for Grafana
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -12,10 +14,7 @@ spec:
   ports:
     - name: grafana
       port: 80
-      targetPort: 80
-    - name: graphite
-      port: 2004
-      targetPort: 2004
+      targetPort: 3000
   type: LoadBalancer
 ---
 # Service for Prometheus
@@ -51,7 +50,7 @@ spec:
       containers:
         - image: "hazelcast-platform-demos/cva-grafana"
           imagePullPolicy: Never
-          name: grafana-container
+          name: cva-grafana-container
 ---
 # Pods for Prometheus, only need one
 ---
@@ -71,5 +70,5 @@ spec:
       containers:
         - image: "hazelcast-platform-demos/cva-prometheus"
           imagePullPolicy: Never
-          name: prometheus-container
+          name: cva-prometheus-container
 ---

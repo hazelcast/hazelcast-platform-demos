@@ -9,5 +9,6 @@
 *.code-workspace
 *.iml
 #
+*.pyc
 dependency-reduced-pom.xml
 target
