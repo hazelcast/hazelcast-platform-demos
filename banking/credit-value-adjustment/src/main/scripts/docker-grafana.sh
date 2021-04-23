@@ -11,8 +11,9 @@ echo '# Start from http://localhost:80            HTTP not HTTPS until logged in
 echo '#################################################################################'
 
 # Private network so can use container names
-docker network rm $PROJECT > /dev/null 2>&1
-docker network create $PROJECT --driver bridge
+docker network create $PROJECT --driver bridge > /dev/null 2>&1
+# For easier restarts
+docker container prune --force > /dev/null 2>&1
 
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 

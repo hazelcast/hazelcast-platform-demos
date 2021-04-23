@@ -493,7 +493,7 @@ in the `bin` folder called `jet`.
 Try this to begin with:
 
 ```
-hazelcast-jet-4.4/bin/jet -t grid@1R23.456.789.0 list-jobs
+hazelcast-jet-4.5/bin/jet -t grid@123.456.789.0 list-jobs
 ```
 
 The cluster name here is `grid` but you will need to substitue the IP address of one of
@@ -503,7 +503,7 @@ the member. Once successful, this should list the running jobs in the cluster,
 Then do this to launch the additional job
 
 ```
-hazelcast-jet-4.4/bin/jet -t grid@1R23.456.789.0 submit target/trade-monitor-remote-job-sub-1-4.0.jar
+hazelcast-jet-4.5/bin/jet -t grid@123.456.789.0 submit target/trade-monitor-remote-job-sub-1-5.0.jar
 ```
 
 This will send the job from your machine to wherever in the world the cluster

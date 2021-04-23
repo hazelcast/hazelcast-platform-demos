@@ -66,6 +66,7 @@ public class ApplicationConfig {
         this.project = myProperties.getProject();
         this.remoteSite = myProperties.getRemoteSite();
         this.site = myProperties.getSite();
+        this.checkPartitionCount(myProperties);
         System.setProperty("my.project", this.project);
         System.setProperty("my.remote.site", this.remoteSite.toString());
         System.setProperty("my.partitions", String.valueOf(myProperties.getPartitions()));
@@ -83,17 +84,17 @@ public class ApplicationConfig {
                         initSizeStr, nfe.getMessage());
             }
         }
-        String partitionsStr = System.getProperty("my.partitions", "");
-        myProperties.setPartitions(DEFAULT_PARTITION_COUNT);
-        if (partitionsStr.length() == 0) {
-            LOGGER.warn("System property 'my.partitions' empty");
-        } else {
-            try {
-                myProperties.setPartitions(Integer.parseInt(partitionsStr));
-            } catch (NumberFormatException nfe) {
-                LOGGER.error("System property 'my.partitions' exception '{}' '{}'",
-                        partitionsStr, nfe.getMessage());
-            }
+    }
+
+    /**
+     * <p>May not be set as provided in environment.</p>
+     *
+     * @param myProperties
+     */
+    private void checkPartitionCount(MyProperties myProperties) {
+        if (myProperties.getPartitions() == 0) {
+            LOGGER.warn("myProperties.getPartitions() == 0, so will use default of {}", DEFAULT_PARTITION_COUNT);
+            myProperties.setPartitions(DEFAULT_PARTITION_COUNT);
         }
     }
 
