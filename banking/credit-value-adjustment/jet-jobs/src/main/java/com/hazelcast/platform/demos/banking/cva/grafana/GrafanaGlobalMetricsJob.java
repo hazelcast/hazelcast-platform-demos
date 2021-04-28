@@ -28,10 +28,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.LockSupport;
 import java.util.stream.Collectors;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
@@ -41,6 +41,7 @@ import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.accumulator.LongAccumulator;
 import com.hazelcast.jet.impl.JobRepository;
 import com.hazelcast.jet.pipeline.Pipeline;
+import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.pipeline.SourceBuilder;
 import com.hazelcast.jet.pipeline.StreamSource;
 import com.hazelcast.map.IMap;
@@ -98,7 +99,8 @@ public class GrafanaGlobalMetricsJob {
         pipeline.readFrom(GrafanaGlobalMetricsJob.mySource(site)).withoutTimestamps()
                 // TODO Make this once per node not once per job
                 .filterStateful(LongAccumulator::new, noopLoggerFilter)
-                .writeTo(MyUtils.buildGraphiteSinkMultiple(grafanaURL));
+                .writeTo(Sinks.logger());
+                //XXX .writeTo(MyUtils.buildGraphiteSinkMultiple(grafanaURL));
 
         return pipeline;
     }
@@ -206,7 +208,7 @@ public class GrafanaGlobalMetricsJob {
             buffer.add(result);
 
             // Wait before running again.
-            LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(MyConstants.GRAPHITE_COLLECTION_INTERVAL_SECONDS));
+            LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(MyConstants.PROMETHEUS_COLLECTION_INTERVAL_SECONDS));
         }
 
         /**

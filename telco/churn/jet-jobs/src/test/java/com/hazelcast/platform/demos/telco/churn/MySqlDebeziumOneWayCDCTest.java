@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+import org.json.JSONException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -92,10 +93,12 @@ public class MySqlDebeziumOneWayCDCTest {
                 + ",\"international\":0,\"rate\":9.1,\"__op\":\"u\",\"__db\":\"churn\""
                 + ",\"__table\":\"tariff\",\"__ts_ms\":1600000000000,\"__deleted\":\"false\"}";
 
-        Map.Entry<String, HazelcastJsonValue> output =
+        Exception e = assertThrows(JSONException.class,
+                () -> {
                     MySqlDebeziumOneWayCDC.cdcToEntry(operation, timestamp, input);
+                });
 
-        assertThat(output).as("entry").isNull();
+        assertThat(e.getMessage()).asString().contains("JSONObject[\"id\"] not found.");
     }
 
     @DisplayName("No year")
@@ -105,10 +108,13 @@ public class MySqlDebeziumOneWayCDCTest {
                 + ",\"international\":0,\"rate\":9.1,\"__op\":\"u\",\"__db\":\"churn\""
                 + ",\"__table\":\"tariff\",\"__ts_ms\":1600000000000,\"__deleted\":\"false\"}";
 
-        Map.Entry<String, HazelcastJsonValue> output =
-                    MySqlDebeziumOneWayCDC.cdcToEntry(operation, timestamp, input);
 
-        assertThat(output).as("entry").isNull();
+        Exception e = assertThrows(JSONException.class,
+                () -> {
+                    MySqlDebeziumOneWayCDC.cdcToEntry(operation, timestamp, input);
+                });
+
+        assertThat(e.getMessage()).asString().contains("JSONObject[\"year\"] not found.");
     }
 
 }

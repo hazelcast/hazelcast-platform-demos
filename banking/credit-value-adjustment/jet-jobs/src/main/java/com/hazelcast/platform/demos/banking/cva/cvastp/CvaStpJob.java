@@ -23,9 +23,9 @@ import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 import com.hazelcast.cluster.Cluster;
 import com.hazelcast.cluster.Member;
