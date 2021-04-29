@@ -52,13 +52,14 @@
 :root {
   box-sizing: border-box;
 
-  --color-bg: #bdbdbd;
-  --color-midnight-blue: #030824;
-  --color-deep-blue: #010830;
-  --color-light-blue: #a7b5ff;
+  --color-bg: #041A3B;
+  --color-midnight-blue: #142B4F;
+  --color-deep-blue: #CBDBFF;
+  --color-light-blue: #fafafa;
   --color-dark-blue: #293574;
-  --color-mid-blue: #43519c;
-  --color-body: rgba(255, 255, 255, 0.5);
+  --color-hover-blue: #1E3659;
+  --color-mid-blue: #041A3B;
+  --color-body: #fafafa;
 
 }
 
