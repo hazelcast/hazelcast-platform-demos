@@ -11,21 +11,23 @@
 }
 
 .App-title {
+  font-family: 'Ubuntu', sans-serif;
   margin: 0;
   margin-bottom: 0.5rem;
-  font-size: 1.5rem;
-  font-weight: 900;
+  font-size: 2rem;
+  font-weight: 600;
   color: var(--color-light-blue);
-  text-transform: uppercase;
+  
 }
 
 .App-subtitle {
+  font-family: 'Ubuntu', sans-serif;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  color: var(--color-dark-blue);
-  font-weight: 900;
-  text-transform: uppercase;
+  color: var(--color-light-blue);
+  font-weight: 400;
+ 
 }
 
 .App-link {
