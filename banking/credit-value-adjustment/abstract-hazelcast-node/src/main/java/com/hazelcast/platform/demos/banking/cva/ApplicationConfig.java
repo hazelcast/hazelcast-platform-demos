@@ -153,12 +153,12 @@ public class ApplicationConfig {
      */
     private void logProperties(JetConfig jetConfig) {
         Properties properties = jetConfig.getProperties();
-        for (Map.Entry propertyEntry : properties.entrySet()) {
+        for (Map.Entry<?, ?> propertyEntry : properties.entrySet()) {
             LOGGER.info("Property '{}'=='{}'",
                     propertyEntry.getKey(), propertyEntry.getValue());
         }
         properties = jetConfig.getHazelcastConfig().getProperties();
-        for (Map.Entry propertyEntry : properties.entrySet()) {
+        for (Map.Entry<?, ?> propertyEntry : properties.entrySet()) {
             LOGGER.info("Property '{}'=='{}'",
                     propertyEntry.getKey(), propertyEntry.getValue());
         }
@@ -174,9 +174,9 @@ public class ApplicationConfig {
      */
     private void adjustNearCacheConfig(Map<String, MapConfig> mapConfigs) {
         for (MapConfig mapConfig : mapConfigs.values()) {
-            NearCacheConfig nearCacheCOnfig = mapConfig.getNearCacheConfig();
-            if (nearCacheCOnfig != null) {
-                nearCacheCOnfig.setCacheLocalEntries(true);
+            NearCacheConfig nearCacheConfig = mapConfig.getNearCacheConfig();
+            if (nearCacheConfig != null) {
+                nearCacheConfig.setCacheLocalEntries(true);
             }
         }
     }

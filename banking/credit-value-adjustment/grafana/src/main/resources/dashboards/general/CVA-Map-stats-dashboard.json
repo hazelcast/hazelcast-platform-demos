@@ -56,16 +56,24 @@
           "span": 4,
           "stack": false,
           "steppedLine": false,
-          "targets": [
-            {
-              "refId": "A",
-              "target": "alias(site1.GrafanaGlobalMetricsJob.map.cva_trades.size, 'site1.size')"
-            },
-            {
-              "refId": "B",
-              "target": "alias(site2.GrafanaGlobalMetricsJob.map.cva_trades.size, 'site2.size')"
-            }
-          ],
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "max(hz_map_entryCount{mc_cluster='site1',name='cva_trades'})",
+          "interval": "",
+          "legendFormat": "site1.size",
+          "refId": "A",
+          "target": "alias(max(hz_map_entryCount{mc_cluster='site1',name='cva_trades'}), 'site1.size')"
+        },
+        {
+          "exemplar": true,
+          "expr": "max(hz_map_entryCount{mc_cluster='site2',name='cva_trades'})",
+          "interval": "",
+          "legendFormat": "site2.size",
+          "refId": "B",
+          "target": "alias(max(hz_map_entryCount{mc_cluster='site2',name='cva_trades'}), 'site2.size')"
+        }
+      ],
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
@@ -314,16 +322,24 @@
           "span": 4,
           "stack": false,
           "steppedLine": false,
-          "targets": [
-            {
-              "refId": "A",
-              "target": "alias(site1.GrafanaGlobalMetricsJob.map.cva_ircurves.size, 'site1.size')"
-            },
-            {
-              "refId": "B",
-              "target": "alias(site2.GrafanaGlobalMetricsJob.map.cva_ircurves.size, 'site2.size')"
-            }
-          ],
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "max(hz_map_entryCount{mc_cluster='site1',name='cva_trades'})",
+          "interval": "",
+          "legendFormat": "site1.size",
+          "refId": "A",
+          "target": "alias(max(hz_map_entryCount{mc_cluster='site1',name='cva_ircurves'}), 'site1.size')"
+        },
+        {
+          "exemplar": true,
+          "expr": "max(hz_map_entryCount{mc_cluster='site2',name='cva_trades'})",
+          "interval": "",
+          "legendFormat": "site2.size",
+          "refId": "B",
+          "target": "alias(max(hz_map_entryCount{mc_cluster='site2',name='cva_ircurves'}), 'site2.size')"
+        }
+      ],
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,

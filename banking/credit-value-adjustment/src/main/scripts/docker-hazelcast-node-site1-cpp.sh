@@ -27,7 +27,7 @@ DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
 # 3 CPUs, one each for Jet and 2 x C++ workers
 PORT=50001
-CMD="docker run --cpuset-cpus=0-2 -e MY_GRAFANA_SERVICE=grafana -e MY_INITSIZE=1 -e MY_KUBERNETES_ENABLED=false -e MY_PARTITIONS=271 -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP} -p 5701:5701 --network=${PROJECT} ${DOCKER_IMAGE} ${PORT}"
+CMD="docker run --cpuset-cpus=0-2 -e MY_INITSIZE=1 -e MY_KUBERNETES_ENABLED=false -e MY_PARTITIONS=271 -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP} -p 5701:5701 --network=${PROJECT} ${DOCKER_IMAGE} ${PORT}"
 #echo $CMD
 
 $CMD
