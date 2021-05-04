@@ -3,6 +3,7 @@
   color: var(--color-light-blue);
   font-size: 1rem;
   font-weight: 500;
+  font-family: 'Ubuntu', sans-serif;
   padding: 2rem;
 }
 
@@ -65,11 +66,14 @@
 }
 
 .rt-tbody .rt-tr:hover {
-  background-color: var(--color-deep-blue);
+  background-color: var(--color-hover-blue);
 }
 
 .ReactTable .rt-td {
   height: 3.125rem;
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 16px;
+  color: #fafafa;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -77,7 +81,7 @@
 }
 
 .rt-tbody .rt-tr.Table-expanded {
-  background-color: #010a3f;
+  background-color: var(--color-midnight-blue);
 }
 
 .ReactTable .rt-expander {
@@ -87,7 +91,7 @@
 }
 
 .ReactTable .rt-expander:after {
-  border-top-color: var(--color-mid-blue);
+  border-top-color: #fafafa;
 }
 
 .Table-highlightValue {
@@ -108,30 +112,30 @@
 }
 
 .Table-changeUp {
-  color: #00d51d;
+  color: #68C200;
   z-index: 0;
 }
 .Table-changeDown {
-  color: #ff0000;
+  color: #E75851;
   z-index: 0;
 }
 
 .Table-changeUp:before {
-  background-color: #00ff4b;
+  background-color: #68C200;
 }
 .Table-changeDown:before {
-  background-color: #ff0000;
+  background-color: #E75851;
 }
 
 .Table-subtable .rt-tbody .rt-tr {
-  background-color: #0c112b;
+  background-color: #1E3659;
   position: relative;
   border-bottom: 1px solid #24283F;
   cursor: default;
 }
 
 .Table-subtable .pagination-bottom {
-  background-color: #0c112b;
+  background-color: #1E3659;
   border-bottom: 1px solid #24283F;
   height: 3.125rem;
   color: var(--color-mid-blue);
