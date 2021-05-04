@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2020, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,12 @@
 
 package com.hazelcast.platform.demos.banking.cva;
 
-import java.io.BufferedOutputStream;
-import java.net.Socket;
-import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
-import org.python.core.PyList;
-import org.python.core.PyString;
-import org.python.core.PyTuple;
-import org.python.modules.cPickle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,8 +30,6 @@ import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.Job;
 import com.hazelcast.jet.core.JobStatus;
 import com.hazelcast.jet.datamodel.Tuple2;
-import com.hazelcast.jet.pipeline.Sink;
-import com.hazelcast.jet.pipeline.SinkBuilder;
 import com.hazelcast.platform.demos.banking.cva.MyConstants.Site;
 
 /**
@@ -50,116 +39,7 @@ import com.hazelcast.platform.demos.banking.cva.MyConstants.Site;
 public class MyUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(MyUtils.class);
 
-    // Primitive int takes 4 bytes to transmit
-    private static final int INT_SIZE = 4;
-    // Protocol 2 == Python 2.3 upwards. No constant for this apparantly.
-    private static final int PROTOCOL_2 = 2;
     private static final int PORT_RANGE = 1000;
-
-    /**
-     * <p>A sink that saves an instance of our {@link GraphiteMetric}
-     * class to a remote Graphite database for displaying on Grafana
-     * dashboards.
-     * </p>
-     * <p>When the job starts, a {@link java.net.Socket.Socket Socket}
-     * is opened to the provided Graphite host.
-     * </p>
-     * <p>Graphite accepts metrics being sent in plain text. However,
-     * for efficiency and best practice we use
-     * <a href="https://docs.python.org/3/library/pickle.html">Python Pickle</a>
-     * to transmit the metric.
-     * </p>
-     * <p>To use Pickle, we use <a href="https://www.jython.org/">Jython</a>,
-     * which currently (March 2020) has no Python 3 implementation.
-     * </p>
-     *
-     * @param host The location of Graphite/Grafana, port 2004 assumed
-     * @return A sink to save to that location.
-     */
-    protected static Sink<? super GraphiteMetric> buildGraphiteSinkSingleton(String host) {
-        return SinkBuilder.sinkBuilder(
-                        "graphite",
-                        context -> {
-                            Socket socket = new Socket(host, MyConstants.GRAPHITE_PORT);
-                            return Tuple2.tuple2(socket, new BufferedOutputStream(socket.getOutputStream()));
-                            }
-                        )
-                .receiveFn((Tuple2<Socket, BufferedOutputStream> tuple2, GraphiteMetric graphiteMetric) -> {
-                    PyString payload = cPickle.dumps(getAsListFromSingleton(graphiteMetric), PROTOCOL_2);
-                    byte[] header = ByteBuffer.allocate(INT_SIZE).putInt(payload.__len__()).array();
-
-                    tuple2.f1().write(header);
-                    tuple2.f1().write(payload.toBytes());
-                })
-                .flushFn(tuple2 -> tuple2.f1().flush())
-                .destroyFn(tuple2 -> {
-                    tuple2.f1().close();
-                    tuple2.f0().close();
-                 })
-                .preferredLocalParallelism(1)
-                .build();
-    }
-
-    /**
-     * <p>Similar to {@link #buildGraphiteSinkSingleton()} except a more
-     * efficient version taking a list of {@link GraphiteMetric} objects.
-     * All that changes from the above is "{@code receiveFn()}".
-     * </p>
-     * <p>It would be possible, though not as type safe to combine this
-     * method with the above, and look at the type of the passed item
-     * to determine whether a single metric or list of metrics is to
-     * be sent across the socket.
-     * </p>
-     *
-     * @param host The location of Graphite/Grafana, port 2004 assumed
-     * @return A sink to save to that location.
-     */
-    public static Sink<List<GraphiteMetric>> buildGraphiteSinkMultiple(String host) {
-        return SinkBuilder.sinkBuilder(
-                        "graphite",
-                        context -> {
-                            Socket socket = new Socket(host, MyConstants.GRAPHITE_PORT);
-                            return Tuple2.tuple2(socket, new BufferedOutputStream(socket.getOutputStream()));
-                            }
-                        )
-                .receiveFn((Tuple2<Socket, BufferedOutputStream> tuple2, List<GraphiteMetric> graphiteMetrics) -> {
-                    PyString payload = cPickle.dumps(getAsListFromList(graphiteMetrics), PROTOCOL_2);
-                    byte[] header = ByteBuffer.allocate(INT_SIZE).putInt(payload.__len__()).array();
-
-                    tuple2.f1().write(header);
-                    tuple2.f1().write(payload.toBytes());
-                })
-                .flushFn(tuple2 -> tuple2.f1().flush())
-                .destroyFn(tuple2 -> {
-                    tuple2.f1().close();
-                    tuple2.f0().close();
-                 })
-                .preferredLocalParallelism(1)
-                .build();
-    }
-
-    /**
-     * <p>A metric list build from a singleton metric.
-     * </p>
-     */
-    private static PyList getAsListFromSingleton(GraphiteMetric graphiteMetric) {
-        return getAsListFromList(Collections.singletonList(graphiteMetric));
-    }
-
-
-    /**
-     * <p>A metric list build from a singleton metric.
-     * </p>
-     */
-    private static PyList getAsListFromList(List<GraphiteMetric> graphiteMetrics) {
-        PyList list = new PyList();
-        for (GraphiteMetric graphiteMetric : graphiteMetrics) {
-            PyTuple metric = new PyTuple(graphiteMetric.getMetricName(),
-                    new PyTuple(graphiteMetric.getTimestamp(), graphiteMetric.getMetricValue()));
-            list.add(metric);
-        }
-        return list;
-    }
 
     /**
      * <p>When trying to run two clusters on the same host,
@@ -283,31 +163,6 @@ public class MyUtils {
         }
 
         return timestampStr;
-    }
-
-    /**
-     * <p>Create a single statistic to send to Graphite/Grafana in a bundle.
-     * </p>
-     *
-     * @param site "{@code CVA-SITE1}" or "{@code CVA-SITE2}"
-     * @param one First tier
-     * @param two Second tier
-     * @param three Third tier
-     * @param four Fourth tier
-     * @param valueStr Value are passed as strings
-     * @param when Timestamp
-     * @return A metric to send to Grafana
-     */
-    public static GraphiteMetric createGraphiteMetric4Tier(Site site, String one, String two, String three, String four,
-            String valueStr, long when) {
-        GraphiteMetric graphiteMetric = new GraphiteMetric(site);
-        graphiteMetric.setMetricName(one + MyConstants.GRAPHITE_SEPARATOR
-                + two + MyConstants.GRAPHITE_SEPARATOR
-                + three + MyConstants.GRAPHITE_SEPARATOR
-                + four);
-        graphiteMetric.setMetricValue(valueStr);
-        graphiteMetric.setTimestamp(when);
-        return graphiteMetric;
     }
 
 }

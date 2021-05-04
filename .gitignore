@@ -5,9 +5,11 @@
 .project
 .settings
 .vscode
+.DS_Store
 #
 *.code-workspace
 *.iml
 #
+*.pyc
 dependency-reduced-pom.xml
 target

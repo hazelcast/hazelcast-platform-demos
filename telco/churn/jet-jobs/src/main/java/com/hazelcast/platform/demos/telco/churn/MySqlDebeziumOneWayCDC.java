@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2020, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,9 @@ import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Date;
 import java.util.Map;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.jet.cdc.ChangeRecord;
@@ -173,62 +172,56 @@ public class MySqlDebeziumOneWayCDC extends MyJobWrapper {
             long timestamp, String valueAsJson) {
         LOGGER.debug("cdcToEntry({}, {}, '{}')", operation, new Date(timestamp), valueAsJson);
 
-        try {
-            JSONObject json = new JSONObject(valueAsJson);
-            String key = null;
+        JSONObject json = new JSONObject(valueAsJson);
+        String key = null;
 
-            StringBuilder stringBuilder = new StringBuilder("{ ");
-            for (int i = 0 ; i < TariffMetadata.FIELD_NAMES.size(); i++) {
-                if (i != 0) {
-                    stringBuilder.append(", ");
-                }
-
-                String name = TariffMetadata.FIELD_NAMES.get(i);
-                stringBuilder.append("\"" + name + "\" : ");
-
-                switch (name) {
-                    case TariffMetadata.ID:
-                    case TariffMetadata.NAME:
-                        stringBuilder.append("\"" + json.get(name).toString() + "\"");
-                        break;
-                    case TariffMetadata.INTERNATIONAL:
-                        // MySql uses 0 & 1
-                        int j = json.getInt(name);
-                        if (j == 0) {
-                            stringBuilder.append("false");
-                        } else {
-                            stringBuilder.append("true");
-                        }
-                        break;
-                    case TariffMetadata.YEAR:
-                        stringBuilder.append(json.getInt(name));
-                        break;
-                    case TariffMetadata.RATE_PER_MINUTE:
-                        // Field in JSON is not same as column name in MySql
-                        stringBuilder.append(json.getDouble("rate"));
-                        break;
-                    default:
-                        LOGGER.error("Field '{}' unexpected in '{}'", name, valueAsJson);
-                        stringBuilder.append("\"\"");
-                }
-
-                if (TariffMetadata.ID.equals(name)) {
-                    key = json.get(name).toString();
-                }
+        StringBuilder stringBuilder = new StringBuilder("{ ");
+        for (int i = 0 ; i < TariffMetadata.FIELD_NAMES.size(); i++) {
+            if (i != 0) {
+                stringBuilder.append(", ");
             }
-            stringBuilder.append(" }");
 
-            if (key == null) {
-                LOGGER.error("Didn't find key in '{}'", valueAsJson);
-                return null;
-            } else {
-                return new SimpleImmutableEntry<String, HazelcastJsonValue>(key,
-                        new HazelcastJsonValue(stringBuilder.toString()));
+            String name = TariffMetadata.FIELD_NAMES.get(i);
+            stringBuilder.append("\"" + name + "\" : ");
+
+            switch (name) {
+                case TariffMetadata.ID:
+                case TariffMetadata.NAME:
+                    stringBuilder.append("\"" + json.get(name).toString() + "\"");
+                    break;
+                case TariffMetadata.INTERNATIONAL:
+                    // MySql uses 0 & 1
+                    int j = json.getInt(name);
+                    if (j == 0) {
+                        stringBuilder.append("false");
+                    } else {
+                        stringBuilder.append("true");
+                    }
+                    break;
+                case TariffMetadata.YEAR:
+                    stringBuilder.append(json.getInt(name));
+                    break;
+                case TariffMetadata.RATE_PER_MINUTE:
+                    // Field in JSON is not same as column name in MySql
+                    stringBuilder.append(json.getDouble("rate"));
+                    break;
+                default:
+                    LOGGER.error("Field '{}' unexpected in '{}'", name, valueAsJson);
+                    stringBuilder.append("\"\"");
             }
-        } catch (JSONException e) {
-            String message = String.format("%s: %s", valueAsJson, e.getMessage());
-            LOGGER.error(message);
+
+            if (TariffMetadata.ID.equals(name)) {
+                key = json.get(name).toString();
+            }
+        }
+        stringBuilder.append(" }");
+
+        if (key == null) {
+            LOGGER.error("Didn't find key in '{}'", valueAsJson);
             return null;
+        } else {
+            return new SimpleImmutableEntry<String, HazelcastJsonValue>(key,
+                    new HazelcastJsonValue(stringBuilder.toString()));
         }
     }
 }

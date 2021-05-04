@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2020, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.function.BiFunctionEx;
@@ -133,7 +132,7 @@ public class ExposureToCvaExposure {
                    stringBuilder.append(" }");
 
                    return Tuple3.tuple3(tradeid, curvename, stringBuilder.toString());
-               } catch (RuntimeException | JSONException e) {
+               } catch (RuntimeException e) {
                    if (exposure.length() > MyConstants.HALF_SCREEN_WIDTH) {
                        if (cpCds.toString().length() > MyConstants.HALF_SCREEN_WIDTH) {
                            LOGGER.error("No counterparty field: " + exposure.substring(0, MyConstants.HALF_SCREEN_WIDTH)

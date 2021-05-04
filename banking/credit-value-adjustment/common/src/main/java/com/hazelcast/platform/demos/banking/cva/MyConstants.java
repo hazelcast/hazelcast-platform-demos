@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2020, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,11 +56,6 @@ public class MyConstants {
             return this.name().toLowerCase(Locale.ROOT);
         }
     };
-
-    // For sending data to Grafana/Graphite
-    public static final int GRAPHITE_COLLECTION_INTERVAL_SECONDS = 5;
-    public static final int GRAPHITE_PORT = 2004;
-    public static final char GRAPHITE_SEPARATOR = '.';
 
     // For logging, prefix for important messages (see "log4j2.yml")
     public static final String BANNER = "*** *** *** ***";

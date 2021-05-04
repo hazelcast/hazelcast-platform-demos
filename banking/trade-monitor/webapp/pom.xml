@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
 		<artifactId>trade-monitor-root</artifactId>
-		<version>4.0</version>
+		<version>5.0</version>
 	</parent>
 
 	<artifactId>trade-monitor-webapp</artifactId>
@@ -23,8 +23,8 @@
 		<!-- See comment on maven-resources-plugin -->
         <frontend.app.dir>${project.basedir}/src/main/app</frontend.app.dir>
 	
-		<node.version>v14.15.4</node.version>
-		<yarn.version>v1.22.0</yarn.version>
+		<node.version>v14.16.0</node.version>
+		<yarn.version>v1.22.5</yarn.version>
 	</properties>
 
 	<dependencies>
@@ -37,6 +37,10 @@
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet-sql</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast</groupId>

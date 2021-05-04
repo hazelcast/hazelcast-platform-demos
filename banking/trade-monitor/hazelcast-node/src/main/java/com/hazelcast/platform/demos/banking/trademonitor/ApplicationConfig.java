@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2020, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,11 @@ public class ApplicationConfig {
             TcpIpConfig tcpIpConfig = new TcpIpConfig();
             tcpIpConfig.setEnabled(true);
             if (System.getProperty("hazelcast.local.publicAddress", "").length() != 0) {
-                tcpIpConfig.setMembers(Arrays.asList(System.getProperty("hazelcast.local.publicAddress")));
+                String publicAddress = System.getProperty("hazelcast.local.publicAddress");
+                String dockerHost = publicAddress.split(":")[0];
+                String port = publicAddress.split(":")[1];
+                tcpIpConfig.setMembers(Arrays.asList(dockerHost + ":5701", dockerHost + ":5702", dockerHost + ":5703"));
+                jetConfig.getHazelcastConfig().getNetworkConfig().setPort(Integer.parseInt(port));
             } else {
                 tcpIpConfig.setMembers(Arrays.asList("127.0.0.1"));
             }

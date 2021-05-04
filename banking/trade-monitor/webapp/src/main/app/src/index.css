@@ -12,6 +12,7 @@
        url('/fonts/ubuntu-v15-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
        url('/fonts/ubuntu-v15-latin-regular.svg#Ubuntu') format('svg'); /* Legacy iOS */
 }
+*/
 
 *, *:before, *:after {
   box-sizing: inherit;

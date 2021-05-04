@@ -1,0 +1,66 @@
+
+/* When closed */
+.Collapsible {
+  background-color:   var(--color-mid-blue);
+  color:   var(--color-midnight-blue);
+}
+
+/* When opened */
+.Collapsible-opened {
+  background-color:   var(--color-mid-blue);
+  color:   var(--color-mid-blue);
+}
+
+/* Trigger when closed */
+.Collapsible__trigger {
+  background-color: white;
+  border: 2px solid var(--color-mid-blue);
+  color: var(--color-midnight-blue);
+}
+.Collapsible__trigger::before {
+  content: "\21CA \21CA \21CA ";
+}
+.Collapsible__trigger::after {
+  content: " \21CA \21CA \21CA";
+}
+
+/* Trigger when opened */
+.Collapsible__trigger-opened {
+  background-color:   var(--color-midnight-blue);
+  color:   white;
+}
+.Collapsible__trigger-opened::before {
+  content: "\21C8 \21C8 \21C8 ";
+}
+.Collapsible__trigger-opened::after {
+  content: " \21C8 \21C8 \21C8";
+}
+
+/* Inner */
+.Collapsible__contentInner {
+  background-color: blue;	
+  color: white;
+}
+
+/* Outer */
+.Collapsible__contentOuter {
+  background-color: white;	
+  color: blue;
+}
+
+/* ======= */
+/* For SQL */
+/* ======= */
+.greenInputBox {
+        border: 4px solid black;
+}
+.greenOutputBox {
+        border: 4px solid black;
+        overflow: scroll;       
+}
+.greenOuterBox {
+        border: 4px solid DarkGray;
+        background-color: black;
+        color: #F0FFF0;
+        font-family: monospace;
+}

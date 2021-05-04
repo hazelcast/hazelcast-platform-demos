@@ -1,4 +1,4 @@
-FROM hazelcast/management-center:latest-snapshot
+FROM hazelcast/management-center:4.2021.04
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MC_LICENSE
@@ -19,6 +19,11 @@ ENV MC_ADMIN_PASSWORD=$MC_ADMINPASSWORD
 # Preconfigure cluster connections
 ENV MC_CLUSTER1_NAME=$MC_CLUSTER1_NAME
 ENV MC_CLUSTER1_ADDRESSLIST=$MC_CLUSTER1_ADDRESSLIST
+
+# If want to query custom classes
+ARG JAR_FILE
+COPY target/${JAR_FILE} /application.jar
+ENV MC_CLASSPATH=/application.jar
 
 # Start Management Center
 CMD ["bash", "-c", "set -euo pipefail \
