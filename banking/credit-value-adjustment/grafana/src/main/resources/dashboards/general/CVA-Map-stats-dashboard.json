@@ -141,31 +141,56 @@
           "span": 4,
           "stack": false,
           "steppedLine": false,
-          "targets": [
-            {
-              "refId": "A",
-              "target": "alias(site1.GrafanaGlobalMetricsJob.map.cva_trades.reads, 'site1.reads')"
-            },
-            {
-              "refId": "B",
-              "target": "alias(site1.GrafanaGlobalMetricsJob.map.cva_trades.writes, 'site1.writes')"
-            },
-            {
-              "refId": "C",
-              "target": "alias(site1.GrafanaGlobalMetricsJob.map.cva_trades.deletes, 'site1.deletes')"
-            },
-            {
-              "refId": "D",
-              "target": "alias(site2.GrafanaGlobalMetricsJob.map.cva_trades.reads, 'site2.reads')"
-            },
-            {
-              "refId": "E",
-              "target": "alias(site2.GrafanaGlobalMetricsJob.map.cva_trades.writes, 'site2.writes')"
-            },
-            {
-              "refId": "F",
-              "target": "alias(site2.GrafanaGlobalMetricsJob.map.cva_trades.deletes, 'site2.deletes')"            }
-          ],
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "max(hz_map_getCount{mc_cluster='site1',name='cva_trades'})",
+          "interval": "",
+          "legendFormat": "site1.reads",
+          "refId": "A",
+          "target": "alias(max(hz_map_getCount{mc_cluster='site1',name='cva_trades'}), 'site1.reads')"
+        },
+        {
+          "exemplar": true,
+          "expr": "max(hz_map_putCount{mc_cluster='site1',name='cva_trades'})",
+          "interval": "",
+          "legendFormat": "site1.writes",
+          "refId": "B",
+          "target": "alias(max(hz_map_putCount{mc_cluster='site1',name='cva_trades'}), 'site1.writes')"
+        },
+        {
+          "exemplar": true,
+          "expr": "max(hz_map_removeCount{mc_cluster='site1',name='cva_trades'})",
+          "interval": "",
+          "legendFormat": "site1.deletes",
+          "refId": "C",
+          "target": "alias(max(hz_map_removeCount{mc_cluster='site1',name='cva_trades'}), 'site1.deletes')"
+        },
+        {
+          "exemplar": true,
+          "expr": "max(hz_map_getCount{mc_cluster='site2',name='cva_trades'})",
+          "interval": "",
+          "legendFormat": "site2.reads",
+          "refId": "D",
+          "target": "alias(max(hz_map_getCount{mc_cluster='site2',name='cva_trades'}), 'site2.reads')"
+        },
+        {
+          "exemplar": true,
+          "expr": "max(hz_map_putCount{mc_cluster='site2',name='cva_trades'})",
+          "interval": "",
+          "legendFormat": "site2.writes",
+          "refId": "E",
+          "target": "alias(max(hz_map_putCount{mc_cluster='site2',name='cva_trades'}), 'site2.writes')"
+        },
+        {
+          "exemplar": true,
+          "expr": "max(hz_map_removeCount{mc_cluster='site2',name='cva_trades'})",
+          "interval": "",
+          "legendFormat": "site2.deletes",
+          "refId": "F",
+          "target": "alias(max(hz_map_removeCount{mc_cluster='site2',name='cva_trades'}), 'site2.deletes')"
+        }	
+      ],
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
@@ -325,7 +350,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "max(hz_map_entryCount{mc_cluster='site1',name='cva_trades'})",
+          "expr": "max(hz_map_entryCount{mc_cluster='site1',name='cva_ircurves'})",
           "interval": "",
           "legendFormat": "site1.size",
           "refId": "A",
@@ -333,7 +358,7 @@
         },
         {
           "exemplar": true,
-          "expr": "max(hz_map_entryCount{mc_cluster='site2',name='cva_trades'})",
+          "expr": "max(hz_map_entryCount{mc_cluster='site2',name='cva_ircurves'})",
           "interval": "",
           "legendFormat": "site2.size",
           "refId": "B",
@@ -407,32 +432,56 @@
           "span": 4,
           "stack": false,
           "steppedLine": false,
-          "targets": [
-            {
-              "refId": "A",
-              "target": "alias(site1.GrafanaGlobalMetricsJob.map.cva_ircurves.reads, 'site1.reads')"
-            },
-            {
-              "refId": "B",
-              "target": "alias(site1.GrafanaGlobalMetricsJob.map.cva_ircurves.writes, 'site1.writes')"
-            },
-            {
-              "refId": "C",
-              "target": "alias(site1.GrafanaGlobalMetricsJob.map.cva_ircurves.deletes, 'site1.deletes')"
-            },
-            {
-              "refId": "D",
-              "target": "alias(site2.GrafanaGlobalMetricsJob.map.cva_ircurves.reads, 'site2.reads')"
-            },
-            {
-              "refId": "E",
-              "target": "alias(site2.GrafanaGlobalMetricsJob.map.cva_ircurves.writes, 'site2.writes')"
-            },
-            {
-              "refId": "F",
-              "target": "alias(site2.GrafanaGlobalMetricsJob.map.cva_ircurves.deletes, 'site2.deletes')"
-            }
-          ],
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "max(hz_map_getCount{mc_cluster='site1',name='cva_ircurves'})",
+          "interval": "",
+          "legendFormat": "site1.reads",
+          "refId": "A",
+          "target": "alias(max(hz_map_getCount{mc_cluster='site1',name='cva_ircurves'}), 'site1.reads')"
+        },
+        {
+          "exemplar": true,
+          "expr": "max(hz_map_putCount{mc_cluster='site1',name='cva_ircurves'})",
+          "interval": "",
+          "legendFormat": "site1.writes",
+          "refId": "B",
+          "target": "alias(max(hz_map_putCount{mc_cluster='site1',name='cva_ircurves'}), 'site1.writes')"
+        },
+        {
+          "exemplar": true,
+          "expr": "max(hz_map_removeCount{mc_cluster='site1',name='cva_ircurves'})",
+          "interval": "",
+          "legendFormat": "site1.deletes",
+          "refId": "C",
+          "target": "alias(max(hz_map_removeCount{mc_cluster='site1',name='cva_ircurves'}), 'site1.deletes')"
+        },
+        {
+          "exemplar": true,
+          "expr": "max(hz_map_getCount{mc_cluster='site2',name='cva_ircurves'})",
+          "interval": "",
+          "legendFormat": "site2.reads",
+          "refId": "D",
+          "target": "alias(max(hz_map_getCount{mc_cluster='site2',name='cva_ircurves'}), 'site2.reads')"
+        },
+        {
+          "exemplar": true,
+          "expr": "max(hz_map_putCount{mc_cluster='site2',name='cva_ircurves'})",
+          "interval": "",
+          "legendFormat": "site2.writes",
+          "refId": "E",
+          "target": "alias(max(hz_map_putCount{mc_cluster='site2',name='cva_ircurves'}), 'site2.writes')"
+        },
+        {
+          "exemplar": true,
+          "expr": "max(hz_map_removeCount{mc_cluster='site2',name='cva_ircurves'})",
+          "interval": "",
+          "legendFormat": "site2.deletes",
+          "refId": "F",
+          "target": "alias(max(hz_map_removeCount{mc_cluster='site2',name='cva_ircurves'}), 'site2.deletes')"
+        }	
+      ],
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
