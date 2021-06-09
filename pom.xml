@@ -41,7 +41,7 @@
 		<hazelcast-jet.version>4.5</hazelcast-jet.version>
 		<hazelcast-jet-spring-boot-starter.version>2.0.1</hazelcast-jet-spring-boot-starter.version>
 		<hazelcast-kubernetes.version>2.2.2</hazelcast-kubernetes.version>
-		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
+		<hibernate-validator.version>6.1.5.Final</hibernate-validator.version>
 		<jackson.version>2.11.3</jackson.version>
 		<json.version>20190722</json.version>
                 <json-smart.version>2.3</json-smart.version>
