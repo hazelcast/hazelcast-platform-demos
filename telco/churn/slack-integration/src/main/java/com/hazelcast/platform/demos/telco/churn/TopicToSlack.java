@@ -18,9 +18,9 @@ package com.hazelcast.platform.demos.telco.churn;
 
 import java.util.Properties;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 import com.hazelcast.cluster.Address;
 import com.hazelcast.function.FunctionEx;

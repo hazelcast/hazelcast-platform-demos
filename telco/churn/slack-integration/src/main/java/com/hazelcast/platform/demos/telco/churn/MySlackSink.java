@@ -20,10 +20,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -61,49 +60,44 @@ public class MySlackSink {
      */
     @SuppressWarnings({ "deprecation", "unchecked" })
     public Object receiveFn(JSONObject jsonObject) {
-        try {
-            // Target channel goes in JSON message
-            jsonObject.put(SlackConstants.PARAM_CHANNEL, this.channelName);
+        // Target channel goes in JSON message
+        jsonObject.put(SlackConstants.PARAM_CHANNEL, this.channelName);
 
-            HttpHeaders headers = new HttpHeaders();
-            //TODO This is deprecated, but Slack seems to require it. Should be MediaType.APPLICATION_JSON
-            headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-            headers.setBearerAuth(this.token);
+        HttpHeaders headers = new HttpHeaders();
+        //TODO This is deprecated, but Slack seems to require it. Should be MediaType.APPLICATION_JSON
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        headers.setBearerAuth(this.token);
 
-            String text = jsonObject.getString(SlackConstants.PARAM_TEXT);
-            if (!text.startsWith(this.messagePrefix)) {
-                jsonObject.put(SlackConstants.PARAM_TEXT, this.messagePrefix + text);
-            }
-            LOGGER.info("Sending to Slack: {}", jsonObject);
+        String text = jsonObject.getString(SlackConstants.PARAM_TEXT);
+        if (!text.startsWith(this.messagePrefix)) {
+            jsonObject.put(SlackConstants.PARAM_TEXT, this.messagePrefix + text);
+        }
+        LOGGER.info("Sending to Slack: {}", jsonObject);
 
-            HttpEntity<String> requestEntity =
-                    new HttpEntity<String>(jsonObject.toString(), headers);
+        HttpEntity<String> requestEntity =
+                new HttpEntity<String>(jsonObject.toString(), headers);
 
-            ResponseEntity<Object> responseEntity
-                = restTemplate.postForEntity(SlackConstants.WRITE_MESSAGE_URL, requestEntity, Object.class);
+        ResponseEntity<Object> responseEntity
+            = restTemplate.postForEntity(SlackConstants.WRITE_MESSAGE_URL, requestEntity, Object.class);
 
-            Object body = responseEntity.getBody();
-            if (responseEntity.getStatusCode() != HttpStatus.OK || body == null || !(body instanceof Map)) {
+        Object body = responseEntity.getBody();
+        if (responseEntity.getStatusCode() != HttpStatus.OK || body == null || !(body instanceof Map)) {
+            String message = String.format("---- Send to Slack fail ----%n => HTTP Status Code %d : %s%n => %s%n",
+                    responseEntity.getStatusCodeValue(),
+                    responseEntity.getStatusCode().getReasonPhrase(),
+                    responseEntity);
+            LOGGER.error(message);
+        } else {
+            Map<String, ?> bodyMap = (Map<String, ?>) body;
+            // 'ok' should be a Boolean
+            Object ok = bodyMap.get(SlackConstants.RESPONSE_KEY_OK);
+            if (ok == null || !ok.toString().toLowerCase(Locale.ROOT).equals(Boolean.TRUE.toString())) {
                 String message = String.format("---- Send to Slack fail ----%n => HTTP Status Code %d : %s%n => %s%n",
                         responseEntity.getStatusCodeValue(),
                         responseEntity.getStatusCode().getReasonPhrase(),
-                        responseEntity);
+                        body);
                 LOGGER.error(message);
-            } else {
-                Map<String, ?> bodyMap = (Map<String, ?>) body;
-                // 'ok' should be a Boolean
-                Object ok = bodyMap.get(SlackConstants.RESPONSE_KEY_OK);
-                if (ok == null || !ok.toString().toLowerCase(Locale.ROOT).equals(Boolean.TRUE.toString())) {
-                    String message = String.format("---- Send to Slack fail ----%n => HTTP Status Code %d : %s%n => %s%n",
-                            responseEntity.getStatusCodeValue(),
-                            responseEntity.getStatusCode().getReasonPhrase(),
-                            body);
-                    LOGGER.error(message);
-                }
             }
-
-        } catch (JSONException e) {
-            LOGGER.error("receiveFn()", e);
         }
 
         return this;

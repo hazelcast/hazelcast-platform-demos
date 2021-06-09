@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -106,7 +105,6 @@ public class ApplicationInitializer {
             jobConfigTopicToSlack.addClass(TopicToSlack.class);
             jobConfigTopicToSlack.addClass(MyTopicSource.class);
             jobConfigTopicToSlack.addClass(MySlackSink.class);
-            jobConfigTopicToSlack.addClass(JSONObject.class);
 
             Pipeline pipelineSlackToSlackCLI = SlackToSlackCLI.buildPipeline(properties, projectName);
 
@@ -116,7 +114,6 @@ public class ApplicationInitializer {
             jobConfigSlackToSlackCLI.addClass(MySlackSource.class);
             jobConfigSlackToSlackCLI.addClass(MySlackSink.class);
             jobConfigSlackToSlackCLI.addClass(MyUtils.class);
-            jobConfigSlackToSlackCLI.addClass(JSONObject.class);
 
             this.trySubmit(jobNamePrefixTopicToSlack, jobConfigTopicToSlack, pipelineTopicToSlack);
             if (slackUseable) {

@@ -18,9 +18,14 @@ then
  exit 1
 fi
 
+# Private network so can use container names
+docker network create $PROJECT --driver bridge > /dev/null 2>&1
+# For easier restarts
+docker container prune --force > /dev/null 2>&1
+
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
-CMD="docker run -e MY_GRAFANA_SERVICE=grafana -e MY_KUBERNETES_ENABLED=false -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP} -p 6701:6701 --network=${PROJECT} ${DOCKER_IMAGE}"
+CMD="docker run -e MY_KUBERNETES_ENABLED=false -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP} -p 6701:6701 --network=${PROJECT} ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD

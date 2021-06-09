@@ -6,7 +6,7 @@
 
 	<groupId>com.hazelcast.platform.demos</groupId>
 	<artifactId>hazelcast-platform-demos-root</artifactId>
-	<version>4.0</version>
+	<version>5.0</version>
 	<packaging>pom</packaging>
 
 	<name>Hazelcast Platform Demo Applications</name>
@@ -37,8 +37,8 @@
 		<guava.version>29.0-jre</guava.version>
                 <!-- Matches banking/credit-value-adjustment/cpp/Dockerfile2 -->
 		<grpc.version>1.31.1</grpc.version>
-		<hazelcast.version>4.1.1</hazelcast.version>
-		<hazelcast-jet.version>4.4</hazelcast-jet.version>
+		<hazelcast.version>4.2</hazelcast.version>
+		<hazelcast-jet.version>4.5</hazelcast-jet.version>
 		<hazelcast-jet-spring-boot-starter.version>2.0.1</hazelcast-jet-spring-boot-starter.version>
 		<hazelcast-kubernetes.version>2.2.2</hazelcast-kubernetes.version>
 		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
@@ -55,9 +55,7 @@
                 <!-- Run same version with 'protoc - -grpc_out=. - -plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin' 
                      banking/credit-value-adjustment/common/src/main/proto/JetToCpp.proto -->
 		<protobuf.version>3.12.2</protobuf.version>
-	 	<!-- See https://github.com/hazelcast/hazelcast-jet-contrib/issues/99 -->
-		<spring-boot.version>2.4.0</spring-boot.version>
-		<spring-boot.version>2.3.6.RELEASE</spring-boot.version>
+		<spring-boot.version>2.5.0</spring-boot.version>
 		<springfox-swagger.version>2.9.2</springfox-swagger.version>
 
 		<!-- Plugins -->
@@ -407,6 +405,13 @@
 				<plugin>
 					<artifactId>maven-clean-plugin</artifactId>
 					<version>${maven-clean-plugin.version}</version>
+					<configuration>
+						<filesets>
+							<fileset>
+								<directory>src/main/app/node_modules</directory>
+							</fileset>
+						</filesets>
+					</configuration>
 				</plugin>
 				<plugin>
 					<artifactId>maven-deploy-plugin</artifactId>

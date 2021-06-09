@@ -19,11 +19,11 @@ package com.hazelcast.platform.demos.banking.cva.cvastp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.function.BiFunctionEx;
@@ -77,7 +77,7 @@ public class MtmToExposure {
                             exposures, mtmJson);
 
                     return Tuple3.tuple3(mtm.f0(), mtm.f1(), exposureStr);
-                } catch (RuntimeException | JSONException e) {
+                } catch (RuntimeException e) {
                     LOGGER.error(mtm.f0() + "," + mtm.f1(), e);
                     return null;
                 }

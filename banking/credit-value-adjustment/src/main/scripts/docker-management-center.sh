@@ -18,6 +18,11 @@ then
  exit 1
 fi
 
+# Private network so can use container names
+docker network create $PROJECT --driver bridge > /dev/null 2>&1
+# For easier restarts
+docker container prune --force > /dev/null 2>&1
+
 echo '#################################################################################'
 echo '#' Modify cluster config to use ${HOST_IP} and give it a few seconds to refresh
 echo '#################################################################################'

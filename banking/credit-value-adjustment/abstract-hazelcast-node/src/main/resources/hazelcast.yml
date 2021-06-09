@@ -44,6 +44,7 @@ hazelcast:
     'cva_cp_cds':
       near-cache:
         in-memory-format: OBJECT
+        name: 'cva_cp_cds_near_cache'
       merkle-tree:
         enabled: true
       wan-replication-ref:
