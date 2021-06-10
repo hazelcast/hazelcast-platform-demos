@@ -17,6 +17,8 @@
 	<properties>
 		<docker.image.name>grafana</docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
+                <my.mc.admin.user>${my.other.admin.user}</my.mc.admin.user>
+                <my.mc.admin.password>${my.other.admin.password}</my.mc.admin.password>
 	</properties>
 
 	<build>

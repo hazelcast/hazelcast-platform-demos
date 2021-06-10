@@ -1,8 +1,55 @@
 {
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus",
+      "description": "connected to Hazelcast Management Center (not the JMX exporter)",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "panel",
+      "id": "bargauge",
+      "name": "Bar Gauge",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "gauge",
+      "name": "Gauge",
+      "version": ""
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "6.7.3"
+    },
+    {
+      "type": "panel",
+      "id": "graph",
+      "name": "Graph",
+      "version": ""
+    },
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
+    }
+  ],
   "annotations": {
     "list": [
       {
-        "$$hashKey": "object:31",
         "builtIn": 1,
         "datasource": "-- Grafana --",
         "enable": true,
@@ -14,13 +61,14 @@
     ]
   },
   "editable": true,
-  "gnetId": null,
+  "gnetId": 13183,
   "graphTooltip": 0,
+  "id": null,
   "links": [],
   "panels": [
     {
       "collapsed": false,
-      "datasource": "Prometheus",
+      "datasource": "${DS_PROMETHEUS}",
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -33,23 +81,7 @@
       "type": "row"
     },
     {
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "none"
-        },
-        "overrides": []
-      },
+      "datasource": "${DS_PROMETHEUS}",
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -59,20 +91,31 @@
       "id": 8,
       "options": {
         "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
+        "fieldOptions": {
           "calcs": [
             "last"
           ],
-          "fields": "",
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                }
+              ]
+            },
+            "unit": "none"
+          },
+          "overrides": [],
           "values": false
         },
-        "text": {},
-        "textMode": "auto"
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto"
       },
-      "pluginVersion": "7.5.3",
+      "pluginVersion": "6.7.3",
       "targets": [
         {
           "expr": "max(hz_cluster_size)",
@@ -108,22 +151,7 @@
       "type": "stat"
     },
     {
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
+      "datasource": "${DS_PROMETHEUS}",
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -133,18 +161,29 @@
       "id": 10,
       "options": {
         "displayMode": "basic",
-        "orientation": "vertical",
-        "reduceOptions": {
+        "fieldOptions": {
           "calcs": [
             "mean"
           ],
-          "fields": "",
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": [],
           "values": false
         },
-        "showUnfilled": true,
-        "text": {}
+        "orientation": "vertical",
+        "showUnfilled": true
       },
-      "pluginVersion": "7.5.3",
+      "pluginVersion": "6.7.3",
       "targets": [
         {
           "expr": "hz_partitions_activePartitionCount",
@@ -163,13 +202,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "links": []
-        },
-        "overrides": []
-      },
+      "datasource": "${DS_PROMETHEUS}",
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -193,10 +226,9 @@
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "alertThreshold": true
+        "dataLinks": []
       },
       "percentage": false,
-      "pluginVersion": "7.5.3",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -232,7 +264,6 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:358",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -241,7 +272,6 @@
           "show": true
         },
         {
-          "$$hashKey": "object:359",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -256,27 +286,7 @@
       }
     },
     {
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 90
-              }
-            ]
-          },
-          "unit": "%"
-        },
-        "overrides": []
-      },
+      "datasource": "${DS_PROMETHEUS}",
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -285,19 +295,35 @@
       },
       "id": 12,
       "options": {
-        "orientation": "auto",
-        "reduceOptions": {
+        "fieldOptions": {
           "calcs": [
             "mean"
           ],
-          "fields": "",
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 90
+                }
+              ]
+            },
+            "unit": "%"
+          },
+          "overrides": [],
           "values": false
         },
+        "orientation": "auto",
         "showThresholdLabels": false,
-        "showThresholdMarkers": true,
-        "text": {}
+        "showThresholdMarkers": true
       },
-      "pluginVersion": "7.5.3",
+      "pluginVersion": "6.7.3",
       "targets": [
         {
           "expr": "(hz_memory_usedHeap{mc_member=~\".+\"} / (hz_memory_usedHeap{mc_member=~\".+\"} + hz_memory_freeHeap{mc_member=~\".+\"} ))*100",
@@ -313,7 +339,7 @@
     },
     {
       "collapsed": false,
-      "datasource": "Prometheus",
+      "datasource": "${DS_PROMETHEUS}",
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -330,13 +356,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "links": []
-        },
-        "overrides": []
-      },
+      "datasource": "${DS_PROMETHEUS}",
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -360,10 +380,9 @@
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "alertThreshold": true
+        "dataLinks": []
       },
       "percentage": false,
-      "pluginVersion": "7.5.3",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -399,7 +418,6 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:233",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -408,7 +426,6 @@
           "show": true
         },
         {
-          "$$hashKey": "object:234",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -427,13 +444,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "links": []
-        },
-        "overrides": []
-      },
+      "datasource": "${DS_PROMETHEUS}",
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -457,10 +468,9 @@
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "alertThreshold": true
+        "dataLinks": []
       },
       "percentage": false,
-      "pluginVersion": "7.5.3",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -508,7 +518,6 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:184",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -517,7 +526,6 @@
           "show": true
         },
         {
-          "$$hashKey": "object:185",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -533,7 +541,7 @@
     },
     {
       "collapsed": false,
-      "datasource": "Prometheus",
+      "datasource": "${DS_PROMETHEUS}",
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -550,13 +558,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "links": []
-        },
-        "overrides": []
-      },
+      "datasource": "${DS_PROMETHEUS}",
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -580,10 +582,9 @@
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "alertThreshold": true
+        "dataLinks": []
       },
       "percentage": false,
-      "pluginVersion": "7.5.3",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -631,7 +632,6 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:217",
           "format": "decmbytes",
           "label": null,
           "logBase": 1,
@@ -640,7 +640,6 @@
           "show": true
         },
         {
-          "$$hashKey": "object:218",
           "format": "decmbytes",
           "label": null,
           "logBase": 1,
@@ -659,13 +658,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "links": []
-        },
-        "overrides": []
-      },
+      "datasource": "${DS_PROMETHEUS}",
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -689,10 +682,9 @@
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "alertThreshold": true
+        "dataLinks": []
       },
       "percentage": false,
-      "pluginVersion": "7.5.3",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -740,7 +732,6 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:106",
           "format": "ms",
           "label": null,
           "logBase": 1,
@@ -749,7 +740,6 @@
           "show": true
         },
         {
-          "$$hashKey": "object:107",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -768,13 +758,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "links": []
-        },
-        "overrides": []
-      },
+      "datasource": "${DS_PROMETHEUS}",
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -797,8 +781,10 @@
       "lines": true,
       "linewidth": 1,
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
-      "pluginVersion": "7.5.3",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -852,7 +838,6 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:308",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -861,7 +846,6 @@
           "show": true
         },
         {
-          "$$hashKey": "object:309",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -876,25 +860,7 @@
       }
     },
     {
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "mappings": [],
-          "max": 1,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "percentunit"
-        },
-        "overrides": []
-      },
+      "datasource": "${DS_PROMETHEUS}",
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -903,19 +869,33 @@
       },
       "id": 28,
       "options": {
-        "orientation": "auto",
-        "reduceOptions": {
+        "fieldOptions": {
           "calcs": [
             "mean"
           ],
-          "fields": "",
+          "defaults": {
+            "mappings": [],
+            "max": 1,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                }
+              ]
+            },
+            "unit": "percentunit"
+          },
+          "overrides": [],
           "values": false
         },
+        "orientation": "auto",
         "showThresholdLabels": false,
-        "showThresholdMarkers": true,
-        "text": {}
+        "showThresholdMarkers": true
       },
-      "pluginVersion": "7.5.3",
+      "pluginVersion": "6.7.3",
       "targets": [
         {
           "expr": "hz_nearcache_hits / (hz_nearcache_hits + hz_nearcache_misses)",
@@ -930,8 +910,8 @@
       "type": "gauge"
     }
   ],
-  "refresh": "5s",
-  "schemaVersion": 27,
+  "refresh": "3s",
+  "schemaVersion": 22,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -949,5 +929,9 @@
   "timezone": "",
   "title": "Hazelcast Default",
   "uid": "GiokMJ5Mz",
-  "version": 1
+  "variables": {
+    "list": []
+  },
+  "version": 23,
+  "description": "Dashboard for monitoring Hazelcast IMDG clusters."
 }
