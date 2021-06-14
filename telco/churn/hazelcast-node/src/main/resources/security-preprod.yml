@@ -43,6 +43,9 @@ hazelcast:
       realm: c2s
 
     client-permissions:
+      management:
+        # Management Center, from hazelcast-client-cluster1.xml
+        - principal: "ManagementCenter"
       map:
         # Management Center, from hazelcast-client-cluster1.xml, allow everything (limited is better)
         - name: "*"
