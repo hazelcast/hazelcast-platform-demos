@@ -26,11 +26,14 @@
 
 		<my.cluster1.name>turbine</my.cluster1.name>
 
+		<my.management.center.name>${docker.image.prefix}-management-center</my.management.center.name>
 		<my.mc.admin.user>${my.other.admin.user}</my.mc.admin.user>
 		<my.mc.admin.password>${my.other.admin.password}</my.mc.admin.password>
 		<my.mc.cluster1.name>${my.cluster1.name}</my.mc.cluster1.name>
 		<my.mc.cluster1.addresslist>${docker.image.prefix}-${my.cluster1.name}-hazelcast.default.svc.cluster.local</my.mc.cluster1.addresslist>
 		<my.mc.license.key>${my.license.key}</my.mc.license.key>
+		<my.prometheus.name>${docker.image.prefix}-prometheus</my.prometheus.name>
+		<my.prometheus.port>9090</my.prometheus.port>
 	</properties>
 
 	<modules>
@@ -38,6 +41,9 @@
 		<module>hazelcast-initializer</module>
 		<module>hazelcast-node</module>
 
+		<!--
+		<module>cassandra</module>
+		-->
 		<module>grafana</module>
 		<module>management-center</module>
 		<module>postgres</module>
@@ -54,6 +60,10 @@
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-enterprise</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-kubernetes</artifactId>
 		</dependency>
 
 		<dependency>

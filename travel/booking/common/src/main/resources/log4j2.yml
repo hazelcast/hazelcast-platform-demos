@@ -34,6 +34,12 @@ Configuration:
           additivity: false
           AppenderRef:
             ref: ConsoleCyan
+        # First cluster member triggers WARN from Kubernetes as nothing else in StatefulSet
+        - name: com.hazelcast.spi.discovery.integration.DiscoveryService
+          level: error
+          additivity: false
+          AppenderRef:
+            ref: ConsoleRed
         - name: com.hazelcast.platform.demos
           level: debug
           additivity: false
@@ -41,6 +47,11 @@ Configuration:
             ref: ConsoleYellow
         - name: com.hazelcast.platform.demos.travel.booking.Application
           level: error
+          additivity: false
+          AppenderRef:
+            ref: ConsoleRed
+        - name: com.hazelcast.system.logo
+          level: info
           additivity: false
           AppenderRef:
             ref: ConsoleMagenta
