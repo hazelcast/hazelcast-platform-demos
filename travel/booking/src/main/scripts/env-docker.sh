@@ -16,8 +16,10 @@ else
 fi
 
 # Private network so can use container names
-if [ `docker network list | awk '{print $2}' | grep -c $PROJECT` -ne 1 ]
+if [ `docker network list | awk '{print $2}' | grep -c $PROJECT` -eq 0 ]
 then
+ # "network prune" helps if two scripts start concurrently, "network list" may be incorrect
+ docker network prune --force > /dev/null 2>&1
  docker network create $PROJECT --driver bridge > /dev/null 2>&1
 fi
 

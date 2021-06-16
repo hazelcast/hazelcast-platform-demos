@@ -1,0 +1,201 @@
+---
+# Service DNS for Hazelcast grid will be "booking-turbine-hazelcast.default.svc.cluster.local".
+# Service DNS for Grafana will be "booking-grafana.default.svc.cluster.local".
+# Service DNS for Management Center will be "booking-management-center.default.svc.cluster.local".
+# Service DNS for Prometheus will be "booking-prometheus.default.svc.cluster.local".
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$ SERVICE DEFINITIONS $$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Service for Hazelcast grid
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: booking-turbine-hazelcast
+spec:
+  clusterIP: None
+  selector:
+    app: booking-turbine-hazelcast
+  ports:
+---
+# Service for Grafana
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: booking-grafana
+spec:
+  selector:
+    app: booking-grafana
+  ports:
+    - name: grafana
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer
+---
+# Service for Prometheus
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: booking-prometheus
+spec:
+  selector:
+    app: booking-prometheus
+  ports:
+    - name: prometheus
+      port: 9090
+      targetPort: 9090
+  type: LoadBalancer
+---
+# Service for Management Center
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: booking-management-center
+spec:
+  selector:
+    app: booking-management-center
+  ports:
+    - name: management-center
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$ POD DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Pods for Hazelcast grid
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: booking-turbine-hazelcast
+spec:
+  replicas: 2
+  serviceName: booking-turbine-hazelcast
+  selector:
+    matchLabels:
+      app: booking-turbine-hazelcast
+  template:
+    metadata:
+      labels:
+        app: booking-turbine-hazelcast
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/booking-hazelcast-node"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /hazelcast/health/node-state
+              port: 5701
+          name: booking-turbine-hazelcast-container
+          readinessProbe:
+            httpGet:
+              path: /hazelcast/health/ready
+              port: 5701
+---
+# Pod for Grafana
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-grafana
+spec:
+  selector:
+    matchLabels:
+      app: booking-grafana
+  template:
+    metadata:
+      labels:
+        app: booking-grafana
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/booking-grafana"
+          imagePullPolicy: Never
+          name: booking-grafana-container
+---
+# Pod for Management Center
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-management-center
+spec:
+  selector:
+    matchLabels:
+      app: booking-management-center
+  template:
+    metadata:
+      labels:
+        app: booking-management-center
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/booking-management-center"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+          name: booking-management-center-container
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 10
+---
+# Pod for Prometheus
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-prometheus
+spec:
+  selector:
+    matchLabels:
+      app: booking-prometheus
+  template:
+    metadata:
+      labels:
+        app: booking-prometheus
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/booking-prometheus"
+          imagePullPolicy: Never
+          name: booking-prometheus-container
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$ JOB DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Job for Hazelcast initializer
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: booking-job-hazelcast-initializer
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: booking-job-hazelcast-initializer
+    spec:
+      initContainers:
+        - name: wait-for-hazelcast-cluster
+          image: busybox
+          command: ['sh', '-c', 'until `wget --spider booking-turbine-hazelcast.default.svc.cluster.local:5701/hazelcast/health/ready > /dev/null 2>&1` ; do echo sleep 5 ; sleep 5 ; done']
+      containers:
+        - image: "hazelcast-platform-demos/booking-hazelcast-initializer"
+          imagePullPolicy: Never
+          name: booking-job-hazelcast-initializer-container
+      restartPolicy: Never
+---
