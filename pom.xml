@@ -14,8 +14,10 @@
 
 	<modules>
 		<module>banking</module>
+		<!-- Until converted to 5.0
 		<module>ml</module>
 		<module>telco</module>
+		-->
 		<module>travel</module>
 	</modules>
 
@@ -38,10 +40,9 @@
 		<guava.version>29.0-jre</guava.version>
                 <!-- Matches banking/credit-value-adjustment/cpp/Dockerfile2 -->
 		<grpc.version>1.31.1</grpc.version>
-		<hazelcast.version>4.2</hazelcast.version>
-		<hazelcast-jet.version>4.5</hazelcast-jet.version>
+		<hazelcast.version>5.0-SNAPSHOT</hazelcast.version>
 		<hazelcast-jet-spring-boot-starter.version>2.0.1</hazelcast-jet-spring-boot-starter.version>
-		<hazelcast-kubernetes.version>2.2.2</hazelcast-kubernetes.version>
+		<hazelcast-kubernetes.version>2.2.3</hazelcast-kubernetes.version>
 		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
 		<jackson.version>2.11.3</jackson.version>
 		<json.version>20190722</json.version>
@@ -142,43 +143,33 @@
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>
-				<artifactId>hazelcast-jet</artifactId>
-				<version>${hazelcast-jet.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.hazelcast.jet</groupId>
 				<artifactId>hazelcast-jet-cdc-debezium</artifactId>
-				<version>${hazelcast-jet.version}</version>
+				<version>${hazelcast.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>
 				<artifactId>hazelcast-jet-cdc-mysql</artifactId>
-				<version>${hazelcast-jet.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.hazelcast.jet</groupId>
-				<artifactId>hazelcast-jet-enterprise</artifactId>
-				<version>${hazelcast-jet.version}</version>
+				<version>${hazelcast.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>
 				<artifactId>hazelcast-jet-grpc</artifactId>
-				<version>${hazelcast-jet.version}</version>
+				<version>${hazelcast.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>
 				<artifactId>hazelcast-jet-kafka</artifactId>
-				<version>${hazelcast-jet.version}</version>
+				<version>${hazelcast.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>
 				<artifactId>hazelcast-jet-python</artifactId>
-				<version>${hazelcast-jet.version}</version>
+				<version>${hazelcast.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>
 				<artifactId>hazelcast-jet-sql</artifactId>
-				<version>${hazelcast-jet.version}</version>
+				<version>${hazelcast.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet.contrib</groupId>

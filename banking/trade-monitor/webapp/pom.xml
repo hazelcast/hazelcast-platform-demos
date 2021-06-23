@@ -21,8 +21,8 @@
 		<main.class>com.hazelcast.platform.demos.banking.trademonitor.Application</main.class>
 
 		<!-- See comment on maven-resources-plugin -->
-        <frontend.app.dir>${project.basedir}/src/main/app</frontend.app.dir>
-	
+		<frontend.app.dir>${project.basedir}/src/main/app</frontend.app.dir>
+
 		<node.version>v14.16.0</node.version>
 		<yarn.version>v1.22.5</yarn.version>
 	</properties>
@@ -35,12 +35,8 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet-sql</artifactId>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-sql</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast</groupId>
@@ -64,7 +60,7 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-	
+
 		<plugins>
 			<plugin>
 				<groupId>com.github.eirslett</groupId>

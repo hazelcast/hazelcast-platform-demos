@@ -25,7 +25,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hazelcast.jet.JetInstance;
+import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.config.ProcessingGuarantee;
 import com.hazelcast.jet.datamodel.Tuple3;
@@ -47,12 +47,12 @@ public class ApplicationInitializer {
      * hold processing results. Launch the Jet jobs for this example.
      * </p>
      */
-    public static void initialise(JetInstance jetInstance, String bootstrapServers) throws Exception {
-        addListeners(jetInstance);
-        createNeededObjects(jetInstance);
-        loadNeededData(jetInstance, bootstrapServers);
-        defineQueryableObjects(bootstrapServers, jetInstance);
-        launchNeededJobs(jetInstance, bootstrapServers);
+    public static void initialise(HazelcastInstance hazelcastInstance, String bootstrapServers) throws Exception {
+        addListeners(hazelcastInstance);
+        createNeededObjects(hazelcastInstance);
+        loadNeededData(hazelcastInstance, bootstrapServers);
+        defineQueryableObjects(hazelcastInstance, bootstrapServers);
+        launchNeededJobs(hazelcastInstance, bootstrapServers);
     }
 
 
@@ -60,12 +60,13 @@ public class ApplicationInitializer {
      * <p>Logging listeners.
      * </p>
      *
-     * @param jetInstance
+     * @param hazelcastInstance
      */
-    static void addListeners(JetInstance jetInstance) {
-        MyMembershipListener myMembershipListener = new MyMembershipListener(jetInstance.getHazelcastInstance());
-        jetInstance.getHazelcastInstance().getCluster().addMembershipListener(myMembershipListener);
+    static void addListeners(HazelcastInstance hazelcastInstance) {
+        MyMembershipListener myMembershipListener = new MyMembershipListener(hazelcastInstance);
+        hazelcastInstance.getCluster().addMembershipListener(myMembershipListener);
     }
+
 
     /**
      * <p>Access the {@link com.hazelcast.map.IMap} and other objects
@@ -73,9 +74,9 @@ public class ApplicationInitializer {
      * access, so ensuring all are visible from the outset.
      * </p>
      */
-    static void createNeededObjects(JetInstance jetInstance) {
+    static void createNeededObjects(HazelcastInstance hazelcastInstance) {
         for (String iMapName : MyConstants.IMAP_NAMES) {
-            jetInstance.getHazelcastInstance().getMap(iMapName);
+            hazelcastInstance.getMap(iMapName);
         }
     }
 
@@ -88,11 +89,11 @@ public class ApplicationInitializer {
      * a {@link com.hazelcast.map.IMap}.
      * </p>
      */
-    static void loadNeededData(JetInstance jetInstance, String bootstrapServers) throws Exception {
+    static void loadNeededData(HazelcastInstance hazelcastInstance, String bootstrapServers) throws Exception {
         IMap<String, String> kafkaConfigMap =
-                jetInstance.getMap(MyConstants.IMAP_NAME_KAFKA_CONFIG);
+                hazelcastInstance.getMap(MyConstants.IMAP_NAME_KAFKA_CONFIG);
         IMap<String, SymbolInfo> symbolsMap =
-                jetInstance.getMap(MyConstants.IMAP_NAME_SYMBOLS);
+                hazelcastInstance.getMap(MyConstants.IMAP_NAME_SYMBOLS);
 
         if (!kafkaConfigMap.isEmpty()) {
             LOGGER.trace("Skip loading '{}', not empty", kafkaConfigMap.getName());
@@ -137,9 +138,9 @@ public class ApplicationInitializer {
      * <p>Define Hazelcast maps &amp; Kafka topics for later SQL querying.
      * </p>
      */
-    static void defineQueryableObjects(String bootstrapServers, JetInstance jetInstance) {
-        defineKafka(bootstrapServers, jetInstance);
-        defineIMap(jetInstance);
+    static void defineQueryableObjects(HazelcastInstance hazelcastInstance, String bootstrapServers) {
+        defineKafka(hazelcastInstance, bootstrapServers);
+        defineIMap(hazelcastInstance);
     }
 
 
@@ -150,7 +151,7 @@ public class ApplicationInitializer {
      *
      * @param bootstrapServers
      */
-    static void defineKafka(String bootstrapServers, JetInstance jetInstance) {
+    static void defineKafka(HazelcastInstance hazelcastInstance, String bootstrapServers) {
         String definition1 = "CREATE EXTERNAL MAPPING IF NOT EXISTS "
                 // Name for our SQL
                 + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRADES
@@ -173,7 +174,7 @@ public class ApplicationInitializer {
                 + " 'bootstrap.servers' = '" + bootstrapServers + "'"
                 + " )";
 
-        define(definition1, jetInstance);
+        define(definition1, hazelcastInstance);
     }
 
 
@@ -182,9 +183,9 @@ public class ApplicationInitializer {
      * {@link IMap}.
      * </p>
      *
-     * @param jetInstance
+     * @param hazelcastInstance
      */
-    static void defineIMap(JetInstance jetInstance) {
+    static void defineIMap(HazelcastInstance hazelcastInstance) {
         String definition1 = "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS
                 + " TYPE IMap "
@@ -225,10 +226,10 @@ public class ApplicationInitializer {
                 + " 'valueJavaClass' = '" + String.class.getCanonicalName() + "'"
                 + " )";
 
-        define(definition1, jetInstance);
-        define(definition2, jetInstance);
-        define(definition3, jetInstance);
-        define(definition4, jetInstance);
+        define(definition1, hazelcastInstance);
+        define(definition2, hazelcastInstance);
+        define(definition3, hazelcastInstance);
+        define(definition4, hazelcastInstance);
     }
 
 
@@ -237,15 +238,21 @@ public class ApplicationInitializer {
      * </p>
      *
      * @param definition
-     * @param jetInstance
+     * @param hazelcastInstance
      */
-    static void define(String definition, JetInstance jetInstance) {
-        LOGGER.trace("Definition '{}'", definition);
+    static void define(String definition, HazelcastInstance hazelcastInstance) {
+        LOGGER.info("Definition '{}'", definition);
+        LOGGER.error("https://github.com/hazelcast/hazelcast/issues/18959");
+        LOGGER.error("https://github.com/hazelcast/hazelcast/issues/18959");
+        LOGGER.error("https://github.com/hazelcast/hazelcast/issues/18959");
+        LOGGER.error("https://github.com/hazelcast/hazelcast/issues/18959");
+        LOGGER.error("https://github.com/hazelcast/hazelcast/issues/18959");
+        /*FIXME https://github.com/hazelcast/hazelcast/issues/18959
         try {
-            jetInstance.getSql().execute(definition);
+            hazelcastInstance.getSql().execute(definition);
         } catch (Exception e) {
             LOGGER.error(definition, e);
-        }
+        }*/
     }
 
 
@@ -262,9 +269,9 @@ public class ApplicationInitializer {
      * <p>Both jobs need the Kafka connection, a list of brokers.
      * </p>
      */
-    static void launchNeededJobs(JetInstance jetInstance, String bootstrapServers) {
+    static void launchNeededJobs(HazelcastInstance hazelcastInstance, String bootstrapServers) {
         // Only do this for the first node.
-        if (jetInstance.getCluster().getMembers().size() != 1) {
+        if (hazelcastInstance.getCluster().getMembers().size() != 1) {
             return;
         }
 
@@ -275,7 +282,7 @@ public class ApplicationInitializer {
         jobConfigIngestTrades.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
         jobConfigIngestTrades.setName(IngestTrades.class.getSimpleName());
 
-        jetInstance.newJobIfAbsent(pipelineIngestTrades, jobConfigIngestTrades);
+        hazelcastInstance.getJet().newJobIfAbsent(pipelineIngestTrades, jobConfigIngestTrades);
 
         // Trade aggregation
         Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(bootstrapServers);
@@ -284,7 +291,7 @@ public class ApplicationInitializer {
         jobConfigAggregateQuery.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
         jobConfigAggregateQuery.setName(AggregateQuery.class.getSimpleName());
 
-        jetInstance.newJobIfAbsent(pipelineAggregateQuery, jobConfigAggregateQuery);
+        hazelcastInstance.getJet().newJobIfAbsent(pipelineAggregateQuery, jobConfigAggregateQuery);
 
     }
 

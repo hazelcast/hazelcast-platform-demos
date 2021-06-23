@@ -20,10 +20,10 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.UUID;
 
+import com.hazelcast.config.ClasspathYamlConfig;
+import com.hazelcast.config.Config;
 import com.hazelcast.config.JoinConfig;
 import com.hazelcast.config.TcpIpConfig;
-import com.hazelcast.jet.config.JetConfig;
-import com.hazelcast.jet.impl.config.YamlJetConfigBuilder;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -51,10 +51,10 @@ public class ApplicationConfig {
      * for more details.
      * </p>
      */
-    public static JetConfig buildJetConfig() {
-        JetConfig jetConfig = new YamlJetConfigBuilder().build();
+    public static Config buildConfig() {
+        Config config = new ClasspathYamlConfig("hazelcast.yml");
 
-        JoinConfig joinConfig = jetConfig.getHazelcastConfig().getNetworkConfig().getJoin();
+        JoinConfig joinConfig = config.getNetworkConfig().getJoin();
 
         if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
             LOGGER.info("Kubernetes configuration: service-dns: {}",
@@ -69,7 +69,7 @@ public class ApplicationConfig {
                 String dockerHost = publicAddress.split(":")[0];
                 String port = publicAddress.split(":")[1];
                 tcpIpConfig.setMembers(Arrays.asList(dockerHost + ":5701", dockerHost + ":5702", dockerHost + ":5703"));
-                jetConfig.getHazelcastConfig().getNetworkConfig().setPort(Integer.parseInt(port));
+                config.getNetworkConfig().setPort(Integer.parseInt(port));
             } else {
                 tcpIpConfig.setMembers(Arrays.asList("127.0.0.1"));
             }
@@ -80,7 +80,7 @@ public class ApplicationConfig {
                     tcpIpConfig.getMembers());
         }
 
-        return jetConfig;
+        return config;
     }
 
     /**
