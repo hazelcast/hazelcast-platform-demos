@@ -67,7 +67,7 @@ public class Pi2IT extends AbstractJetIT {
         JobConfig jobConfig = new JobConfig();
         jobConfig.setName(testInfo.getDisplayName());
 
-        jetInstance.newJob(pipeline, jobConfig).join();
+        hazelcastInstance.getJet().newJob(pipeline, jobConfig).join();
     }
 
     /**
@@ -95,7 +95,7 @@ public class Pi2IT extends AbstractJetIT {
         JobConfig jobConfig = new JobConfig();
         jobConfig.setName(testInfo.getDisplayName());
 
-        jetInstance.newJob(pipeline, jobConfig).join();
+        hazelcastInstance.getJet().newJob(pipeline, jobConfig).join();
     }
 
     /**
@@ -129,7 +129,7 @@ public class Pi2IT extends AbstractJetIT {
         JobConfig jobConfig = new JobConfig();
         jobConfig.setName(testInfo.getDisplayName());
 
-        jetInstance.newJob(pipeline, jobConfig).join();
+        hazelcastInstance.getJet().newJob(pipeline, jobConfig).join();
     }
 
 }

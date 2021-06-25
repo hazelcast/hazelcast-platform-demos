@@ -21,7 +21,7 @@ import java.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hazelcast.jet.JetInstance;
+import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.jet.Job;
 import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.pipeline.Pipeline;
@@ -50,16 +50,16 @@ public class CvaStpJobSubmitter {
      * be huge.
      * </p>
      *
-     * @param jetInstance Used to find similar named jobs
+     * @param hazelcastInstance Used to find similar named jobs
      * @param calcDate Calculation date to use
      * @return The job if submitted
      * @throws Exception If the job is rejected as a duplicate is still running
      */
-    public static Job submitCvaStpJob(JetInstance jetInstance, LocalDate calcDate) throws Exception {
+    public static Job submitCvaStpJob(HazelcastInstance hazelcastInstance, LocalDate calcDate) throws Exception {
         boolean debug = false;
         int batchSize = MyConstants.DEFAULT_BATCH_SIZE;
         int parallelism = 1;
-        return CvaStpJobSubmitter.submitCvaStpJob(jetInstance, calcDate, batchSize, parallelism, debug);
+        return CvaStpJobSubmitter.submitCvaStpJob(hazelcastInstance, calcDate, batchSize, parallelism, debug);
     }
 
     /**
@@ -72,7 +72,7 @@ public class CvaStpJobSubmitter {
      * a suffix.
      * </p>
      *
-     * @param jetInstance Used to find similar named jobs
+     * @param hazelcastInstance Used to find similar named jobs
      * @param calcDate Calculation date to use
      * @param batchSize How many calcs to pass to C++
      * @param parallelism How many C++ workers to each each Jet
@@ -80,7 +80,7 @@ public class CvaStpJobSubmitter {
      * @return The job if submitted
      * @throws Exception If the job is rejected as a duplicate is still running
      */
-    public static Job submitCvaStpJob(JetInstance jetInstance, LocalDate calcDate,
+    public static Job submitCvaStpJob(HazelcastInstance hazelcastInstance, LocalDate calcDate,
             int batchSize, int parallelism, boolean debug) throws Exception {
         long timestamp = System.currentTimeMillis();
         String timestampStr = MyUtils.timestampToISO8601(timestamp);
@@ -96,13 +96,13 @@ public class CvaStpJobSubmitter {
         jobConfig.setName(jobName);
         jobConfig.addClass(CvaStpJob.class);
 
-        Job job = MyUtils.findRunningJobsWithSamePrefix(jobNamePrefix, jetInstance);
+        Job job = MyUtils.findRunningJobsWithSamePrefix(jobNamePrefix, hazelcastInstance);
         if (job != null) {
             String message = String.format("Previous job '%s' id=='%d' still at status '%s'",
                     job.getName(), job.getId(), job.getStatus());
             throw new RuntimeException(message);
         } else {
-            return jetInstance.newJobIfAbsent(pipeline, jobConfig);
+            return hazelcastInstance.getJet().newJobIfAbsent(pipeline, jobConfig);
         }
     }
 

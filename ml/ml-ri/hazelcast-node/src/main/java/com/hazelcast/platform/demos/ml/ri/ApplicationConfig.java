@@ -18,10 +18,10 @@ package com.hazelcast.platform.demos.ml.ri;
 
 import java.util.Arrays;
 
+import com.hazelcast.config.ClasspathYamlConfig;
+import com.hazelcast.config.Config;
 import com.hazelcast.config.JoinConfig;
 import com.hazelcast.config.TcpIpConfig;
-import com.hazelcast.jet.config.JetConfig;
-import com.hazelcast.jet.impl.config.YamlJetConfigBuilder;
 
 /**
  * <p>Non-default configuration for Jet, to allow this example to run in Kubernetes (by default),
@@ -43,10 +43,10 @@ public class ApplicationConfig {
      * for more details.
      * </p>
      */
-    public static JetConfig buildJetConfig() {
-        JetConfig jetConfig = new YamlJetConfigBuilder().build();
+    public static Config buildConfig() {
+        Config config = new ClasspathYamlConfig("hazelcast.yml");
 
-        JoinConfig joinConfig = jetConfig.getHazelcastConfig().getNetworkConfig().getJoin();
+        JoinConfig joinConfig = config.getNetworkConfig().getJoin();
 
         if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
             System.out.println("Kubernetes configuration: service-dns: "
@@ -68,7 +68,7 @@ public class ApplicationConfig {
                     + tcpIpConfig.getMembers());
         }
 
-        return jetConfig;
+        return config;
     }
 
 }

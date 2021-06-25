@@ -22,9 +22,7 @@
         </properties>
 
         <modules>
-		<!-- Until converted to 5.0
         	<module>credit-value-adjustment</module>
-		-->
         	<module>trade-monitor</module>
         </modules>
 

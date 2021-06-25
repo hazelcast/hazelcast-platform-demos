@@ -30,12 +30,12 @@
 			<artifactId>hazelcast-kubernetes</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet-grpc</artifactId>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-spring</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.hazelcast.jet.contrib</groupId>
-			<artifactId>hazelcast-jet-spring-boot-starter</artifactId>
+			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet-grpc</artifactId>
 		</dependency>
 	</dependencies>
 

@@ -51,7 +51,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
-import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.Job;
 import com.hazelcast.map.IMap;
 import com.hazelcast.platform.demos.banking.cva.MyConstants;
@@ -72,7 +71,7 @@ public class MyRestController {
     @Autowired
     private HazelcastInstance hazelcastInstance;
     @Autowired
-    private JetInstance jetInstance;
+    private HazelcastInstance jetInstance;
     @Autowired
     private MyProperties myProperties;
 

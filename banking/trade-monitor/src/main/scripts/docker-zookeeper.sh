@@ -13,7 +13,7 @@ docker network create $PROJECT --driver bridge > /dev/null 2>&1
 # For easier restarts
 docker container prune --force > /dev/null 2>&1
 
-CMD="docker run -e ALLOW_ANONYMOUS_LOGIN=yes --name=${MODULE} --network=${PROJECT} ${DOCKER_IMAGE}"
+CMD="docker run -e ALLOW_ANONYMOUS_LOGIN=yes --name=${MODULE} --rm --network=${PROJECT} ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD

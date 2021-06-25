@@ -23,8 +23,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
-import com.hazelcast.jet.JetInstance;
 
 /**
  * <p>Ensure the server is in a ready state, by requesting all the
@@ -37,7 +37,7 @@ public class ApplicationInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInitializer.class);
 
     @Autowired
-    private JetInstance jetInstance;
+    private HazelcastInstance hazelcastInstance;
     //@Autowired
     //private MyProperties myProperties;
 
@@ -83,10 +83,10 @@ public class ApplicationInitializer {
      */
     private void createNeededObjects() {
         for (String iMapName : MyConstants.IMAP_NAMES) {
-            this.jetInstance.getHazelcastInstance().getMap(iMapName);
+            this.hazelcastInstance.getMap(iMapName);
         }
         for (String iTopicName : MyConstants.ITOPIC_NAMES) {
-            this.jetInstance.getHazelcastInstance().getTopic(iTopicName);
+            this.hazelcastInstance.getTopic(iTopicName);
         }
     }
 
@@ -278,7 +278,7 @@ public class ApplicationInitializer {
     private void define(String definition) {
         LOGGER.trace("Definition '{}'", definition);
         try {
-            this.jetInstance.getSql().execute(definition);
+            this.hazelcastInstance.getSql().execute(definition);
         } catch (Exception e) {
             LOGGER.error(definition, e);
         }

@@ -30,7 +30,7 @@ docker container prune --force > /dev/null 2>&1
 
 PORT=$(($CLONE + 5701))
 
-CMD="docker run -e MY_BOOTSTRAP_SERVERS=$MY_BOOTSTRAP_SERVERS -e MY_KUBERNETES_ENABLED=false -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP}:${PORT} -p ${PORT}:${PORT} --name=${MODULE}${CLONE} --network=${PROJECT} ${DOCKER_IMAGE}"
+CMD="docker run -e MY_BOOTSTRAP_SERVERS=$MY_BOOTSTRAP_SERVERS -e MY_KUBERNETES_ENABLED=false -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP}:${PORT} -p ${PORT}:${PORT} --name=${MODULE}${CLONE} --rm --network=${PROJECT} ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD

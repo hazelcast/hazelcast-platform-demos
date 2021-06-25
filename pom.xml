@@ -14,10 +14,8 @@
 
 	<modules>
 		<module>banking</module>
-		<!-- Until converted to 5.0
 		<module>ml</module>
 		<module>telco</module>
-		-->
 		<module>travel</module>
 	</modules>
 
@@ -41,7 +39,6 @@
                 <!-- Matches banking/credit-value-adjustment/cpp/Dockerfile2 -->
 		<grpc.version>1.31.1</grpc.version>
 		<hazelcast.version>5.0-SNAPSHOT</hazelcast.version>
-		<hazelcast-jet-spring-boot-starter.version>2.0.1</hazelcast-jet-spring-boot-starter.version>
 		<hazelcast-kubernetes.version>2.2.3</hazelcast-kubernetes.version>
 		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
 		<jackson.version>2.11.3</jackson.version>
@@ -138,6 +135,11 @@
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast</groupId>
+				<artifactId>hazelcast-spring</artifactId>
+				<version>${hazelcast.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.hazelcast</groupId>
 				<artifactId>hazelcast-sql</artifactId>
 				<version>${hazelcast.version}</version>
 			</dependency>
@@ -170,11 +172,6 @@
 				<groupId>com.hazelcast.jet</groupId>
 				<artifactId>hazelcast-jet-sql</artifactId>
 				<version>${hazelcast.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.hazelcast.jet.contrib</groupId>
-				<artifactId>hazelcast-jet-spring-boot-starter</artifactId>
-				<version>${hazelcast-jet-spring-boot-starter.version}</version>
 			</dependency>
 
 			<dependency>

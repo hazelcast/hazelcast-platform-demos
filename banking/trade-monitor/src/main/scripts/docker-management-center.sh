@@ -29,7 +29,7 @@ docker network create $PROJECT --driver bridge > /dev/null 2>&1
 # For easier restarts
 docker container prune --force > /dev/null 2>&1
 
-CMD="docker run -e JAVA_ARGS=-Dhazelcast.mc.healthCheck.enable=true -p 8080:8080 ${DOCKER_IMAGE}"
+CMD="docker run -e JAVA_ARGS=-Dhazelcast.mc.healthCheck.enable=true -p 8080:8080 --rm ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD

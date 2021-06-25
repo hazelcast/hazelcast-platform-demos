@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import com.hazelcast.config.ClasspathYamlConfig;
+import com.hazelcast.config.Config;
 import com.hazelcast.config.DiscoveryConfig;
 import com.hazelcast.config.DiscoveryStrategyConfig;
 import com.hazelcast.config.MapConfig;
@@ -29,8 +31,6 @@ import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.config.TcpIpConfig;
 import com.hazelcast.config.WanBatchPublisherConfig;
 import com.hazelcast.config.WanReplicationConfig;
-import com.hazelcast.jet.config.JetConfig;
-import com.hazelcast.jet.impl.config.YamlJetConfigBuilder;
 import com.hazelcast.platform.demos.banking.cva.MyConstants.Site;
 
 import org.slf4j.Logger;
@@ -109,21 +109,21 @@ public class ApplicationConfig {
      * </p>
      */
     @Bean
-    public JetConfig jetConfig() {
-        JetConfig jetConfig = new YamlJetConfigBuilder().build();
-        this.logProperties(jetConfig);
+    public Config config() {
+        Config config = new ClasspathYamlConfig("hazelcast.yml");
+        this.logProperties(config);
 
-        this.adjustNearCacheConfig(jetConfig.getHazelcastConfig().getMapConfigs());
+        this.adjustNearCacheConfig(config.getMapConfigs());
 
-        NetworkConfig networkConfig = jetConfig.getHazelcastConfig().getNetworkConfig();
+        NetworkConfig networkConfig = config.getNetworkConfig();
 
         if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
-            this.addWanConfig(jetConfig.getHazelcastConfig().getWanReplicationConfigs());
+            this.addWanConfig(config.getWanReplicationConfigs());
 
             LOGGER.info("Kubernetes configuration: service-dns: {}",
                     networkConfig.getJoin().getKubernetesConfig().getProperty("service-dns"));
         } else {
-            this.removeWanConfig(jetConfig.getHazelcastConfig().getMapConfigs());
+            this.removeWanConfig(config.getMapConfigs());
 
             networkConfig.getJoin().getKubernetesConfig().setEnabled(false);
 
@@ -142,7 +142,7 @@ public class ApplicationConfig {
                     tcpIpConfig.getMembers());
         }
 
-        return jetConfig;
+        return config;
     }
 
     /**
@@ -151,13 +151,13 @@ public class ApplicationConfig {
      *
      * @param jetConfig Loaded from Yaml
      */
-    private void logProperties(JetConfig jetConfig) {
-        Properties properties = jetConfig.getProperties();
+    private void logProperties(Config config) {
+        Properties properties = config.getProperties();
         for (Map.Entry<?, ?> propertyEntry : properties.entrySet()) {
             LOGGER.info("Property '{}'=='{}'",
                     propertyEntry.getKey(), propertyEntry.getValue());
         }
-        properties = jetConfig.getHazelcastConfig().getProperties();
+        properties = config.getProperties();
         for (Map.Entry<?, ?> propertyEntry : properties.entrySet()) {
             LOGGER.info("Property '{}'=='{}'",
                     propertyEntry.getKey(), propertyEntry.getValue());

@@ -20,9 +20,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
 import com.hazelcast.config.Config;
-import com.hazelcast.jet.Jet;
-import com.hazelcast.jet.JetInstance;
-import com.hazelcast.jet.config.JetConfig;
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.jet.python.PythonServiceConfig;
 
 /**
@@ -31,7 +30,7 @@ import com.hazelcast.jet.python.PythonServiceConfig;
  */
 public abstract class AbstractJetIT {
 
-    protected static JetInstance jetInstance;
+    protected static HazelcastInstance hazelcastInstance;
     protected static PythonServiceConfig pythonServiceConfig;
 
     @BeforeAll
@@ -39,15 +38,14 @@ public abstract class AbstractJetIT {
         Config config = new Config();
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
 
-        JetConfig jetConfig = new JetConfig();
-        jetConfig.setHazelcastConfig(config);
+        config.getJetConfig().setResourceUploadEnabled(true);
 
-        jetInstance = Jet.newJetInstance(jetConfig);
+        hazelcastInstance = Hazelcast.newHazelcastInstance(config);
     }
 
     @AfterAll
     public static void afterAll() {
-        jetInstance.shutdown();
+        hazelcastInstance.shutdown();
     }
 
 }

@@ -26,8 +26,8 @@
 
 		<!-- scope==provided -->
 		<dependency>
-			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet-enterprise</artifactId>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-enterprise</artifactId>
 			<scope>provided</scope>
 		</dependency>
 

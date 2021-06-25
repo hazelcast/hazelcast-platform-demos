@@ -26,7 +26,7 @@ docker container prune --force > /dev/null 2>&1
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
 # External port 8081
-CMD="docker run -e MY_CPP_SERVICE=cva-cpp -e MY_KUBERNETES_ENABLED=false -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP} -p 8081:8080 ${DOCKER_IMAGE} $@"
+CMD="docker run -e MY_CPP_SERVICE=cva-cpp -e MY_KUBERNETES_ENABLED=false -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP} -p 8081:8080 --rm ${DOCKER_IMAGE} $@"
 #echo $CMD
 
 $CMD
