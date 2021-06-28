@@ -22,9 +22,8 @@
 		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
 
-		<hazelcast.version>5.0-SNAPSHOT</hazelcast.version>
-
-		<my.cluster1.name>turbine</my.cluster1.name>
+		<!-- Temporary name -->
+		<my.cluster1.name>dev</my.cluster1.name>
 
 		<my.management.center.name>${docker.image.prefix}-management-center</my.management.center.name>
 		<my.mc.admin.user>${my.other.admin.user}</my.mc.admin.user>
@@ -39,11 +38,10 @@
 	<modules>
 		<module>common</module>
 		<module>hazelcast-initializer</module>
+		<module>hazelcast-security</module>
 		<module>hazelcast-node</module>
 
-		<!--
 		<module>cassandra</module>
-		-->
 		<module>grafana</module>
 		<module>management-center</module>
 		<module>postgres</module>

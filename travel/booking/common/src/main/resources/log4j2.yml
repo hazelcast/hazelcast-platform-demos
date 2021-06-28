@@ -22,6 +22,10 @@ Configuration:
         target: SYSTEM_OUT
         PatternLayout:
           Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %red{%msg%n}"
+      - name: ConsoleRedBlink
+        target: SYSTEM_OUT
+        PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %style{%msg%n}{blink,red}"
       - name: ConsoleYellow
         target: SYSTEM_OUT
         PatternLayout:
@@ -50,6 +54,11 @@ Configuration:
           additivity: false
           AppenderRef:
             ref: ConsoleRed
+        - name: com.hazelcast.platform.demos.travel.booking.ApplicationConfigLogger
+          level: info
+          additivity: false
+          AppenderRef:
+            ref: ConsoleRedBlink
         - name: com.hazelcast.system.logo
           level: info
           additivity: false

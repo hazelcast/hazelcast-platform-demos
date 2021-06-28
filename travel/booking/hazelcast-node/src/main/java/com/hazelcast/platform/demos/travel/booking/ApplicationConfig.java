@@ -45,6 +45,8 @@ public class ApplicationConfig {
     public Config config() {
         Config config = new ClasspathYamlConfig("hazelcast.yml");
 
+        ApplicationConfigLogger.logSecurity(config);
+
         NetworkConfig networkConfig = config.getNetworkConfig();
 
         if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {

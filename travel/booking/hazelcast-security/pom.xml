@@ -9,20 +9,20 @@
 		<version>5.0</version>
 	</parent>
 
-	<artifactId>booking-hazelcast-node</artifactId>
+	<artifactId>booking-hazelcast-security</artifactId>
 
-	<name>Hazelcast Platform - Booking - Hazelcast Node</name>
-	<description>Travel Booking - Hazelcast Node</description>
+	<name>Hazelcast Platform - Booking - Hazelcast Security</name>
+	<description>Travel Booking - Hazelcast Security</description>
 
 	<properties>
-		<docker.image.name>hazelcast-node</docker.image.name>
+		<docker.image.name>hazelcast-initializer</docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>booking-hazelcast-security</artifactId>
+			<artifactId>booking-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
@@ -34,16 +34,5 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
 	</build>
 </project>

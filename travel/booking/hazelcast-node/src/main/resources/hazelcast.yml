@@ -1,4 +1,7 @@
 hazelcast:
+  import:
+    # Import for Dev, Test or Prod at runtime
+    - security-${my.cluster1.name}.yml
   # Replaced by Maven
   cluster-name: '@my.cluster1.name@'
   # Replaced by Maven
