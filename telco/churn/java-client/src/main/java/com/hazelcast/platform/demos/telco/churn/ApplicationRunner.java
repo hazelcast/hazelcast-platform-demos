@@ -36,7 +36,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.map.IMap;
@@ -59,7 +58,7 @@ public class ApplicationRunner {
             + "/" + MyLocalConstants.WEBSOCKET_SIZES_SUFFIX;
 
     @Autowired
-    private JetInstance jetInstance;
+    private HazelcastInstance hazelcastInstance;
     @Autowired
     private MySocketTopicListener mySocketTopicListener;
     @Autowired
@@ -81,14 +80,12 @@ public class ApplicationRunner {
     @Bean
     public CommandLineRunner commandLineRunner() {
         return args -> {
-            HazelcastInstance hazelcastInstance = this.jetInstance.getHazelcastInstance();
-
-            this.addTopicLister(hazelcastInstance);
+             this.addTopicLister(this.hazelcastInstance);
 
             LOGGER.info("-=-=-=-=- START '{}' START -=-=-=-=-=-", hazelcastInstance.getName());
             this.gaFeatures(hazelcastInstance);
             LOGGER.info("-=-=-=  MIDDLE  '{}'  MIDDLE  =-=-=-=-", hazelcastInstance.getName());
-            this.betaFeatures(this.jetInstance);
+            this.betaFeatures(this.hazelcastInstance);
             LOGGER.info("-=-=-=-=-  END  '{}'  END  -=-=-=-=-=-", hazelcastInstance.getName());
 
             LOGGER.debug("Starting web-socket feed");
@@ -184,9 +181,9 @@ public class ApplicationRunner {
      * SQL. As these are beta features, they may change in 4.2 and beyond until GA.
      * </p>
      *
-     * @param jetInstance
+     * @param hazelcastInstance
      */
-    private void betaFeatures(JetInstance jetInstance) {
+    private void betaFeatures(HazelcastInstance hazelcastInstance) {
         String[] queries = new String[] {
                 // IMap with Portable
                 "SELECT * FROM " + MyConstants.IMAP_NAME_SENTIMENT,
@@ -212,7 +209,7 @@ public class ApplicationRunner {
                 count++;
                 System.out.printf("(%d)%n", count);
                 System.out.println(query);
-                SqlResult sqlResult = jetInstance.getSql().execute(query);
+                SqlResult sqlResult = this.hazelcastInstance.getSql().execute(query);
                 Tuple3<String, String, List<String>> result =
                         MyUtils.prettyPrintSqlResult(sqlResult);
                 if (result.f0().length() > 0) {
@@ -249,7 +246,7 @@ public class ApplicationRunner {
                 .stream()
                 .map(mapName -> {
                     try {
-                        return Tuple2.tuple2(mapName, this.jetInstance.getMap(mapName).size());
+                        return Tuple2.tuple2(mapName, this.hazelcastInstance.getMap(mapName).size());
                     } catch (Exception e) {
                         return Tuple2.tuple2(mapName, Integer.valueOf(-1));
                     }
@@ -270,7 +267,7 @@ public class ApplicationRunner {
                         // Remove "-1". permission denied, no point retrying
                         .filter(entry -> entry.getValue() >= 0)
                         .map(entry -> Tuple3.tuple3(entry.getKey(), entry.getValue(),
-                                    this.jetInstance.getMap(entry.getKey()).size()))
+                                    this.hazelcastInstance.getMap(entry.getKey()).size()))
                         // Remove if size unchanged
                         .filter(tuple3 -> tuple3.f1() != tuple3.f2())
                         .collect(Collectors.toMap(Tuple3::f0, Tuple3::f2));

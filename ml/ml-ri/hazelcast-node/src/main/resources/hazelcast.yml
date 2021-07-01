@@ -37,7 +37,8 @@ hazelcast:
         capacity: 27100000
   #
   jet:
+    enabled: true
     resource-upload-enabled: true
     instance:
-      # 'true' requires Enterprise
+      # 'true' requires Enterprise and persistence enabled
       lossless-restart-enabled: false

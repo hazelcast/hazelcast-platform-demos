@@ -23,7 +23,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.hazelcast.jet.JetInstance;
+import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.map.IMap;
 import com.hazelcast.platform.demos.telco.churn.mapstore.UpdatedByMapInterceptor;
 import com.hazelcast.topic.ITopic;
@@ -41,7 +41,7 @@ public class ApplicationInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInitializer.class);
 
     @Autowired
-    private JetInstance jetInstance;
+    private HazelcastInstance hazelcastInstance;
     @Autowired
     private MyProperties myProperties;
 
@@ -58,12 +58,12 @@ public class ApplicationInitializer {
                     .equalsIgnoreCase(Boolean.TRUE.toString())
                     && !System.getProperty("my.kubernetes.enabled", "false").equalsIgnoreCase(Boolean.TRUE.toString());
 
-            int currentSize = this.jetInstance.getCluster().getMembers().size();
+            int currentSize = this.hazelcastInstance.getCluster().getMembers().size();
             if (this.myProperties.getInitSize() != currentSize) {
                 LOGGER.info("Cluster size {}, initializing at {}", currentSize, this.myProperties.getInitSize());
             } else {
                 LOGGER.info("Cluster size {}, -=-=-=-=- START initialize by '{}' START -=-=-=-=-=-",
-                        currentSize, this.jetInstance.getName());
+                        currentSize, this.hazelcastInstance.getName());
                 var bootstrapServers = this.myProperties.getBootstrapServers();
                 LOGGER.debug("Kafka brokers: {}", bootstrapServers);
                 // Create maps before defining their metadata
@@ -75,7 +75,7 @@ public class ApplicationInitializer {
                 // Do jobs last, in case they use SQL
                 this.launchNeededJobs(isLocalhost);
                 LOGGER.info("Cluster size {}, -=-=-=-=-  END  initialize by '{}'  END  -=-=-=-=-=-",
-                        currentSize, this.jetInstance.getName());
+                        currentSize, this.hazelcastInstance.getName());
             }
         };
     }
@@ -95,16 +95,16 @@ public class ApplicationInitializer {
         String modifiedBy = MyMapHelpers.getModifiedBy(this.myProperties);
         for (String iMapName : MyConstants.CDC_MAPSTORE_NAMES) {
             IMap<?, ?> iMap =
-                    this.jetInstance.getHazelcastInstance().getMap(iMapName);
+                    this.hazelcastInstance.getMap(iMapName);
             iMap.addInterceptor(new UpdatedByMapInterceptor(modifiedBy));
         }
 
         for (String iMapName : MyConstants.IMAP_NAMES) {
-            this.jetInstance.getHazelcastInstance().getMap(iMapName);
+            this.hazelcastInstance.getMap(iMapName);
         }
         for (String iTopicName : MyConstants.ITOPIC_NAMES) {
             ITopic<Object> iTopic =
-                    this.jetInstance.getHazelcastInstance().getTopic(iTopicName);
+                    this.hazelcastInstance.getTopic(iTopicName);
             // Log on the topics added
             iTopic.addMessageListener(new MyLoggingTopicListener());
         }
@@ -183,7 +183,7 @@ public class ApplicationInitializer {
     private void define(String definition) {
         LOGGER.trace("Definition '{}'", definition);
         try {
-            this.jetInstance.getSql().execute(definition);
+            this.hazelcastInstance.getSql().execute(definition);
         } catch (Exception e) {
             LOGGER.error(definition, e);
         }

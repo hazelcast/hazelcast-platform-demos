@@ -71,8 +71,6 @@ public class MyRestController {
     @Autowired
     private HazelcastInstance hazelcastInstance;
     @Autowired
-    private HazelcastInstance jetInstance;
-    @Autowired
     private MyProperties myProperties;
 
     /**
@@ -234,7 +232,7 @@ public class MyRestController {
 
         try {
             LocalDate calcDate = LocalDate.parse(calcDateStr);
-            Job job = CvaStpJobSubmitter.submitCvaStpJob(this.jetInstance,
+            Job job = CvaStpJobSubmitter.submitCvaStpJob(this.hazelcastInstance,
                     calcDate, batchSize, parallelism, debug);
 
             stringBuilder.append(", \"id\": \"" + job.getId() + "\"");

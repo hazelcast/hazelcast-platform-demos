@@ -60,7 +60,7 @@ public class ApplicationInitializer {
 
            /* Not currently required, no jobs launch for housekeeping
             *
-           int currentSize = this.jetInstance.getCluster().getMembers().size();
+           int currentSize = this.hazelcastInstance.getCluster().getMembers().size();
            if (this.myProperties.getInitSize() > currentSize) {
                LOGGER.info("Cluster size {}, not initializing until {}",
                        currentSize, this.myProperties.getInitSize());

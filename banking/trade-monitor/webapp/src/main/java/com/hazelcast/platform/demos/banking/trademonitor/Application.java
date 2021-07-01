@@ -19,9 +19,9 @@ package com.hazelcast.platform.demos.banking.trademonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
-import com.hazelcast.jet.Jet;
-import com.hazelcast.jet.JetInstance;
+import com.hazelcast.core.HazelcastInstance;
 
 /**
  * <p>Entry point, "{@code main()}" method.
@@ -63,11 +63,11 @@ public class Application {
 
         ClientConfig clientConfig = ApplicationConfig.buildJetClientConfig();
 
-        JetInstance jetInstance = Jet.newJetClient(clientConfig);
+        HazelcastInstance hazelcastInstance = HazelcastClient.newHazelcastClient(clientConfig);
 
-        new ApplicationRunner(jetInstance).run();
+        new ApplicationRunner(hazelcastInstance).run();
 
-        jetInstance.shutdown();
+        hazelcastInstance.shutdown();
     }
 
     /**

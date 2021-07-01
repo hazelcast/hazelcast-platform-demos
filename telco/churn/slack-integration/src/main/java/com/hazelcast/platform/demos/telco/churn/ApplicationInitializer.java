@@ -26,7 +26,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.Job;
 import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.pipeline.Pipeline;
@@ -54,7 +53,7 @@ public class ApplicationInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInitializer.class);
 
     @Autowired
-    private JetInstance jetInstance;
+    private HazelcastInstance hazelcastInstance;
     @Autowired
     private MyProperties myProperties;
 
@@ -66,7 +65,6 @@ public class ApplicationInitializer {
     @Bean
     public CommandLineRunner commandLineRunner() {
         return args -> {
-            HazelcastInstance hazelcastInstance = this.jetInstance.getHazelcastInstance();
             LOGGER.info("-=-=-=-=- START '{}' START -=-=-=-=-=-", hazelcastInstance.getName());
 
             long timestamp = System.currentTimeMillis();
@@ -141,13 +139,13 @@ public class ApplicationInitializer {
      * @throws Exception
      */
     private void trySubmit(String jobNamePrefix, JobConfig jobConfig, Pipeline pipeline) throws Exception {
-        Job job = MyUtils.findRunningJobsWithSamePrefix(jobNamePrefix, this.jetInstance);
+        Job job = MyUtils.findRunningJobsWithSamePrefix(jobNamePrefix, this.hazelcastInstance);
         if (job != null) {
             String message = String.format("Previous job '%s' id=='%d' still at status '%s'",
                     job.getName(), job.getId(), job.getStatus());
             throw new RuntimeException(message);
         } else {
-            job = jetInstance.newJobIfAbsent(pipeline, jobConfig);
+            job = this.hazelcastInstance.getJet().newJobIfAbsent(pipeline, jobConfig);
             LOGGER.info("Submitted {}", job);
         }
     }

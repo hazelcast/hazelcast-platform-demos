@@ -34,6 +34,10 @@
 			<artifactId>hazelcast-spring</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-sql</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet-grpc</artifactId>
 		</dependency>

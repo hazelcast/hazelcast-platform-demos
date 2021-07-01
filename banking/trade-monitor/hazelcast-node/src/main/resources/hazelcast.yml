@@ -34,3 +34,10 @@ hazelcast:
         - type: HASH
           attributes:
             - 'symbol'
+  #
+  jet:
+    enabled: true
+    resource-upload-enabled: true
+    instance:
+      # 'true' requires Enterprise and persistence enabled
+      lossless-restart-enabled: false
