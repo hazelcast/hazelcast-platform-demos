@@ -242,17 +242,11 @@ public class ApplicationInitializer {
      */
     static void define(String definition, HazelcastInstance hazelcastInstance) {
         LOGGER.info("Definition '{}'", definition);
-        LOGGER.error("https://github.com/hazelcast/hazelcast/issues/18959");
-        LOGGER.error("https://github.com/hazelcast/hazelcast/issues/18959");
-        LOGGER.error("https://github.com/hazelcast/hazelcast/issues/18959");
-        LOGGER.error("https://github.com/hazelcast/hazelcast/issues/18959");
-        LOGGER.error("https://github.com/hazelcast/hazelcast/issues/18959");
-        /*FIXME https://github.com/hazelcast/hazelcast/issues/18959
         try {
             hazelcastInstance.getSql().execute(definition);
         } catch (Exception e) {
             LOGGER.error(definition, e);
-        }*/
+        }
     }
 
 

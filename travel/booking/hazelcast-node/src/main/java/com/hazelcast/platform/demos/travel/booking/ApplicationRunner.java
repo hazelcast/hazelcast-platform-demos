@@ -48,7 +48,7 @@ public class ApplicationRunner {
     private HazelcastInstance hazelcastInstance;
 
     /**
-     * <p>Peridically log to the console, so there is something to
+     * <p>Periodically log to the console, so there is something to
      * confirm member is ok.
      * </p>
      */
