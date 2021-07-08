@@ -41,7 +41,7 @@
 		<hazelcast.version>5.0-SNAPSHOT</hazelcast.version>
 		<hazelcast-kubernetes.version>2.2.3</hazelcast-kubernetes.version>
 		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
-		<jackson.version>2.11.3</jackson.version>
+		<jackson.version>2.12.4</jackson.version>
 		<json.version>20190722</json.version>
                 <json-smart.version>2.3</json-smart.version>
 		<junit-jupiter.version>5.7.0</junit-jupiter.version>
