@@ -38,7 +38,7 @@ public abstract class AbstractJetIT {
         Config config = new Config();
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
 
-        config.getJetConfig().setResourceUploadEnabled(true);
+        config.getJetConfig().setResourceUploadEnabled(true).setEnabled(true);
 
         hazelcastInstance = Hazelcast.newHazelcastInstance(config);
     }
