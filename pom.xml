@@ -16,7 +16,9 @@
 		<module>banking</module>
 		<module>ml</module>
 		<module>telco</module>
+		<!--
 		<module>travel</module>
+		-->
 	</modules>
 
 	<properties>
@@ -38,7 +40,7 @@
 		<guava.version>29.0-jre</guava.version>
                 <!-- Matches banking/credit-value-adjustment/cpp/Dockerfile2 -->
 		<grpc.version>1.31.1</grpc.version>
-		<hazelcast.version>5.0-SNAPSHOT</hazelcast.version>
+		<hazelcast.version>5.0-BETA-1</hazelcast.version>
 		<hazelcast-kubernetes.version>2.2.3</hazelcast-kubernetes.version>
 		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
 		<jackson.version>2.12.4</jackson.version>
@@ -396,6 +398,9 @@
 					<version>${maven-clean-plugin.version}</version>
 					<configuration>
 						<filesets>
+							<fileset>
+								<directory>src/main/app/build</directory>
+							</fileset>
 							<fileset>
 								<directory>src/main/app/node_modules</directory>
 							</fileset>

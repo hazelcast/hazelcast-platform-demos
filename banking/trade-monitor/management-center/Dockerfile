@@ -1,4 +1,4 @@
-FROM hazelcast/management-center:latest-snapshot
+FROM hazelcast/management-center:5.0-BETA-1
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MC_LICENSE
@@ -8,6 +8,7 @@ ARG MY_ADMINUSER
 ARG MY_ADMINPASSWORD
 
 # To check health, uses port 8081 but internal URL. Preconfigure license, logon/password.
+# -Dhazelcast.mc.periodic.healthcheck.enabled=false \
 ENV JAVA_OPTS="-Dhazelcast.mc.healthCheck.enable=true \
  -Dhazelcast.mc.prometheusExporter.enabled=true \
  -Dhazelcast.mc.license=$MC_LICENSE"
