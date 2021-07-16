@@ -47,6 +47,9 @@
     <logger name="com.hazelcast.internal.server.tcp.TcpServerConnection" level="warn" additivity="false">
         <appender-ref ref="NORMAL"/>
     </logger>
+    <logger name="com.hazelcast.system.logo" level="trace" additivity="false">
+        <appender-ref ref="MAGENTA"/>
+    </logger>
     <!-- Webapp -->
     <logger name="io.javalin" level="debug" additivity="false">
         <appender-ref ref="NORMAL"/>

@@ -54,6 +54,11 @@ Configuration:
           additivity: false
           AppenderRef:
             ref: ConsoleYellow
+        - name: com.hazelcast.system.logo
+          level: info
+          additivity: false
+          AppenderRef:
+            ref: ConsoleMagenta
         - name: com.hazelcast.platform.demos
           level: debug
           additivity: false

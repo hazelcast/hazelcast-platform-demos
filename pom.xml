@@ -16,6 +16,9 @@
 		<module>banking</module>
 		<module>ml</module>
 		<module>telco</module>
+		<!--
+		<module>travel</module>
+		-->
 	</modules>
 
 	<properties>
@@ -37,12 +40,10 @@
 		<guava.version>29.0-jre</guava.version>
                 <!-- Matches banking/credit-value-adjustment/cpp/Dockerfile2 -->
 		<grpc.version>1.31.1</grpc.version>
-		<hazelcast.version>4.2</hazelcast.version>
-		<hazelcast-jet.version>4.5</hazelcast-jet.version>
-		<hazelcast-jet-spring-boot-starter.version>2.0.1</hazelcast-jet-spring-boot-starter.version>
-		<hazelcast-kubernetes.version>2.2.2</hazelcast-kubernetes.version>
+		<hazelcast.version>5.0-BETA-1</hazelcast.version>
+		<hazelcast-kubernetes.version>2.2.3</hazelcast-kubernetes.version>
 		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
-		<jackson.version>2.11.3</jackson.version>
+		<jackson.version>2.12.4</jackson.version>
 		<json.version>20190722</json.version>
                 <json-smart.version>2.3</json-smart.version>
 		<junit-jupiter.version>5.7.0</junit-jupiter.version>
@@ -55,7 +56,7 @@
                 <!-- Run same version with 'protoc - -grpc_out=. - -plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin' 
                      banking/credit-value-adjustment/common/src/main/proto/JetToCpp.proto -->
 		<protobuf.version>3.12.2</protobuf.version>
-		<spring-boot.version>2.5.0</spring-boot.version>
+		<spring-boot.version>2.5.2</spring-boot.version>
 		<springfox-swagger.version>2.9.2</springfox-swagger.version>
 
 		<!-- Plugins -->
@@ -136,53 +137,43 @@
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast</groupId>
+				<artifactId>hazelcast-spring</artifactId>
+				<version>${hazelcast.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.hazelcast</groupId>
 				<artifactId>hazelcast-sql</artifactId>
 				<version>${hazelcast.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>
-				<artifactId>hazelcast-jet</artifactId>
-				<version>${hazelcast-jet.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.hazelcast.jet</groupId>
 				<artifactId>hazelcast-jet-cdc-debezium</artifactId>
-				<version>${hazelcast-jet.version}</version>
+				<version>${hazelcast.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>
 				<artifactId>hazelcast-jet-cdc-mysql</artifactId>
-				<version>${hazelcast-jet.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.hazelcast.jet</groupId>
-				<artifactId>hazelcast-jet-enterprise</artifactId>
-				<version>${hazelcast-jet.version}</version>
+				<version>${hazelcast.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>
 				<artifactId>hazelcast-jet-grpc</artifactId>
-				<version>${hazelcast-jet.version}</version>
+				<version>${hazelcast.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>
 				<artifactId>hazelcast-jet-kafka</artifactId>
-				<version>${hazelcast-jet.version}</version>
+				<version>${hazelcast.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>
 				<artifactId>hazelcast-jet-python</artifactId>
-				<version>${hazelcast-jet.version}</version>
+				<version>${hazelcast.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>
 				<artifactId>hazelcast-jet-sql</artifactId>
-				<version>${hazelcast-jet.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.hazelcast.jet.contrib</groupId>
-				<artifactId>hazelcast-jet-spring-boot-starter</artifactId>
-				<version>${hazelcast-jet-spring-boot-starter.version}</version>
+				<version>${hazelcast.version}</version>
 			</dependency>
 
 			<dependency>
@@ -408,6 +399,9 @@
 					<configuration>
 						<filesets>
 							<fileset>
+								<directory>src/main/app/build</directory>
+							</fileset>
+							<fileset>
 								<directory>src/main/app/node_modules</directory>
 							</fileset>
 						</filesets>
@@ -443,8 +437,6 @@
 							<!-- Dockerfile will use for our built modules -->
 							<JAR_FILE>${docker.jar.file}</JAR_FILE>
 							<!-- Dockerfile uses for Management Center. -->
-							<MC_ADMINUSER>${my.mc.admin.user}</MC_ADMINUSER>
-							<MC_ADMINPASSWORD>${my.mc.admin.password}</MC_ADMINPASSWORD>
 							<MC_LICENSE>${my.mc.license.key}</MC_LICENSE>
 							<!-- Preconfigured connections -->
 							<MC_CLUSTER1_NAME>${my.mc.cluster1.name}</MC_CLUSTER1_NAME>
@@ -452,6 +444,8 @@
 							<MC_CLUSTER2_NAME>${my.mc.cluster2.name}</MC_CLUSTER2_NAME>
 							<MC_CLUSTER2_ADDRESSLIST>${my.mc.cluster2.addresslist}</MC_CLUSTER2_ADDRESSLIST>
                                                         <!-- Dockerfile uses for other tools -->
+							<MY_ADMINUSER>${my.mc.admin.user}</MY_ADMINUSER>
+							<MY_ADMINPASSWORD>${my.mc.admin.password}</MY_ADMINPASSWORD>
                                                         <MY_OTHERUSER>${my.other.admin.user}</MY_OTHERUSER>
                                                         <MY_OTHERPASSWORD>${my.other.admin.password}</MY_OTHERPASSWORD>
                                                         <MY_OTHERDATABASE>${my.other.admin.database}</MY_OTHERDATABASE>

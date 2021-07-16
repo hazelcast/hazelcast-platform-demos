@@ -18,7 +18,7 @@
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 
-	<!-- Use hazelcast-jet instead of hazelcast-jet-enterprise -->
+	<!-- Use hazelcast instead of hazelcast-enterprise -->
 	<!-- so integration tests do not need a license key.       -->
 
 	<dependencies>
@@ -28,15 +28,15 @@
 			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
-					<groupId>com.hazelcast.jet</groupId>
-					<artifactId>hazelcast-jet-enterprise</artifactId>
+					<groupId>com.hazelcast</groupId>
+					<artifactId>hazelcast-enterprise</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
 
 		<dependency>
-			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet</artifactId>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
@@ -51,8 +51,8 @@
 			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
-					<groupId>com.hazelcast.jet</groupId>
-					<artifactId>hazelcast-jet-enterprise</artifactId>
+					<groupId>com.hazelcast</groupId>
+					<artifactId>hazelcast-enterprise</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

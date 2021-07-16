@@ -29,8 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
-import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.Job;
 import com.hazelcast.jet.core.JobStatus;
 import com.hazelcast.jet.datamodel.Tuple2;
@@ -49,7 +49,7 @@ public class ApplicationRunner implements CommandLineRunner {
     private static final long FIVE = 5L;
 
     @Autowired
-    private JetInstance jetInstance;
+    private HazelcastInstance hazelcastInstance;
     @Autowired
     private MySocketJobListener mySocketJobListener;
 
@@ -65,7 +65,7 @@ public class ApplicationRunner implements CommandLineRunner {
     public void run(String... args) throws Exception {
 
         ITopic<Tuple2<HazelcastJsonValue, JobStatus>> jobStateTopic =
-                this.jetInstance.getHazelcastInstance().getTopic(MyConstants.ITOPIC_NAME_JOB_STATE);
+                this.hazelcastInstance.getTopic(MyConstants.ITOPIC_NAME_JOB_STATE);
 
         jobStateTopic.addMessageListener(this.mySocketJobListener);
 
@@ -77,7 +77,7 @@ public class ApplicationRunner implements CommandLineRunner {
                 // Checkstyle thinks the below is more obvious than "TimeUnit.SECONDS.sleep(5)"
                 TimeUnit.SECONDS.sleep(FIVE);
 
-                currentState = this.jetInstance.getJobs()
+                currentState = this.hazelcastInstance.getJet().getJobs()
                         .stream()
                         .collect(Collectors.toMap(Job::getId, Job::getStatus));
 
@@ -88,7 +88,7 @@ public class ApplicationRunner implements CommandLineRunner {
 
                     Job job = null;
                     try {
-                        job = this.jetInstance.getJob(entry.getKey());
+                        job = this.hazelcastInstance.getJet().getJob(entry.getKey());
                     } catch (Exception e) {
                         LOGGER.error("Live:," + entry.getKey().toString(), e);
                     }
@@ -113,7 +113,7 @@ public class ApplicationRunner implements CommandLineRunner {
                 for (Entry<Long, JobStatus> entry : previousState.entrySet()) {
                     Job job = null;
                     try {
-                        job = this.jetInstance.getJob(entry.getKey());
+                        job = this.hazelcastInstance.getJet().getJob(entry.getKey());
                     } catch (Exception e) {
                         LOGGER.error("Dead:," + entry.getKey().toString(), e);
                     }

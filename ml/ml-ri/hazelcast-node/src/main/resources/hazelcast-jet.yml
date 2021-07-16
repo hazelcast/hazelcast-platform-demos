@@ -1,6 +1,0 @@
-hazelcast-jet:
-  #
-  instance:
-    # 'true' requires Enterprise
-    lossless-restart-enabled: false
- 

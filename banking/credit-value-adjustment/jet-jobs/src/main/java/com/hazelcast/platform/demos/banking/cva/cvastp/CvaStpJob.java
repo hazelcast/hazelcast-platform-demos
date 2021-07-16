@@ -457,7 +457,7 @@ public class CvaStpJob {
         /* A diagnostic service factory to get the calling member to pass to C++.
          */
         ServiceFactory<?, Cluster> clusterService =
-                ServiceFactories.sharedService(ctx -> ctx.jetInstance().getCluster());
+                ServiceFactories.sharedService(ctx -> ctx.hazelcastInstance().getCluster());
 
         /* A service factory to provide a BiDirectional connection to a C++ server,
          * using the provided channel builder and invoking function.

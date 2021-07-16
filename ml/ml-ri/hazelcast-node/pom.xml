@@ -11,7 +11,7 @@
 
         <artifactId>ml-ri-hazelcast-node</artifactId>
 
-        <name>Hazelcast Platform - ML - RI - Hazelcast Node</name>
+        <name>Hazelcast Platform - RI - Hazelcast Node</name>
         <description>ML Reference Implementation - Hazelcast Node</description>
 
         <properties>
@@ -23,8 +23,8 @@
 
         <dependencies>
                 <dependency>
-                        <groupId>com.hazelcast.jet</groupId>
-                        <artifactId>hazelcast-jet</artifactId>
+                        <groupId>com.hazelcast</groupId>
+                        <artifactId>hazelcast</artifactId>
                 </dependency>
                 <dependency>
                         <groupId>com.hazelcast.jet</groupId>

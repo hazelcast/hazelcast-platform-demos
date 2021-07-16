@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hazelcast.config.NetworkConfig;
-import com.hazelcast.jet.JetInstance;
+import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.jet.Job;
 import com.hazelcast.jet.core.JobStatus;
 import com.hazelcast.jet.datamodel.Tuple2;
@@ -123,13 +123,13 @@ public class MyUtils {
      * </p>
      *
      * @param prefix The start of a job name
-     * @param jetInstance To access the job registry
+     * @param hazelcastInstance To access the job registry
      * @return The first match, or null if none.
      */
-    public static Job findRunningJobsWithSamePrefix(String prefix, JetInstance jetInstance) {
+    public static Job findRunningJobsWithSamePrefix(String prefix, HazelcastInstance hazelcastInstance) {
         Job match = null;
 
-        for (Job job : jetInstance.getJobs()) {
+        for (Job job : hazelcastInstance.getJet().getJobs()) {
             if (job.getName() != null && job.getName().startsWith(prefix)) {
                 if ((job.getStatus() == JobStatus.STARTING)
                      || (job.getStatus() == JobStatus.RUNNING)

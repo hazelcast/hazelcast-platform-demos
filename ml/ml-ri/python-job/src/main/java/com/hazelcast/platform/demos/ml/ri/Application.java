@@ -16,9 +16,9 @@
 
 package com.hazelcast.platform.demos.ml.ri;
 
+import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
-import com.hazelcast.jet.Jet;
-import com.hazelcast.jet.JetInstance;
+import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.pipeline.Pipeline;
 
@@ -43,9 +43,9 @@ public class Application {
             System.out.println("Arg='" + args[0] + "', pythonJob=='" + pythonJob + ".py'");
         }
 
-        ClientConfig clientConfig = ApplicationConfig.buildJetClientConfig();
+        ClientConfig clientConfig = ApplicationConfig.buildClientConfig();
 
-        JetInstance jetInstance = Jet.newJetClient(clientConfig);
+        HazelcastInstance hazelcastInstance = HazelcastClient.newHazelcastClient(clientConfig);
 
         try {
             Pipeline pipeline = null;
@@ -62,12 +62,12 @@ public class Application {
             jobConfig.addClass(MyUtils.class);
 
             // Throws exception if job exists
-            jetInstance.newJob(pipeline, jobConfig);
+            hazelcastInstance.getJet().newJob(pipeline, jobConfig);
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }
 
-        jetInstance.shutdown();
+        hazelcastInstance.shutdown();
     }
 
 }

@@ -399,7 +399,7 @@ public class MLChurnDetector extends MyJobWrapper {
     private static Sink<Entry<String, Sentiment>> myTopicSink(String topicName) {
         return SinkBuilder.sinkBuilder(
                     "topicSink-" + topicName,
-                    context -> context.jetInstance().getHazelcastInstance().<String>getTopic(topicName)
+                    context -> context.hazelcastInstance().<String>getTopic(topicName)
                 )
                 .<Entry<String, Sentiment>>receiveFn(
                         (iTopic, entry) -> {

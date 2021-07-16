@@ -40,9 +40,13 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet-enterprise</artifactId>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-enterprise</artifactId>
 		</dependency>
+                <dependency>
+                        <groupId>com.hazelcast</groupId>
+                        <artifactId>hazelcast-spring</artifactId>
+                </dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
             <artifactId>hazelcast-jet-cdc-debezium</artifactId>
@@ -60,23 +64,12 @@
             <artifactId>hazelcast-jet-python</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.hazelcast.jet</groupId>
-            <artifactId>hazelcast-jet-sql</artifactId>
+			<groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast-sql</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-kubernetes</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.hazelcast.jet.contrib</groupId>
-			<artifactId>hazelcast-jet-spring-boot-starter</artifactId>
-			<exclusions>
-				<exclusion>
-					<!-- Exclude in favour of hazelcast-jet-enterprise -->
-					<groupId>com.hazelcast.jet</groupId>
-					<artifactId>hazelcast-jet</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
 		<dependency>
