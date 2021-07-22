@@ -18,7 +18,10 @@ package com.hazelcast.platform.demos.banking.trademonitor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +31,7 @@ import com.hazelcast.cluster.MembershipEvent;
 import com.hazelcast.cluster.MembershipListener;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IExecutorService;
+import com.hazelcast.jet.datamodel.Tuple2;
 
 /**
  * <p>A listener on cluster change events to report CPU capacity
@@ -70,11 +74,18 @@ public class MyMembershipListener implements MembershipListener {
         int processorsCount = 0;
         boolean allProcessorsTheSame = true;
 
+        try {
+            LOGGER.info("=====================================");
+            this.logPartitions();
+            LOGGER.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        } catch (Exception e) {
+            LOGGER.error("report() -> logPartitions()", e);
+        }
         CountProcessorsCallable countProcessorsCallable = new CountProcessorsCallable();
         IExecutorService iExecutorService = this.hazelcastInstance.getExecutorService("default");
 
-        @SuppressWarnings("unchecked")
         int[] processors = new int[members.size()];
+        @SuppressWarnings("unchecked")
         Future<Integer>[] futures = new Future[members.size()];
         for (int i = 0 ; i < members.size(); i++) {
             futures[i] = iExecutorService.submitToMember(countProcessorsCallable, members.get(i));
@@ -112,6 +123,101 @@ public class MyMembershipListener implements MembershipListener {
         LOGGER.info("-------------------------------------");
         LOGGER.info("Total processors {}", processorsCount);
         LOGGER.info("-------------------------------------");
+        LOGGER.info("=====================================");
     }
 
+    /**
+     * <p>Assess the loading of the partitions.
+     * </p>
+     * <p>See <a href="https://hazelcast.com/blog/calculation-in-hazelcast-cloud/">here</a>
+     * for a more efficient way to calculate Standard Deviation. Here we go for simplicity.
+     * </p>
+     */
+    private void logPartitions() {
+        CountIMapPartitionsCallable countIMapPartitionsCallable = new CountIMapPartitionsCallable();
+        final Map<Integer, Tuple2<Integer, String>> collatedResults = new TreeMap<>();
+
+        Map<Member, Future<Map<Integer, Integer>>> rawResults =
+                this.hazelcastInstance.getExecutorService("default").submitToAllMembers(countIMapPartitionsCallable);
+
+        rawResults.entrySet()
+        .stream()
+        .forEach(memberEntry -> {
+            try {
+                String member = memberEntry.getKey().getAddress().getHost() + ":" + memberEntry.getKey().getAddress().getPort();
+                Map<Integer, Integer> result = memberEntry.getValue().get();
+                result.entrySet().stream()
+                .forEach(resultEntry -> collatedResults.put(resultEntry.getKey(), Tuple2.tuple2(resultEntry.getValue(), member)));
+            } catch (Exception e) {
+                LOGGER.error("logPartitions()", e);
+            }
+        });
+
+        int partitionCountActual = collatedResults.size();
+        int partitionCountExpected = this.hazelcastInstance.getPartitionService().getPartitions().size();
+
+        // Less is ok, some may be empty.
+        if (partitionCountActual > partitionCountExpected) {
+            LOGGER.error("logPartitions() Results for {} partitions but expected {}",
+                    partitionCountActual, partitionCountExpected);
+            return;
+        }
+
+        double total = 0d;
+        final AtomicInteger max = new AtomicInteger(Integer.MIN_VALUE);
+        final AtomicInteger min = new AtomicInteger(Integer.MAX_VALUE);
+        for (int i = 0 ; i < partitionCountExpected; i++) {
+            if (collatedResults.containsKey(i)) {
+                int count = collatedResults.get(i).f0();
+                total += count;
+                if (count > max.get()) {
+                    max.set(count);
+                }
+                if (count < min.get()) {
+                    min.set(count);
+                }
+            }
+        }
+        double average = total / partitionCountActual;
+        double stdDev = this.calculateStdDev(collatedResults, average);
+
+        LOGGER.info("-------------------------------------");
+        collatedResults.entrySet()
+        .stream()
+        .forEach(entry -> {
+            int count = entry.getValue().f0();
+            LOGGER.info("Partition {} - entry count {} - member {} {}{}",
+                    String.format("%3d", entry.getKey()),
+                    String.format("%7d", count),
+                    String.format("%22s", entry.getValue().f1()),
+                    (count == max.get() ? "- MAXIMUM" : ""),
+                    (count == min.get() ? "- MINIMUM" : "")
+                    );
+        });
+        LOGGER.info("-------------------------------------");
+        LOGGER.info("Total {}, StdDev {}, Maximum {}, Mininum {}",
+                Double.valueOf(total).intValue(), stdDev, max, min);
+        LOGGER.info("-------------------------------------");
+    }
+
+
+    /**
+     * <p>Calculate the deviation from the average.
+     * </p>
+     *
+     * @param collatedResults
+     * @param average
+     * @return
+     */
+    private double calculateStdDev(Map<Integer, Tuple2<Integer, String>> collatedResults, double average) {
+        double total = collatedResults.values()
+        .stream()
+        .mapToDouble(value -> {
+            double diff = value.f0() - average;
+            return diff * diff;
+        })
+        .sum();
+
+        return Math.sqrt(total / collatedResults.size());
+    }
 }
