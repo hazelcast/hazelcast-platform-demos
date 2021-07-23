@@ -13,4 +13,5 @@ ENV JAVA_OPTS "--add-modules java.se --add-exports java.base/jdk.internal.ref=AL
 ENTRYPOINT exec java --illegal-access=deny \
    $JAVA_ARGS $JAVA_OPTS \
    -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+   -DHOST_IP=$HOST_IP \
    -jar application.jar
