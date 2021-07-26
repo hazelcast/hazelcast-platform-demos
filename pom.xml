@@ -55,7 +55,10 @@
                      banking/credit-value-adjustment/common/src/main/proto/JetToCpp.proto -->
 		<protobuf.version>3.12.2</protobuf.version>
 		<spring-boot.version>2.5.2</spring-boot.version>
+        <spring-cloud.version>2020.0.3</spring-cloud.version>
+        <spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
 		<springfox-swagger.version>2.9.2</springfox-swagger.version>
+		<zipkin.version>2.23.3-SNAPSHOT</zipkin.version>
 
 		<!-- Plugins -->
 		<build-helper-maven-plugin.version>3.1.0</build-helper-maven-plugin.version>
@@ -67,7 +70,6 @@
 		<maven-checkstyle-plugin.version>3.1.0</maven-checkstyle-plugin.version>
 		<maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-		<maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
 		<maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
 		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
 		<maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
@@ -76,11 +78,6 @@
 		<os-maven-plugin.version>1.6.2</os-maven-plugin.version>
 		<protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
 		<spotbugs-maven-plugin.version>4.2.0</spotbugs-maven-plugin.version>
-
-		<!-- Environments -->
-		<!-- Google Cloud -->
-		<gcp.project>NAME GOES HERE</gcp.project>
-		<gcp.registry>gcr.io</gcp.registry>
 	</properties>
 
 	<dependencies>
@@ -404,10 +401,6 @@
 							</fileset>
 						</filesets>
 					</configuration>
-				</plugin>
-				<plugin>
-					<artifactId>maven-deploy-plugin</artifactId>
-					<version>${maven-deploy-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-jar-plugin</artifactId>

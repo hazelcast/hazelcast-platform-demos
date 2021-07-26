@@ -28,19 +28,4 @@
             <module>python-job</module>
         </modules>
 
-        <build>
-                <plugins>
-                        <plugin>
-                                <artifactId>maven-antrun-plugin</artifactId>
-                                <configuration>
-                                        <target>
-                                                <echo message="====================================" />
-                                                <echo message="TODO: 'mvn deploy' to upload to GKE" />
-                                                <echo message="====================================" />
-                                        </target>
-                                </configuration>
-                        </plugin>
-                </plugins>
-        </build>
-
 </project>

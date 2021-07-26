@@ -38,6 +38,11 @@ then
  JAVA_ARGS="-e HOST_IP=${HOST_IP}"
  JAVA_ARGS="${JAVA_ARGS} -e MY_KUBERNETES_ENABLED=false"
 fi
+# Management Center, convert member addresses
+if [ "$FIRST" == "management" ] && [ "$SECOND" == "center" ]
+then
+ JAVA_ARGS="-e HOST_IP=${HOST_IP}"
+fi
 
 # Internal/external port mapping
 if [ "$DOCKER_PORT_INTERNAL" == "" ]
