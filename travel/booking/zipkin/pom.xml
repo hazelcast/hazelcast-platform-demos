@@ -16,7 +16,7 @@
 
 	<properties>
 		<docker.image.name>zipkin</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</docker.jar.file>
+		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 		<main.class>zipkin.server.ZipkinServer</main.class>
 	</properties>
@@ -31,7 +31,11 @@
 	<build>
 		<plugins>
 			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+                                <configuration>
+                                    <mainClass>${main.class}</mainClass>
+                                </configuration>
 			</plugin>
 			<plugin>
 				<groupId>com.spotify</groupId>

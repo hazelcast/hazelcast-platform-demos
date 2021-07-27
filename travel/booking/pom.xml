@@ -25,6 +25,8 @@
 		<!-- Temporary name for cluster -->
 		<my.cluster1.name>dev</my.cluster1.name>
 
+		<my.flight.service.name>flight-service</my.flight.service.name>
+		<my.flight.service.port>3000</my.flight.service.port>
 		<my.hotel.service.name>hotel-service</my.hotel.service.name>
 		<my.hotel.service.port>3000</my.hotel.service.port>
 
@@ -40,6 +42,8 @@
 
 	<modules>
 		<module>common</module>
+		<module>flight-nodejs</module>
+		<module>frontend</module>
 		<module>hazelcast-initializer</module>
 		<module>hazelcast-security</module>
 		<module>hazelcast-node</module>
