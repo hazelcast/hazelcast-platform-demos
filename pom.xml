@@ -16,7 +16,9 @@
 		<module>banking</module>
 		<module>ml</module>
 		<module>telco</module>
+		<!--
 		<module>travel</module>
+		-->
 	</modules>
 
 	<properties>
