@@ -7,20 +7,10 @@ TARGET=`basename $0 | sed 's/^docker-//' | sed 's/\.sh$//'`
 CONTAINER_NAME=$TARGET
 FIRST=`echo $TARGET | cut -d- -f1`
 SECOND=`echo $TARGET | cut -d- -f2`
-THIRD=`echo $TARGET | cut -d- -f3`
-if [ "${FIRST}" == "${SECOND}" ]
+MODULE=${FIRST}
+if [ "$FIRST" != "$SECOND" ] && [ $(expr `echo $SECOND | egrep -vw '0|1|2' | wc -l`) -gt 0 ]
 then
- MODULE=${FIRST}
-else
  MODULE=${FIRST}-${SECOND}
-fi
-
-# Private network so can use container names
-if [ `docker network list | awk '{print $2}' | grep -c $PROJECT` -eq 0 ]
-then
- # "network prune" helps if two scripts start concurrently, "network list" may be incorrect
- docker network prune --force > /dev/null 2>&1
- docker network create $PROJECT --driver bridge > /dev/null 2>&1
 fi
 
 # May need host machine IP for clustering
@@ -35,20 +25,23 @@ then
  ifconfig | grep -w inet | grep -v 127.0.0.1
  exit 1
 fi
-DOCKERIP="-e HOST_IP=${HOST_IP}"
 
 # Server
 if [ "$FIRST" == "hazelcast" ] && [ "$SECOND" == "node" ]
 then
  JAVA_ARGS="-e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP}:${DOCKER_PORT_EXTERNAL}"
- JAVA_ARGS="${JAVA_ARGS} -e LOCAL_NODE_NAME=member${THIRD}"
- DOCKERIP="-e HOST_IP=${HOST_IP} -e MY_KUBERNETES_ENABLED=false"
+ JAVA_ARGS="${JAVA_ARGS} -e MY_KUBERNETES_ENABLED=false"
 fi
 # Client
 if [ "$FIRST" == "hazelcast" ] && [ "$SECOND" != "node" ]
 then
- JAVA_ARGS="-e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP}"
- DOCKERIP="-e HOST_IP=${HOST_IP} -e MY_KUBERNETES_ENABLED=false"
+ JAVA_ARGS="-e HOST_IP=${HOST_IP}"
+ JAVA_ARGS="${JAVA_ARGS} -e MY_KUBERNETES_ENABLED=false"
+fi
+# Management Center, convert member addresses
+if [ "$FIRST" == "management" ] && [ "$SECOND" == "center" ]
+then
+ JAVA_ARGS="-e HOST_IP=${HOST_IP}"
 fi
 
 # Internal/external port mapping
@@ -63,7 +56,7 @@ fi
 docker container prune --force > /dev/null 2>&1
 
 DOCKER_IMAGE=${GROUP}/${PROJECT}-${MODULE}
-CMD="docker run $TTY ${JAVA_ARGS} ${VOLUMES} ${PORT_MAPPING} ${DOCKERIP} --cap-add=sys_nice --rm --name=${CONTAINER_NAME} --network=${PROJECT} ${DOCKER_IMAGE} $*"
+CMD="docker run ${JAVA_ARGS} ${PORT_MAPPING} --rm --name=${CONTAINER_NAME} ${DOCKER_IMAGE}"
 echo $CMD
 
 $CMD

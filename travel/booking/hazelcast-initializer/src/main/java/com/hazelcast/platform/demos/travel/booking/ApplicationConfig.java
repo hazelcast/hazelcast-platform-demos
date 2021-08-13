@@ -53,7 +53,7 @@ public class ApplicationConfig {
         } else {
             clientNetworkConfig.getKubernetesConfig().setEnabled(false);
 
-            String host = System.getProperty("hazelcast.local.publicAddress", "127.0.0.1");
+            String host = System.getProperty("HOST_IP", "127.0.0.1");
             if (host.indexOf(':') > 0) {
                 // Ignore port if provided, since we'll use several
                 host = host.substring(0, host.indexOf(":"));
