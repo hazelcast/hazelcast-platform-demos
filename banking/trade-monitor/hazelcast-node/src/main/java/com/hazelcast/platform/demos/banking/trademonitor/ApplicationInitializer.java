@@ -38,6 +38,9 @@ import com.hazelcast.map.IMap;
  * exist and necessary jobs are running. These are idempotent operations,
  * the will only do anything for the first node in the Jet cluster.
  * </p>
+ * <p>TODO: When <a href="https://github.com/hazelcast/hazelcast/issues/19137">19137</a>
+ * fixed update Dockerfile for Management Center to re-activate config healthcheck.
+ * </p>
  */
 public class ApplicationInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInitializer.class);

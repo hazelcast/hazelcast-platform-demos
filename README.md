@@ -16,6 +16,11 @@ of [Hazelcast Jet](https://hazelcast.org/jet/) and [Hazelcast IMDG](https://haze
 4. Travel
   * [Booking](./travel/booking) Integrated travel booking for accommodation and transport
 
+Also
+
+5. Utils
+  * [Utils](./utils) Utillity modules for the above projects to share.
+
 ## Build Instructions
 
 ### `settings.xml`
