@@ -31,6 +31,9 @@ import com.hazelcast.jet.config.ProcessingGuarantee;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.map.IMap;
+import com.hazelcast.platform.demos.utils.UtilsConstants;
+import com.hazelcast.platform.demos.utils.UtilsProperties;
+import com.hazelcast.platform.demos.utils.UtilsSlackSQLJob;
 
 
 /**
@@ -44,6 +47,8 @@ import com.hazelcast.map.IMap;
  */
 public class ApplicationInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInitializer.class);
+    // Local constant, never needed outside this class
+    private static final String APPLICATION_PROPERTIES_FILE = "application.properties";
 
     /**
      * <p>Ensure the necessary {@link com.hazelcast.core.DistributedObject} exist to
@@ -290,6 +295,15 @@ public class ApplicationInitializer {
 
         hazelcastInstance.getJet().newJobIfAbsent(pipelineAggregateQuery, jobConfigAggregateQuery);
 
+        // Slack SQL integration from common utils
+        try {
+            Properties properties = UtilsProperties.loadClasspathProperties(APPLICATION_PROPERTIES_FILE);
+            Object projectName = properties.get(UtilsConstants.SLACK_PROJECT_NAME);
+            UtilsSlackSQLJob.submitJob(hazelcastInstance,
+                    projectName == null ? "" : projectName.toString());
+        } catch (Exception e) {
+            LOGGER.error("launchNeededJobs:" + UtilsSlackSQLJob.class.getSimpleName(), e);
+        }
     }
 
 }

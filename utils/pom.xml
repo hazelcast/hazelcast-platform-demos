@@ -22,6 +22,7 @@
 	</properties>
 
 	<modules>
+		<module>misc</module>
 		<module>slack</module>
 	</modules>
 

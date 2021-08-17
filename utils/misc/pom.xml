@@ -9,25 +9,16 @@
 		<version>5.0</version>
 	</parent>
 
-	<artifactId>utils-slack-integration</artifactId>
+	<artifactId>utils-miscellaneous</artifactId>
 
-	<name>Hazelcast Platform - Utils - Slack Integration</name>
-	<description>Utils - Read/write from/to Slack</description>
+	<name>Hazelcast Platform - Utils - Misc</name>
+	<description>Utils - Miscellaneous helpers</description>
 
 	<properties>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
-		<slack.bot.user.oath.access.token>${my.slack.bot.user.oath.access.token}</slack.bot.user.oath.access.token>
-		<slack.bot.channel.id>${my.slack.bot.channel.id}</slack.bot.channel.id>
-		<slack.bot.channel.name>${my.slack.bot.channel.name}</slack.bot.channel.name>
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>utils-miscellaneous</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 		<!-- Provided scope, caller can use hazelcast or hazelcast-enterprise -->
 		<dependency>
 			<groupId>com.hazelcast</groupId>
@@ -59,12 +50,4 @@
 		</dependencies>
 	</dependencyManagement>
 
-	<build>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
-	</build>
 </project>
