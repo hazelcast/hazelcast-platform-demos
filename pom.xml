@@ -47,8 +47,8 @@
 		<jackson.version>2.12.4</jackson.version>
 		<json.version>20190722</json.version>
                 <json-smart.version>2.3</json-smart.version>
-		<junit-jupiter.version>5.7.0</junit-jupiter.version>
-		<junit-vintage.version>5.7.0</junit-vintage.version>
+		<junit-jupiter.version>5.7.2</junit-jupiter.version>
+		<junit-vintage.version>5.7.2</junit-vintage.version>
 		<jython.version>2.7.2rc1</jython.version>
 		<kafka-clients.version>2.4.0</kafka-clients.version>
 		<kafka-connect.version>2.6.0</kafka-connect.version>

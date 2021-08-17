@@ -22,9 +22,27 @@ package com.hazelcast.platform.demos.utils;
  */
 public class UtilsConstants {
 
+    // Alway run in a container
+    public static final String NEWLINE = System.getProperty("line.separator");
+
+    // -- Slack
+
+    // Our constants, we could change them
     public static final String SLACK_ACCESS_TOKEN = "slack.bot.user.oath.access.token";
     public static final String SLACK_CHANNEL_ID = "slack.bot.channel.id";
     public static final String SLACK_CHANNEL_NAME = "slack.bot.channel.name";
     public static final String SLACK_PROJECT_NAME = "my.project.name";
+
+    // Slack's constant, we can't change them
+  //XXX public static final String PARAM_CHANNEL = "channel";
+    public static final String PARAM_TEXT = "text";
+  //XXX public static final String PARAM_TOKEN = "token";
+    public static final String RESPONSE_BOT_ID = "bot_id";
+    public static final String RESPONSE_KEY_OK = "ok";
+    public static final String RESPONSE_MESSAGES = "messages";
+    public static final String RESPONSE_TEXT = "text";
+    public static final String RESPONSE_TIMESTAMP = "ts";
+    public static final String URL_READ_MESSAGE = "https://slack.com/api/conversations.history";
+    //XXX public static final String URL_WRITE_MESSAGE = "https://slack.com/api/chat.postMessage";
 
 }
