@@ -96,7 +96,7 @@ public class UtilsSlackSink {
                 this.handleBody(httpResponse.body(), httpRequest.uri());
             } else {
                 String message = String.format("%s:receiveFn response %d body '%s' for '%s'",
-                        UtilsSlackSource.class.getSimpleName(),
+                        UtilsSlackSink.class.getSimpleName(),
                         httpResponse.statusCode(), Objects.toString(httpResponse.body()),
                         httpRequest.uri());
                 LOGGER.error(message);
