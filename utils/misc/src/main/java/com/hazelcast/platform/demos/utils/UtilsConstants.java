@@ -34,15 +34,15 @@ public class UtilsConstants {
     public static final String SLACK_PROJECT_NAME = "my.project.name";
 
     // Slack's constant, we can't change them
-  //XXX public static final String PARAM_CHANNEL = "channel";
-    public static final String PARAM_TEXT = "text";
+    public static final String SLACK_PARAM_CHANNEL = "channel";
+    public static final String SLACK_PARAM_TEXT = "text";
   //XXX public static final String PARAM_TOKEN = "token";
-    public static final String RESPONSE_BOT_ID = "bot_id";
-    public static final String RESPONSE_KEY_OK = "ok";
-    public static final String RESPONSE_MESSAGES = "messages";
-    public static final String RESPONSE_TEXT = "text";
-    public static final String RESPONSE_TIMESTAMP = "ts";
-    public static final String URL_READ_MESSAGE = "https://slack.com/api/conversations.history";
+    public static final String SLACK_RESPONSE_BOT_ID = "bot_id";
+    public static final String SLACK_RESPONSE_KEY_OK = "ok";
+    public static final String SLACK_RESPONSE_MESSAGES = "messages";
+    public static final String SLACK_RESPONSE_TEXT = "text";
+    public static final String SLACK_RESPONSE_TIMESTAMP = "ts";
+    public static final String SLACK_URL_READ_MESSAGE = "https://slack.com/api/conversations.history";
     //XXX public static final String URL_WRITE_MESSAGE = "https://slack.com/api/chat.postMessage";
 
 }

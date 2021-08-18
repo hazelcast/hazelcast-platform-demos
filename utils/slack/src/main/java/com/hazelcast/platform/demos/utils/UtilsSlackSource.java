@@ -30,6 +30,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hazelcast.jet.pipeline.SourceBuilder;
+import com.hazelcast.jet.pipeline.StreamSource;
 import com.hazelcast.jet.pipeline.SourceBuilder.SourceBuffer;
 
 /**
@@ -57,6 +59,26 @@ public class UtilsSlackSource {
 
         // Start to consume messages since launch
         this.lastPoll = Instant.now().getEpochSecond();
+    }
+
+    /**
+     * <p>Create a continuous source listening to Slack.
+     * </p>
+     *
+     * @param accessToken For access to Slack
+     * @param channelId For access to Slack
+     * @param channelName For job name
+     * @return
+     */
+    public static StreamSource<String> slackSource(String accessToken, String channelId, String channelName) {
+        return SourceBuilder.stream(
+                    "slackSource-" + channelName,
+                    __ -> {
+                        return new UtilsSlackSource(accessToken, channelId);
+                    }
+                )
+                .fillBufferFn(UtilsSlackSource::fillBufferFn)
+                .build();
     }
 
     /**
@@ -123,7 +145,7 @@ public class UtilsSlackSource {
     private HttpRequest buildHttpRequest(long since) throws Exception {
         String timestampMicroseconds = since + ".000000";
         String url = String.format("%s?channel=%s&limit=%s&oldest=%s",
-                UtilsConstants.URL_READ_MESSAGE,
+                UtilsConstants.SLACK_URL_READ_MESSAGE,
                 this.channelId,
                 MAX_ALLOWED_MESSAGES,
                 timestampMicroseconds);
@@ -146,14 +168,14 @@ public class UtilsSlackSource {
      */
     private void handleBody(String body, SortedMap<Long, String> results, URI uri) {
         JSONObject json = new JSONObject(body);
-        Boolean ok = json.getBoolean(UtilsConstants.RESPONSE_KEY_OK);
+        Boolean ok = json.getBoolean(UtilsConstants.SLACK_RESPONSE_KEY_OK);
         if (ok) {
-            JSONArray messages = json.getJSONArray(UtilsConstants.RESPONSE_MESSAGES);
+            JSONArray messages = json.getJSONArray(UtilsConstants.SLACK_RESPONSE_MESSAGES);
             for (int i = 0 ; i < messages.length() ; i++) {
                 JSONObject message = messages.getJSONObject(i);
-                if (!message.has(UtilsConstants.RESPONSE_BOT_ID)) {
-                    String text = message.getString(UtilsConstants.RESPONSE_TEXT);
-                    String timestampStr = message.getString(UtilsConstants.RESPONSE_TIMESTAMP);
+                if (!message.has(UtilsConstants.SLACK_RESPONSE_BOT_ID)) {
+                    String text = message.getString(UtilsConstants.SLACK_RESPONSE_TEXT);
+                    String timestampStr = message.getString(UtilsConstants.SLACK_RESPONSE_TIMESTAMP);
                     String timestampSeconds = timestampStr.substring(0, timestampStr.indexOf('.'));
                     long timestamp = Long.parseLong(timestampSeconds);
                     results.put(timestamp, text);
@@ -162,7 +184,7 @@ public class UtilsSlackSource {
         } else {
             String message = String.format("%s:handleBody '%s'=='%s' for %s",
                     UtilsSlackSource.class.getSimpleName(),
-                    UtilsConstants.RESPONSE_KEY_OK, ok, uri);
+                    UtilsConstants.SLACK_RESPONSE_KEY_OK, ok, uri);
             LOGGER.error(message);
         }
     }
