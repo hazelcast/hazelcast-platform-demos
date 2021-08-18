@@ -46,7 +46,6 @@ import com.hazelcast.jet.pipeline.SourceBuilder.SourceBuffer;
 public class UtilsSlackSource {
     private static final Logger LOGGER = LoggerFactory.getLogger(UtilsSlackSource.class);
     private static final long FOUR_SECONDS = 4L;
-    private static final int HTTP_OK = 200;
     private static final int MAX_ALLOWED_MESSAGES = 999;
 
     private final String accessToken;
@@ -117,7 +116,7 @@ public class UtilsSlackSource {
             HttpClient httpClient = HttpClient.newHttpClient();
             HttpResponse<String> httpResponse =
                   httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-            if (httpResponse.statusCode() == HTTP_OK && httpResponse.body() != null) {
+            if (httpResponse.statusCode() == UtilsConstants.HTTP_OK && httpResponse.body() != null) {
                 this.handleBody(httpResponse.body(), results, httpRequest.uri());
             } else {
                 String message = String.format("%s:pollSlack response %d body '%s' for '%s'",

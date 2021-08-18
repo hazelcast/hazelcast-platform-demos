@@ -24,8 +24,10 @@ public class UtilsConstants {
 
     // Alway run in a container
     public static final String NEWLINE = System.getProperty("line.separator");
+    public static final int SQL_RESULT_THRESHOLD = 10;
 
     // -- Slack
+    public static final int HTTP_OK = 200;
 
     // Our constants, we could change them
     public static final String SLACK_ACCESS_TOKEN = "slack.bot.user.oath.access.token";
@@ -36,13 +38,12 @@ public class UtilsConstants {
     // Slack's constant, we can't change them
     public static final String SLACK_PARAM_CHANNEL = "channel";
     public static final String SLACK_PARAM_TEXT = "text";
-  //XXX public static final String PARAM_TOKEN = "token";
     public static final String SLACK_RESPONSE_BOT_ID = "bot_id";
     public static final String SLACK_RESPONSE_KEY_OK = "ok";
     public static final String SLACK_RESPONSE_MESSAGES = "messages";
     public static final String SLACK_RESPONSE_TEXT = "text";
     public static final String SLACK_RESPONSE_TIMESTAMP = "ts";
     public static final String SLACK_URL_READ_MESSAGE = "https://slack.com/api/conversations.history";
-    //XXX public static final String URL_WRITE_MESSAGE = "https://slack.com/api/chat.postMessage";
+    public static final String SLACK_URL_WRITE_MESSAGE = "https://slack.com/api/chat.postMessage";
 
 }
