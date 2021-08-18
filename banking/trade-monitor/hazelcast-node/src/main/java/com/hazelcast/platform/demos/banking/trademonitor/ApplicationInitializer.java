@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.config.ProcessingGuarantee;
 import com.hazelcast.jet.datamodel.Tuple3;
@@ -33,7 +34,9 @@ import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.map.IMap;
 import com.hazelcast.platform.demos.utils.UtilsConstants;
 import com.hazelcast.platform.demos.utils.UtilsProperties;
+import com.hazelcast.platform.demos.utils.UtilsSlack;
 import com.hazelcast.platform.demos.utils.UtilsSlackSQLJob;
+import com.hazelcast.platform.demos.utils.UtilsSlackSink;
 
 
 /**
@@ -205,26 +208,22 @@ public class ApplicationInitializer {
                 + " )";
 
         String definition2 = "CREATE MAPPING IF NOT EXISTS "
-                + MyConstants.IMAP_NAME_SYMBOLS
-                + " TYPE IMap "
+                + MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME
+                + " ("
+                + "    __key BIGINT,"
+                + "    \"timestamp\" VARCHAR,"
+                + "    symbol VARCHAR,"
+                + "    volume BIGINT"
+                + ")"
+                 + " TYPE IMap "
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = 'java.lang.String',"
-                + " 'valueFormat' = 'java',"
-                + " 'valueJavaClass' = '" + SymbolInfo.class.getCanonicalName() + "'"
+                + " 'keyJavaClass' = 'java.lang.Long',"
+                + " 'valueFormat' = 'json',"
+                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
                 + " )";
 
         String definition3 = "CREATE MAPPING IF NOT EXISTS "
-                + MyConstants.IMAP_NAME_TRADES
-                + " TYPE IMap "
-                + " OPTIONS ( "
-                + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = 'java.lang.String',"
-                + " 'valueFormat' = 'java',"
-                + " 'valueJavaClass' = '" + Trade.class.getCanonicalName() + "'"
-                + " )";
-
-        String definition4 = "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_KAFKA_CONFIG
                 + " TYPE IMap "
                 + " OPTIONS ( "
@@ -234,10 +233,31 @@ public class ApplicationInitializer {
                 + " 'valueJavaClass' = '" + String.class.getCanonicalName() + "'"
                 + " )";
 
+        String definition4 = "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_SYMBOLS
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = '" + SymbolInfo.class.getCanonicalName() + "'"
+                + " )";
+
+        String definition5 = "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_TRADES
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = '" + Trade.class.getCanonicalName() + "'"
+                + " )";
+
         define(definition1, hazelcastInstance);
         define(definition2, hazelcastInstance);
         define(definition3, hazelcastInstance);
         define(definition4, hazelcastInstance);
+        define(definition5, hazelcastInstance);
     }
 
 
@@ -292,17 +312,51 @@ public class ApplicationInitializer {
         JobConfig jobConfigAggregateQuery = new JobConfig();
         jobConfigAggregateQuery.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
         jobConfigAggregateQuery.setName(AggregateQuery.class.getSimpleName());
+        jobConfigAggregateQuery.addClass(MaxVolumeAggregator.class);
 
         hazelcastInstance.getJet().newJobIfAbsent(pipelineAggregateQuery, jobConfigAggregateQuery);
 
+        // Remaining jobs need properties, skip if not as expected
+
+        Properties properties = null;
+        try {
+            properties = UtilsProperties.loadClasspathProperties(APPLICATION_PROPERTIES_FILE);
+            Properties properties2 = UtilsSlack.loadSlackAccessProperties();
+            properties.putAll(properties2);
+        } catch (Exception e) {
+            LOGGER.error("launchNeededJobs:" + UtilsSlackSQLJob.class.getSimpleName(), e);
+            LOGGER.error("launchNeededJobs:" + UtilsSlackSQLJob.class.getSimpleName()
+                    + " - No jobs submitted for Slack");
+            return;
+        }
+
         // Slack SQL integration from common utils
         try {
-            Properties properties = UtilsProperties.loadClasspathProperties(APPLICATION_PROPERTIES_FILE);
             Object projectName = properties.get(UtilsConstants.SLACK_PROJECT_NAME);
+
             UtilsSlackSQLJob.submitJob(hazelcastInstance,
                     projectName == null ? "" : projectName.toString());
         } catch (Exception e) {
             LOGGER.error("launchNeededJobs:" + UtilsSlackSQLJob.class.getSimpleName(), e);
+        }
+
+        // Slack alerting, indirectly uses common utils
+        try {
+            Pipeline pipelineAlertingToSlack = AlertingToSlack.buildPipeline(
+                    properties.get(UtilsConstants.SLACK_ACCESS_TOKEN),
+                    properties.get(UtilsConstants.SLACK_CHANNEL_NAME),
+                    properties.get(UtilsConstants.SLACK_PROJECT_NAME)
+                    );
+
+            JobConfig jobConfigAlertingToSlack = new JobConfig();
+            jobConfigAlertingToSlack.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
+            jobConfigAlertingToSlack.setName(AlertingToSlack.class.getSimpleName());
+            jobConfigAlertingToSlack.addClass(AlertingToSlack.class);
+            jobConfigAlertingToSlack.addClass(UtilsSlackSink.class);
+
+            hazelcastInstance.getJet().newJobIfAbsent(pipelineAlertingToSlack, jobConfigAlertingToSlack);
+        } catch (Exception e) {
+            LOGGER.error("launchNeededJobs:" + AlertingToSlack.class.getSimpleName(), e);
         }
     }
 

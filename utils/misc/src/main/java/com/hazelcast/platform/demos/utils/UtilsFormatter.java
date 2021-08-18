@@ -16,6 +16,10 @@
 
 package com.hazelcast.platform.demos.utils;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -35,6 +39,28 @@ import com.hazelcast.sql.SqlRowMetadata;
  */
 public class UtilsFormatter {
     private static final Logger LOGGER = LoggerFactory.getLogger(UtilsFormatter.class);
+
+    /**
+     * <p>Take a timestamp {@code long} and convert it into an ISO-8601
+     * style string, but drop the millisecond accuracy.
+     * </p>
+     *
+     * @see <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO-8601</a>
+     * @param timestamp From "{@code System.currentTimeMillis()}" probabaly
+     * @return Time as a string
+     */
+    public static String timestampToISO8601(long timestamp) {
+        LocalDateTime localDateTime =
+                Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+        String timestampStr = DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(localDateTime);
+
+        if (timestampStr.indexOf('.') > 0) {
+            timestampStr = timestampStr.substring(0, timestampStr.indexOf('.'));
+        }
+
+        return timestampStr;
+    }
 
     /**
      * <p>Make a String safe to include in JSON.

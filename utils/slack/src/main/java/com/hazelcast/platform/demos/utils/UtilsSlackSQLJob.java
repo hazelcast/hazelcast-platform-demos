@@ -125,8 +125,6 @@ public class UtilsSlackSQLJob {
     private static final Logger LOGGER = LoggerFactory.getLogger(UtilsSlackSQLJob.class);
 
     // Local constant, never needed outside this class
-    private static final String SLACK_PROPERTIES = "platform-utils-slack.properties";
-    // Local constant, never needed outside this class
     private static final List<String> ALLOWED_PREFIXES = List.of("SELECT");
 
     /**
@@ -145,7 +143,7 @@ public class UtilsSlackSQLJob {
                     UtilsConstants.SLACK_PROJECT_NAME);
             throw new RuntimeException(message);
         }
-        Properties slackProperties = loadSlackAccessProperties();
+        Properties slackProperties = UtilsSlack.loadSlackAccessProperties();
         String accessToken = safeGet(slackProperties, UtilsConstants.SLACK_ACCESS_TOKEN);
         String channelId = safeGet(slackProperties, UtilsConstants.SLACK_CHANNEL_ID);
         String channelName = safeGet(slackProperties, UtilsConstants.SLACK_CHANNEL_NAME);
@@ -168,6 +166,8 @@ public class UtilsSlackSQLJob {
         jobConfigUtilsSlackSQLJob.setName(jobName);
         jobConfigUtilsSlackSQLJob.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
         jobConfigUtilsSlackSQLJob.addClass(UtilsSlackSQLJob.class);
+        jobConfigUtilsSlackSQLJob.addClass(UtilsSlackSource.class);
+        jobConfigUtilsSlackSQLJob.addClass(UtilsSlackSink.class);
 
         try {
             Job job =
@@ -222,18 +222,6 @@ public class UtilsSlackSQLJob {
             }
             return result;
         }
-    }
-
-    /**
-     * <p>Loads the needed properties from a classpath resource.
-     * These may not have values if Slack integration is not
-     * enabled.
-     * </p>
-     *
-     * @return
-     */
-    private static Properties loadSlackAccessProperties() {
-        return UtilsProperties.loadClasspathProperties(SLACK_PROPERTIES);
     }
 
     /**
