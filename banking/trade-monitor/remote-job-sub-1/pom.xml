@@ -11,7 +11,7 @@
 
 	<artifactId>trade-monitor-remote-job-sub-1</artifactId>
 
-	<name>Hazelcast Platform - Trade Monitor - Remote job sub#1</name>
+	<name>Hazelcast Platform - Trade Monitor - Job sub#1 Python</name>
 	<description>Trade Monitor - optional Jet job #1</description>
 
 	<properties>

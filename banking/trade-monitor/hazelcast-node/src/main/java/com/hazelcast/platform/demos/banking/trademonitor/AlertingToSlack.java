@@ -35,7 +35,7 @@ import com.hazelcast.platform.demos.utils.UtilsSlackSink;
  * </p>
  * <pre>
  *                +------( 1 )------+
- *                |  Slack Source   |
+ *                | Journal Source  |
  *                +-----------------+
  *                         |
  *                         |
