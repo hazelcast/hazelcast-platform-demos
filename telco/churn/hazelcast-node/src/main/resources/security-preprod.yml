@@ -52,9 +52,39 @@ hazelcast:
           principal: churn-java-client
           actions:
             - read
+        - name: "customer"
+          principal: "JobSubmitter"
+          actions:
+            - create
+            - put
+            - read
+        - name: "customer"
+          principal: "ManagementCenter"
+          actions:
+            - create
+            - put
+            - read
         #
         - name: "sentiment"
           principal: churn-java-client
+          actions:
+            - create
+            - put
+            - read
+        - name: "sentiment"
+          principal: "JobSubmitter"
+          actions:
+            - create
+            - put
+            - read
+        - name: "sentiment"
+          principal: "ManagementCenter"
+          actions:
+            - create
+            - put
+            - read
+        - name: "tariff"
+          principal: "JobSubmitter"
           actions:
             - create
             - put
@@ -84,6 +114,11 @@ hazelcast:
           actions:
             - all
       job:
+        - name: "*"
+          principal: churn-java-client
+          actions:
+            - read
+            - submit
         - name: "*"
           principal: "ManagementCenter"
           actions:
