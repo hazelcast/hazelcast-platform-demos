@@ -24,9 +24,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.map.IMap;
 import com.hazelcast.platform.demos.telco.churn.mapstore.UpdatedByMapInterceptor;
 import com.hazelcast.topic.ITopic;
+import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordKey;
+import com.hazelcast.platform.demos.telco.churn.domain.Sentiment;
 import com.hazelcast.platform.demos.telco.churn.mapstore.MyMapHelpers;
 
 /**
@@ -145,8 +148,8 @@ public class ApplicationInitializer {
                 + " ) "
                 + " TYPE Kafka "
                 + " OPTIONS ( "
-                + " 'keyFormat' = 'json',"
-                + " 'valueFormat' = 'json',"
+                + " 'keyFormat' = 'json-flat',"
+                + " 'valueFormat' = 'json-flat',"
                 + " 'auto.offset.reset' = 'earliest',"
                 + " 'bootstrap.servers' = '" + bootstrapServers + "'"
                 + " )";
@@ -155,23 +158,67 @@ public class ApplicationInitializer {
 
     /**
      * <p>Without this metadata, cannot query an empty
-     * {@link IMap}.
+     * {@link IMap}. Since only run once, don't need 'CREATE OR REPLACE'
      * </p>
      */
     private void defineIMap() {
-        // Since only run once, don't need 'CREATE OR REPLACE'
-        String definition1 = "CREATE MAPPING "
-                + MyConstants.IMAP_NAME_SENTIMENT
-                + " TYPE IMap "
-                + " OPTIONS ( "
-                + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = 'java.lang.String',"
+        String definition1 = "CREATE MAPPING " + MyConstants.IMAP_NAME_CDR
+                + "( __key VARCHAR,"
+                + "    \"id\" VARCHAR,"
+                + "    callSucceful BOOLEAN,"
+                + "    calleeMastId VARCHAR,"
+                + "    calleeTelno VARCHAR,"
+                + "    callerMastId VARCHAR,"
+                + "    callerTelno VARCHAR,"
+                + "    durationSeconds INTEGER,"
+                + "    startTimestamp TIMESTAMP,"
+                + "    createdBy VARCHAR,"
+                + "    createdDate TIMESTAMP,"
+                + "    lastModifiedBy VARCHAR,"
+                + "    lastModifiedDate TIMESTAMP"
+                + ") TYPE IMap OPTIONS ( "
+                + " 'keyFormat' = 'java', 'keyJavaClass' = '" + CallDataRecordKey.class.getCanonicalName() + "',"
+                + " 'valueFormat' = 'json-flat', 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
+                + " )";
+        String definition2 = "CREATE MAPPING " + MyConstants.IMAP_NAME_CUSTOMER
+                + "( __key VARCHAR,"
+                + "    \"id\" VARCHAR,"
+                + "    firstName VARCHAR,"
+                + "    lastName VARCHAR,"
+                + "    accountType VARCHAR,"
+                + "    createdBy VARCHAR,"
+                + "    createdDate TIMESTAMP,"
+                + "    lastModifiedBy VARCHAR,"
+                + "    lastModifiedDate TIMESTAMP"
+                + ") TYPE IMap OPTIONS ( "
+                + " 'keyFormat' = 'java', 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
+                + " 'valueFormat' = 'json-flat',"
+                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
+                + " )";
+        String definition3 = "CREATE MAPPING " + MyConstants.IMAP_NAME_SENTIMENT
+                + " TYPE IMap OPTIONS ( "
+                + " 'keyFormat' = 'java', 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
                 + " 'valueFormat' = 'portable',"
-                + " 'valueJavaClass' = 'com.hazelcast.platform.demos.telco.churn.domain.Sentiment',"
+                + " 'valueJavaClass' = '" + Sentiment.class.getCanonicalName() + "',"
                 + " 'valuePortableFactoryId' = '" + MyConstants.CLASS_ID_MYPORTABLEFACTORY + "',"
                 + " 'valuePortableClassId' = '" + MyConstants.CLASS_ID_SENTIMENT + "'"
                 + " )";
+        String definition4 = "CREATE MAPPING " + MyConstants.IMAP_NAME_TARIFF
+                + "( __key VARCHAR,"
+                + "    \"id\" VARCHAR,"
+                + "    \"year\" INTEGER,"
+                + "    \"name\" VARCHAR,"
+                + "    international BOOLEAN,"
+                + "    ratePerMinute DOUBLE"
+                + ") TYPE IMap OPTIONS ( "
+                + " 'keyFormat' = 'java', 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
+                + " 'valueFormat' = 'json-flat',"
+                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
+                + " )";
         this.define(definition1);
+        this.define(definition2);
+        this.define(definition3);
+        this.define(definition4);
     }
 
     /**
