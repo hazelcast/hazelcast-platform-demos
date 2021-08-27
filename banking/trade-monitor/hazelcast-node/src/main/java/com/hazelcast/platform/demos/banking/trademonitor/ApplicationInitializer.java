@@ -180,7 +180,7 @@ public class ApplicationInitializer {
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
                 + " 'keyJavaClass' = 'java.lang.String',"
-                + " 'valueFormat' = 'json',"
+                + " 'valueFormat' = 'json-flat',"
                 + " 'auto.offset.reset' = 'earliest',"
                 + " 'bootstrap.servers' = '" + bootstrapServers + "'"
                 + " )";
@@ -219,7 +219,7 @@ public class ApplicationInitializer {
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
                 + " 'keyJavaClass' = 'java.lang.Long',"
-                + " 'valueFormat' = 'json',"
+                + " 'valueFormat' = 'json-flat',"
                 + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
                 + " )";
 
