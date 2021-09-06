@@ -163,7 +163,7 @@ public class ApplicationInitializer {
      */
     private void defineIMap() {
         String definition1 = "CREATE MAPPING " + MyConstants.IMAP_NAME_CDR
-                + "( __key OBJECT,"
+                + "(   \"csv\" VARCHAR EXTERNAL NAME \"__key.csv\","
                 + "    \"id\" VARCHAR,"
                 + "    callSucceful BOOLEAN,"
                 + "    calleeMastId VARCHAR,"
