@@ -67,10 +67,6 @@
 			<groupId>com.hazelcast</groupId>
             <artifactId>hazelcast-sql</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast-kubernetes</artifactId>
-		</dependency>
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>

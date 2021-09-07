@@ -45,11 +45,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast-kubernetes</artifactId>
-		</dependency>
-		<!-- After Kubernetes for maven-assembly-plugin -->
-		<dependency>
-			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast</artifactId>
 		</dependency>
 

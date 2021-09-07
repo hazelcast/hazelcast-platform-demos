@@ -30,10 +30,6 @@
                         <groupId>com.hazelcast.jet</groupId>
                         <artifactId>hazelcast-jet-python</artifactId>
                 </dependency>
-                <dependency>
-                        <groupId>com.hazelcast</groupId>
-                        <artifactId>hazelcast-kubernetes</artifactId>
-                </dependency>
         </dependencies>
 
         <build>
