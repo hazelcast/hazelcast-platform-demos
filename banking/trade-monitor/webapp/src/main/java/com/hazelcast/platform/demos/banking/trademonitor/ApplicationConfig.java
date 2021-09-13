@@ -18,6 +18,9 @@ package com.hazelcast.platform.demos.banking.trademonitor;
 
 import java.util.Arrays;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
 import com.hazelcast.client.config.YamlClientConfigBuilder;
@@ -32,6 +35,7 @@ import com.hazelcast.client.config.YamlClientConfigBuilder;
  * </p>
  */
 public class ApplicationConfig {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
 
     /**
      * <p>Load the configuration for this job to connect to a Jet cluster as
@@ -46,20 +50,25 @@ public class ApplicationConfig {
         ClientConfig clientConfig = new YamlClientConfigBuilder().build();
 
         ClientNetworkConfig clientNetworkConfig = clientConfig.getNetworkConfig();
+        clientNetworkConfig.getAutoDetectionConfig().setEnabled(false);
 
         if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
-            System.out.println("Kubernetes configuration: service-dns: "
+            LOGGER.info("Kubernetes configuration: service-dns: "
                     + clientNetworkConfig.getKubernetesConfig().getProperty("service-dns"));
         } else {
             clientNetworkConfig.getKubernetesConfig().setEnabled(false);
 
-            if (System.getProperty("hazelcast.local.publicAddress", "").length() != 0) {
-                clientNetworkConfig.setAddresses(Arrays.asList(System.getProperty("hazelcast.local.publicAddress")));
+            if (System.getProperty("MY_HAZELCAST_SERVERS", "").length() != 0) {
+                clientNetworkConfig.setAddresses(Arrays.asList(System.getProperty("MY_HAZELCAST_SERVERS")));
             } else {
-                clientNetworkConfig.setAddresses(Arrays.asList("127.0.0.1"));
+                if (System.getProperty("hazelcast.local.publicAddress", "").length() != 0) {
+                    clientNetworkConfig.setAddresses(Arrays.asList(System.getProperty("hazelcast.local.publicAddress")));
+                } else {
+                    clientNetworkConfig.setAddresses(Arrays.asList("127.0.0.1"));
+                }
             }
 
-            System.out.println("Non-Kubernetes configuration: member-list: "
+            LOGGER.info("Non-Kubernetes configuration: member-list: "
                     + clientNetworkConfig.getAddresses());
         }
 

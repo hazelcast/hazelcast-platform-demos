@@ -23,7 +23,6 @@ import java.util.UUID;
 import com.hazelcast.config.ClasspathYamlConfig;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.JoinConfig;
-import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.config.TcpIpConfig;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -56,7 +55,7 @@ public class ApplicationConfig {
         Config config = new ClasspathYamlConfig("hazelcast.yml");
 
         JoinConfig joinConfig = config.getNetworkConfig().getJoin();
-        NetworkConfig networkConfig = config.getNetworkConfig();
+        joinConfig.getAutoDetectionConfig().setEnabled(false);
 
         if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
             LOGGER.info("Kubernetes configuration: service-dns: {}",
@@ -66,11 +65,15 @@ public class ApplicationConfig {
 
             TcpIpConfig tcpIpConfig = new TcpIpConfig();
             tcpIpConfig.setEnabled(true);
-            String host = System.getProperty("hazelcast.local.publicAddress", "127.0.0.1");
-            host = host.replaceAll("5703", "5701").replaceAll("5702", "5701");
-            tcpIpConfig.setMembers(Arrays.asList(host));
+            if (System.getProperty("MY_HAZELCAST_SERVERS", "").length() != 0) {
+                tcpIpConfig.setMembers(Arrays.asList(System.getProperty("MY_HAZELCAST_SERVERS")));
+            } else {
+                String host = System.getProperty("hazelcast.local.publicAddress", "127.0.0.1");
+                host = host.replaceAll("5703", "5701").replaceAll("5702", "5701");
+                tcpIpConfig.setMembers(Arrays.asList(host));
+            }
 
-            networkConfig.getJoin().setTcpIpConfig(tcpIpConfig);
+            joinConfig.setTcpIpConfig(tcpIpConfig);
 
             LOGGER.info("Non-Kubernetes configuration: member-list: {}", tcpIpConfig.getMembers());
         }
