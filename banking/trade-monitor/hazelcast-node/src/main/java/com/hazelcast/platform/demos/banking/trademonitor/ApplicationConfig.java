@@ -16,7 +16,7 @@
 
 package com.hazelcast.platform.demos.banking.trademonitor;
 
-import java.util.List;
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -68,7 +68,7 @@ public class ApplicationConfig {
             tcpIpConfig.setEnabled(true);
             String host = System.getProperty("hazelcast.local.publicAddress", "127.0.0.1");
             host = host.replaceAll("5703", "5701").replaceAll("5702", "5701");
-            tcpIpConfig.setMembers(List.of(host));
+            tcpIpConfig.setMembers(Arrays.asList(host));
 
             networkConfig.getJoin().setTcpIpConfig(tcpIpConfig);
 
