@@ -66,11 +66,11 @@ public class ApplicationConfig {
             TcpIpConfig tcpIpConfig = new TcpIpConfig();
             tcpIpConfig.setEnabled(true);
             if (System.getProperty("MY_HAZELCAST_SERVERS", "").length() != 0) {
-                tcpIpConfig.setMembers(Arrays.asList(System.getProperty("MY_HAZELCAST_SERVERS")));
+                tcpIpConfig.setMembers(Arrays.asList(System.getProperty("MY_HAZELCAST_SERVERS").split(",")));
             } else {
                 String host = System.getProperty("hazelcast.local.publicAddress", "127.0.0.1");
                 host = host.replaceAll("5703", "5701").replaceAll("5702", "5701");
-                tcpIpConfig.setMembers(Arrays.asList(host));
+                tcpIpConfig.setMembers(Arrays.asList(host.split(",")));
             }
 
             joinConfig.setTcpIpConfig(tcpIpConfig);

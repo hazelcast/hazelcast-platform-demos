@@ -59,10 +59,10 @@ public class ApplicationConfig {
             clientNetworkConfig.getKubernetesConfig().setEnabled(false);
 
             if (System.getProperty("MY_HAZELCAST_SERVERS", "").length() != 0) {
-                clientNetworkConfig.setAddresses(Arrays.asList(System.getProperty("MY_HAZELCAST_SERVERS")));
+                clientNetworkConfig.setAddresses(Arrays.asList(System.getProperty("MY_HAZELCAST_SERVERS").split(",")));
             } else {
                 if (System.getProperty("hazelcast.local.publicAddress", "").length() != 0) {
-                    clientNetworkConfig.setAddresses(Arrays.asList(System.getProperty("hazelcast.local.publicAddress")));
+                    clientNetworkConfig.setAddresses(Arrays.asList(System.getProperty("hazelcast.local.publicAddress").split(",")));
                 } else {
                     clientNetworkConfig.setAddresses(Arrays.asList("127.0.0.1"));
                 }
