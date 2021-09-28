@@ -29,6 +29,7 @@ public class MyConstants {
 
     public static final String IMAP_NAME_AGGREGATE_QUERY_RESULTS = "AggregateQuery" + "_results";
     public static final String IMAP_NAME_ALERTS_MAX_VOLUME = "alertsMaxVolume";
+    public static final String IMAP_NAME_JOB_CONTROL = "job_control";
     public static final String IMAP_NAME_KAFKA_CONFIG = "kafka_config";
     public static final String IMAP_NAME_PYTHON_SENTIMENT = "python_sentiment";
     public static final String IMAP_NAME_SYMBOLS = "symbols";
@@ -36,7 +37,7 @@ public class MyConstants {
 
     public static final List<String> IMAP_NAMES =
             List.of(IMAP_NAME_AGGREGATE_QUERY_RESULTS, IMAP_NAME_ALERTS_MAX_VOLUME,
-                    IMAP_NAME_KAFKA_CONFIG, IMAP_NAME_PYTHON_SENTIMENT,
+                    IMAP_NAME_JOB_CONTROL, IMAP_NAME_KAFKA_CONFIG, IMAP_NAME_PYTHON_SENTIMENT,
                     IMAP_NAME_SYMBOLS, IMAP_NAME_TRADES);
 
     public static final String WEBSOCKET_PATH_TRADES = "/trades";

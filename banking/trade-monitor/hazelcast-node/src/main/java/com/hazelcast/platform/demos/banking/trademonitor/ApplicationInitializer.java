@@ -59,7 +59,7 @@ public class ApplicationInitializer {
      * </p>
      */
     public static void initialise(HazelcastInstance hazelcastInstance, String bootstrapServers) throws Exception {
-        addListeners(hazelcastInstance);
+        addListeners(hazelcastInstance, bootstrapServers);
         createNeededObjects(hazelcastInstance);
         loadNeededData(hazelcastInstance, bootstrapServers);
         defineQueryableObjects(hazelcastInstance, bootstrapServers);
@@ -68,14 +68,18 @@ public class ApplicationInitializer {
 
 
     /**
-     * <p>Logging listeners.
+     * <p>Logging listeners, and job control.
      * </p>
      *
      * @param hazelcastInstance
      */
-    static void addListeners(HazelcastInstance hazelcastInstance) {
+    static void addListeners(HazelcastInstance hazelcastInstance, String bootstrapServers) {
         MyMembershipListener myMembershipListener = new MyMembershipListener(hazelcastInstance);
         hazelcastInstance.getCluster().addMembershipListener(myMembershipListener);
+
+        JobControlListener jobControlListener = new JobControlListener(bootstrapServers);
+        hazelcastInstance.getMap(MyConstants.IMAP_NAME_JOB_CONTROL)
+            .addEntryListener(jobControlListener, true);
     }
 
 
@@ -297,24 +301,32 @@ public class ApplicationInitializer {
             return;
         }
 
-        // Trade ingest
-        Pipeline pipelineIngestTrades = IngestTrades.buildPipeline(bootstrapServers);
+        if (!System.getProperty("my.autostart.enabled", "").equalsIgnoreCase("true")) {
+            LOGGER.info("Not launching Kafka jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",
+                    System.getProperty("my.autostart.enabled"));
+        } else {
+            LOGGER.info("Launching Kafka jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",
+                    System.getProperty("my.autostart.enabled"));
 
-        JobConfig jobConfigIngestTrades = new JobConfig();
-        jobConfigIngestTrades.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
-        jobConfigIngestTrades.setName(IngestTrades.class.getSimpleName());
+            // Trade ingest
+            Pipeline pipelineIngestTrades = IngestTrades.buildPipeline(bootstrapServers);
 
-        hazelcastInstance.getJet().newJobIfAbsent(pipelineIngestTrades, jobConfigIngestTrades);
+            JobConfig jobConfigIngestTrades = new JobConfig();
+            jobConfigIngestTrades.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
+            jobConfigIngestTrades.setName(IngestTrades.class.getSimpleName());
 
-        // Trade aggregation
-        Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(bootstrapServers);
+            hazelcastInstance.getJet().newJobIfAbsent(pipelineIngestTrades, jobConfigIngestTrades);
 
-        JobConfig jobConfigAggregateQuery = new JobConfig();
-        jobConfigAggregateQuery.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
-        jobConfigAggregateQuery.setName(AggregateQuery.class.getSimpleName());
-        jobConfigAggregateQuery.addClass(MaxVolumeAggregator.class);
+            // Trade aggregation
+            Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(bootstrapServers);
 
-        hazelcastInstance.getJet().newJobIfAbsent(pipelineAggregateQuery, jobConfigAggregateQuery);
+            JobConfig jobConfigAggregateQuery = new JobConfig();
+            jobConfigAggregateQuery.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
+            jobConfigAggregateQuery.setName(AggregateQuery.class.getSimpleName());
+            jobConfigAggregateQuery.addClass(MaxVolumeAggregator.class);
+
+            hazelcastInstance.getJet().newJobIfAbsent(pipelineAggregateQuery, jobConfigAggregateQuery);
+        }
 
         // Remaining jobs need properties, skip if not as expected
 
