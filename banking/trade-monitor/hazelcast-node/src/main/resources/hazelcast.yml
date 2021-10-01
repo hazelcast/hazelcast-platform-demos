@@ -24,6 +24,10 @@ hazelcast:
           enabled: true
   #
   map:
+     # Any map with a name matching this pattern has a journal
+    'alerts*':
+      event-journal:
+        enabled: true
      # 'trades' map needs defined as non-default configuration.
     'trades':
       indexes:

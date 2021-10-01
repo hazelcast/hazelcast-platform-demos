@@ -158,7 +158,7 @@ public class MySqlDebeziumOneWayCDC extends MyJobWrapper {
      * assuming not columns added while running. Also, it may have
      * extra unexpected metadata columns.
      * </p>
-     * <p>TODO: Add typing information to {@link TariffMetadata} for
+     * <p>Optional: Add typing information to {@link TariffMetadata} for
      * cleaner parsing, deduce rather than code types, and non-direct
      * field name mappings ("{@code rate}" to "{@code ratePerMinute}").
      * </p>

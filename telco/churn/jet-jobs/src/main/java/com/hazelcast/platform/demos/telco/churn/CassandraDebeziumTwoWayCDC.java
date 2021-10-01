@@ -152,9 +152,10 @@ public class CassandraDebeziumTwoWayCDC extends MyJobWrapper {
      * Discard any entries with the incorrect modifier flag, so we don't
      * get into a loop of uploading changes we created.
      * </p>
-     * TODO: The mapping between JSON field names (eg. "{@code caller_telno}")
-     * and Java counterparts ("{@code callerTelno}") needs handled better
+     * <p>Optional: The mapping between JSON field names (eg. "{@code caller_telno}")
+     * and Java counterparts ("{@code callerTelno}") could be handled better
      * across the application as a whole.
+     * </p>
      *
      * @param entry From Kafka
      * @return Null if the entry is filtered out

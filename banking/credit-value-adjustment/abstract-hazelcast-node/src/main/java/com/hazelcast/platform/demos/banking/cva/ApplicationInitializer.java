@@ -152,7 +152,7 @@ public class ApplicationInitializer {
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
                 + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
-                + " 'valueFormat' = 'json',"
+                + " 'valueFormat' = 'json-flat',"
                 + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
                 + " )";
     }
@@ -178,7 +178,7 @@ public class ApplicationInitializer {
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
                 + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
-                + " 'valueFormat' = 'json',"
+                + " 'valueFormat' = 'json-flat',"
                 + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
                 + " )";
     }
@@ -214,7 +214,7 @@ public class ApplicationInitializer {
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
                 + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
-                + " 'valueFormat' = 'json',"
+                + " 'valueFormat' = 'json-flat',"
                 + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
                 + " )";
     }
@@ -264,7 +264,7 @@ public class ApplicationInitializer {
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
                 + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
-                + " 'valueFormat' = 'json',"
+                + " 'valueFormat' = 'json-flat',"
                 + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
                 + " )";
     }

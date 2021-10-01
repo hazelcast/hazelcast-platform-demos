@@ -21,8 +21,11 @@ import java.util.Properties;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map.Entry;
 
+import com.hazelcast.core.HazelcastJsonValue;
+import com.hazelcast.function.Functions;
 import com.hazelcast.function.ToLongFunctionEx;
 import com.hazelcast.jet.accumulator.LongAccumulator;
 import com.hazelcast.jet.accumulator.MutableReference;
@@ -30,11 +33,13 @@ import com.hazelcast.jet.aggregate.AggregateOperation;
 import com.hazelcast.jet.aggregate.AggregateOperation1;
 import com.hazelcast.jet.aggregate.AggregateOperations;
 import com.hazelcast.jet.datamodel.Tuple3;
+import com.hazelcast.jet.datamodel.Tuple4;
 import com.hazelcast.jet.kafka.KafkaSources;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.ServiceFactories;
 import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.pipeline.StreamStage;
+import com.hazelcast.jet.pipeline.WindowDefinition;
 
 /**
  * <p>Creates a pipeline job to "<i>query</i>" Kafka trades.
@@ -59,7 +64,11 @@ import com.hazelcast.jet.pipeline.StreamStage;
  */
 public class AggregateQuery {
 
+    private static final int CONSTANT_KEY = Integer.valueOf(0);
+    private static final long TEN_MINUTES_IN_MS = 10 * 60 * 1_000L;
     private static final long LOG_THRESHOLD = 100_000L;
+
+    private static ToLongFunctionEx<Object> nowTimestampFn = __ -> System.currentTimeMillis();
 
     /**
      * <p>Read from Kafka, aggregate, store in a map.
@@ -124,6 +133,9 @@ public class AggregateQuery {
         }).setName("filter_every_" + LOG_THRESHOLD)
         .writeTo(Sinks.logger());
 
+        // Extra stages for alert generation
+        AggregateQuery.addMaxVolumeAlert(aggregated);
+
         return pipeline;
     }
 
@@ -146,5 +158,39 @@ public class AggregateQuery {
                 reference.set(getLongValueFn.applyAsLong(trade));
             })
             .andExportFinish(MutableReference::get);
+    }
+
+    /**
+     * <p>Periodically (every ten minutes) output the largest
+     * trading stock by volume.
+     * </p>
+     * <p>This is the largest since the start, not in that
+     * time period.
+     * </p>
+     *
+     * @param aggregated
+     */
+    private static void addMaxVolumeAlert(
+            StreamStage<Entry<String, Tuple3<Long, Long, Long>>> aggregated) {
+        AggregateOperation1<
+            Entry<Integer, Tuple4<String, Long, Long, Long>>,
+            MaxVolumeAggregator,
+            Entry<Long, HazelcastJsonValue>>
+                maxVolumeAggregator =
+                    MaxVolumeAggregator.buildMaxVolumeAggregation();
+
+        aggregated
+        .map(entry -> {
+            Tuple4<String, Long, Long, Long> tuple4 =
+                    Tuple4.tuple4(entry.getKey(), entry.getValue().f0(),
+                            entry.getValue().f1(), entry.getValue().f2());
+            return new SimpleImmutableEntry<>(CONSTANT_KEY, tuple4);
+        })
+        .addTimestamps(nowTimestampFn, 0)
+        .groupingKey(Functions.entryKey())
+        .window(WindowDefinition.tumbling(TEN_MINUTES_IN_MS))
+        .aggregate(maxVolumeAggregator)
+        .map(result -> result.getValue())
+        .writeTo(Sinks.map(MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME));
     }
 }

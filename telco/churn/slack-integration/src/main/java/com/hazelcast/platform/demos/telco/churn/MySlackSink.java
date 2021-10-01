@@ -52,7 +52,7 @@ public class MySlackSink {
     }
 
     /**
-     * <p>Take a JSON message, enrich with Slack connectity
+     * <p>Take a JSON message, enrich with Slack connectivity
      * and do an HTTP Post.
      * </p>
      *

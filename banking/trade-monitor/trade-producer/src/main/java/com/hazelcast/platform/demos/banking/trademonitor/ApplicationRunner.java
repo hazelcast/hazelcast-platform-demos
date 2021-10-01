@@ -50,6 +50,8 @@ public class ApplicationRunner {
     private static final int HIGHEST_QUANTITY = 10_000;
 
     private final int rate;
+    private final int max;
+    private int count;
     private final KafkaProducer<String, String> kafkaProducer;
     private final List<String> symbols;
     private final Map<String, Integer> symbolToPrice;
@@ -61,12 +63,13 @@ public class ApplicationRunner {
      * </p>
      *
      * @param arg0 Rate to produce per second
-     * @param arg1 Kafka broker list
+     * @param arg1 Maximum to produce before ending
+     * @param arg2 Kafka broker list
      */
-    public ApplicationRunner(int arg0, String arg1) throws Exception {
+    public ApplicationRunner(int arg0, int arg1, String arg2) throws Exception {
         this.rate = arg0;
-
-        String bootstrapServers = arg1;
+        this.max = arg1;
+        String bootstrapServers = arg2;
 
         Properties properties = new Properties();
         properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -89,23 +92,26 @@ public class ApplicationRunner {
     }
 
     /**
-     * <p>Infinite loop, producing random trades at the requested
+     * <p>Loop, producing random trades at the requested
      * rate.
      * </p>
      *
      * @throws Exception
      */
     public void run() {
-        LOGGER.info("Producing {} trades per second", rate);
+        if (this.max > 0) {
+            LOGGER.info("Producing {} trades per second, until {} written", this.rate, this.max);
+        } else {
+            LOGGER.info("Producing {} trades per second", this.rate);
+        }
 
-        long count = 0;
-        long interval = TimeUnit.SECONDS.toNanos(1) / rate;
+        long interval = TimeUnit.SECONDS.toNanos(1) / this.rate;
         long emitSchedule = System.nanoTime();
         ThreadLocalRandom random = ThreadLocalRandom.current();
 
         // loop over ( wait, create a random trade Id, emit )
         try {
-            while (true) {
+            while (this.max <= 0 || this.count < this.max) {
                 for (int i = 0; i < MAX_BATCH_SIZE; i++) {
                     if (System.nanoTime() < emitSchedule) {
                         break;
@@ -116,9 +122,10 @@ public class ApplicationRunner {
 
                     this.kafkaProducer.send(new ProducerRecord<>(MyConstants.KAFKA_TOPIC_NAME_TRADES, id, trade));
 
-                    if (count++ % LOG_THRESHOLD == 0) {
-                        LOGGER.info("Wrote {} => \"{}\"", count - 1, trade);
+                    if (this.count % LOG_THRESHOLD == 0) {
+                        LOGGER.info("Wrote {} => \"{}\"", this.count, trade);
                     }
+                    this.count++;
 
                     emitSchedule += interval;
                 }
@@ -128,6 +135,8 @@ public class ApplicationRunner {
         } catch (InterruptedException exception) {
             this.kafkaProducer.close();
         }
+
+        LOGGER.info("Produced {} trades", this.count);
     }
 
     /**

@@ -27,7 +27,6 @@ public class SlackConstants {
 
     public static final String PARAM_CHANNEL = "channel";
     public static final String PARAM_TEXT = "text";
-    public static final String PARAM_TOKEN = "token";
 
     public static final String RESPONSE_BOT_ID = "bot_id";
     public static final String RESPONSE_KEY_OK = "ok";
