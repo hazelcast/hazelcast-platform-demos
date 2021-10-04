@@ -11,14 +11,16 @@ of [Hazelcast Jet](https://hazelcast.org/jet/) and [Hazelcast IMDG](https://haze
   * [Credit Value Adjustment](./banking/credit-value-adjustment) Risk exposure calculation for Interest Rate Swaps.
 2. Machine Learning
   * [RI](./ml/ml-ri) Reference Implementation for Machine Learning Inference, minimal dependencies.
-3. Telco
+3. Retail
+  * [Clickstream](./retail/clickstream) E-Commerce analysis using ML prediction.
+4. Telco
   * [Churn](./telco/churn) Uses ML to predict customer churn
-4. Travel
+5. Travel
   * [Booking](./travel/booking) Integrated travel booking for accommodation and transport
 
 Also
 
-5. Utils
+6. Utils
   * [Utils](./utils) Utillity modules for the above projects to share.
 
 ## Build Instructions

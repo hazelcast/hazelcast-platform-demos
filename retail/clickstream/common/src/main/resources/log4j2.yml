@@ -1,0 +1,137 @@
+Configuration:
+
+  Appenders:
+    Console:
+      - name: ConsoleBlue
+        target: SYSTEM_OUT
+        PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %blue{%msg%n}"
+      - name: ConsoleCyan
+        target: SYSTEM_OUT
+        PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %cyan{%msg%n}"
+      - name: ConsoleGreen
+        target: SYSTEM_OUT
+        PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %green{%msg%n}"
+      - name: ConsoleMagenta
+        target: SYSTEM_OUT
+        PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %magenta{%msg%n}"
+      - name: ConsoleRed
+        target: SYSTEM_OUT
+        PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %red{%msg%n}"
+      - name: ConsoleRedBlink
+        target: SYSTEM_OUT
+        PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %style{%msg%n}{blink,red}"
+      - name: ConsoleYellow
+        target: SYSTEM_OUT
+        PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %yellow{%msg%n}"
+      - name: ConsoleWhite
+        target: SYSTEM_OUT
+        PatternLayout:
+          Pattern: "%d{HH:mm:ss.SSS} [%t] %highlight{%-5level %logger{36}} - %yellow{%msg%n}"
+ 
+  Loggers:
+    logger:
+        - name: com.scurrilous.circe.checksum
+          level: error
+          additivity: false
+          AppenderRef:
+            ref: ConsoleRed
+        - name: com.hazelcast
+          level: info
+          additivity: false
+          AppenderRef:
+            ref: ConsoleCyan
+        # May run less node than listed connections, don't want warnings about missing target members in REMOTE cluster
+        - name: com.hazelcast.enterprise.wan.impl.connection.WanConnectionManager
+          level: error
+          additivity: false
+          AppenderRef:
+            ref: ConsoleCyan
+        - name: com.hazelcast.jet.impl
+          level: error
+          additivity: false
+          AppenderRef:
+            ref: ConsoleCyan
+        - name: com.hazelcast.jet.python
+          level: info
+          additivity: false
+          AppenderRef:
+            ref: ConsoleWhite
+        - name: com.hazelcast.internal.diagnostics
+          level: error
+          additivity: false
+          AppenderRef:
+            ref: ConsoleCyan
+        # May run less node than listed connections, don't want warnings about missing target members in LOCAL cluster
+        - name: com.hazelcast.internal.server.tcp
+          level: error
+          additivity: false
+          AppenderRef:
+            ref: ConsoleCyan
+        # First cluster member triggers WARN from Kubernetes as nothing else in StatefulSet
+        - name: com.hazelcast.spi.discovery.integration.DiscoveryService
+          level: error
+          additivity: false
+          AppenderRef:
+            ref: ConsoleRed
+        - name: com.hazelcast.system.logo
+          level: info
+          additivity: false
+          AppenderRef:
+            ref: ConsoleRedBlink
+        - name: com.datastax.oss.driver.api.core.auth
+          level: error
+          additivity: false
+          AppenderRef:
+            ref: ConsoleRedBlink
+        - name: demo
+          level: debug
+          additivity: false
+          AppenderRef:
+            ref: ConsoleYellow
+        - name: demo.Application
+          level: error
+          additivity: false
+          AppenderRef:
+            ref: ConsoleRed
+        - name: org.apache.pulsar.client.impl
+          level: error
+          additivity: false
+          AppenderRef:
+            ref: ConsoleRed
+        - name: org.hibernate
+          level: error
+          additivity: false
+          AppenderRef:
+            ref: ConsoleRed
+        - name: org.springframework
+          level: info
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+        - name: org.springframework.data
+          level: error
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+        - name: org.springframework.boot.actuate
+          level: warn
+          additivity: false
+          AppenderRef:
+            ref: ConsoleGreen
+        # Useful to see the selected web port
+        - name: org.springframework.boot.web.embedded.tomcat.TomcatWebServer
+          level: info
+          additivity: false
+          AppenderRef:
+            ref: ConsoleBlue
+    Root:
+      level: info
+      AppenderRef:
+        ref: ConsoleGreen

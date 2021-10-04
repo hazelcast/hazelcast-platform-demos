@@ -1,0 +1,5 @@
+hazelcast-client-failover:
+  clients:
+    # Blue first, then green
+    - hazelcast-client-first.yml
+    - hazelcast-client-second.yml
