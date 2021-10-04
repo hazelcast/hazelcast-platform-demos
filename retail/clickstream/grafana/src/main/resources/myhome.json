@@ -439,6 +439,6 @@
     "type": "timepicker"
   },
   "timezone": "browser",
-  "title": "@docker.image.name@",
+  "title": "@docker.image.prefix@",
   "version": 2
 }
