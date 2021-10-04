@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hazelcast.platform.demos.travel</groupId>
+		<artifactId>travel-root</artifactId>
+		<version>5.0</version>
+	</parent>
+
+	<groupId>com.hazelcast.platform.demos.travel.booking</groupId>
+	<artifactId>booking-root</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Hazelcast Platform - Travel - Booking</name>
+	<description>Integrated travel booking for accommodation and transport</description>
+
+	<properties>
+		<docker.image.prefix>booking</docker.image.prefix>
+		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<main.basedir>${project.parent.parent.basedir}</main.basedir>
+
+		<!-- Temporary name for cluster -->
+		<my.cluster1.name>dev</my.cluster1.name>
+
+		<my.flight.service.name>flight-service</my.flight.service.name>
+		<my.flight.service.port>3000</my.flight.service.port>
+		<my.hotel.service.name>hotel-service</my.hotel.service.name>
+		<my.hotel.service.port>3000</my.hotel.service.port>
+
+		<my.management.center.name>${docker.image.prefix}-management-center</my.management.center.name>
+		<my.mc.admin.user>${my.other.admin.user}</my.mc.admin.user>
+		<my.mc.admin.password>${my.other.admin.password}</my.mc.admin.password>
+		<my.mc.cluster1.name>${my.cluster1.name}</my.mc.cluster1.name>
+		<my.mc.cluster1.addresslist>${docker.image.prefix}-${my.cluster1.name}-hazelcast.default.svc.cluster.local</my.mc.cluster1.addresslist>
+		<my.mc.license.key>${my.license.key}</my.mc.license.key>
+		<my.prometheus.name>${docker.image.prefix}-prometheus</my.prometheus.name>
+		<my.prometheus.port>9090</my.prometheus.port>
+	</properties>
+
+	<modules>
+		<module>common</module>
+		<module>flight-nodejs</module>
+		<module>frontend</module>
+		<module>hazelcast-initializer</module>
+		<module>hazelcast-security</module>
+		<module>hazelcast-node</module>
+		<module>hotel-go</module>
+
+		<module>cassandra</module>
+		<module>grafana</module>
+		<module>management-center</module>
+		<module>postgres</module>
+		<module>prometheus</module>
+		<module>zipkin</module>
+	</modules>
+
+	<dependencies>
+		<!-- Required for YAML style Log4j2 config -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-yaml</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-enterprise</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-kubernetes</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-log4j2</artifactId>
+		</dependency>
+
+		<!-- Need the next two for Zipkin tracing -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-bootstrap</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-zipkin</artifactId>
+			<version>${spring-cloud-zipkin.version}</version>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- Only for "zipkin" module -->
+			<dependency>
+				<groupId>io.zipkin</groupId>
+				<artifactId>zipkin-server</artifactId>
+				<version>${zipkin.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-parent</artifactId>
+				<type>pom</type>
+				<scope>import</scope>
+				<version>${spring-boot.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+</project>

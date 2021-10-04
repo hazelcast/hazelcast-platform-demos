@@ -65,6 +65,11 @@ Configuration:
           AppenderRef:
             - ref: ConsoleSinksLoggerNormal
             - ref: ConsoleSinksLoggerHighlight
+        - name: com.hazelcast.system.logo
+          level: info
+          additivity: false
+          AppenderRef:
+            ref: ConsoleMagenta
         # gRPC interface
         - name: io.grpc
           level: info

@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hazelcast.jet.JetInstance;
+import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.sql.SqlResult;
 
@@ -45,7 +45,7 @@ public class MyRestController {
     private static final Logger LOGGER = LoggerFactory.getLogger(MyRestController.class);
 
     @Autowired
-    private JetInstance jetInstance;
+    private HazelcastInstance hazelcastInstance;
     @Autowired
     private MyProperties myProperties;
 
@@ -80,7 +80,7 @@ public class MyRestController {
         for (String mapName : mapNames) {
             stringBuilder.append("{ \"name\": \"" + mapName + "\",");
             try {
-                int size = this.jetInstance.getMap(mapName).size();
+                int size = this.hazelcastInstance.getMap(mapName).size();
                 stringBuilder.append("\"error\": \"\", \"size\": " + size + " }");
             } catch (Exception e) {
                 stringBuilder.append("\"error\": \""
@@ -108,7 +108,7 @@ public class MyRestController {
         LOGGER.info("sql(query '{}')", query);
 
         try {
-            SqlResult sqlResult = this.jetInstance.getSql().execute(query);
+            SqlResult sqlResult = this.hazelcastInstance.getSql().execute(query);
             Tuple3<String, String, List<String>> result =
                     MyUtils.prettyPrintSqlResult(sqlResult);
 

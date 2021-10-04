@@ -30,8 +30,8 @@
 
                 <!-- For Tuple3 utility class -->
                 <dependency>
-                        <groupId>com.hazelcast.jet</groupId>
-                        <artifactId>hazelcast-jet</artifactId>
+                        <groupId>com.hazelcast</groupId>
+                        <artifactId>hazelcast</artifactId>
                 </dependency>
 
 		<dependency>

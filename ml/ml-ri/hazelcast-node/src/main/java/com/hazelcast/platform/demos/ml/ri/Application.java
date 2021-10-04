@@ -16,9 +16,9 @@
 
 package com.hazelcast.platform.demos.ml.ri;
 
-import com.hazelcast.jet.Jet;
-import com.hazelcast.jet.JetInstance;
-import com.hazelcast.jet.config.JetConfig;
+import com.hazelcast.config.Config;
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
 
 /**
  * <p>Entry point, "{@code main()}" method.
@@ -31,11 +31,11 @@ public class Application {
      * </p>
      */
     public static void main(String[] args) {
-        JetConfig jetConfig = ApplicationConfig.buildJetConfig();
+        Config config = ApplicationConfig.buildConfig();
 
-        JetInstance jetInstance = Jet.newJetInstance(jetConfig);
+        HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance(config);
 
-        ApplicationInitializer.initialise(jetInstance);
+        ApplicationInitializer.initialise(hazelcastInstance);
     }
 
 }

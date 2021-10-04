@@ -38,7 +38,7 @@ public class MySocketConfigurer implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry stompEndpointRegistry) {
         stompEndpointRegistry
         .addEndpoint("/" + MyLocalConstants.WEBSOCKET_ENDPOINT)
-        .setAllowedOrigins("*")
+        .setAllowedOriginPatterns("*")
         .withSockJS();
     }
 

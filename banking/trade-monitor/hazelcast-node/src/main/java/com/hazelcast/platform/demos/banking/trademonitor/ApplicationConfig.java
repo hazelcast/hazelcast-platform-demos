@@ -20,10 +20,10 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.UUID;
 
+import com.hazelcast.config.ClasspathYamlConfig;
+import com.hazelcast.config.Config;
 import com.hazelcast.config.JoinConfig;
 import com.hazelcast.config.TcpIpConfig;
-import com.hazelcast.jet.config.JetConfig;
-import com.hazelcast.jet.impl.config.YamlJetConfigBuilder;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -51,10 +51,11 @@ public class ApplicationConfig {
      * for more details.
      * </p>
      */
-    public static JetConfig buildJetConfig() {
-        JetConfig jetConfig = new YamlJetConfigBuilder().build();
+    public static Config buildConfig() {
+        Config config = new ClasspathYamlConfig("hazelcast.yml");
 
-        JoinConfig joinConfig = jetConfig.getHazelcastConfig().getNetworkConfig().getJoin();
+        JoinConfig joinConfig = config.getNetworkConfig().getJoin();
+        joinConfig.getAutoDetectionConfig().setEnabled(false);
 
         if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
             LOGGER.info("Kubernetes configuration: service-dns: {}",
@@ -64,23 +65,20 @@ public class ApplicationConfig {
 
             TcpIpConfig tcpIpConfig = new TcpIpConfig();
             tcpIpConfig.setEnabled(true);
-            if (System.getProperty("hazelcast.local.publicAddress", "").length() != 0) {
-                String publicAddress = System.getProperty("hazelcast.local.publicAddress");
-                String dockerHost = publicAddress.split(":")[0];
-                String port = publicAddress.split(":")[1];
-                tcpIpConfig.setMembers(Arrays.asList(dockerHost + ":5701", dockerHost + ":5702", dockerHost + ":5703"));
-                jetConfig.getHazelcastConfig().getNetworkConfig().setPort(Integer.parseInt(port));
+            if (System.getProperty("MY_HAZELCAST_SERVERS", "").length() != 0) {
+                tcpIpConfig.setMembers(Arrays.asList(System.getProperty("MY_HAZELCAST_SERVERS").split(",")));
             } else {
-                tcpIpConfig.setMembers(Arrays.asList("127.0.0.1"));
+                String host = System.getProperty("hazelcast.local.publicAddress", "127.0.0.1");
+                host = host.replaceAll("5703", "5701").replaceAll("5702", "5701");
+                tcpIpConfig.setMembers(Arrays.asList(host.split(",")));
             }
 
             joinConfig.setTcpIpConfig(tcpIpConfig);
 
-            LOGGER.info("Non-Kubernetes configuration: member-list: {}",
-                    tcpIpConfig.getMembers());
+            LOGGER.info("Non-Kubernetes configuration: member-list: {}", tcpIpConfig.getMembers());
         }
 
-        return jetConfig;
+        return config;
     }
 
     /**

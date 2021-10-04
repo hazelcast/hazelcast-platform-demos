@@ -1,11 +1,11 @@
-FROM hazelcast/management-center:4.2021.04
+FROM hazelcast/management-center:5.0
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MC_LICENSE
-ARG MC_ADMINUSER
-ARG MC_ADMINPASSWORD
 ARG MC_CLUSTER1_NAME
 ARG MC_CLUSTER1_ADDRESSLIST
+ARG MY_ADMINUSER
+ARG MY_ADMINPASSWORD
 
 # To check health, uses port 8081 but internal URL. Preconfigure license, logon/password.
 ENV MY_PASSWORD=unset
@@ -16,8 +16,8 @@ ENV JAVA_OPTS="-Dhazelcast.mc.healthCheck.enable=true \
  -Dmy.password=$MY_PASSWORD"
 
 # Used by /mc-start.sh to create admin user, for default security module
-ENV MC_ADMIN_USER=$MC_ADMINUSER
-ENV MC_ADMIN_PASSWORD=$MC_ADMINPASSWORD
+ENV MC_ADMIN_USER=$MY_ADMINUSER
+ENV MC_ADMIN_PASSWORD=$MY_ADMINPASSWORD
 
 # Preconfigure cluster connections, use variables or hazelcast-client.xml files
 #ENV MC_CLUSTER1_NAME=$MC_CLUSTER1_NAME

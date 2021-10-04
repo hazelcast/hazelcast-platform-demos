@@ -27,10 +27,19 @@
 			<artifactId>trade-monitor-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.platform.demos.utils</groupId>
+			<artifactId>utils-slack-integration</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet</artifactId>
+			<artifactId>hazelcast-jet-grpc</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
@@ -39,14 +48,16 @@
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet-python</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet-sql</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.hazelcast.jet</groupId>
+					<artifactId>hazelcast-jet-grpc</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast-kubernetes</artifactId>
+			<artifactId>hazelcast-sql</artifactId>
 		</dependency>
 
 		<dependency>

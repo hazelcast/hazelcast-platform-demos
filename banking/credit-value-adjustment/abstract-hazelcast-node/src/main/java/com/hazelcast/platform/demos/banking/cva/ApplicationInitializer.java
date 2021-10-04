@@ -23,8 +23,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
-import com.hazelcast.jet.JetInstance;
 
 /**
  * <p>Ensure the server is in a ready state, by requesting all the
@@ -37,7 +37,7 @@ public class ApplicationInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInitializer.class);
 
     @Autowired
-    private JetInstance jetInstance;
+    private HazelcastInstance hazelcastInstance;
     //@Autowired
     //private MyProperties myProperties;
 
@@ -60,7 +60,7 @@ public class ApplicationInitializer {
 
            /* Not currently required, no jobs launch for housekeeping
             *
-           int currentSize = this.jetInstance.getCluster().getMembers().size();
+           int currentSize = this.hazelcastInstance.getCluster().getMembers().size();
            if (this.myProperties.getInitSize() > currentSize) {
                LOGGER.info("Cluster size {}, not initializing until {}",
                        currentSize, this.myProperties.getInitSize());
@@ -83,10 +83,10 @@ public class ApplicationInitializer {
      */
     private void createNeededObjects() {
         for (String iMapName : MyConstants.IMAP_NAMES) {
-            this.jetInstance.getHazelcastInstance().getMap(iMapName);
+            this.hazelcastInstance.getMap(iMapName);
         }
         for (String iTopicName : MyConstants.ITOPIC_NAMES) {
-            this.jetInstance.getHazelcastInstance().getTopic(iTopicName);
+            this.hazelcastInstance.getTopic(iTopicName);
         }
     }
 
@@ -152,7 +152,7 @@ public class ApplicationInitializer {
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
                 + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
-                + " 'valueFormat' = 'json',"
+                + " 'valueFormat' = 'json-flat',"
                 + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
                 + " )";
     }
@@ -178,7 +178,7 @@ public class ApplicationInitializer {
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
                 + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
-                + " 'valueFormat' = 'json',"
+                + " 'valueFormat' = 'json-flat',"
                 + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
                 + " )";
     }
@@ -214,7 +214,7 @@ public class ApplicationInitializer {
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
                 + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
-                + " 'valueFormat' = 'json',"
+                + " 'valueFormat' = 'json-flat',"
                 + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
                 + " )";
     }
@@ -264,7 +264,7 @@ public class ApplicationInitializer {
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
                 + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
-                + " 'valueFormat' = 'json',"
+                + " 'valueFormat' = 'json-flat',"
                 + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
                 + " )";
     }
@@ -278,7 +278,7 @@ public class ApplicationInitializer {
     private void define(String definition) {
         LOGGER.trace("Definition '{}'", definition);
         try {
-            this.jetInstance.getSql().execute(definition);
+            this.hazelcastInstance.getSql().execute(definition);
         } catch (Exception e) {
             LOGGER.error(definition, e);
         }

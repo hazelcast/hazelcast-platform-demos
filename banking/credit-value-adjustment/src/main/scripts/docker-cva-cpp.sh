@@ -27,7 +27,7 @@ DOCKER_IMAGE=hazelcast-${PROJECT}/${MODULE}
 
 # CPP Server on port 50001
 PORT=50001
-CMD="docker run -p ${PORT}:${PORT} --name=${MODULE} --network=${PROJECT} ${DOCKER_IMAGE} ${PORT}"
+CMD="docker run -p ${PORT}:${PORT} --rm --name=${MODULE} --network=${PROJECT} ${DOCKER_IMAGE} ${PORT}"
 #echo $CMD
 
 $CMD

@@ -42,7 +42,7 @@ public class ApplicationConfig {
      * declared configuration and replace it with localhost or Docker.
      * </p>
      */
-    public static ClientConfig buildJetClientConfig() {
+    public static ClientConfig buildClientConfig() {
         ClientConfig clientConfig = new YamlClientConfigBuilder().build();
 
         ClientNetworkConfig clientNetworkConfig = clientConfig.getNetworkConfig();

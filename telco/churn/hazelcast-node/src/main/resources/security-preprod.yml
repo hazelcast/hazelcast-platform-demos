@@ -43,38 +43,70 @@ hazelcast:
       realm: c2s
 
     client-permissions:
+      management:
+        # Management Center, from hazelcast-client-cluster1.xml
+        - principal: "ManagementCenter"
       map:
-        # Management Center, from hazelcast-client-cluster1.xml, allow everything (limited is better)
-        - name: "*"
-          principal: "ManagementCenter"
-          actions:
-            - all
-        # Job Submission, only allowed to interact with system data, maps with "__" name prefix
-        - name: "__*"
-          principal: "JobSubmitter"
-          actions:
-            - all
         #
         - name: "customer"
           principal: churn-java-client
           actions:
+            - create
             - read
-        #actions: []
+        - name: "customer"
+          principal: "JobSubmitter"
+          actions:
+            - create
+            - put
+            - read
+        - name: "customer"
+          principal: "ManagementCenter"
+          actions:
+            - create
+            - put
+            - read
         #
         - name: "sentiment"
           principal: churn-java-client
           actions:
-#            - create
-#            - execute
-#            - put
-#            - read
-            - all
+            - create
+            - put
+            - read
+        - name: "sentiment"
+          principal: "JobSubmitter"
+          actions:
+            - create
+            - put
+            - read
+        - name: "sentiment"
+          principal: "ManagementCenter"
+          actions:
+            - create
+            - put
+            - read
+        - name: "tariff"
+          principal: "JobSubmitter"
+          actions:
+            - create
+            - put
+            - read
+        - name: "*"
+          principal: "JobSubmitter"
+          actions:
+            - create
+            - put
+            - read
+        - name: "*"
+          principal: "ManagementCenter"
+          actions:
+            - create
+            - put
+            - read
       topic:
         #
         - name: "slack"
           principal: churn-java-client
           actions:
-#            - publish
             - listen
       # For unique job ids
       flake-id-generator:
@@ -82,6 +114,22 @@ hazelcast:
           principal: "JobSubmitter"
           actions:
             - all
+      job:
+        - name: "*"
+          principal: churn-java-client
+          actions:
+            - read
+            - submit
+        - name: "*"
+          principal: "ManagementCenter"
+          actions:
+            - read
+            - submit
+        - name: "*"
+          principal: "JobSubmitter"
+          actions:
+            - read
+            - submit
     client-block-unmapped-actions: false
     
     # Doesn't block, just logs

@@ -13,6 +13,13 @@ of [Hazelcast Jet](https://hazelcast.org/jet/) and [Hazelcast IMDG](https://haze
   * [RI](./ml/ml-ri) Reference Implementation for Machine Learning Inference, minimal dependencies.
 3. Telco
   * [Churn](./telco/churn) Uses ML to predict customer churn
+4. Travel
+  * [Booking](./travel/booking) Integrated travel booking for accommodation and transport
+
+Also
+
+5. Utils
+  * [Utils](./utils) Utillity modules for the above projects to share.
 
 ## Build Instructions
 
@@ -39,12 +46,17 @@ and apply the value in your build.
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
+        <my.cloud.discovery.token>GOES HERE</my.cloud.discovery.token>
         <my.license.key>GOES HERE</my.license.key>
       </properties>
     </profile>
   </profiles>
 </settings>
 ```
+
+You will need `my.license.key` for use with Hazelcast Enterprise.
+
+If using Hazelcast Cloud, you will need `my.cloud.discovery.token` from your Cloud cluster's credentials.
 
 ## 3rd Party Software
 

@@ -23,10 +23,13 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.hazelcast.jet.JetInstance;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.map.IMap;
 import com.hazelcast.platform.demos.telco.churn.mapstore.UpdatedByMapInterceptor;
 import com.hazelcast.topic.ITopic;
+import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecordKey;
+import com.hazelcast.platform.demos.telco.churn.domain.Sentiment;
 import com.hazelcast.platform.demos.telco.churn.mapstore.MyMapHelpers;
 
 /**
@@ -41,7 +44,7 @@ public class ApplicationInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInitializer.class);
 
     @Autowired
-    private JetInstance jetInstance;
+    private HazelcastInstance hazelcastInstance;
     @Autowired
     private MyProperties myProperties;
 
@@ -58,12 +61,12 @@ public class ApplicationInitializer {
                     .equalsIgnoreCase(Boolean.TRUE.toString())
                     && !System.getProperty("my.kubernetes.enabled", "false").equalsIgnoreCase(Boolean.TRUE.toString());
 
-            int currentSize = this.jetInstance.getCluster().getMembers().size();
+            int currentSize = this.hazelcastInstance.getCluster().getMembers().size();
             if (this.myProperties.getInitSize() != currentSize) {
                 LOGGER.info("Cluster size {}, initializing at {}", currentSize, this.myProperties.getInitSize());
             } else {
                 LOGGER.info("Cluster size {}, -=-=-=-=- START initialize by '{}' START -=-=-=-=-=-",
-                        currentSize, this.jetInstance.getName());
+                        currentSize, this.hazelcastInstance.getName());
                 var bootstrapServers = this.myProperties.getBootstrapServers();
                 LOGGER.debug("Kafka brokers: {}", bootstrapServers);
                 // Create maps before defining their metadata
@@ -75,7 +78,7 @@ public class ApplicationInitializer {
                 // Do jobs last, in case they use SQL
                 this.launchNeededJobs(isLocalhost);
                 LOGGER.info("Cluster size {}, -=-=-=-=-  END  initialize by '{}'  END  -=-=-=-=-=-",
-                        currentSize, this.jetInstance.getName());
+                        currentSize, this.hazelcastInstance.getName());
             }
         };
     }
@@ -95,16 +98,16 @@ public class ApplicationInitializer {
         String modifiedBy = MyMapHelpers.getModifiedBy(this.myProperties);
         for (String iMapName : MyConstants.CDC_MAPSTORE_NAMES) {
             IMap<?, ?> iMap =
-                    this.jetInstance.getHazelcastInstance().getMap(iMapName);
+                    this.hazelcastInstance.getMap(iMapName);
             iMap.addInterceptor(new UpdatedByMapInterceptor(modifiedBy));
         }
 
         for (String iMapName : MyConstants.IMAP_NAMES) {
-            this.jetInstance.getHazelcastInstance().getMap(iMapName);
+            this.hazelcastInstance.getMap(iMapName);
         }
         for (String iTopicName : MyConstants.ITOPIC_NAMES) {
             ITopic<Object> iTopic =
-                    this.jetInstance.getHazelcastInstance().getTopic(iTopicName);
+                    this.hazelcastInstance.getTopic(iTopicName);
             // Log on the topics added
             iTopic.addMessageListener(new MyLoggingTopicListener());
         }
@@ -145,8 +148,8 @@ public class ApplicationInitializer {
                 + " ) "
                 + " TYPE Kafka "
                 + " OPTIONS ( "
-                + " 'keyFormat' = 'json',"
-                + " 'valueFormat' = 'json',"
+                + " 'keyFormat' = 'json-flat',"
+                + " 'valueFormat' = 'json-flat',"
                 + " 'auto.offset.reset' = 'earliest',"
                 + " 'bootstrap.servers' = '" + bootstrapServers + "'"
                 + " )";
@@ -155,23 +158,67 @@ public class ApplicationInitializer {
 
     /**
      * <p>Without this metadata, cannot query an empty
-     * {@link IMap}.
+     * {@link IMap}. Since only run once, don't need 'CREATE OR REPLACE'
      * </p>
      */
     private void defineIMap() {
-        // Since only run once, don't need 'CREATE OR REPLACE'
-        String definition1 = "CREATE MAPPING "
-                + MyConstants.IMAP_NAME_SENTIMENT
-                + " TYPE IMap "
-                + " OPTIONS ( "
-                + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = 'java.lang.String',"
+        String definition1 = "CREATE MAPPING " + MyConstants.IMAP_NAME_CDR
+                + "(   \"csv\" VARCHAR EXTERNAL NAME \"__key.csv\","
+                + "    \"id\" VARCHAR,"
+                + "    callSucceful BOOLEAN,"
+                + "    calleeMastId VARCHAR,"
+                + "    calleeTelno VARCHAR,"
+                + "    callerMastId VARCHAR,"
+                + "    callerTelno VARCHAR,"
+                + "    durationSeconds INTEGER,"
+                + "    startTimestamp BIGINT,"
+                + "    createdBy VARCHAR,"
+                + "    createdDate BIGINT,"
+                + "    lastModifiedBy VARCHAR,"
+                + "    lastModifiedDate BIGINT"
+                + ") TYPE IMap OPTIONS ( "
+                + " 'keyFormat' = 'java', 'keyJavaClass' = '" + CallDataRecordKey.class.getCanonicalName() + "',"
+                + " 'valueFormat' = 'json-flat', 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
+                + " )";
+        String definition2 = "CREATE MAPPING " + MyConstants.IMAP_NAME_CUSTOMER
+                + "( __key VARCHAR,"
+                + "    \"id\" VARCHAR,"
+                + "    firstName VARCHAR,"
+                + "    lastName VARCHAR,"
+                + "    accountType VARCHAR,"
+                + "    createdBy VARCHAR,"
+                + "    createdDate BIGINT,"
+                + "    lastModifiedBy VARCHAR,"
+                + "    lastModifiedDate BIGINT"
+                + ") TYPE IMap OPTIONS ( "
+                + " 'keyFormat' = 'java', 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
+                + " 'valueFormat' = 'json-flat',"
+                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
+                + " )";
+        String definition3 = "CREATE MAPPING " + MyConstants.IMAP_NAME_SENTIMENT
+                + " TYPE IMap OPTIONS ( "
+                + " 'keyFormat' = 'java', 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
                 + " 'valueFormat' = 'portable',"
-                + " 'valueJavaClass' = 'com.hazelcast.platform.demos.telco.churn.domain.Sentiment',"
+                + " 'valueJavaClass' = '" + Sentiment.class.getCanonicalName() + "',"
                 + " 'valuePortableFactoryId' = '" + MyConstants.CLASS_ID_MYPORTABLEFACTORY + "',"
                 + " 'valuePortableClassId' = '" + MyConstants.CLASS_ID_SENTIMENT + "'"
                 + " )";
+        String definition4 = "CREATE MAPPING " + MyConstants.IMAP_NAME_TARIFF
+                + "( __key VARCHAR,"
+                + "    \"id\" VARCHAR,"
+                + "    \"year\" INTEGER,"
+                + "    \"name\" VARCHAR,"
+                + "    international BOOLEAN,"
+                + "    ratePerMinute DOUBLE"
+                + ") TYPE IMap OPTIONS ( "
+                + " 'keyFormat' = 'java', 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
+                + " 'valueFormat' = 'json-flat',"
+                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
+                + " )";
         this.define(definition1);
+        this.define(definition2);
+        this.define(definition3);
+        this.define(definition4);
     }
 
     /**
@@ -183,7 +230,7 @@ public class ApplicationInitializer {
     private void define(String definition) {
         LOGGER.trace("Definition '{}'", definition);
         try {
-            this.jetInstance.getSql().execute(definition);
+            this.hazelcastInstance.getSql().execute(definition);
         } catch (Exception e) {
             LOGGER.error(definition, e);
         }

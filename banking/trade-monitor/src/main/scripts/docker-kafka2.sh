@@ -16,7 +16,7 @@ docker container prune --force > /dev/null 2>&1
 
 PORT=$(($CLONE + 9092))
 
-CMD="docker run -e ALLOW_PLAINTEXT_LISTENER=yes -e KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181 -p ${PORT}:9092 --name=${MODULE}${CLONE} --network=${PROJECT} ${DOCKER_IMAGE}"
+CMD="docker run -e ALLOW_PLAINTEXT_LISTENER=yes -e KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181 -p ${PORT}:9092 --name=${MODULE}${CLONE} --rm --network=${PROJECT} ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD

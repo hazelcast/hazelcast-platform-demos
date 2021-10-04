@@ -16,7 +16,7 @@ docker network create $PROJECT --driver bridge > /dev/null 2>&1
 docker container prune --force > /dev/null 2>&1
 
 # External port 8083
-CMD="docker run -e MY_ZOOKEEPER=$MY_ZOOKEEPER --network=${PROJECT} ${DOCKER_IMAGE}"
+CMD="docker run -e MY_ZOOKEEPER=$MY_ZOOKEEPER --rm --network=${PROJECT} ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD

@@ -18,7 +18,7 @@ package com.hazelcast.platform.demos.ml.ri;
 
 import java.util.Locale;
 
-import com.hazelcast.jet.JetInstance;
+import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.topic.ITopic;
@@ -37,10 +37,10 @@ public class ApplicationInitializer {
      * pre-requisite Jet jobs for this example.
      * </p>
      */
-    public static void initialise(JetInstance jetInstance) {
-        createNeededObjects(jetInstance);
-        addNeededListeners(jetInstance);
-        launchNeededJobs(jetInstance);
+    public static void initialise(HazelcastInstance hazelcastInstance) {
+        createNeededObjects(hazelcastInstance);
+        addNeededListeners(hazelcastInstance);
+        launchNeededJobs(hazelcastInstance);
     }
 
 
@@ -50,9 +50,9 @@ public class ApplicationInitializer {
      * access, so ensuring all are visible from the outset.
      * </p>
      */
-    static void createNeededObjects(JetInstance jetInstance) {
-        jetInstance.getHazelcastInstance().getMap("points");
-        jetInstance.getHazelcastInstance().getTopic("pi");
+    static void createNeededObjects(HazelcastInstance hazelcastInstance) {
+        hazelcastInstance.getMap("points");
+        hazelcastInstance.getTopic("pi");
     }
 
 
@@ -64,11 +64,10 @@ public class ApplicationInitializer {
      * </p>
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    static void addNeededListeners(JetInstance jetInstance) {
+    static void addNeededListeners(HazelcastInstance hazelcastInstance) {
         MyTopicListener myTopicListener = new MyTopicListener();
 
-        jetInstance
-        .getHazelcastInstance()
+        hazelcastInstance
         .getDistributedObjects()
         .stream()
         .filter(distributedObject -> distributedObject instanceof ITopic)
@@ -89,13 +88,13 @@ public class ApplicationInitializer {
      * co-ordinates to the map "{@code points}".
      * </p>
      */
-    static void launchNeededJobs(JetInstance jetInstance) {
+    static void launchNeededJobs(HazelcastInstance hazelcastInstance) {
         Pipeline pipeline = RandomXYGenerator.buildPipeline();
 
         JobConfig jobConfig = new JobConfig();
         jobConfig.setName(RandomXYGenerator.class.getSimpleName());
 
-        jetInstance.newJobIfAbsent(pipeline, jobConfig);
+        hazelcastInstance.getJet().newJobIfAbsent(pipeline, jobConfig);
     }
 
 }
