@@ -74,6 +74,18 @@ Configuration:
           additivity: false
           AppenderRef:
             ref: ConsoleCyan
+        # Application general
+        - name: com.hazelcast.platform.demos.retail.clickstream
+          level: debug
+          additivity: false
+          AppenderRef:
+            ref: ConsoleYellow
+        # Application general main() class
+        - name: com.hazelcast.platform.demos.retail.clickstream.Application
+          level: error
+          additivity: false
+          AppenderRef:
+            ref: ConsoleRed
         # First cluster member triggers WARN from Kubernetes as nothing else in StatefulSet
         - name: com.hazelcast.spi.discovery.integration.DiscoveryService
           level: error
@@ -90,16 +102,6 @@ Configuration:
           additivity: false
           AppenderRef:
             ref: ConsoleRedBlink
-        - name: demo
-          level: debug
-          additivity: false
-          AppenderRef:
-            ref: ConsoleYellow
-        - name: demo.Application
-          level: error
-          additivity: false
-          AppenderRef:
-            ref: ConsoleRed
         - name: org.apache.pulsar.client.impl
           level: error
           additivity: false
