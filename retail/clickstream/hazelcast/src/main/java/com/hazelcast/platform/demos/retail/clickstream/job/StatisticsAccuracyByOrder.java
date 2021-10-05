@@ -16,8 +16,13 @@
 
 package com.hazelcast.platform.demos.retail.clickstream.job;
 
+import java.util.List;
+import java.util.Locale;
 import java.util.Map.Entry;
 
+import com.hazelcast.function.Functions;
+import com.hazelcast.jet.aggregate.AggregateOperation1;
+import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.jet.datamodel.Tuple5;
 import com.hazelcast.jet.pipeline.JournalInitialPosition;
@@ -26,7 +31,9 @@ import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.pipeline.Sources;
 import com.hazelcast.jet.pipeline.StreamSourceStage;
 import com.hazelcast.jet.pipeline.StreamStage;
+import com.hazelcast.jet.pipeline.WindowDefinition;
 import com.hazelcast.platform.demos.retail.clickstream.MyConstants;
+import com.hazelcast.platform.demos.retail.clickstream.MyUtils;
 import com.hazelcast.platform.demos.retail.clickstream.PredictionKey;
 
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +53,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class StatisticsAccuracyByOrder {
     private static final String[] ALGORITHMS = { "DecisionTree", "Gaussian", "RandomForest" };
-    //XXX private static final long ONE_MINUTE_IN_MS = 1 * 60 * 1_000L;
+    private static final long ONE_MINUTE_IN_MS = 1 * 60 * 1_000L;
+    private static final long FIVE = 5L;
 
     public static Pipeline buildPipeline(String clusterName, String graphiteHost) {
         Pipeline pipeline = Pipeline.create();
@@ -66,30 +74,20 @@ public class StatisticsAccuracyByOrder {
 
             // 3 way repeat for the possible algorithms
             for (String algorithm : ALGORITHMS) {
-                inputTimestamped
-                .mapUsingIMap(MyConstants.IMAP_NAME_PREDICTION,
+                StreamStage<Tuple2<String, Integer>> inputReduced =
+                    inputTimestamped
+                    .mapUsingIMap(MyConstants.IMAP_NAME_PREDICTION,
                         entry -> new PredictionKey(entry.getKey(), algorithm),
                         (Entry<String, Tuple3<Long, Long, String>> entry,
                                 Tuple5<String, Long, Long, Long, Integer> predictionValue) -> {
                                     if (predictionValue == null) {
                                         return null;
                                     }
-                                    String s =
-                                    "ALGO-2 K" + entry.getKey() + "A" + algorithm + "V" + predictionValue;
-                                    log.info(s);
-                                    //FIXME Grafana password and default dashboard -- try DOCKER
-                                    //FIXME Grafana password and default dashboard -- try DOCKER
-                                    //FIXME Grafana password and default dashboard -- try DOCKER
-                                    //FIXME Grafana password and default dashboard -- try DOCKER
-                                    //FIXME Grafana password and default dashboard -- try DOCKER
-                                    //FIXME ALGO-2 K65a5-774d5497-65a5-4603-a825-833262
-                                    //FIXME ADecisionTree
-                                    //FIXME V(2021-10-01T15:27:59Z, 1633103327410, 1633103327429, 1633103327439, 0)
-                                    return s;
+                                    return Tuple2.<String, Integer>tuple2(entry.getKey(), predictionValue.f4());
                                 }
-                                ).setName("prediction-" + algorithm)
-                .filter(x -> false)
-                .writeTo(Sinks.logger());
+                                ).setName("prediction-" + algorithm);
+
+                StatisticsAccuracyByOrder.addAggregation(inputReduced, algorithm, graphiteHost);
             }
         } catch (Exception e) {
             log.error("buildPipeline()", e);
@@ -97,6 +95,51 @@ public class StatisticsAccuracyByOrder {
         }
 
         return pipeline;
+    }
+
+    /**
+     * <p>Split off standard coding to stop method size being too huge.
+     * Aggregate by accuracy, format and send to Graphite for Grafana.
+     * </p>
+     *
+     * @param inputReduced
+     * @param algorithm
+     * @param graphiteHost
+     */
+    private static void addAggregation(StreamStage<Tuple2<String, Integer>> inputReduced,
+            String algorithm, String graphiteHost) {
+
+        AggregateOperation1<
+            Entry<String, Integer>,
+            AccuracyAggregator,
+            Entry<String, Float>>
+                accuracyAggregator =
+                    AccuracyAggregator.builAccuracyAggregation(algorithm);
+
+        StreamStage<Entry<String, Float>> aggregated
+            = inputReduced
+            .groupingKey(Functions.entryKey())
+            .window(WindowDefinition.tumbling(ONE_MINUTE_IN_MS))
+            .aggregate(accuracyAggregator).setName("aggregate-" + algorithm)
+            .map(keyedWindowResult -> keyedWindowResult.getValue()).setName("getAccuracy-" + algorithm);
+
+        if (graphiteHost.length() > 0) {
+            // Key is algorithm
+            StreamStage<List<Entry<String, Float>>> formattedStats = aggregated
+            .map(entry -> {
+                Tuple2<String, Float> accuracy =
+                        Tuple2.tuple2("ACCURACY." + entry.getKey().toUpperCase(Locale.ROOT),
+                                entry.getValue());
+                List<Entry<String, Float>> stats = List.of(accuracy);
+                return stats;
+             }).setName("accuracy-" + algorithm);
+
+            formattedStats.writeTo(MyUtils.buildGraphiteBatchSink(graphiteHost));
+            MyUtils.addExponentialLogger(formattedStats, "formattedStats-" + algorithm, FIVE);
+        } else {
+            log.warn("buildPipeline(), no graphite host, using Sinks.logger()");
+            aggregated.writeTo(Sinks.logger()).setName("logger-" + algorithm);
+        }
     }
 
 

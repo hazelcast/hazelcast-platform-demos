@@ -439,6 +439,6 @@
     "type": "timepicker"
   },
   "timezone": "browser",
-  "title": "@docker.image.prefix@",
+  "title": "hazelcast-@docker.image.prefix@",
   "version": 2
 }
