@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.retail.clickstream;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.io.Serializable;
 
 import org.python.core.PyFloat;
@@ -35,6 +37,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@SuppressFBWarnings(value = {"EI_EXPOSE_REP", "EI_EXPOSE_REP2"}, justification = "Graphite to be replaced with Prometheus")
 public class MyGraphiteMetric implements Serializable {
 
     private static final long serialVersionUID = 1L;

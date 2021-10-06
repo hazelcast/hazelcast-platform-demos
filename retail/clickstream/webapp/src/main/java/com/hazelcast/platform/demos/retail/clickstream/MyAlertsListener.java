@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.retail.clickstream;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -38,6 +40,7 @@ public class MyAlertsListener implements EntryAddedListener<Long, String> {
 
     private SimpMessagingTemplate simpMessagingTemplate;
 
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "A Spring singleton @Bean so must be shared")
     public MyAlertsListener(SimpMessagingTemplate arg0) {
         this.simpMessagingTemplate = arg0;
     }

@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.retail.clickstream;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -203,6 +205,8 @@ public class LoaderService {
      * @param block
      * @param producer
      */
+    @SuppressFBWarnings(value = "DMI_RANDOM_USED_ONLY_ONCE",
+            justification = "Wish single random sequence, each time fillBuffernFn() is called")
     private void processDataBlock(List<Tuple4<String, List<String>, List<String>, List<String>>> block,
             Producer<String> producer) throws Exception {
         int size = block.size();
@@ -251,6 +255,8 @@ public class LoaderService {
      * @param exponentialLogger
      * @param producer
      */
+    @SuppressFBWarnings(value = "DMI_RANDOM_USED_ONLY_ONCE",
+            justification = "Wish single random sequence, each time fillBuffernFn() is called")
     private void processDataItem(String key, List<String> actions, ExponentialLogger exponentialLogger,
             Producer<String> producer) throws Exception {
         int size = actions.size();

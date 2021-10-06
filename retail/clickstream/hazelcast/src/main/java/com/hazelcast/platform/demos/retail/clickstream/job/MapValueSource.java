@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.retail.clickstream.job;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.jet.pipeline.SourceBuilder;
 import com.hazelcast.map.IMap;
@@ -33,6 +35,7 @@ public class MapValueSource {
     private final Object key;
     private final String mapName;
 
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Hazelcast instance must be shared, not cloned")
     public MapValueSource(HazelcastInstance arg0, String arg1, Object arg2) {
         this.hazelcastInstance = arg0;
         this.mapName = arg1;

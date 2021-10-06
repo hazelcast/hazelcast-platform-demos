@@ -176,12 +176,12 @@ public class MySqlDebeziumOneWayCDC extends MyJobWrapper {
         String key = null;
 
         StringBuilder stringBuilder = new StringBuilder("{ ");
-        for (int i = 0 ; i < TariffMetadata.FIELD_NAMES.size(); i++) {
+        for (int i = 0 ; i < TariffMetadata.getFieldNames().size(); i++) {
             if (i != 0) {
                 stringBuilder.append(", ");
             }
 
-            String name = TariffMetadata.FIELD_NAMES.get(i);
+            String name = TariffMetadata.getFieldNames().get(i);
             stringBuilder.append("\"" + name + "\" : ");
 
             switch (name) {

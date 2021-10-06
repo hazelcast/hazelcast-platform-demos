@@ -16,6 +16,7 @@
 
 package com.hazelcast.platform.demos.telco.churn.domain;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -30,9 +31,12 @@ public class TariffMetadata {
     public static final String INTERNATIONAL = "international";
     public static final String RATE_PER_MINUTE = "ratePerMinute";
 
-    public static final List<String> FIELD_NAMES =
+    protected static final List<String> FIELD_NAMES =
             List.of(ID, YEAR, NAME,
                     INTERNATIONAL, RATE_PER_MINUTE
                     );
 
+    public static List<String> getFieldNames() {
+        return Collections.unmodifiableList(FIELD_NAMES);
+    }
 }
