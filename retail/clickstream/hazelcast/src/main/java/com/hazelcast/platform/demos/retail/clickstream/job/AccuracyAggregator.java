@@ -95,6 +95,8 @@ public class AccuracyAggregator implements Serializable {
             return null;
         }
         Float averageCorrect = (0.0F + this.sumCorrect) / this.count;
+        log.trace("exportFinish() this.algorithm=='{}', this.count=={} this.sumCorrect=={} AVG {}",
+                this.algorithm, this.count, this.sumCorrect, averageCorrect);
         return new SimpleImmutableEntry<>(this.algorithm, averageCorrect);
     }
 

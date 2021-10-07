@@ -43,6 +43,9 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * <p>Produce statistics on the latency of predictions.
  * </p>
+ * <p>TODO: Stats go to Graphite. Upgrading to Prometheus would be better.
+ * More in line with Grafana 8 onwards.
+ * </p>
  */
 @Slf4j
 public class StatisticsLatency {

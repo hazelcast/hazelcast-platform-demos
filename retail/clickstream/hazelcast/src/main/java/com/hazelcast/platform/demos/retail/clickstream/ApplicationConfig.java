@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.hazelcast.config.ClasspathYamlConfig;
 import com.hazelcast.config.Config;
+import com.hazelcast.config.DiscoveryStrategyConfig;
 import com.hazelcast.config.EventJournalConfig;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MapStoreConfig;
@@ -187,9 +188,16 @@ public class ApplicationConfig {
         WanBatchPublisherConfig myWanBatchPublisherConfig = new WanBatchPublisherConfig();
         myWanBatchPublisherConfig.setClusterName(remoteClusterName);
         myWanBatchPublisherConfig.setPublisherId("to-" + remoteClusterName);
-        myWanBatchPublisherConfig.setTargetEndpoints(remoteClusterMembers);
         myWanBatchPublisherConfig.setQueueCapacity(MyConstants.WAN_QUEUE_SIZE);
         myWanBatchPublisherConfig.setBatchSize(MyConstants.WAN_BATCH_SIZE);
+
+        if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
+            myWanBatchPublisherConfig.setUseEndpointPrivateAddress(false);
+            this.setKubernetesWanDiscoveryConfig(remoteClusterMembers, myWanBatchPublisherConfig);
+        } else {
+            // For Docker
+            myWanBatchPublisherConfig.setTargetEndpoints(remoteClusterMembers);
+        }
 
         // A group of 1 clusters to publish to
         WanReplicationConfig myWanReplicationConfig = new WanReplicationConfig();
@@ -197,6 +205,22 @@ public class ApplicationConfig {
         myWanReplicationConfig.getBatchPublisherConfigs().add(myWanBatchPublisherConfig);
 
         config.getWanReplicationConfigs().put(myWanReplicationConfig.getName(), myWanReplicationConfig);
+    }
+
+    /**
+     * <p>This demo runs both Hazelcast clusters in the same Kubernetes cluster, so can
+     * use DNS lookup.
+     * </p>
+     *
+     * @return
+     */
+    private void setKubernetesWanDiscoveryConfig(String remoteClusterMembers, WanBatchPublisherConfig myWanBatchPublisherConfig) {
+        DiscoveryStrategyConfig discoveryStrategyConfig =
+                // Class not public, can't use HazelcastKubernetesDiscoveryStrategy.class.getName()
+                new DiscoveryStrategyConfig("com.hazelcast.kubernetes.HazelcastKubernetesDiscoveryStrategy");
+        discoveryStrategyConfig.addProperty(MyConstants.KUBERNETES_PROPERTY_SERVICE_DNS, remoteClusterMembers);
+
+        myWanBatchPublisherConfig.getDiscoveryConfig().addDiscoveryStrategyConfig(discoveryStrategyConfig);
     }
 
     /**

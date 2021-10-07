@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 
-import com.hazelcast.function.Functions;
 import com.hazelcast.jet.aggregate.AggregateOperation1;
 import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.datamodel.Tuple3;
@@ -48,6 +47,9 @@ import lombok.extern.slf4j.Slf4j;
  * </p>
  * <p>But see also {@link RandomForestValidation} which does a different
  * variation of the calculation.
+ * </p>
+ * <p>TODO: Stats go to Graphite. Upgrading to Prometheus would be better.
+ * More in line with Grafana 8 onwards.
  * </p>
  */
 @Slf4j
@@ -116,9 +118,10 @@ public class StatisticsAccuracyByOrder {
                 accuracyAggregator =
                     AccuracyAggregator.builAccuracyAggregation(algorithm);
 
+        // Grouping key is constant, all keys counted together
         StreamStage<Entry<String, Float>> aggregated
             = inputReduced
-            .groupingKey(Functions.entryKey())
+            .groupingKey(__ -> "")
             .window(WindowDefinition.tumbling(ONE_MINUTE_IN_MS))
             .aggregate(accuracyAggregator).setName("aggregate-" + algorithm)
             .map(keyedWindowResult -> keyedWindowResult.getValue()).setName("getAccuracy-" + algorithm);

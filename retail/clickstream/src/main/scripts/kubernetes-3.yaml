@@ -1,0 +1,114 @@
+---
+# Service DNS for Pulsar Manager will be "clickstream-pulsar-manager.default.svc.cluster.local".
+# Service DNS for WebApp will be "clickstream-webapp.default.svc.cluster.local".
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$ SERVICE DEFINITIONS $$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clickstream-pulsar-manager
+spec:
+  selector:
+    app: clickstream-pulsar-manager
+  ports:
+  - name: port7750
+    port: 7750
+    protocol: TCP
+    targetPort: 7750
+  - name: port9527
+    port: 9527
+    protocol: TCP
+    targetPort: 9527
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clickstream-webapp
+spec:
+  selector:
+    app: clickstream-webapp
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: LoadBalancer
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$ POD DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clickstream-pulsar-manager
+spec:
+  selector:
+    matchLabels:
+      app: clickstream-pulsar-manager
+  template:
+    metadata:
+      labels:
+        app: clickstream-pulsar-manager
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/clickstream-pulsar-manager"
+          imagePullPolicy: Never
+          name: clickstream-pulsar-manager-container
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clickstream-webapp
+spec:
+  selector:
+    matchLabels:
+      app: clickstream-webapp
+  template:
+    metadata:
+      labels:
+        app: clickstream-webapp
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/clickstream-webapp"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /rest/k8s
+              port: 8080
+          name: clickstream-webapp-container
+          readinessProbe:
+            httpGet:
+              path: /rest/k8s
+              port: 8080
+            initialDelaySeconds: 30
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$ JOB DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: clickstream-job-pulsar-feed
+  name: clickstream-job-pulsar-feed
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: clickstream-job-pulsar-feed
+    spec:
+      containers:
+        - env:
+          - name: "MY_PULSAR_LIST"
+            value: "clickstream-pulsar.default.svc.cluster.local"
+          image: "neil/clickstream-pulsar-feed"
+          imagePullPolicy: Never
+          name: clickstream-job-pulsar-feed-container
+      restartPolicy: Never
+---
