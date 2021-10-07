@@ -79,7 +79,7 @@ public class ApplicationInitializer {
 
         JobControlListener jobControlListener = new JobControlListener(bootstrapServers);
         hazelcastInstance.getMap(MyConstants.IMAP_NAME_JOB_CONTROL)
-            .addEntryListener(jobControlListener, true);
+            .addLocalEntryListener(jobControlListener);
     }
 
 
@@ -156,6 +156,7 @@ public class ApplicationInitializer {
     static void defineQueryableObjects(HazelcastInstance hazelcastInstance, String bootstrapServers) {
         defineKafka(hazelcastInstance, bootstrapServers);
         defineIMap(hazelcastInstance);
+        defineIMap2(hazelcastInstance);
     }
 
 
@@ -262,6 +263,36 @@ public class ApplicationInitializer {
         define(definition3, hazelcastInstance);
         define(definition4, hazelcastInstance);
         define(definition5, hazelcastInstance);
+    }
+
+    /**
+     * <p>More map definitions
+     * </p>
+     * @param hazelcastInstance
+     */
+     static void defineIMap2(HazelcastInstance hazelcastInstance) {
+        String definition6 = "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_PYTHON_SENTIMENT
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = 'java.lang.String'"
+                + " )";
+
+        String definition7 = "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_JOB_CONTROL
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = 'java.lang.String'"
+                + " )";
+
+        define(definition6, hazelcastInstance);
+        define(definition7, hazelcastInstance);
     }
 
 
