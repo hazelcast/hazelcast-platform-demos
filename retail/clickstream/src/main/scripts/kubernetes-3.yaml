@@ -14,14 +14,14 @@ spec:
   selector:
     app: clickstream-pulsar-manager
   ports:
-  - name: port7750
-    port: 7750
-    protocol: TCP
-    targetPort: 7750
-  - name: port9527
+  - name: frontend
     port: 9527
     protocol: TCP
     targetPort: 9527
+  - name: backend
+    port: 7750
+    protocol: TCP
+    targetPort: 7750
   type: LoadBalancer
 ---
 apiVersion: v1
