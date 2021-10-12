@@ -122,7 +122,7 @@ public class ApplicationInitializer {
      * @return
      */
     private String defineIMapCpCds() {
-        return "CREATE MAPPING "
+        return "CREATE OR REPLACE MAPPING "
                 + MyConstants.IMAP_NAME_CP_CDS
                 + " ("
                 + "  __key VARCHAR,"
@@ -164,7 +164,7 @@ public class ApplicationInitializer {
      * @return
      */
     private String defineIMapFixings() {
-        return "CREATE MAPPING "
+        return "CREATE OR REPLACE MAPPING "
                 + MyConstants.IMAP_NAME_FIXINGS
                 + " ("
                 + "  __key VARCHAR,"
@@ -190,7 +190,7 @@ public class ApplicationInitializer {
      * @return
      */
     private String defineIMapIrCurves() {
-        return "CREATE MAPPING "
+        return "CREATE OR REPLACE MAPPING "
                 + MyConstants.IMAP_NAME_IRCURVES
                 + " ("
                 + "  __key VARCHAR,"
@@ -226,7 +226,7 @@ public class ApplicationInitializer {
      * @return
      */
     private String defineIMapTrades() {
-        return "CREATE MAPPING "
+        return "CREATE OR REPLACE MAPPING "
                 + MyConstants.IMAP_NAME_TRADES
                 + " ("
                 + "  __key VARCHAR,"
