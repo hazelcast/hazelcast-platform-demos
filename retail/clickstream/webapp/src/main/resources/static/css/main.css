@@ -1,0 +1,82 @@
+:root {
+	--hazelcast-blue: #012168;
+	--hazelcast-blue-dark: #0b2a35;
+	--hazelcast-blue-light: #2e7de1;
+	--hazelcast-orange: #ff5f00;
+}
+
+body {
+	background: DarkGrey;
+}
+
+h1 {
+    text-align: center;
+}
+h2, h3, h4 {
+    text-align: center;
+}
+
+.major_pane {
+	border-style: solid;
+    border-color: var(--hazelcast-blue-dark);
+    padding: 5px 5px 5px 5px;
+}
+
+.minor_pane {
+    border-top: 1px dashed;
+    border-color: var(--hazelcast-blue-light);
+    margin-left: auto;
+    margin-right: auto;
+    overflow-y: scroll;
+    vertical-align: top;
+}
+
+.whiteBox {
+    border: 4px solid DarkGray;
+    background-color: white;        
+    color: black;
+    font-family: "Courier New", Courier, monospace;
+}
+
+.pane_separator {
+        border-top: 1px dashed salmon;
+}
+
+.alertsOuterBox {
+    font-family: monospace;
+}
+.alertsOutputBox {
+    border: 4px solid black;
+    overflow: scroll;
+}
+
+.dataOuterBox {
+    font-family: monospace;
+}
+.dataOutputBox {
+    overflow: scroll;       
+}
+.dataBlue {
+        color: blue; 
+}
+.dataPurple {
+        color: purple;
+}
+
+.membersOuterBox {
+    font-family: monospace;
+}
+.membersOutputBox {
+    overflow: scroll;       
+}
+
+.headerfooter {
+	color: var(--hazelcast-blue-dark);
+	font-family: "Courier New", Courier, monospace;
+	font-size: 80%;
+	text-align: center;
+}
+.headerfooterline {
+	color: var(--hazelcast-orange);
+}
+

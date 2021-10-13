@@ -1,7 +1,7 @@
 # Hazelcast Platform Demo Applications
 
-Demonstration applications for the [Hazelcast Platform](https://hazelcast.org/platform/), the usage
-of [Hazelcast Jet](https://hazelcast.org/jet/) and [Hazelcast IMDG](https://hazelcast.org/imdg/) together.
+Demonstration applications for the [Hazelcast Platform](https://hazelcast.com/products/hazelcast-platform/), the combination
+of streaming analytics and in-memory data.
 
 ## Demos
 
@@ -11,14 +11,16 @@ of [Hazelcast Jet](https://hazelcast.org/jet/) and [Hazelcast IMDG](https://haze
   * [Credit Value Adjustment](./banking/credit-value-adjustment) Risk exposure calculation for Interest Rate Swaps.
 2. Machine Learning
   * [RI](./ml/ml-ri) Reference Implementation for Machine Learning Inference, minimal dependencies.
-3. Telco
+3. Retail
+  * [Clickstream](./retail/clickstream) E-Commerce analysis using ML prediction.
+4. Telco
   * [Churn](./telco/churn) Uses ML to predict customer churn
-4. Travel
+5. Travel
   * [Booking](./travel/booking) Integrated travel booking for accommodation and transport
 
 Also
 
-5. Utils
+6. Utils
   * [Utils](./utils) Utillity modules for the above projects to share.
 
 ## Build Instructions
@@ -27,7 +29,7 @@ Also
 
 Projects that use commercial features require a license key to operate. 
 
-Register [here](https://hazelcast.com/download/) to request the license key you need.
+Register [here](https://hazelcast.com/contact/) to request the license key you need.
 
 Once you have the license key you need, create a `settings.xml` in your `.m2` folder. Copy
 the example below, and replace the property value. Maven will read this file when you build
@@ -48,6 +50,9 @@ and apply the value in your build.
       <properties>
         <my.cloud.discovery.token>GOES HERE</my.cloud.discovery.token>
         <my.license.key>GOES HERE</my.license.key>
+        <my.slack.bot.user.oath.access.token>GOES HERE</my.slack.bot.user.oath.access.token>
+        <my.slack.bot.channel.name>GOES HERE</my.slack.bot.channel.name>
+        <my.slack.bot.channel.id>GOES HERE</my.slack.bot.channel.id>
       </properties>
     </profile>
   </profiles>
@@ -57,6 +62,10 @@ and apply the value in your build.
 You will need `my.license.key` for use with Hazelcast Enterprise.
 
 If using Hazelcast Cloud, you will need `my.cloud.discovery.token` from your Cloud cluster's credentials.
+
+If you plan to use the Slack integration in some modules, you will also need three Slack settings,
+`my.slack.bot.user.oath.access.token`, `my.slack.bot.channel.name` and `my.slack.bot.channel.id`.
+
 
 ## 3rd Party Software
 

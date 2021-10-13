@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.telco.churn.security;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
@@ -54,6 +56,7 @@ public class MyServerCredentialsFactory implements ICredentialsFactory {
      * </p>
      */
     @Override
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "These properties are immutable in practice")
     public void init(Properties properties) {
         this.buildTimestamp = properties.getProperty("buildTimestamp");
         this.moduleName = properties.getProperty("moduleName");
@@ -99,7 +102,7 @@ public class MyServerCredentialsFactory implements ICredentialsFactory {
             LOGGER.info("newCredentials => {}", token);
             this.myCredentials = new SimpleTokenCredentials(token.getBytes(StandardCharsets.UTF_8));
         }
-        return this.myCredentials;
+        return new SimpleTokenCredentials(this.myCredentials.getToken());
     }
 
 }

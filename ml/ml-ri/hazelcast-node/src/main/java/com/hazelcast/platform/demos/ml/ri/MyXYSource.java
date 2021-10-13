@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.ml.ri;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -46,6 +48,8 @@ public class MyXYSource {
      *
      * @param buffer Jet's unbounded input buffer.
      */
+    @SuppressFBWarnings(value = "DMI_RANDOM_USED_ONLY_ONCE",
+            justification = "Wish single random sequence, each time fillBuffernFn() is called")
     void fillBufferFn(SourceBuilder.SourceBuffer<Map.Entry<Double, Double>> buffer) {
         Tuple2<Double, Double> tuple2 = Tuple2.tuple2(random.nextDouble(), random.nextDouble());
         buffer.add(tuple2);

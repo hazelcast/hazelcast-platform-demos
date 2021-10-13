@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.banking.trademonitor;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -70,6 +72,7 @@ public class ApplicationRunner {
      * <p>Obtain references to the maps that are needed.
      * </p>
      */
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Hazelcast instance must be shared, not cloned")
     public ApplicationRunner(HazelcastInstance arg0) throws Exception {
         this.hazelcastInstance = arg0;
         this.aggregateQueryResultsMap =

@@ -1,0 +1,30 @@
+hazelcast:
+  # Replaced by Docker
+  cluster-name: '${CLUSTER_NAME}'
+  # Replaced by Maven
+  license-key: '@my.license.key@'
+
+  properties:
+    # Graceful shutdown is helpful for Kubernetes scale-down.
+    hazelcast.member.naming.moby.enabled: true
+    hazelcast.shutdownhook.policy: GRACEFUL
+
+  # Assuming Kubernetes, but override from Java code if we detect otherwise
+  network:
+    join:
+      auto-detection:
+        enabled: false
+      multicast:
+        enabled: false
+      kubernetes:
+        enabled: false
+        service-dns: '???.default.svc.cluster.local'
+    rest-api:
+      enabled: true
+      endpoint-groups:
+        HEALTH_CHECK:
+          enabled: true
+  # Resource upload for ML
+  jet:
+    enabled: true
+    resource-upload-enabled: true

@@ -1,0 +1,7 @@
+# Shared amongst "hazelcast-client-first.yml" and "hazelcast-client-second.yml"
+hazelcast-client:
+  instance-name: webapp-@maven.build.timestamp@
+  client-labels:
+    - webapp
+  properties:
+    hazelcast.client.statistics.enabled: true

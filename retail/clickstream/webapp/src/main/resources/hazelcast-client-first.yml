@@ -1,0 +1,13 @@
+hazelcast-client:
+  import:
+    - hazelcast-client-shared.yml
+  cluster-name: '@my.cluster1.name@'
+#  "cluster-members" added by Java
+#  network:
+#    cluster-members:
+  #
+  connection-strategy:
+    reconnect-mode: ON
+    connection-retry:
+      cluster-connect-timeout-millis: 5000
+ 

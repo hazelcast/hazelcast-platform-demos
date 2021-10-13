@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.banking.trademonitor;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import io.javalin.http.Handler;
 
 import org.eclipse.jetty.http.HttpStatus;
@@ -41,6 +43,7 @@ public class MyRestController {
 
     private final HazelcastInstance hazelcastInstance;
 
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Hazelcast instance must be shared, not cloned")
     public MyRestController(HazelcastInstance arg0) {
         this.hazelcastInstance = arg0;
     }

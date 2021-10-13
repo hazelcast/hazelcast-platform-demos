@@ -1,0 +1,67 @@
+---
+# Service DNS will be "clickstream-blue-hazelcast.default.svc.cluster.local".
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$ SERVICE DEFINITIONS $$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clickstream-blue-hazelcast
+spec:
+  clusterIP: None
+  selector:
+    app: clickstream-blue-hazelcast
+  ports:
+  - port: 5701
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clickstream-blue-hazelcast-for-hz-cli
+spec:
+  selector:
+    app: clickstream-blue-hazelcast
+  ports:
+  - port: 5701
+  type: LoadBalancer
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$ POD DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: clickstream-blue-hazelcast
+spec:
+  replicas: 5
+  serviceName: clickstream-blue-hazelcast
+  selector:
+    matchLabels:
+      app: clickstream-blue-hazelcast
+  template:
+    metadata:
+      labels:
+        app: clickstream-blue-hazelcast
+    spec:
+      containers:
+        - env:
+          - name: "LOCAL_CLUSTER_NAME"
+            value: "blue"
+          - name: "MY_PULSAR_LIST"
+            value: "clickstream-pulsar.default.svc.cluster.local"
+          image: "neil/clickstream-hazelcast"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /hazelcast/health/node-state
+              port: 5701
+          name: clickstream-blue-hazelcast-container
+          readinessProbe:
+            httpGet:
+              path: /hazelcast/health/ready
+              port: 5701
+            initialDelaySeconds: 30
+---
