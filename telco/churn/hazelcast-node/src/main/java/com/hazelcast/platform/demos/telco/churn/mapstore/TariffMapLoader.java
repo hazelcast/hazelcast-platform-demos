@@ -62,7 +62,7 @@ public class TariffMapLoader implements MapLoader<String, HazelcastJsonValue> {
 
             if (tariff != null) {
                 JSONObject json = new JSONObject(tariff);
-                MyMapHelpers.validate(json, TariffMetadata.FIELD_NAMES);
+                MyMapHelpers.validate(json, TariffMetadata.getFieldNames());
                 result = new HazelcastJsonValue(json.toString());
             }
 

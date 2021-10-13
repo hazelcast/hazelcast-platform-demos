@@ -24,16 +24,16 @@
 
 		<!-- Project specific versions -->
 		<javalin.version>3.13.0</javalin.version>
-		<spring-boot.version>2.4.3</spring-boot.version>
+		<spring-boot.version>2.5.1</spring-boot.version>
 
-                <!-- Common logons for Management Center, Grafana, Prometheus -->
-                <my.other.admin.user>admin</my.other.admin.user>
-                <my.other.admin.password>password1</my.other.admin.password>
+		<!-- Common logons for Management Center, Grafana, Prometheus -->
+		<my.other.admin.user>admin</my.other.admin.user>
+		<my.other.admin.password>password1</my.other.admin.password>
 
-                <!-- So Grafana can find Prometheus service, must match K8S YAML -->
-                <my.prometheus.name>${docker.image.prefix}-prometheus</my.prometheus.name>
-                <my.prometheus.port>9090</my.prometheus.port>
-                <my.management.center.name>${docker.image.prefix}-management-center</my.management.center.name>
+		<!-- So Grafana can find Prometheus service, must match K8S YAML -->
+		<my.prometheus.name>${docker.image.prefix}-prometheus</my.prometheus.name>
+		<my.prometheus.port>9090</my.prometheus.port>
+		<my.management.center.name>${docker.image.prefix}-management-center</my.management.center.name>
 	</properties>
 
 	<modules>

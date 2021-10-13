@@ -21,8 +21,8 @@ import java.util.UUID;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 
-import com.hazelcast.jet.Jet;
-import com.hazelcast.jet.JetInstance;
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.map.IMap;
@@ -40,9 +40,9 @@ public class Application {
      * </p>
      */
     public static void main(String[] args) throws Exception {
-        JetInstance jetInstance = Jet.bootstrappedInstance();
+        HazelcastInstance hazelcastInstance = Hazelcast.bootstrappedInstance();
 
-        Properties properties = buildKafkaProperties(jetInstance);
+        Properties properties = buildKafkaProperties(hazelcastInstance);
         String buildTimestamp = getBuildTimestamp();
 
         Pipeline pipelinePythonAnalysis = PythonAnalysis.buildPipeline(properties, buildTimestamp);
@@ -52,7 +52,7 @@ public class Application {
         jobConfigPythonAnalysis.setName(PythonAnalysis.class.getSimpleName() + "@" + buildTimestamp);
 
         // Fails if job exists with same job name, unlike "newJobIfAbsent"
-        jetInstance.newJob(pipelinePythonAnalysis, jobConfigPythonAnalysis);
+        hazelcastInstance.getJet().newJob(pipelinePythonAnalysis, jobConfigPythonAnalysis);
     }
 
     /**
@@ -61,12 +61,12 @@ public class Application {
      * Mainly makes sense for the "{@code BOOTSTRAP_SERVERS_CONFIG}".
      * </p>
      *
-     * @param jetInstance
+     * @param hazelcastInstance
      * @return
      */
-    private static Properties buildKafkaProperties(JetInstance jetInstance) {
+    private static Properties buildKafkaProperties(HazelcastInstance hazelcastInstance) {
         IMap<String, String> kafkaConfigMap =
-                jetInstance.getMap(MyConstants.IMAP_NAME_KAFKA_CONFIG);
+                hazelcastInstance.getMap(MyConstants.IMAP_NAME_KAFKA_CONFIG);
 
         Properties properties = new Properties();
 

@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.banking.trademonitor;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import io.javalin.http.Handler;
 
 import org.eclipse.jetty.http.HttpStatus;
@@ -26,7 +28,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hazelcast.jet.JetInstance;
+import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.sql.SqlResult;
 
@@ -39,10 +41,11 @@ import com.hazelcast.sql.SqlResult;
 public class MyRestController {
     private static final Logger LOGGER = LoggerFactory.getLogger(MyRestController.class);
 
-    private final JetInstance jetInstance;
+    private final HazelcastInstance hazelcastInstance;
 
-    public MyRestController(JetInstance arg0) {
-        this.jetInstance = arg0;
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Hazelcast instance must be shared, not cloned")
+    public MyRestController(HazelcastInstance arg0) {
+        this.hazelcastInstance = arg0;
     }
 
     /**
@@ -97,7 +100,7 @@ public class MyRestController {
      */
     public SqlDto sql(String query) {
         try {
-            SqlResult sqlResult = this.jetInstance.getSql().execute(query);
+            SqlResult sqlResult = this.hazelcastInstance.getSql().execute(query);
             Tuple3<String, String, List<String>> result =
                     MyUtils.prettyPrintSqlResult(sqlResult);
 

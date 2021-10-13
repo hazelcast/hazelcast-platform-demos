@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.telco.churn.security;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -70,6 +72,7 @@ public class MyServerLoginModule implements LoginModule {
      */
     @SuppressWarnings("unchecked")
     @Override
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "sharedState is shared")
     public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
             Map<String, ?> options) {
         String myIp = "?";

@@ -31,7 +31,11 @@ public class TariffTestdata {
     };
 
     public static Object[][] getTariffs() {
-        return TARIFFS.clone();
+        Object[][] result = new Object[TARIFFS.length][TARIFFS[0].length];
+        for (int i = 0 ; i < TARIFFS.length; i++) {
+            result[i] = TARIFFS[i].clone();
+        }
+        return result;
     }
 
 }

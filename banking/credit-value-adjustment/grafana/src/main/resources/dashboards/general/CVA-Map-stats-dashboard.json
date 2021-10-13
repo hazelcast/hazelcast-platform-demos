@@ -59,19 +59,19 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "max(hz_map_entryCount{mc_cluster='site1',name='cva_trades'})",
+          "expr": "max(hz_map_ownedEntryCount{mc_cluster='site1',name='cva_trades'})",
           "interval": "",
           "legendFormat": "site1.size",
           "refId": "A",
-          "target": "alias(max(hz_map_entryCount{mc_cluster='site1',name='cva_trades'}), 'site1.size')"
+          "target": "alias(max(hz_map_ownedEntryCount{mc_cluster='site1',name='cva_trades'}), 'site1.size')"
         },
         {
           "exemplar": true,
-          "expr": "max(hz_map_entryCount{mc_cluster='site2',name='cva_trades'})",
+          "expr": "max(hz_map_ownedEntryCount{mc_cluster='site2',name='cva_trades'})",
           "interval": "",
           "legendFormat": "site2.size",
           "refId": "B",
-          "target": "alias(max(hz_map_entryCount{mc_cluster='site2',name='cva_trades'}), 'site2.size')"
+          "target": "alias(max(hz_map_ownedEntryCount{mc_cluster='site2',name='cva_trades'}), 'site2.size')"
         }
       ],
           "thresholds": [],
@@ -258,16 +258,24 @@
           "span": 4,
           "stack": false,
           "steppedLine": false,
-          "targets": [
-            {
-              "refId": "A",
-              "target": "alias(site1.GrafanaGlobalMetricsJob.map.cva_cp_cds.near_cache_percent, 'site1.near_cache_percent')"
-            },
-            {
-              "refId": "B",
-              "target": "alias(site2.GrafanaGlobalMetricsJob.map.cva_cp_cds.near_cache_percent, 'site2.near_cache_percent')"
-            }
-          ],
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "(sum(hz_map_nearcache_hits{mc_cluster='site1',name='cva_cp_cds'}) * 100) / (sum(hz_map_nearcache_hits{mc_cluster='site1',name='cva_cp_cds'}) + sum(hz_map_nearcache_misses{mc_cluster='site1',name='cva_cp_cds'}) )",
+          "interval": "",
+          "legendFormat": "site1.near_cache_percent",
+          "refId": "A",
+          "target": "alias(site1.GrafanaGlobalMetricsJob.map.cva_cp_cds.near_cache_percent, 'site1.near_cache_percent')"
+        },
+        {
+          "exemplar": true,
+          "expr": "(sum(hz_map_nearcache_hits{mc_cluster='site2',name='cva_cp_cds'}) * 100) / (sum(hz_map_nearcache_hits{mc_cluster='site2',name='cva_cp_cds'}) + sum(hz_map_nearcache_misses{mc_cluster='site2',name='cva_cp_cds'}) )",
+          "interval": "",
+          "legendFormat": "site2.near_cache_percent",
+          "refId": "B",
+          "target": "alias(site2.GrafanaGlobalMetricsJob.map.cva_cp_cds.near_cache_percent, 'site2.near_cache_percent')"
+        }
+      ],
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
@@ -350,19 +358,19 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "max(hz_map_entryCount{mc_cluster='site1',name='cva_ircurves'})",
+          "expr": "max(hz_map_ownedEntryCount{mc_cluster='site1',name='cva_ircurves'})",
           "interval": "",
           "legendFormat": "site1.size",
           "refId": "A",
-          "target": "alias(max(hz_map_entryCount{mc_cluster='site1',name='cva_ircurves'}), 'site1.size')"
+          "target": "alias(max(hz_map_ownedEntryCount{mc_cluster='site1',name='cva_ircurves'}), 'site1.size')"
         },
         {
           "exemplar": true,
-          "expr": "max(hz_map_entryCount{mc_cluster='site2',name='cva_ircurves'})",
+          "expr": "max(hz_map_ownedEntryCount{mc_cluster='site2',name='cva_ircurves'})",
           "interval": "",
           "legendFormat": "site2.size",
           "refId": "B",
-          "target": "alias(max(hz_map_entryCount{mc_cluster='site2',name='cva_ircurves'}), 'site2.size')"
+          "target": "alias(max(hz_map_ownedEntryCount{mc_cluster='site2',name='cva_ircurves'}), 'site2.size')"
         }
       ],
           "thresholds": [],

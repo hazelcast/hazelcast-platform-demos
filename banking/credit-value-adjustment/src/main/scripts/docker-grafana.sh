@@ -17,7 +17,7 @@ docker container prune --force > /dev/null 2>&1
 
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
-CMD="docker run -p 80:80 -p 2004:2004 --name=${MODULE} --network=${PROJECT} ${DOCKER_IMAGE}"
+CMD="docker run -p 80:80 -p 2004:2004 --rm --name=${MODULE} --network=${PROJECT} ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD

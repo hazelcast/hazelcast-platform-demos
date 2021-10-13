@@ -1,0 +1,15 @@
+{
+  "name": "hazelcast",
+  "version": "1.0.0",
+  "description": "",
+  "main": "flight.js",
+  "scripts": {
+    "start": "node flight.js"
+  },
+  "author": "",
+  "dependencies": {
+    "async": "3.2.0",
+    "fastify": "3.19.2",
+    "hazelcast-client": "4.2.0"
+  }
+}

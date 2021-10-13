@@ -27,7 +27,6 @@ import com.hazelcast.config.MapStoreConfig;
 import com.hazelcast.config.NearCacheConfig;
 import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.config.TcpIpConfig;
-import com.hazelcast.jet.config.JetConfig;
 import com.hazelcast.nio.serialization.ClassDefinition;
 import com.hazelcast.nio.serialization.ClassDefinitionBuilder;
 import com.hazelcast.platform.demos.telco.churn.mapstore.MyMapStoreFactory;
@@ -68,6 +67,7 @@ public class ApplicationConfig {
     public Config config(MyMapStoreFactory myMapStoreFactory) {
         Config config = new ClasspathYamlConfig("hazelcast.yml");
 
+        this.adjustNetworkConfig(config);
         this.addClassDefinitions(config);
 
         // Call data records - Cassandra
@@ -108,6 +108,8 @@ public class ApplicationConfig {
 
         config.getMapConfigs().put(tariffMapConfig.getName(), tariffMapConfig);
 
+        this.adjustNearCacheConfig(config.getMapConfigs());
+
         return config;
     }
 
@@ -142,13 +144,8 @@ public class ApplicationConfig {
      * See <b>README.md</b> and "{@code src/main/scripts}" in the project top-level.
      * </p>
      */
-    @Bean
-    public JetConfig jetConfig(Config config) {
-        JetConfig jetConfig = new JetConfig().setHazelcastConfig(config);
-
-        this.adjustNearCacheConfig(jetConfig.getHazelcastConfig().getMapConfigs());
-
-        NetworkConfig networkConfig = jetConfig.getHazelcastConfig().getNetworkConfig();
+    public void adjustNetworkConfig(Config config) {
+        NetworkConfig networkConfig = config.getNetworkConfig();
 
         if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
             LOGGER.info("Kubernetes configuration: service-dns: {}",
@@ -166,8 +163,6 @@ public class ApplicationConfig {
 
             LOGGER.info("Non-Kubernetes configuration: member-list: {}", tcpIpConfig.getMembers());
         }
-
-        return jetConfig;
     }
 
     /**

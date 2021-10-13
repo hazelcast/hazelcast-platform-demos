@@ -69,7 +69,7 @@ public class MyUtils {
     protected static Sink<? super WindowResult<?>> buildTopicSink(Class<?> klass, String topicName) {
         return SinkBuilder.sinkBuilder(
                         "topicSink-" + topicName,
-                        context -> context.jetInstance().getHazelcastInstance().getTopic(topicName)
+                        context -> context.hazelcastInstance().getTopic(topicName)
                         )
                         .receiveFn((ITopic<Object> iTopic, WindowResult<?> item) ->
                             iTopic.publish(klass.getSimpleName() + "," + item.result().toString()))

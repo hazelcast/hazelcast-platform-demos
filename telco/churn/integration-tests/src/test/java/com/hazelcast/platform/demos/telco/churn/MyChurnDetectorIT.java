@@ -57,7 +57,7 @@ public class MyChurnDetectorIT extends AbstractJetIT {
 
     @BeforeEach
     void setUp() throws Exception {
-        jetInstance.getList(SINK_ILIST_NAME).clear();
+        hazelcastInstance.getList(SINK_ILIST_NAME).clear();
     }
 
     /**
@@ -101,9 +101,9 @@ public class MyChurnDetectorIT extends AbstractJetIT {
         jobConfig.addClass(MLChurnDetector.class);
         jobConfig.addClass(CallDataRecordKey.class);
         jobConfig.addClass(Sentiment.class);
-        jetInstance.newJob(pipeline, jobConfig).join();
+        hazelcastInstance.getJet().newJob(pipeline, jobConfig).join();
 
-        IList<String> iList = jetInstance.getList(SINK_ILIST_NAME);
+        IList<String> iList = hazelcastInstance.getList(SINK_ILIST_NAME);
         List<String> list = iList.stream().collect(Collectors.toList());
 
         assertThat(list).size().isEqualTo(expectedCurrent.size());

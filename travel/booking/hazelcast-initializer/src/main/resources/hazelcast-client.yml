@@ -1,0 +1,22 @@
+hazelcast-client:
+  # Replaced by Maven
+  cluster-name: '@my.cluster1.name@'
+  # Replaced by Maven
+  instance-name: '@project.artifactId@'
+  # 
+  client-labels:
+    - '@maven.build.timestamp@'
+  #
+  properties:
+    hazelcast.client.statistics.enabled: true
+  #
+  network:
+    auto-detection:
+      enabled: false
+    cluster-members:
+      - '@docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local'
+  #
+  connection-strategy:
+    reconnect-mode: OFF
+    connection-retry:
+      cluster-connect-timeout-millis: 5000 

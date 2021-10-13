@@ -1,0 +1,73 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hazelcast.platform.demos.utils</groupId>
+		<artifactId>utils-root</artifactId>
+		<version>5.0</version>
+	</parent>
+
+	<artifactId>utils-slack-integration</artifactId>
+
+	<name>Hazelcast Platform - Utils - Slack Integration</name>
+	<description>Utils - Read/write from/to Slack</description>
+
+	<properties>
+		<main.basedir>${project.parent.parent.basedir}</main.basedir>
+		<slack.bot.user.oath.access.token>${my.slack.bot.user.oath.access.token}</slack.bot.user.oath.access.token>
+		<slack.bot.channel.id>${my.slack.bot.channel.id}</slack.bot.channel.id>
+		<slack.bot.channel.name>${my.slack.bot.channel.name}</slack.bot.channel.name>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>utils-miscellaneous</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+
+		<!-- "provided" scope, caller can use hazelcast or hazelcast-enterprise -->
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-sql</artifactId>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-parent</artifactId>
+				<version>${spring-boot.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+	</build>
+</project>

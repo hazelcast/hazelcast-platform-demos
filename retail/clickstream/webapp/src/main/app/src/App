@@ -1,0 +1,68 @@
+import React, { Component } from 'react';
+import SockJsClient from 'react-stomp';
+import update from 'immutability-helper';
+import Alerts from './components/alerts'
+import Data from './components/data'
+import Members from './components/members'
+
+// Note SockJsClient uses 'http' protocol not 'ws'
+// See https://github.com/lahsivjar/react-stomp/blob/HEAD/API/
+const WS_URL = 'http://' + window.location.host + '/hazelcast';
+const WS_TOPICS_PREFIX = '/info';
+const WS_TOPICS = [ WS_TOPICS_PREFIX + "/cluster" ];
+
+class App extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            color: {background: 'DarkGrey'}
+        };
+        this.handleData = this.handleData.bind(this);
+    }
+    
+    handleData(message) {
+        console.log("App.js", "handleData()", message);
+
+        var clusterName = message.clusterName;
+        var newColor = {background: 'Red'};
+        if (clusterName === "blue") {
+            newColor = {background: 'DeepSkyBlue'};
+        }
+        if (clusterName === "green") {
+            newColor = {background: 'DarkSeaGreen'};
+        }
+               
+        // Unconditional update, newColor may not be different 
+        this.setState({
+            color: update(this.state.color, {$set: newColor}) 
+        })
+    }
+    
+    render() {
+                return (
+	               <div>
+                    	<SockJsClient 
+                        	url={WS_URL}
+                            topics={WS_TOPICS}
+                            onMessage={this.handleData}
+                            debug={false} />                
+                    	<div style={this.state.color}>
+                            <div class="minor_pane">
+								<Data />
+                    	    </div>
+                        	<div class="minor_pane">
+								<Members />
+                            </div>
+                            <div>
+                                <hr class="pane_separator"/>
+                            </div>
+                        	<div class="minor_pane">
+								<Alerts />
+                            </div>
+                    	</div>
+	               </div>
+                )
+        }
+}
+
+export default App;

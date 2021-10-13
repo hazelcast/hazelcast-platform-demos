@@ -45,7 +45,7 @@ public class SqlDto {
     }
 
     public List<String> getRows() {
-        return rows;
+        return new ArrayList<>(this.rows);
     }
 
     @Override

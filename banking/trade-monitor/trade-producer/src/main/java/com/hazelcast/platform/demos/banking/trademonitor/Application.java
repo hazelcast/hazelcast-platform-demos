@@ -27,11 +27,13 @@ public class Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
     private static final int DEFAULT_RATE = 300;
+    private static final int DEFAULT_MAX = -1;
 
     /**
      * <p>To run we need one argument, the Kafka brokers to connect
      * to. The second argument, the rate at which to create trades is
-     * optional.
+     * optional. A third argument, the number of items to produce,
+     * is also optional, and defaults to unlimited.
      * </p>
      */
     public static void main(String[] args) throws Exception {
@@ -50,11 +52,15 @@ public class Application {
         LOGGER.info("bootstrapServers={}", bootstrapServers);
 
         int rate = DEFAULT_RATE;
-        if (args.length == 2) {
+        int max = DEFAULT_MAX;
+        if (args.length >= 2) {
             rate = Integer.parseInt(args[1]);
         }
+        if (args.length == 3) {
+            max = Integer.parseInt(args[2]);
+        }
 
-        new ApplicationRunner(rate, bootstrapServers).run();
+        new ApplicationRunner(rate, max, bootstrapServers).run();
     }
 
 }

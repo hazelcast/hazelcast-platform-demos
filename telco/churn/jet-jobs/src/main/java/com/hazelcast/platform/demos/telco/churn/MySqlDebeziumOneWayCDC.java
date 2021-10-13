@@ -158,7 +158,7 @@ public class MySqlDebeziumOneWayCDC extends MyJobWrapper {
      * assuming not columns added while running. Also, it may have
      * extra unexpected metadata columns.
      * </p>
-     * <p>TODO: Add typing information to {@link TariffMetadata} for
+     * <p>Optional: Add typing information to {@link TariffMetadata} for
      * cleaner parsing, deduce rather than code types, and non-direct
      * field name mappings ("{@code rate}" to "{@code ratePerMinute}").
      * </p>
@@ -176,12 +176,12 @@ public class MySqlDebeziumOneWayCDC extends MyJobWrapper {
         String key = null;
 
         StringBuilder stringBuilder = new StringBuilder("{ ");
-        for (int i = 0 ; i < TariffMetadata.FIELD_NAMES.size(); i++) {
+        for (int i = 0 ; i < TariffMetadata.getFieldNames().size(); i++) {
             if (i != 0) {
                 stringBuilder.append(", ");
             }
 
-            String name = TariffMetadata.FIELD_NAMES.get(i);
+            String name = TariffMetadata.getFieldNames().get(i);
             stringBuilder.append("\"" + name + "\" : ");
 
             switch (name) {

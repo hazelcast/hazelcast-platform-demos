@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.banking.trademonitor;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,8 +32,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
-import com.hazelcast.jet.JetInstance;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.map.IMap;
 import com.hazelcast.query.impl.predicates.EqualPredicate;
@@ -60,7 +62,7 @@ public class ApplicationRunner {
     private static final String DRILL_SYMBOL = "DRILL_SYMBOL";
     private static final String LOAD_SYMBOLS = "LOAD_SYMBOLS";
 
-    private final JetInstance jetInstance;
+    private final HazelcastInstance  hazelcastInstance;
     private final IMap<String, Tuple3<Long, Long, Integer>> aggregateQueryResultsMap;
     private final IMap<String, SymbolInfo> symbolsMap;
     private final IMap<String, HazelcastJsonValue> tradesMap;
@@ -70,14 +72,15 @@ public class ApplicationRunner {
      * <p>Obtain references to the maps that are needed.
      * </p>
      */
-    public ApplicationRunner(JetInstance arg0) throws Exception {
-        this.jetInstance = arg0;
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Hazelcast instance must be shared, not cloned")
+    public ApplicationRunner(HazelcastInstance arg0) throws Exception {
+        this.hazelcastInstance = arg0;
         this.aggregateQueryResultsMap =
-            this.jetInstance.getMap(MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS);
+            this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS);
         this.symbolsMap =
-            this.jetInstance.getMap(MyConstants.IMAP_NAME_SYMBOLS);
+            this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_SYMBOLS);
         this.tradesMap =
-            this.jetInstance.getMap(MyConstants.IMAP_NAME_TRADES);
+            this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_TRADES);
     }
 
     /**
@@ -111,7 +114,7 @@ public class ApplicationRunner {
             .addSinglePageRoot("/", "/app/index.html");
 
             // REST
-            MyRestController myRestController = new MyRestController(this.jetInstance);
+            MyRestController myRestController = new MyRestController(this.hazelcastInstance);
             javalin.addHandler(HandlerType.GET, "/rest/", myRestController.handleIndex());
             javalin.addHandler(HandlerType.GET, "/rest/sql", myRestController.handleSql());
 
@@ -285,7 +288,7 @@ public class ApplicationRunner {
     private boolean demoSql() {
         boolean didFail = false;
         String[][] queries = new String[][] {
-            /*TODO Turn off for now, so Javalin available sooner
+            /* Turn off for now, so Javalin available sooner
             { "System",  "SELECT * FROM information_schema.mappings" },
             { "System",  "SELECT mapping_name AS name FROM information_schema.mappings" },
             { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS },
@@ -314,7 +317,7 @@ public class ApplicationRunner {
                 count++;
                 System.out.printf("(%d) : %s%n", count, query[0]);
                 System.out.println(query[1]);
-                SqlResult sqlResult = jetInstance.getSql().execute(query[1]);
+                SqlResult sqlResult = this.hazelcastInstance.getSql().execute(query[1]);
                 Tuple3<String, String, List<String>> result =
                         MyUtils.prettyPrintSqlResult(sqlResult);
                 if (result.f0().length() > 0) {

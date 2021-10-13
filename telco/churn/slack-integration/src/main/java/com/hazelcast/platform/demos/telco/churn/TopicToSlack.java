@@ -129,8 +129,8 @@ public class TopicToSlack {
                     "topicSource-" + topicName,
                     context -> {
                         ITopic<String> topic
-                            = context.jetInstance().getHazelcastInstance().getTopic(topicName);
-                        Address address = context.jetInstance().getCluster().getLocalMember().getAddress();
+                            = context.hazelcastInstance().getTopic(topicName);
+                        Address address = context.hazelcastInstance().getCluster().getLocalMember().getAddress();
                         String member = address.getHost() + ":" + address.getPort();
                         return new MyTopicSource(topic, member);
                     }

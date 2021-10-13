@@ -16,6 +16,8 @@
 
 package com.hazelcast.platform.demos.banking.cva;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.io.Serializable;
 import java.util.concurrent.Callable;
 
@@ -52,6 +54,7 @@ public class MapStatsCallable implements Callable<HazelcastJsonValue>, Hazelcast
      * </p>
      */
     @Override
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Hazelcast instance must be shared, not cloned")
     public void setHazelcastInstance(HazelcastInstance arg0) {
         this.hazelcastInstance = arg0;
     }

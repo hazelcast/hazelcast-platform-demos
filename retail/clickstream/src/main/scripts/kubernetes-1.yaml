@@ -1,0 +1,203 @@
+---
+# Service DNS for Cassandra will be "clickstream-cassandra.default.svc.cluster.local".
+# Service DNS for Grafana will be "clickstream-grafana.default.svc.cluster.local".
+# Service DNS for Management Center will be "clickstream-management-center.default.svc.cluster.local".
+# Service DNS for Prometheus will be "clickstream-prometheus.default.svc.cluster.local".
+# Service DNS for Pulsar will be "clickstream-pulsar.default.svc.cluster.local".
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$ SERVICE DEFINITIONS $$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Service for Cassandra
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clickstream-cassandra
+spec:
+  clusterIP: None
+  selector:
+    app: clickstream-cassandra
+  ports:
+  - port: 9042
+---
+# Service for Grafana
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clickstream-grafana
+spec:
+  selector:
+    app: clickstream-grafana
+  ports:
+    - name: grafana-http
+      port: 80
+      targetPort: 3000
+    - name: graphite
+      port: 2004
+      targetPort: 2004
+  type: LoadBalancer
+---
+# Service for Management Center
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clickstream-management-center
+spec:
+  selector:
+    app: clickstream-management-center
+  ports:
+    - name: clickstream-management-center
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer
+---
+# Service for Prometheus
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clickstream-prometheus
+spec:
+  selector:
+    app: clickstream-prometheus
+  ports:
+    - name: prometheus
+      port: 9090
+      targetPort: 9090
+  type: LoadBalancer
+---
+# Service for Pulsar
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clickstream-pulsar
+spec:
+  selector:
+    app: clickstream-pulsar
+  ports:
+    - name: pulsar-scheme
+      port: 6650
+      targetPort: 6650
+    - name: pulsar-http
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$ POD DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Pod for Cassandra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clickstream-cassandra
+spec:
+  selector:
+    matchLabels:
+      app: clickstream-cassandra
+  template:
+    metadata:
+      labels:
+        app: clickstream-cassandra
+    spec:
+      containers:
+        - image: "neil/clickstream-cassandra"
+          imagePullPolicy: Never
+          name: clickstream-cassandra-container
+---
+# Pod for Grafana
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clickstream-grafana
+spec:
+  selector:
+    matchLabels:
+      app: clickstream-grafana
+  template:
+    metadata:
+      labels:
+        app: clickstream-grafana
+    spec:
+      containers:
+        - image: "neil/clickstream-grafana"
+          imagePullPolicy: Never
+          name: clickstream-grafana-container
+---
+# Pod for Management Center
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clickstream-management-center
+spec:
+  selector:
+    matchLabels:
+      app: clickstream-management-center
+  template:
+    metadata:
+      labels:
+        app: clickstream-management-center
+    spec:
+      containers:
+        - image: "neil/clickstream-management-center"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+          name: clickstream-management-center-container
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 30
+---
+# Pod for Prometheus
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clickstream-prometheus
+spec:
+  selector:
+    matchLabels:
+      app: clickstream-prometheus
+  template:
+    metadata:
+      labels:
+        app: clickstream-prometheus
+    spec:
+      containers:
+        - image: "neil/clickstream-prometheus"
+          imagePullPolicy: Never
+          name: clickstream-prometheus-container
+---
+# Pod for Pulsar
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clickstream-pulsar
+spec:
+  selector:
+    matchLabels:
+      app: clickstream-pulsar
+  template:
+    metadata:
+      labels:
+        app: clickstream-pulsar
+    spec:
+      containers:
+        - image: "neil/clickstream-pulsar"
+          imagePullPolicy: Never
+          name: clickstream-pulsar-container
+---

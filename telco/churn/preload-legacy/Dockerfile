@@ -1,4 +1,4 @@
-FROM library/openjdk:11-jre-slim
+FROM library/openjdk:17-slim
 
 # Maven compiled target
 ARG JAR_FILE

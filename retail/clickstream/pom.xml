@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hazelcast.platform.demos.retail</groupId>
+		<artifactId>retail-root</artifactId>
+		<version>5.0</version>
+	</parent>
+
+	<groupId>com.hazelcast.platform.demos.retail.clickstream</groupId>
+	<artifactId>clickstream-root</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Hazelcast Platform - Retail - Clickstream</name>
+	<description>Clickstream Analysis with ML</description>
+
+	<modules>
+		<module>cassandra</module>
+		<module>common</module>
+		<module>grafana</module>
+		<module>hazelcast</module>
+		<module>job-decisiontree</module>
+		<module>job-gaussian</module>
+		<module>management-center</module>
+		<module>prometheus</module>
+		<module>pulsar</module>
+		<module>pulsar-feed</module>
+		<module>pulsar-manager</module>
+		<module>webapp</module>
+	</modules>
+
+	<properties>
+		<docker.image.prefix>clickstream</docker.image.prefix>
+		<main.basedir>${project.parent.parent.basedir}</main.basedir>
+
+		<!-- Environment variables -->
+		<my.build.timestamp>${maven.build.timestamp}</my.build.timestamp>
+		<my.cluster1.name>blue</my.cluster1.name>
+		<my.cluster2.name>green</my.cluster2.name>
+
+		<!-- For Management Center, Cassandra etc logons -->
+		<my.mc.admin.user>admin</my.mc.admin.user>
+		<my.mc.admin.password>password1</my.mc.admin.password>
+		<my.other.admin.user>${my.mc.admin.user}</my.other.admin.user>
+		<my.other.admin.password>${my.mc.admin.password}</my.other.admin.password>
+		<my.other.admin.database>clickstream</my.other.admin.database>
+
+		<my.mc.cluster1.name>${my.cluster1.name}</my.mc.cluster1.name>
+		<my.mc.cluster1.addresslist>${docker.image.prefix}-${my.cluster1.name}-hazelcast.default.svc.cluster.local</my.mc.cluster1.addresslist>
+		<my.mc.cluster1.portlist>5701,5702,5703</my.mc.cluster1.portlist>
+		<my.mc.cluster2.name>${my.cluster2.name}</my.mc.cluster2.name>
+		<my.mc.cluster2.addresslist>${docker.image.prefix}-${my.cluster2.name}-hazelcast.default.svc.cluster.local</my.mc.cluster2.addresslist>
+		<my.mc.cluster2.portlist>6701,6702,6703</my.mc.cluster2.portlist>
+
+		<!-- From settings.xml -->
+		<my.mc.license.key>${my.license.key}</my.mc.license.key>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-yaml</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.python</groupId>
+			<artifactId>jython</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-log4j2</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-cassandra</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- scope==test -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.hazelcast</groupId>
+				<artifactId>hazelcast-enterprise</artifactId>
+				<version>${hazelcast.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.hazelcast</groupId>
+				<artifactId>hazelcast-sql</artifactId>
+				<version>${hazelcast.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.hazelcast.jet</groupId>
+				<artifactId>hazelcast-jet-python</artifactId>
+				<version>${hazelcast.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.hazelcast.jet.contrib</groupId>
+				<artifactId>pulsar</artifactId>
+				<version>${hazelcast-jet-pulsar.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>com.google.code.findbugs</groupId>
+						<artifactId>jsr305</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.hazelcast.jet</groupId>
+						<artifactId>hazelcast-jet</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.pulsar</groupId>
+						<artifactId>pulsar-client</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<dependency>
+				<groupId>net.minidev</groupId>
+				<artifactId>json-smart</artifactId>
+				<version>${json-smart.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.pulsar</groupId>
+				<artifactId>pulsar-client</artifactId>
+				<version>${pulsar.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-parent</artifactId>
+				<type>pom</type>
+				<scope>import</scope>
+				<version>${spring-boot.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+</project>
