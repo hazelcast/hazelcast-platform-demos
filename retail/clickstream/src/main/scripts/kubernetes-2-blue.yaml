@@ -52,7 +52,7 @@ spec:
             value: "blue"
           - name: "MY_PULSAR_LIST"
             value: "clickstream-pulsar.default.svc.cluster.local"
-          image: "neil/clickstream-hazelcast"
+          image: "hazelcast-platform-demos/clickstream-hazelcast"
           imagePullPolicy: Never
           livenessProbe:
             httpGet:
