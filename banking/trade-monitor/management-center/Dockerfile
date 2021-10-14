@@ -8,11 +8,8 @@ ARG MY_ADMINUSER
 ARG MY_ADMINPASSWORD
 
 # To check health, uses port 8081 but internal URL. Preconfigure license, logon/password.
-# Until https://github.com/hazelcast/hazelcast/issues/19137 fixed use
-# -Dhazelcast.mc.periodic.healthcheck.enabled=false \
 ENV JAVA_OPTS="-Dhazelcast.mc.healthCheck.enable=true \
  -Dhazelcast.mc.prometheusExporter.enabled=true \
- -Dhazelcast.mc.periodic.healthcheck.enabled=false \
  -Dhazelcast.mc.license=$MC_LICENSE"
 
 # Used by /mc-start.sh to create admin user

@@ -95,6 +95,7 @@ public class CvaStpJobSubmitter {
         JobConfig jobConfig = new JobConfig();
         jobConfig.setName(jobName);
         jobConfig.addClass(CvaStpJob.class);
+        jobConfig.addClass(CvaStpUtils.class);
 
         Job job = MyUtils.findRunningJobsWithSamePrefix(jobNamePrefix, hazelcastInstance);
         if (job != null) {
