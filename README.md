@@ -9,18 +9,20 @@ of streaming analytics and in-memory data.
   * [Trade Monitor](./banking/trade-monitor) Monitoring and aggregation of stock market trading volumes.
     * [Watch The Video](https://hazelcast.com/resources/continuous-query-with-drill-down-demo/)
   * [Credit Value Adjustment](./banking/credit-value-adjustment) Risk exposure calculation for Interest Rate Swaps.
-2. Machine Learning
+2. Industry 4.0
+  * [IIOT](./industry/iiot) Predictive maintenance for plant machinery
+3. Machine Learning
   * [RI](./ml/ml-ri) Reference Implementation for Machine Learning Inference, minimal dependencies.
-3. Retail
+4. Retail
   * [Clickstream](./retail/clickstream) E-Commerce analysis using ML prediction.
-4. Telco
+5. Telco
   * [Churn](./telco/churn) Uses ML to predict customer churn
-5. Travel
+6. Travel
   * [Booking](./travel/booking) Integrated travel booking for accommodation and transport
 
 Also
 
-6. Utils
+7. Utils
   * [Utils](./utils) Utillity modules for the above projects to share.
 
 ## Build Instructions
