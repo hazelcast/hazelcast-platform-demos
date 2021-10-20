@@ -1,0 +1,6 @@
+hazelcast-client:
+  cluster-name: '@hz.cloud.cluster1.name@'
+  connection-strategy:
+    reconnect-mode: OFF
+    connection-retry:
+      cluster-connect-timeout-millis: 5000

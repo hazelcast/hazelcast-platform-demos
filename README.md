@@ -50,7 +50,8 @@ and apply the value in your build.
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <my.cloud.discovery.token>GOES HERE</my.cloud.discovery.token>
+	    <my.cloud.cluster1.name>GOES HERE</my.cloud.cluster1.name>
+        <my.cloud.cluster1.discovery.token>GOES HERE</my.cloud.cluster1.discovery.token>
         <my.license.key>GOES HERE</my.license.key>
         <my.slack.bot.user.oath.access.token>GOES HERE</my.slack.bot.user.oath.access.token>
         <my.slack.bot.channel.name>GOES HERE</my.slack.bot.channel.name>
@@ -63,7 +64,7 @@ and apply the value in your build.
 
 You will need `my.license.key` for use with Hazelcast Enterprise.
 
-If using Hazelcast Cloud, you will need `my.cloud.discovery.token` from your Cloud cluster's credentials.
+If using Hazelcast Cloud, you will need `my.cloud.c` and `my.cloud.cluster1.discovery.token` from your Cloud cluster's credentials.
 
 If you plan to use the Slack integration in some modules, you will also need three Slack settings,
 `my.slack.bot.user.oath.access.token`, `my.slack.bot.channel.name` and `my.slack.bot.channel.id`.

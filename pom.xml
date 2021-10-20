@@ -14,6 +14,7 @@
 
 	<modules>
 		<module>banking</module>
+		<module>industry</module>
 		<module>ml</module>
 		<module>retail</module>
 		<module>telco</module>
@@ -29,6 +30,9 @@
 		<dockerfile.skip>true</dockerfile.skip>
 		<failsafe.skip>true</failsafe.skip>
 		<java.version>17</java.version>
+		<!-- TMP 
+		<java.version>11</java.version>
+		-->
 		<main.basedir>${project.basedir}</main.basedir>
 		<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -42,7 +46,7 @@
 		<guava.version>29.0-jre</guava.version>
         <!-- Matches banking/credit-value-adjustment/cpp/Dockerfile2 -->
 		<grpc.version>1.31.1</grpc.version>
-		<hazelcast.version>5.0</hazelcast.version>
+		<hazelcast.version>5.0.1-SNAPSHOT</hazelcast.version>
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
 		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
 		<jackson.version>2.12.4</jackson.version>
@@ -84,6 +88,11 @@
 		<os-maven-plugin.version>1.6.2</os-maven-plugin.version>
 		<protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
 		<spotbugs-maven-plugin.version>${spotbugs-annotations.version}</spotbugs-maven-plugin.version>
+
+		<!-- Common logons for Management Center, Grafana, Prometheus -->
+	        <my.other.admin.user>admin</my.other.admin.user>
+                <my.other.admin.password>password1</my.other.admin.password>
+                <my.other.admin.database>${docker.image.prefix}</my.other.admin.database>
 	</properties>
 
 	<dependencies>
@@ -431,8 +440,13 @@
 					<version>${dockerfile-maven-plugin.version}</version>
 					<configuration>
 						<buildArgs>
+							<!-- Hazelcast cloud -->
+							<HZ_CLOUD_CLUSTER1_DISCOVERY_TOKEN>${my.hz.cloud.cluster1.discovery.token}</HZ_CLOUD_CLUSTER1_DISCOVERY_TOKEN>
+							<HZ_CLOUD_CLUSTER1_NAME>${my.hz.cloud.cluster1.name}</HZ_CLOUD_CLUSTER1_NAME>
 							<!-- Dockerfile will use for our built modules -->
 							<JAR_FILE>${docker.jar.file}</JAR_FILE>
+							<JAR_FILE2>${docker.jar.file2}</JAR_FILE2>
+							<MAIN_CLASS>${main.class}</MAIN_CLASS>
 							<!-- Dockerfile uses for Management Center. -->
 							<MC_LICENSE>${my.mc.license.key}</MC_LICENSE>
 							<!-- Preconfigured connections -->
