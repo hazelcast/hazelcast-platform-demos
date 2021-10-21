@@ -5,17 +5,17 @@
 
 	<parent>
 		<groupId>com.hazelcast.platform.demos.industry.iiot</groupId>
-		<artifactId>iiot-test-local-root</artifactId>
+		<artifactId>iiot-test-cloud-root</artifactId>
 		<version>5.0</version>
 	</parent>
 
-	<artifactId>iiot-test-local-client</artifactId>
+	<artifactId>iiot-test-cloud-client</artifactId>
 
-	<name>Hazelcast Platform - IIOT - Test - Local - Client</name>
-	<description>For offline testing, a client connecting to the offline cluster</description>
+	<name>Hazelcast Platform - IIOT - Test - Cloud - Client</name>
+	<description>For online testing, a client connecting to the Hazelcast Cloud cluster</description>
 
 	<properties>
-		<docker.image.name>test-local-client</docker.image.name>
+		<docker.image.name>test-cloud-client</docker.image.name>
 		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.parent.parent.basedir}</main.basedir>
 	</properties>

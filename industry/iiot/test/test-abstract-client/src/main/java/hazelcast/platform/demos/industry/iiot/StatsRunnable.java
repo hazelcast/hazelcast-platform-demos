@@ -16,6 +16,7 @@
 
 package hazelcast.platform.demos.industry.iiot;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -27,6 +28,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.jet.Job;
 import com.hazelcast.map.IMap;
@@ -60,8 +62,11 @@ public class StatsRunnable {
                 log.info("-=-=-=-=- {} '{}' {} -=-=-=-=-=-",
                         countStr, this.hazelcastInstance.getName(), countStr);
                 if (count % 3 == 0) {
-                    this.logIMapSizes();
-                    this.logJobs();
+                    this.logDistributedObjects();
+                    //XXX
+                    if ("5.0".equals(System.getProperty("user.name"))) {
+                        this.logJobs();
+                    }
                 }
                 count++;
             }
@@ -74,9 +79,10 @@ public class StatsRunnable {
      * <p>Confirm the data sizes for {@link IMap} instances..
      * </p>
      */
-    private void logIMapSizes() {
-        Set<String> mapNames = this.hazelcastInstance
-                .getDistributedObjects()
+    private void logDistributedObjects() {
+        Collection<DistributedObject> distributedObjects = this.hazelcastInstance.getDistributedObjects();
+
+        Set<String> mapNames = distributedObjects
                 .stream()
                 .filter(distributedObject -> (distributedObject instanceof IMap))
                 .filter(distributedObject -> !distributedObject.getName().startsWith("__"))
@@ -92,6 +98,16 @@ public class StatsRunnable {
                 log.info("MAP '{}'.size() => {}", iMap.getName(), iMap.size());
             });
         }
+
+        // Catch unexpected
+        distributedObjects
+        .stream()
+        .filter(distributedObject -> !(distributedObject instanceof IMap))
+        .forEach(distributedObject -> {
+            String klassName = Utils.formatClientProxyClass(distributedObject.getClass());
+            log.info("UNEXPECTED OBJECT, NAME '{}', CLASS '{}'",
+                    distributedObject.getName(), klassName);
+        });
     }
 
     /**
