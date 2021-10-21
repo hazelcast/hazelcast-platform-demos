@@ -5,20 +5,20 @@
 
 	<parent>
 		<groupId>com.hazelcast.platform.demos.industry.iiot</groupId>
-		<artifactId>iiot-test-root</artifactId>
+		<artifactId>iiot-test-local-root</artifactId>
 		<version>5.0</version>
 	</parent>
 
-	<artifactId>iiot-test-cluster</artifactId>
+	<artifactId>iiot-test-local-cluster</artifactId>
 
-	<name>Hazelcast Platform - IIOT - Test - Hazelcast Cluster</name>
+	<name>Hazelcast Platform - IIOT - Test - Local - Cluster</name>
 	<description>For offline testing, a cluster simulating Hazelcast Cloud</description>
 
 	<properties>
-		<docker.image.name>test-hazelcast</docker.image.name>
+		<docker.image.name>test-local-hazelcast</docker.image.name>
 		<docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</docker.jar.file>
 		<docker.jar.file2>iiot-custom-classes-${project.version}-jar-with-dependencies.jar</docker.jar.file2>
-		<main.basedir>${project.parent.parent.parent.parent.basedir}</main.basedir>
+		<main.basedir>${project.parent.parent.parent.parent.parent.basedir}</main.basedir>
 		<main.class>hazelcast.platform.demos.industry.iiot.Application</main.class>
 	</properties>
 
@@ -67,7 +67,7 @@
 				<artifactId>maven-antrun-plugin</artifactId>
 				<configuration>
 					<target name="Copy ${docker.jar.file2}">
-						<copy file="../../custom-classes/target/${docker.jar.file2}" todir="${project.build.directory}"/>
+						<copy file="../../../custom-classes/target/${docker.jar.file2}" todir="${project.build.directory}"/>
 					</target>
 				</configuration>
 				<executions>

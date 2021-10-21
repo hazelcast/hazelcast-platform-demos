@@ -7,7 +7,8 @@ TARGET=`basename $0 | sed 's/^docker-//' | sed 's/\.sh$//'`
 FIRST=`echo $TARGET | cut -d- -f1`
 SECOND=`echo $TARGET | cut -d- -f2`
 THIRD=`echo $TARGET | cut -d- -f3`
-MODULE=${FIRST}-${SECOND}
+FOURTH=`echo $TARGET | cut -d- -f4`
+MODULE=${FIRST}-${SECOND}-${THIRD}
 CONTAINER_NAME=${MODULE}
 VOLUME=""
 if [ "$FIRST" != "test" ]
@@ -15,9 +16,9 @@ then
  echo Usage: ${0}: Only for "test"
  exit 1
 fi
-if [ "$THIRD" != "" ] && [ $(expr `echo $THIRD | egrep -w '0|1|2' | wc -l`) -gt 0 ]
+if [ "$FOURTH" != "" ] && [ $(expr `echo "$FOURTH" | egrep -w '0|1|2' | wc -l`) -gt 0 ]
 then
- CONTAINER_NAME=${CONTAINER_NAME}-${THIRD}
+ CONTAINER_NAME=${CONTAINER_NAME}-${FOURTH}
 fi
 
 # May need host machine IP for clustering
@@ -34,12 +35,12 @@ then
 fi
 
 # Test Cluster
-if [ "$SECOND" == "hazelcast" ]
+if [ "$THIRD" == "hazelcast" ]
 then
  JAVA_ARGS="-e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP}:${DOCKER_PORT_EXTERNAL}"
 fi
 # Test Client
-if [ "$SECOND" == "client" ]
+if [ "$THIRD" == "client" ]
 then
  JAVA_ARGS="-e HOST_IP=${HOST_IP}"
 fi

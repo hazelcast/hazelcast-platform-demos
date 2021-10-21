@@ -6,22 +6,22 @@
 
 	<parent>
 		<groupId>com.hazelcast.platform.demos.industry.iiot</groupId>
-		<artifactId>iiot-root</artifactId>
+		<artifactId>iiot-test-root</artifactId>
 		<version>5.0</version>
 	</parent>
 
-	<artifactId>iiot-test-root</artifactId>
+	<artifactId>iiot-test-local-root</artifactId>
 	<packaging>pom</packaging>
 
-	<name>Hazelcast Platform - IIOT - Test</name>
+	<name>Hazelcast Platform - IIOT - Test - Local</name>
 	<description>Modules for offline testing</description>
 
 	<modules>
-		<module>test-client</module>
-		<module>test-cluster</module>
+		<module>test-local-client</module>
+		<module>test-local-cluster</module>
 	</modules>
 
 	<properties>
-		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
+		<main.basedir>${project.parent.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 </project>
