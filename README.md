@@ -50,7 +50,7 @@ and apply the value in your build.
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-	    <my.cloud.cluster1.name>GOES HERE</my.cloud.cluster1.name>
+        <my.cloud.cluster1.name>GOES HERE</my.cloud.cluster1.name>
         <my.cloud.cluster1.discovery.token>GOES HERE</my.cloud.cluster1.discovery.token>
         <my.license.key>GOES HERE</my.license.key>
         <my.slack.bot.user.oath.access.token>GOES HERE</my.slack.bot.user.oath.access.token>
