@@ -16,10 +16,12 @@
 
 package hazelcast.platform.demos.industry.iiot;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -54,7 +56,10 @@ public class ApplicationRunner {
 
             this.listAndDeleteDistributedObject();
 
-            TimeUnit.HOURS.sleep(1L);
+            // Shutdown if didn't work
+            if (this.initialize()) {
+                TimeUnit.HOURS.sleep(1L);
+            }
 
             log.info("-=-=-=-=-  END  '{}'  END  -=-=-=-=-=-",
                     this.hazelcastInstance.getName());
@@ -68,7 +73,10 @@ public class ApplicationRunner {
      */
     @SuppressWarnings("rawtypes")
     private void listAndDeleteDistributedObject() {
-        Collection<DistributedObject> distributedObjects = this.hazelcastInstance.getDistributedObjects();
+        Collection<DistributedObject> distributedObjects = this.hazelcastInstance.getDistributedObjects()
+                .stream()
+                .filter(distributedObject -> !distributedObject.getName().startsWith("__"))
+                .collect(Collectors.toCollection(ArrayList::new));
 
         log.info("-------------------------------");
         log.info("Delete:");
@@ -81,7 +89,11 @@ public class ApplicationRunner {
             } else {
                 // Unexpected type
                 String klassName = Utils.formatClientProxyClass(distributedObject.getClass());
-                log.error(String.format("  : %10s: %s unexpected", "'" + distributedObject.getName() + "'", klassName));
+                if (klassName.equals("ExecutorService")) {
+                    log.info(String.format("  : %10s: %s", "'" + distributedObject.getName() + "'", klassName));
+                } else {
+                    log.error(String.format("  : %10s: %s unexpected", "'" + distributedObject.getName() + "'", klassName));
+                }
                 distributedObject.destroy();
                 count++;
             }
@@ -105,4 +117,12 @@ public class ApplicationRunner {
         log.info("-------------------------------");
     }
 
+    /**
+     * <p>Initialize the cluster, creating maps, loading any necessary data.
+     * </p>
+     */
+    private boolean initialize() {
+        InitializerAnyNode initializerAnyNode = new InitializerAnyNode();
+        return Utils.runTuple3Callable(initializerAnyNode, this.hazelcastInstance, true);
+    }
 }

@@ -16,6 +16,7 @@
 
 package hazelcast.platform.demos.industry.iiot;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Component;
 
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IExecutorService;
 import com.hazelcast.jet.Job;
 import com.hazelcast.map.IMap;
 
@@ -80,19 +82,40 @@ public class StatsRunnable {
      * </p>
      */
     private void logDistributedObjects() {
-        Collection<DistributedObject> distributedObjects = this.hazelcastInstance.getDistributedObjects();
+        Set<String> iMapNames = new TreeSet<>();
+        Set<String> executorNames = new TreeSet<>();
+        Map<String, Class<?>> otherNames = new TreeMap<>();
 
-        Set<String> mapNames = distributedObjects
+        Collection<DistributedObject> distributedObjects = this.hazelcastInstance.getDistributedObjects()
                 .stream()
-                .filter(distributedObject -> (distributedObject instanceof IMap))
                 .filter(distributedObject -> !distributedObject.getName().startsWith("__"))
-                .map(distributedObject -> distributedObject.getName())
-                .collect(Collectors.toCollection(TreeSet::new));
+                .collect(Collectors.toCollection(ArrayList::new));
 
-        if (mapNames.isEmpty()) {
-            log.info("NO MAPS");
-        } else {
-            mapNames
+        distributedObjects
+                .stream()
+                .forEach(distributedObject -> {
+                    if (distributedObject instanceof IMap) {
+                        iMapNames.add(distributedObject.getName());
+                    } else {
+                        if (distributedObject instanceof IExecutorService) {
+                            executorNames.add(distributedObject.getName());
+                        } else {
+                            otherNames.put(distributedObject.getName(), distributedObject.getClass());
+                        }
+                    }
+                });
+
+        if (distributedObjects.isEmpty()) {
+            log.info("NO DISTRIBUTED OBJECTSs");
+        }
+        if (!executorNames.isEmpty()) {
+            executorNames
+            .forEach(name -> {
+                log.info("EXECUTOR '{}'", name);
+            });
+        }
+        if (!iMapNames.isEmpty()) {
+            iMapNames
             .forEach(name -> {
                 IMap<?, ?> iMap = this.hazelcastInstance.getMap(name);
                 log.info("MAP '{}'.size() => {}", iMap.getName(), iMap.size());
@@ -100,13 +123,12 @@ public class StatsRunnable {
         }
 
         // Catch unexpected
-        distributedObjects
-        .stream()
-        .filter(distributedObject -> !(distributedObject instanceof IMap))
-        .forEach(distributedObject -> {
-            String klassName = Utils.formatClientProxyClass(distributedObject.getClass());
+        otherNames
+        .entrySet()
+        .forEach(entry -> {
+            String klassName = Utils.formatClientProxyClass(entry.getValue());
             log.info("UNEXPECTED OBJECT, NAME '{}', CLASS '{}'",
-                    distributedObject.getName(), klassName);
+                    entry.getKey(), klassName);
         });
     }
 
