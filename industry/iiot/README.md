@@ -19,6 +19,6 @@ Both are provided when you set up the cluster. Refer to the top-level [README](.
 To facilitate testing and debugging, additional modules are provided. These are not part
 of the main demo.
 
-* [Cloud](./test/cloud) Online testing, runs against a Hazelcast Cloud instance
-* [Local](./test/local) Offline testing, creates a local cluster and runs tests against it.
+* [Cloud](./test/test-cloud) Online testing, runs against a Hazelcast Cloud instance
+* [Local](./test/test-local) Offline testing, creates a local cluster and runs tests against it.
 
