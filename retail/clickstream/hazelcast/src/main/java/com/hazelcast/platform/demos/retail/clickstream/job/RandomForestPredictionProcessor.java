@@ -16,8 +16,10 @@
 
 package com.hazelcast.platform.demos.retail.clickstream.job;
 
+import java.text.SimpleDateFormat;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -48,6 +50,7 @@ public class RandomForestPredictionProcessor extends AbstractProcessor {
     private static final int FIFTH_PREDICTION = 4;
 
     private final String algorithm;
+    private final SimpleDateFormat iso8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
     public RandomForestPredictionProcessor(String arg0) {
         this.algorithm = arg0;
@@ -67,7 +70,15 @@ public class RandomForestPredictionProcessor extends AbstractProcessor {
         Long publishTimestamp = Long.parseLong(tokenList.get(SECOND_PUBLISH_TIMESTAMP));
         Long ingestTimestamp = Long.parseLong(tokenList.get(THIRD_INGEST_TIMESTAMP));
         Long predictionTimestamp = System.currentTimeMillis();
-        String version = tokenList.get(FOURTH_MODEL_VERSION);
+        String version = "?";
+        try {
+            long timestamp = Long.parseLong(tokenList.get(FOURTH_MODEL_VERSION));
+            Date date = new Date(timestamp);
+            version = iso8601.format(date);
+        } catch (NumberFormatException nfe) {
+            // Was a String already
+            version = tokenList.get(FOURTH_MODEL_VERSION);
+        }
         Integer prediction = Integer.parseInt(tokenList.get(FIFTH_PREDICTION));
 
         PredictionKey predictionKey = new PredictionKey();

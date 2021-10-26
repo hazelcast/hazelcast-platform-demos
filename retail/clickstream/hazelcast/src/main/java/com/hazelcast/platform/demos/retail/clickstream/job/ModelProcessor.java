@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.jet.core.AbstractProcessor;
 import com.hazelcast.map.IMap;
+import com.hazelcast.map.MapLoader;
 import com.hazelcast.platform.demos.retail.clickstream.MyConstants;
 
 import lombok.extern.slf4j.Slf4j;

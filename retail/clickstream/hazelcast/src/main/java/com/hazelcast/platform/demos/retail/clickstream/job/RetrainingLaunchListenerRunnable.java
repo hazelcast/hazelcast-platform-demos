@@ -78,7 +78,7 @@ public class RetrainingLaunchListenerRunnable implements Runnable {
             Instant instant = Instant.ofEpochMilli(keyTimestamp);
             LocalDateTime when = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
             String keyTimestampStr = DateTimeFormatter.ISO_DATE_TIME.format(when);
-            String modelName = keyTimestampStr;
+            String modelName = "RandomForest-" + keyTimestamp;
 
             String num = RetrainingLaunchListenerRunnable
                     .findNum(count, MyConstants.RETRAINING_CONTROL_ACTION_VALIDATE.equals(action));

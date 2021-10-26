@@ -81,6 +81,10 @@ public class ClickstreamHandler {
                 Tuple3.tuple3(tuple4.f1(), tuple4.f2(), tuple4.f3().toString())))
         .writeTo(Sinks.mapWithMerging(MyConstants.IMAP_NAME_DIGITAL_TWIN,
                 (oldValue, newValue) -> {
+                    // No field is substring of another. Ignore duplicates, we don't count how often each button is clicked.
+                    if (oldValue.f2().contains(newValue.f2())) {
+                        return Tuple3.tuple3(newValue.f0(), newValue.f1(), oldValue.f2());
+                    }
                     // Timestamp from newest
                     return Tuple3.tuple3(newValue.f0(), newValue.f1(),
                             oldValue.f2() + "," + newValue.f2());

@@ -48,32 +48,32 @@ Configuration:
           AppenderRef:
             ref: ConsoleCyan
         # May run less node than listed connections, don't want warnings about missing target members in REMOTE cluster
-        - name: com.hazelcast.enterprise.wan.impl.connection.WanConnectionManager
-          level: error
-          additivity: false
-          AppenderRef:
-            ref: ConsoleCyan
-        - name: com.hazelcast.jet.impl
-          level: error
-          additivity: false
-          AppenderRef:
-            ref: ConsoleCyan
-        - name: com.hazelcast.jet.python
-          level: info
-          additivity: false
-          AppenderRef:
-            ref: ConsoleWhite
-        - name: com.hazelcast.internal.diagnostics
-          level: error
-          additivity: false
-          AppenderRef:
-            ref: ConsoleCyan
+        #- name: com.hazelcast.enterprise.wan.impl.connection.WanConnectionManager
+        #  level: error
+        #  additivity: false
+        #  AppenderRef:
+        #    ref: ConsoleCyan
+        #- name: com.hazelcast.jet.impl
+        #  level: error
+        #  additivity: false
+        #  AppenderRef:
+        #    ref: ConsoleCyan
+        #- name: com.hazelcast.jet.python
+        #  level: info
+        #  additivity: false
+        #  AppenderRef:
+        #    ref: ConsoleWhite
+        #- name: com.hazelcast.internal.diagnostics
+        #  level: error
+        #  additivity: false
+        #  AppenderRef:
+        #    ref: ConsoleCyan
         # May run less node than listed connections, don't want warnings about missing target members in LOCAL cluster
-        - name: com.hazelcast.internal.server.tcp
-          level: error
-          additivity: false
-          AppenderRef:
-            ref: ConsoleCyan
+        #- name: com.hazelcast.internal.server.tcp
+        #  level: error
+        #  additivity: false
+        #  AppenderRef:
+        #    ref: ConsoleCyan
         # Application general
         - name: com.hazelcast.platform.demos.retail.clickstream
           level: debug
@@ -87,11 +87,11 @@ Configuration:
           AppenderRef:
             ref: ConsoleRed
         # First cluster member triggers WARN from Kubernetes as nothing else in StatefulSet
-        - name: com.hazelcast.spi.discovery.integration.DiscoveryService
-          level: error
-          additivity: false
-          AppenderRef:
-            ref: ConsoleRed
+        #- name: com.hazelcast.spi.discovery.integration.DiscoveryService
+        #  level: error
+        #  additivity: false
+        #  AppenderRef:
+        #    ref: ConsoleRed
         - name: com.hazelcast.system.logo
           level: info
           additivity: false
