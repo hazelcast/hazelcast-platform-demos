@@ -16,9 +16,9 @@
 
 package com.hazelcast.platform.demos.retail.clickstream.job;
 
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Arrays;
 import java.util.List;
-import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map.Entry;
 
 import com.hazelcast.function.FunctionEx;
@@ -73,6 +73,9 @@ public class DecisionTreePrediction {
                     .mapUsingIMap(MyConstants.IMAP_NAME_DIGITAL_TWIN,
                             FunctionEx.identity(),
                             (String key, Tuple3<Long, Long, String> digitalTwin) -> {
+                                if (digitalTwin == null) {
+                                    return null;
+                                }
                                 String arrPrint = Arrays.toString(MyUtils.digitalTwinCsvToBinary(null, digitalTwin.f2(), false));
                                 return "data," + key + "," + digitalTwin.f0() + ","
                                         + digitalTwin.f1() + "," + arrPrint.substring(1, arrPrint.length() - 1);

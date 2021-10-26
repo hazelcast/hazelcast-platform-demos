@@ -73,6 +73,9 @@ public class GaussianPrediction {
                     .mapUsingIMap(MyConstants.IMAP_NAME_DIGITAL_TWIN,
                             FunctionEx.identity(),
                             (String key, Tuple3<Long, Long, String> digitalTwin) -> {
+                                if (digitalTwin == null) {
+                                    return null;
+                                }
                                 String arrPrint = Arrays.toString(MyUtils.digitalTwinCsvToBinary(null, digitalTwin.f2(), false));
                                 return "data," + key + "," + digitalTwin.f0() + ","
                                         + digitalTwin.f1() + "," + arrPrint.substring(1, arrPrint.length() - 1);

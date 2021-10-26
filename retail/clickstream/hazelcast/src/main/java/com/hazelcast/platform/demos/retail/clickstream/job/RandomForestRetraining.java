@@ -19,6 +19,7 @@ package com.hazelcast.platform.demos.retail.clickstream.job;
 import java.util.Arrays;
 import java.util.Map.Entry;
 
+import com.hazelcast.function.BiFunctionEx;
 import com.hazelcast.function.FunctionEx;
 import com.hazelcast.jet.aggregate.AggregateOperation1;
 import com.hazelcast.jet.datamodel.Tuple3;
@@ -66,8 +67,7 @@ public class RandomForestRetraining {
                     inputRange
                     .mapUsingIMap(MyConstants.IMAP_NAME_DIGITAL_TWIN,
                             FunctionEx.identity(),
-                            (String key, Tuple3<Long, Long, String> digitalTwin) ->
-                            MyUtils.digitalTwinCsvToBinary(null, digitalTwin.f2(), true))
+                            RandomForestRetraining.formatDigitalTwin())
                     .map(arr -> Arrays.toString(arr));
 
             // Group all onto any one node, only run training once per cluster
@@ -101,6 +101,20 @@ public class RandomForestRetraining {
         }
 
         return pipeline;
+    }
+
+    /**
+     * <p>Can't inline as a lambda as SpotBugs can't suppress correctly.
+     * </p>
+     */
+    //@SuppressFBWarnings(value = "PZLA_PREFER_ZERO_LENGTH_ARRAYS", justification = "null drops from pipeline")
+    private static BiFunctionEx<String, Tuple3<Long, Long, String>, String[]> formatDigitalTwin() {
+        return (String key, Tuple3<Long, Long, String> digitalTwin) -> {
+            if (digitalTwin == null) {
+                return MyUtils.digitalTwinCsvToBinary(null, "", true);
+            }
+            return MyUtils.digitalTwinCsvToBinary(null, digitalTwin.f2(), true);
+        };
     }
 
 }
