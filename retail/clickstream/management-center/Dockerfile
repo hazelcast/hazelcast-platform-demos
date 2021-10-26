@@ -14,7 +14,8 @@ ARG MY_ADMINPASSWORD
 # To check health, uses port 8081 but internal URL. Preconfigure license, logon/password.
 ENV JAVA_OPTS="-Dhazelcast.mc.healthCheck.enable=true \
  -Dhazelcast.mc.prometheusExporter.enabled=true \
- -Dhazelcast.mc.license=$MC_LICENSE"
+ -Dhazelcast.mc.license=$MC_LICENSE \
+ -Xmx3G -Xms3G"
 
 # Used by /mc-start.sh to create admin user unless MC_INIT_CMD used
 #ENV MC_ADMIN_USER=$MY_ADMINUSER
