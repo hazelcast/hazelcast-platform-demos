@@ -69,7 +69,7 @@ def predict(input_list):
         else:
             version = values[1]
             update_model(values[2])
-            result.append(str(key) + "," + version)
+            result.append("model," + version)
 
     return result
 
