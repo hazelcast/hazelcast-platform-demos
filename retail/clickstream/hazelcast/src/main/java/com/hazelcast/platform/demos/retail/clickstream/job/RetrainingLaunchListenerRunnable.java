@@ -169,7 +169,7 @@ public class RetrainingLaunchListenerRunnable implements Runnable {
                         }
                     }
                     if (count == TEN) {
-                        log.error("waitTilFinished(): Gave up waiting to submit '{}' as '{}' has status {}",
+                        log.warn("waitTilFinished(): Gave up waiting to submit '{}' as '{}' has status {}",
                                 jobNameToSubmit, existingJob.getName(), existingJob.getStatus());
                     }
                 }
@@ -195,7 +195,7 @@ public class RetrainingLaunchListenerRunnable implements Runnable {
                         if (existingJob.getStatus() != JobStatus.COMPLETED
                                 && existingJob.getStatus() != JobStatus.COMPLETING) {
                             // Only run if previous worked, not failed or still running
-                            log.error("launchRecurringJob(): Not submitting new job '{}' as '{}' has status {}",
+                            log.warn("launchRecurringJob(): Not submitting new job '{}' as '{}' has status {}",
                                     jobConfig.getName(), existingJob.getName(), existingJob.getStatus());
                             return;
                         }

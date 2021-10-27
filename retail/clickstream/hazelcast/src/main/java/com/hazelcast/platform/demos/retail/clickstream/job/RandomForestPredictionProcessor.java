@@ -50,7 +50,7 @@ public class RandomForestPredictionProcessor extends AbstractProcessor {
     private static final int FIFTH_PREDICTION = 4;
 
     private final String algorithm;
-    private final SimpleDateFormat iso8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+    private final SimpleDateFormat iso8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     public RandomForestPredictionProcessor(String arg0) {
         this.algorithm = arg0;
@@ -61,7 +61,12 @@ public class RandomForestPredictionProcessor extends AbstractProcessor {
         String[] tokens = item.toString().split(",");
 
         if (tokens.length != EXPECTED_LENGTH_OF_5) {
-            log.error("tryProcess({}, '{}')", ordinal, item);
+            // Model applied
+            if (tokens.length == 2 && "model".equals(tokens[0])) {
+                log.debug("tryProcess({}, '{}') : model updated", ordinal, item);
+            } else {
+                log.error("tryProcess({}, '{}')", ordinal, item);
+            }
             return true;
         }
 
@@ -72,12 +77,9 @@ public class RandomForestPredictionProcessor extends AbstractProcessor {
         Long predictionTimestamp = System.currentTimeMillis();
         String version = "?";
         try {
-            long timestamp = Long.parseLong(tokenList.get(FOURTH_MODEL_VERSION));
-            Date date = new Date(timestamp);
-            version = iso8601.format(date);
-        } catch (NumberFormatException nfe) {
-            // Was a String already
-            version = tokenList.get(FOURTH_MODEL_VERSION);
+            version = this.deriveVersion(tokenList.get(FOURTH_MODEL_VERSION));
+        } catch (Exception e) {
+            log.error("tryProcess(" + ordinal + ", '" + item + "') : derive version", e);
         }
         Integer prediction = Integer.parseInt(tokenList.get(FIFTH_PREDICTION));
 
@@ -93,6 +95,30 @@ public class RandomForestPredictionProcessor extends AbstractProcessor {
             = new SimpleImmutableEntry<>(predictionKey, predictionValue);
 
         return super.tryEmit(entry);
+    }
+
+    /**
+     * <p>Initial timestamp is baked into Python with Maven's build timestamp
+     * as ISO8601 style, "{@code 2021-10-27T12:34:45Z"}.
+     * </p>
+     * <p>Version provided by training has algorithm name and timestamp, so
+     * is "{@code RandomForest-1630000123456}" and needs converted to match.
+     *
+     * @param string One of two input formats
+     * @return CCYY-MM-DDTHH:MM:SS
+     */
+    private String deriveVersion(String version) {
+        // Remove trailing "Z"
+        if (version.endsWith("Z")) {
+            version = version.substring(0, version.length() - 1);
+        }
+        String[] versionTokens = version.split("-");
+        if (versionTokens.length == 2) {
+            long timestamp = Long.parseLong(versionTokens[1]);
+            Date date = new Date(timestamp);
+            version = iso8601.format(date);
+        }
+        return version;
     }
 
 }

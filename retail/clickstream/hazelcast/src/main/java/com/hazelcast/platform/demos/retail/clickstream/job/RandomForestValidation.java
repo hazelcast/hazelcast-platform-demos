@@ -120,8 +120,8 @@ public class RandomForestValidation {
                         String[] tokens = str.split(",");
                         // Last field is error message, if present makes length 6
                         if (tokens.length != EXPECTED_LENGTH_OF_5) {
-                            if (tokens.length != 1) {
-                                // Length 1 is model training acceptance
+                            if (tokens.length != 2) {
+                                // Length 2 is model training acceptance
                                 log.error("Unexpected Python output: '{}'", str);
                             }
                             return null;
