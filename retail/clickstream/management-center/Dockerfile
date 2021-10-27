@@ -34,9 +34,9 @@ ENV MC_CLUSTER2_PORTLIST=$MC_CLUSTER2_PORTLIST
 ENV MC_INIT_CMD="./bin/mc-conf.sh user create -n=$MY_ADMINUSER -p=$MY_ADMINPASSWORD -r=admin && ./bin/mc-conf.sh user issue-token -H=/data --username=$MY_ADMINUSER"
 
 # If want to query custom classes
-ARG JAR_FILE
-COPY target/${JAR_FILE} /application.jar
-ENV MC_CLASSPATH=/application.jar
+#ARG JAR_FILE
+#COPY target/${JAR_FILE} /application.jar
+#ENV MC_CLASSPATH=/application.jar
 
 # Start Management Center
 CMD ["bash", "-c", "set -euo pipefail \
