@@ -43,6 +43,9 @@ public class Application {
                 .get(MyConstants.CONFIG_MAP_KEY_GRAPHITE).toString();
 
         String jobName = GaussianPrediction.class.getSimpleName() + "@" + MyUtils.getBuildTimestamp();
+        if (jobName.endsWith("Z")) {
+            jobName = jobName.substring(0, jobName.length() - 1);
+        }
         log.info(jobName);
 
         Pipeline pipelineGaussianPrediction = GaussianPrediction.buildPipeline(graphiteHost);

@@ -111,8 +111,12 @@ public class ApplicationRunner {
                 log.info("-=-=-=-=- {} '{}' {} -=-=-=-=-=-",
                         countStr, this.hazelcastInstance.getName(), countStr);
                 if (count % FIVE == 0) {
-                    this.logSizes();
-                    this.logJobs();
+                    try {
+                        this.logSizes();
+                        this.logJobs();
+                    } catch (Exception e) {
+                        log.error("count==" + count, e);
+                    }
                 }
             }
         };

@@ -43,6 +43,9 @@ public class Application {
                 .get(MyConstants.CONFIG_MAP_KEY_GRAPHITE).toString();
 
         String jobName = DecisionTreePrediction.class.getSimpleName() + "@" + MyUtils.getBuildTimestamp();
+        if (jobName.endsWith("Z")) {
+            jobName = jobName.substring(0, jobName.length() - 1);
+        }
         log.info(jobName);
 
         Pipeline pipelineDecisionTreePrediction = DecisionTreePrediction.buildPipeline(graphiteHost);

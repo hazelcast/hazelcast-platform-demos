@@ -129,6 +129,9 @@ public class GaussianPrediction {
         Long ingestTimestamp = Long.parseLong(tokenList.get(THIRD_INGEST_TIMESTAMP));
         Long predictionTimestamp = System.currentTimeMillis();
         String version = tokenList.get(FOURTH_MODEL_VERSION);
+        if (version.endsWith("Z")) {
+            version = version.substring(0, version.length() - 1);
+        }
         Integer prediction = Integer.parseInt(tokenList.get(FIFTH_PREDICTION));
 
         PredictionKey predictionKey = new PredictionKey();
