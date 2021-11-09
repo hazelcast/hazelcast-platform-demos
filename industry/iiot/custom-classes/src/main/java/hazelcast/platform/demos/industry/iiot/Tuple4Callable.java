@@ -22,7 +22,7 @@ import java.util.concurrent.Callable;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
-import com.hazelcast.jet.datamodel.Tuple3;
+import com.hazelcast.jet.datamodel.Tuple4;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -36,10 +36,12 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * </p></li>
  * <li><p><b>f2</b> A list of any errors associated. No errors means it worked.
  * </p></li>
+ * <li><p><b>f3</b> A list of any warnings associated. Warnings still means it worked.
+ * </p></li>
  * </ol>
  * </p>
  */
-public abstract class Tuple3OutputCallable implements Callable<List<Tuple3<String, String, List<String>>>>,
+public abstract class Tuple4Callable implements Callable<List<Tuple4<String, String, List<String>, List<String>>>>,
     HazelcastInstanceAware, Serializable {
     private static final long serialVersionUID = 1L;
 

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="ConsoleCyan" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level %thread %logger{40}) - %cyan(%msg) %n</pattern>
+        </encoder>
+    </appender>
+    <appender name="ConsoleGreen" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level %thread %logger{40}) - %green(%msg) %n</pattern>
+        </encoder>
+    </appender>
+    <appender name="ConsoleRed" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level %thread %logger{40}) - %red(%msg) %n</pattern>
+        </encoder>
+    </appender>
+    <appender name="ConsoleYellow" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level %thread %logger{40}) - %yellow(%msg) %n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.hazelcast" level="info" additivity="false">
+        <appender-ref ref="ConsoleCyan"/>
+    </logger>
+    <!-- Not "com" base package -->
+    <logger name="hazelcast.platform.demos" level="info" additivity="false">
+        <appender-ref ref="ConsoleGreen"/>
+    </logger>
+    
+    <root level="error">
+        <appender-ref ref="ConsoleRed"/>
+    </root>
+</configuration>

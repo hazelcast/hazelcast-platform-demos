@@ -25,7 +25,14 @@ import java.util.List;
 public class MyConstants {
 
     // Map names, for eager creation
-    public static final String IMAP_NAME_CONFIG  = "sys.config";
+    //TODO https://github.com/hazelcast/hazelcast/issues/19915
+    //TODO public static final String IMAP_NAME_CONFIG = "sys.config";
+    //TODO public static final String IMAP_NAME_LOGGING = "sys.logging";
+    public static final String IMAP_NAME_CONFIG = "sys_config";
+    public static final String IMAP_NAME_LOGGING = "sys_logging";
     public static final List<String> IMAP_NAMES =
-            List.of(IMAP_NAME_CONFIG);
+            List.of(IMAP_NAME_CONFIG, IMAP_NAME_LOGGING);
+
+    public static final String SLF4J_APPENDER_NAME = "IMAP-" + IMAP_NAME_LOGGING;
+    public static final String SLF4J_LOGGER_NAME = "hazelcast.platform.demos";
 }

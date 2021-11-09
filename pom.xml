@@ -14,9 +14,7 @@
 
 	<modules>
 		<module>banking</module>
-		<!--
 		<module>industry</module>
-		-->
 		<module>ml</module>
 		<module>retail</module>
 		<module>telco</module>
@@ -45,7 +43,7 @@
 		<guava.version>29.0-jre</guava.version>
         <!-- Matches banking/credit-value-adjustment/cpp/Dockerfile2 -->
 		<grpc.version>1.31.1</grpc.version>
-		<hazelcast.version>5.0.1-SNAPSHOT</hazelcast.version>
+		<hazelcast.version>5.1-SNAPSHOT</hazelcast.version>
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
 		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
 		<jackson.version>2.12.4</jackson.version>
@@ -62,8 +60,8 @@
              banking/credit-value-adjustment/common/src/main/proto/JetToCpp.proto -->
 		<protobuf.version>3.12.2</protobuf.version>
 		<pulsar.version>2.8.0</pulsar.version>
-		<spotbugs-annotations.version>4.4.1</spotbugs-annotations.version>
-		<spring-boot.version>2.5.5</spring-boot.version>
+		<spotbugs-annotations.version>4.4.2</spotbugs-annotations.version>
+		<spring-boot.version>2.5.6</spring-boot.version>
         <spring-cloud.version>2020.0.3</spring-cloud.version>
         <spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
 		<springfox-swagger.version>2.9.2</springfox-swagger.version>

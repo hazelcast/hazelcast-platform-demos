@@ -34,6 +34,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IExecutorService;
 import com.hazelcast.jet.Job;
 import com.hazelcast.map.IMap;
+import com.hazelcast.version.MemberVersion;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -65,9 +66,15 @@ public class StatsRunnable {
                         countStr, this.hazelcastInstance.getName(), countStr);
                 if (count % 3 == 0) {
                     this.logDistributedObjects();
-                    //XXX
-                    if ("5.0".equals(System.getProperty("user.name"))) {
-                        this.logJobs();
+                    MemberVersion memberVersion = this.hazelcastInstance.getCluster().getMembers().iterator().next().getVersion();
+                    byte major = memberVersion.getMajor();
+                    // Jet added in version 5.
+                    if (major >= Byte.valueOf("5")) {
+                        try {
+                            this.logJobs();
+                        } catch (Exception e) {
+                            log.error("count==" + count, e);
+                        }
                     }
                 }
                 count++;
@@ -142,7 +149,18 @@ public class StatsRunnable {
             .getJet()
             .getJobs()
             .stream()
-            .forEach(job -> jobs.put(job.getName(), job));
+            .forEach(job -> {
+                if (job.getName() == null) {
+                    if (job.isLightJob()) {
+                        // Concurrent SQL doesn't have a name set.
+                        log.warn("logJobs(), job.getName()==null for light job {}", job);
+                    } else {
+                        log.error("logJobs(), job.getName()==null for {}", job);
+                    }
+                } else {
+                    jobs.put(job.getName(), job);
+                }
+            });
 
         if (jobs.isEmpty()) {
             log.info("NO JOBS");

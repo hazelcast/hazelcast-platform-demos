@@ -104,7 +104,18 @@ public class ApplicationRunner {
             .getJet()
             .getJobs()
             .stream()
-            .forEach(job -> jobs.put(job.getName(), job));
+            .forEach(job -> {
+                if (job.getName() == null) {
+                    if (job.isLightJob()) {
+                        // Concurrent SQL doesn't have a name set.
+                        log.warn("logJobs(), job.getName()==null for light job {}", job);
+                    } else {
+                        log.error("logJobs(), job.getName()==null for {}", job);
+                    }
+                } else {
+                    jobs.put(job.getName(), job);
+                }
+            });
 
         jobs
         .forEach((key, value) -> {
