@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.jet.datamodel.Tuple4;
 import com.hazelcast.map.IMap;
 
@@ -100,10 +99,8 @@ public class MappingDefinitions {
                 + ") "
                 + "TYPE IMap "
                 + " OPTIONS ( "
-                + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "',"
-                + " 'valueFormat' = 'java',"
-                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
+                + " 'keyFormat' = 'json-flat',"
+                + " 'valueFormat' = 'json-flat'"
                 + " )";
         List<String> errors = MappingDefinitions.executeSqlMapping(hazelcastInstance, sql);
         List<String> warnings = new ArrayList<>();
