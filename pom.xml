@@ -35,6 +35,13 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spotbugs.skip>true</spotbugs.skip>
 
+                <!-- For Management Center, Cassandra/Mongo/MySQL etc logons -->
+                <my.mc.admin.user>admin</my.mc.admin.user>
+                <my.mc.admin.password>password1</my.mc.admin.password>
+                <my.other.admin.user>${my.mc.admin.user}</my.other.admin.user>
+                <my.other.admin.password>${my.mc.admin.password}</my.other.admin.password>
+                <my.other.admin.database>_unset_in_root_pom.xml_</my.other.admin.database>
+
 		<!-- Version dependencies - ${project.version} should track Hazelcast version -->
         <cassandra-driver.version>3.5.0</cassandra-driver.version>
         <debezium-connector-cassandra.version>1.4.0.Alpha1</debezium-connector-cassandra.version>

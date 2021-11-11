@@ -1,0 +1,85 @@
+---
+# Service DNS for Grafana will be "iiot-grafana.default.svc.cluster.local".
+# Service DNS for Prometheus will be "iiot-prometheus.default.svc.cluster.local".
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$ SERVICE DEFINITIONS $$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Service for Grafana
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: iiot-grafana
+spec:
+  selector:
+    app: iiot-grafana
+  ports:
+    - name: grafana-http
+      port: 80
+      targetPort: 3000
+    - name: graphite
+      port: 2004
+      targetPort: 2004
+  type: LoadBalancer
+---
+# Service for Prometheus
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: iiot-prometheus
+spec:
+  selector:
+    app: iiot-prometheus
+  ports:
+    - name: prometheus
+      port: 9090
+      targetPort: 9090
+  type: LoadBalancer
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$ POD DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Pod for Grafana
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iiot-grafana
+spec:
+  selector:
+    matchLabels:
+      app: iiot-grafana
+  template:
+    metadata:
+      labels:
+        app: iiot-grafana
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/iiot-grafana"
+          imagePullPolicy: Never
+          name: iiot-grafana-container
+---
+# Pod for Prometheus
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iiot-prometheus
+spec:
+  selector:
+    matchLabels:
+      app: iiot-prometheus
+  template:
+    metadata:
+      labels:
+        app: iiot-prometheus
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/iiot-prometheus"
+          imagePullPolicy: Never
+          name: iiot-prometheus-container
+---

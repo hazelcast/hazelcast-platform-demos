@@ -45,12 +45,22 @@ then
  JAVA_ARGS="-e HOST_IP=${HOST_IP}"
 fi
 
+# Grafana,etc - part of main demo, image name does not include "test"
+if [ "$THIRD" == "grafana" ] || [ "$THIRD" == "prometheus" ]
+then
+ MODULE=${THIRD}
+fi
+
 # Internal/external port mapping
 if [ "$DOCKER_PORT_INTERNAL" == "" ]
 then
  PORT_MAPPING=""
 else
  PORT_MAPPING="-p ${DOCKER_PORT_EXTERNAL}:${DOCKER_PORT_INTERNAL}"
+fi
+if [ "$DOCKER_PORT_INTERNAL2" != "" ]
+then
+ PORT_MAPPING="${PORT_MAPPING} -p ${DOCKER_PORT_EXTERNAL2}:${DOCKER_PORT_INTERNAL2}"
 fi
 
 # So can rerun named container

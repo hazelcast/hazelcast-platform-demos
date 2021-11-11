@@ -11,7 +11,7 @@
 
         <artifactId>iiot-grafana</artifactId>
 
-        <name>Hazelcast Platform - IIOT - Mongo (1 replica:DEV)</name>
+        <name>Hazelcast Platform - IIOT - Grafana</name>
 	<description>Grafana/Graphite node</description>
 
 	<properties>
