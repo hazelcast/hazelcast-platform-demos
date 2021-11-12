@@ -1,5 +1,6 @@
 ---
 # Service DNS for Grafana will be "iiot-grafana.default.svc.cluster.local".
+# Service DNS for Mongo will be "iiot-mongo.default.svc.cluster.local".
 # Service DNS for Prometheus will be "iiot-prometheus.default.svc.cluster.local".
 ---
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -23,6 +24,19 @@ spec:
       port: 2004
       targetPort: 2004
   type: LoadBalancer
+---
+# Service for Mongo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: iiot-mongo
+spec:
+  clusterIP: None
+  selector:
+    app: iiot-mongo
+  ports:
+  - port: 27017
 ---
 # Service for Prometheus
 ---
@@ -62,6 +76,26 @@ spec:
         - image: "hazelcast-platform-demos/iiot-grafana"
           imagePullPolicy: Never
           name: iiot-grafana-container
+---
+# Pod for Mongo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iiot-mongo
+spec:
+  selector:
+    matchLabels:
+      app: iiot-mongo
+  template:
+    metadata:
+      labels:
+        app: iiot-mongo
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/iiot-mongo"
+          imagePullPolicy: Never
+          name: iiot-mongo-container
 ---
 # Pod for Prometheus
 ---

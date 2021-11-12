@@ -34,7 +34,10 @@ import ch.qos.logback.core.Appender;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
- * <p>Idempotent initialization steps to be run on every node.
+ * <p>Idempotent initialization steps to be run on every node
+ * before initialization on any node.
+ * </p>
+ * <p>Ie. member specific runs before cluster specific.
  * </p>
  * <ol>
  * <li>
@@ -54,6 +57,11 @@ public class InitializerAllNodes
     @SuppressFBWarnings(value = "UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR",
             justification = "setHazelcastInstanc() gets called by Hazelcast")
     private transient HazelcastInstance hazelcastInstance;
+    private Level level;
+
+    InitializerAllNodes(Level arg0) {
+        this.level = arg0;
+    }
 
     /**
      * <p>This to do to initialize every node. Each method invoked should
@@ -113,11 +121,17 @@ public class InitializerAllNodes
 
                 Logger iMapLogger = loggerContext.getLogger(MyConstants.SLF4J_LOGGER_NAME);
                 iMapLogger.setAdditive(false);
-                iMapLogger.setLevel(Level.INFO);
+                if (this.level == null) {
+                    iMapLogger.setLevel(Level.DEBUG);
+                } else {
+                    iMapLogger.setLevel(this.level);
+                }
                 iMapLogger.addAppender(iMapAppender);
 
                 org.slf4j.Logger slf4jLogger = org.slf4j.LoggerFactory.getLogger(InitializerAllNodes.class);
                 slf4jLogger.info("Initialized Logback");
+                slf4jLogger.debug("Runtime.getRuntime().availableProcessors()=="
+                        + Runtime.getRuntime().availableProcessors());
             }
 
             result.add(Tuple4.tuple4(MY_NAME + ".initialiseLogback()", "", errors, warnings));

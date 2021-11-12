@@ -20,12 +20,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.MapStoreConfig;
 import com.hazelcast.jet.datamodel.Tuple4;
 import com.hazelcast.map.IMap;
 
+import hazelcast.platform.demos.industry.iiot.mapstore.ServiceHistoryMapLoader;
+
 /**
- * <p>Create necessary objects on demand rather than lazy, so as
- * visible on Management Center etc.
+ * <p>Idempotent initialization steps to be run on any node
+ * after initialization on all node.
+ * </p>
+ * <p>Ie. member specific runs before cluster specific.
  * </p>
  */
 public class InitializerAnyNode extends Tuple4Callable {
@@ -48,6 +54,7 @@ public class InitializerAnyNode extends Tuple4Callable {
 
         // Add config before touching maps that may have MapStores that use config
         this.populateConfig(result);
+        this.addMapStores(result);
         // Define needed objects
         this.touchAllIMaps(result);
 
@@ -114,6 +121,31 @@ public class InitializerAnyNode extends Tuple4Callable {
         if (previous != null) {
             warnings.add("Key '" + pair[0] + "' already present");
         }
+    }
+
+    /**
+     *
+     * @param result
+     */
+    private void addMapStores(List<Tuple4<String, String, List<String>, List<String>>> result) {
+        IMap<String, String> configMap = super.getHazelcastInstance().getMap(MyConstants.IMAP_NAME_SYS_CONFIG);
+        List<String> errors = new ArrayList<>();
+        List<String> warnings = new ArrayList<>();
+        String diagnostic = "";
+
+        ServiceHistoryMapLoader serviceHistoryMapLoader = new ServiceHistoryMapLoader(configMap.entrySet());
+
+        MapStoreConfig serviceHistoryMapStoreConfig = new MapStoreConfig();
+        serviceHistoryMapStoreConfig.setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER);
+        serviceHistoryMapStoreConfig.setImplementation(serviceHistoryMapLoader);
+
+        MapConfig serviceHistoryMapConfig = new MapConfig(MyConstants.IMAP_NAME_SERVICE_HISTORY);
+        serviceHistoryMapConfig.setMapStoreConfig(serviceHistoryMapStoreConfig);
+
+        this.getHazelcastInstance().getConfig().addMapConfig(serviceHistoryMapConfig);
+
+        diagnostic = serviceHistoryMapConfig.getName();
+        result.add(Tuple4.tuple4(MY_NAME + ".addMapStores()", diagnostic, errors, warnings));
     }
 
     /**
