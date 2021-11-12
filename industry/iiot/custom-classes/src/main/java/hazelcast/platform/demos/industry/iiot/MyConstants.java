@@ -26,10 +26,9 @@ public class MyConstants {
 
     // Map names, for eager creation
     //FIXME Add MapStore
-    public static final String IMAP_NAME_SERVICE_HISTORY = "service_history";
-    //TODO https://github.com/hazelcast/hazelcast/issues/19915
-    public static final String IMAP_NAME_SYS_CONFIG = "sys_config";
-    public static final String IMAP_NAME_SYS_LOGGING = "sys_logging";
+    public static final String IMAP_NAME_SERVICE_HISTORY = "service.history";
+    public static final String IMAP_NAME_SYS_CONFIG = "sys.config";
+    public static final String IMAP_NAME_SYS_LOGGING = "sys.logging";
     public static final List<String> IMAP_NAMES =
             List.of(IMAP_NAME_SERVICE_HISTORY,
                     IMAP_NAME_SYS_CONFIG, IMAP_NAME_SYS_LOGGING);
