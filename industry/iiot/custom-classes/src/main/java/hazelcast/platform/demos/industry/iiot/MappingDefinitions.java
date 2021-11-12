@@ -42,8 +42,9 @@ public class MappingDefinitions {
     public static List<Tuple4<String, String, List<String>, List<String>>> addMappings(HazelcastInstance hazelcastInstance) {
         List<Tuple4<String, String, List<String>, List<String>>> result = new ArrayList<>();
 
-        result.add(MappingDefinitions.addMappingStringString(hazelcastInstance, MyConstants.IMAP_NAME_CONFIG));
+        result.add(MappingDefinitions.addMappingStringString(hazelcastInstance, MyConstants.IMAP_NAME_SYS_CONFIG));
         result.add(MappingDefinitions.addMappingIMapLogging(hazelcastInstance));
+        result.add(MappingDefinitions.addMappingIMapServiceHistory(hazelcastInstance));
 
         return result;
     }
@@ -86,7 +87,7 @@ public class MappingDefinitions {
      * @return
      */
     private static Tuple4<String, String, List<String>, List<String>> addMappingIMapLogging(HazelcastInstance hazelcastInstance) {
-        String mapName = MyConstants.IMAP_NAME_LOGGING;
+        String mapName = MyConstants.IMAP_NAME_SYS_LOGGING;
         String sql = "CREATE OR REPLACE MAPPING \"" + mapName + "\""
                 + " EXTERNAL NAME \"" + mapName + "\""
                 + " ("
@@ -106,6 +107,33 @@ public class MappingDefinitions {
         List<String> warnings = new ArrayList<>();
         return Tuple4.<String, String, List<String>, List<String>>
             tuple4(MY_NAME + ".addMappingIMapLogging()", mapName, errors, warnings);
+    }
+
+    /**
+     * <p>Backed by Mongo, last date storage for machine service history.</p>
+     *
+     * @param hazelcastInstance
+     * @return
+     */
+    private static Tuple4<String, String, List<String>, List<String>> addMappingIMapServiceHistory(
+            HazelcastInstance hazelcastInstance) {
+        String mapName = MyConstants.IMAP_NAME_SERVICE_HISTORY;
+        String sql = "CREATE OR REPLACE MAPPING \"" + mapName + "\""
+                + " EXTERNAL NAME \"" + mapName + "\""
+                + " ("
+                + "    __key BIGINT,"
+                + "    \"lastServiced\" VARCHAR EXTERNAL NAME \"this.lastServiced\""
+                + ") "
+                + "TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = '" + Long.class.getCanonicalName() + "',"
+                + " 'valueFormat' = 'json-flat'"
+                + " )";
+        List<String> errors = MappingDefinitions.executeSqlMapping(hazelcastInstance, sql);
+        List<String> warnings = new ArrayList<>();
+        return Tuple4.<String, String, List<String>, List<String>>
+            tuple4(MY_NAME + ".addMappingIMapServiceHistory()", mapName, errors, warnings);
     }
 
     /**

@@ -41,7 +41,7 @@ public class IMapAppender extends AppenderBase<ILoggingEvent> {
     private final String memberAddress;
 
     IMapAppender(HazelcastInstance arg0) {
-        this.logMap = arg0.getMap(MyConstants.IMAP_NAME_LOGGING);
+        this.logMap = arg0.getMap(MyConstants.IMAP_NAME_SYS_LOGGING);
         Address address = arg0.getCluster().getLocalMember().getAddress();
         this.memberAddress = address.getHost() + ":" + address.getPort();
     }
