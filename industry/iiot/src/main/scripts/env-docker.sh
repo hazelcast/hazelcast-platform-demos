@@ -46,7 +46,7 @@ then
 fi
 
 # Grafana,etc - part of main demo, image name does not include "test"
-if [ "$THIRD" == "grafana" ] || [ "$THIRD" == "prometheus" ]
+if [ "$THIRD" == "grafana" ] || [ "$THIRD" == "mongo" ] || [ "$THIRD" == "prometheus" ]
 then
  MODULE=${THIRD}
 fi
