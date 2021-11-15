@@ -144,7 +144,7 @@ public class Utils {
     }
 
     /**
-     * <p>Prints an indidivual success/failure message.
+     * <p>Prints an individual success/failure message.
      * </p>
      *
      * @param prefix
@@ -171,14 +171,14 @@ public class Utils {
     }
 
     /**
-     * <p>Format an exception
+     * <p>Format an exception to return to client
      * </p>
      *
      * @param errors - modified in-situ
      * @param s - optional, added first
      * @param e - Exception
      */
-    static void addExceptionToError(List<String> errors, String s, Exception e) {
+    public static void addExceptionToError(List<String> errors, String s, Exception e) {
         if (s != null && s.length() > 0) {
             errors.add(s);
         }
@@ -187,4 +187,23 @@ public class Utils {
             errors.add(stackTraceElement.toString());
         }
     }
+
+    /**
+     * <p>Format an exception to a logger. Always {@code ERROR}.
+     * </p>
+     *
+     * @param logger - where to log
+     * @param s - optional, added first
+     * @param e - Exception
+     */
+    public static void addExceptionToLogger(org.slf4j.Logger logger, String s, Exception e) {
+        if (s != null && s.length() > 0) {
+            logger.error(s);
+        }
+        logger.error(e.getMessage());
+        for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+            logger.error(stackTraceElement.toString());
+        }
+    }
+
 }

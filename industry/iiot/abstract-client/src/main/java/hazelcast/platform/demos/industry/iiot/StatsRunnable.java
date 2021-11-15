@@ -18,6 +18,7 @@ package hazelcast.platform.demos.industry.iiot;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -34,6 +35,8 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IExecutorService;
 import com.hazelcast.jet.Job;
 import com.hazelcast.map.IMap;
+import com.hazelcast.sql.SqlResult;
+import com.hazelcast.sql.SqlRow;
 import com.hazelcast.version.MemberVersion;
 
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +54,7 @@ public class StatsRunnable {
     private HazelcastInstance hazelcastInstance;
 
     private int count;
+    private long lastLoggingPrint;
 
     /**
      * <p>Once a minute
@@ -76,6 +80,7 @@ public class StatsRunnable {
                             log.error("count==" + count, e);
                         }
                     }
+                    this.logLogging();
                 }
                 count++;
             }
@@ -172,4 +177,24 @@ public class StatsRunnable {
         }
     }
 
+    private void logLogging() {
+        String sql = "SELECT * FROM \"" + MyConstants.IMAP_NAME_SYS_LOGGING + "\""
+                + " WHERE \"timestamp\" >= " + this.lastLoggingPrint;
+        try {
+            SqlResult sqlResult = this.hazelcastInstance.getSql().execute(sql);
+            Iterator<SqlRow> sqlRowsIterator = sqlResult.iterator();
+            int count = 0;
+            while (sqlRowsIterator.hasNext()) {
+                SqlRow sqlRow = sqlRowsIterator.next();
+                System.out.println(sqlRow);
+                count++;
+            }
+            if (count == 0) {
+                log.info("NO LOGS");
+            }
+        } catch (Exception e) {
+            log.error("logLogging(): " + sql, e);
+        }
+        this.lastLoggingPrint = System.currentTimeMillis();
+    }
 }

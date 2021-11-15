@@ -121,13 +121,13 @@ public class MappingDefinitions {
         String sql = "CREATE OR REPLACE MAPPING \"" + mapName + "\""
                 + " EXTERNAL NAME \"" + mapName + "\""
                 + " ("
-                + "    __key BIGINT,"
+                + "    __key VARCHAR,"
                 + "    \"lastServiced\" VARCHAR EXTERNAL NAME \"this.lastServiced\""
                 + ") "
                 + "TYPE IMap "
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = '" + Long.class.getCanonicalName() + "',"
+                + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
                 + " 'valueFormat' = 'json-flat'"
                 + " )";
         List<String> errors = MappingDefinitions.executeSqlMapping(hazelcastInstance, sql);

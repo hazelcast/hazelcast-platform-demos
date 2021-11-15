@@ -18,12 +18,14 @@ package hazelcast.platform.demos.industry.iiot;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 /**
  * <p>Entry point. Let Spring do the work.
  * </p>
  */
 @SpringBootApplication
+@EnableConfigurationProperties(MyProperties.class)
 public class Application {
 
     public static void main(String[] args) throws Exception {

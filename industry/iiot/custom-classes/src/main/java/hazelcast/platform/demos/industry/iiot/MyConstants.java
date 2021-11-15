@@ -35,4 +35,11 @@ public class MyConstants {
 
     public static final String SLF4J_APPENDER_NAME = "IMAP-" + IMAP_NAME_SYS_LOGGING;
     public static final String SLF4J_LOGGER_NAME = "hazelcast.platform.demos";
+
+    public static final String MONGO_PREFIX = "mongo.";
+    public static final String MONGO_COLLECTION1 = MONGO_PREFIX + "collection1";
+    public static final String MONGO_HOST = MONGO_PREFIX + "host";
+    public static final String MONGO_DATABASE = MONGO_PREFIX + "database";
+    public static final String MONGO_PASSWORD = MONGO_PREFIX + "password";
+    public static final String MONGO_USERNAME = MONGO_PREFIX + "username";
 }
