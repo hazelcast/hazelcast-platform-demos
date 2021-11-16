@@ -29,6 +29,9 @@
     <logger name="hazelcast.platform.demos" level="info" additivity="false">
         <appender-ref ref="ConsoleGreen"/>
     </logger>
+    <logger name="org.springframework.boot.web.embedded.tomcat.TomcatWebServer" level="info" additivity="false">
+        <appender-ref ref="ConsoleYellow"/>
+    </logger>
     
     <root level="error">
         <appender-ref ref="ConsoleRed"/>
