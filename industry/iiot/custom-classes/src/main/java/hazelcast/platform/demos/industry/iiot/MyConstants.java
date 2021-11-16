@@ -25,7 +25,6 @@ import java.util.List;
 public class MyConstants {
 
     // Map names, for eager creation
-    //FIXME Add MapStore
     public static final String IMAP_NAME_SERVICE_HISTORY = "service.history";
     public static final String IMAP_NAME_SYS_CONFIG = "sys.config";
     public static final String IMAP_NAME_SYS_LOGGING = "sys.logging";

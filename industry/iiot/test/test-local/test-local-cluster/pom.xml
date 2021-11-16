@@ -31,6 +31,12 @@
 		</dependency>
 		 -->
 
+		<!-- hazelcast and hazelcast-sql are needed are dependencies, although the former is transitive of -->
+		<!-- the latter, so that maven-assembly-plugin merges their META-INF/services correctly. -->
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-sql</artifactId>
@@ -49,11 +55,6 @@
 			<plugin>
 				<!-- No main class -->
 				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-				</configuration>
 				<executions>
 					<execution>
 						<phase>package</phase>

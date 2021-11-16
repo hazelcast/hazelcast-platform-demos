@@ -51,6 +51,8 @@ public class ApplicationRunner {
 
     @Autowired
     private HazelcastInstance hazelcastInstance;
+    @Autowired
+    private MyProperties myProperties;
 
     @Bean
     public CommandLineRunner commandLineRunner() {
@@ -136,8 +138,12 @@ public class ApplicationRunner {
      */
     private boolean initialize(Level level) {
         String[][] config = new String[][] {
-            { "a", "bb"},
-            { "c", "d"},
+            { MyConstants.MONGO_COLLECTION1, this.myProperties.getMongoCollection1() },
+            { MyConstants.MONGO_DATABASE, this.myProperties.getMongoDatabase() },
+            { MyConstants.MONGO_PASSWORD, this.myProperties.getMongoPassword() },
+            { MyConstants.MONGO_USERNAME, this.myProperties.getMongoUsername() },
+            //FIXME temporary ?
+            { MyConstants.MONGO_HOST, System.getProperty("HOST_IP", "") },
         };
 
         log.info("Logging level '{}'", level);

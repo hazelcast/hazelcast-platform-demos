@@ -391,6 +391,9 @@
 						<descriptorRefs>
 							<descriptorRef>jar-with-dependencies</descriptorRef>
 						</descriptorRefs>
+                                                <descriptors>
+                                                        <descriptor>${main.basedir}/assemble/assembly.xml</descriptor>
+                                                </descriptors>
 						<tarLongFileMode>posix</tarLongFileMode>
 					</configuration>
 					<executions>

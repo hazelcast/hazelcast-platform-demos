@@ -23,11 +23,18 @@
 		<module>mongo</module>
 		<module>prometheus</module>
 		<module>test</module>
+		<module>abstract-client</module>
+		<!--
+		<module>webapp</module>
+		-->
 	</modules>
 
 	<properties>
 		<docker.image.prefix>iiot</docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
+
+		<!-- Mapstores and databases -->
+                <my.mongo.collection1.name>serviceHistory</my.mongo.collection1.name>
 		
 		<!-- From settings.xml -->
 		<hz.cloud.cluster1.discovery.token>${my.cloud.cluster1.discovery.token}</hz.cloud.cluster1.discovery.token>

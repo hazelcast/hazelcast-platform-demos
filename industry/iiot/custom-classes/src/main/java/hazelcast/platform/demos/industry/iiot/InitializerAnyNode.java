@@ -18,7 +18,10 @@ package hazelcast.platform.demos.industry.iiot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MapStoreConfig;
@@ -133,18 +136,27 @@ public class InitializerAnyNode extends Tuple4Callable {
         List<String> warnings = new ArrayList<>();
         String diagnostic = "";
 
-        ServiceHistoryMapLoader serviceHistoryMapLoader = new ServiceHistoryMapLoader(configMap.entrySet());
+        Map<String, String> mongoProperties = configMap.entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().startsWith(MyConstants.MONGO_PREFIX))
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+        try {
+            ServiceHistoryMapLoader serviceHistoryMapLoader = new ServiceHistoryMapLoader(mongoProperties);
 
-        MapStoreConfig serviceHistoryMapStoreConfig = new MapStoreConfig();
-        serviceHistoryMapStoreConfig.setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER);
-        serviceHistoryMapStoreConfig.setImplementation(serviceHistoryMapLoader);
+            MapStoreConfig serviceHistoryMapStoreConfig = new MapStoreConfig();
+            serviceHistoryMapStoreConfig.setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER);
+            serviceHistoryMapStoreConfig.setImplementation(serviceHistoryMapLoader);
 
-        MapConfig serviceHistoryMapConfig = new MapConfig(MyConstants.IMAP_NAME_SERVICE_HISTORY);
-        serviceHistoryMapConfig.setMapStoreConfig(serviceHistoryMapStoreConfig);
+            MapConfig serviceHistoryMapConfig = new MapConfig(MyConstants.IMAP_NAME_SERVICE_HISTORY);
+            serviceHistoryMapConfig.setMapStoreConfig(serviceHistoryMapStoreConfig);
 
-        this.getHazelcastInstance().getConfig().addMapConfig(serviceHistoryMapConfig);
+            this.getHazelcastInstance().getConfig().addMapConfig(serviceHistoryMapConfig);
 
-        diagnostic = serviceHistoryMapConfig.getName();
+            diagnostic = serviceHistoryMapConfig.getName();
+        } catch (Exception e) {
+            Utils.addExceptionToError(errors, MyConstants.IMAP_NAME_SERVICE_HISTORY, e);
+        }
+
         result.add(Tuple4.tuple4(MY_NAME + ".addMapStores()", diagnostic, errors, warnings));
     }
 
