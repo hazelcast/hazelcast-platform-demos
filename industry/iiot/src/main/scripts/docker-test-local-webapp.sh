@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# 8080 for MC
+DOCKER_PORT_INTERNAL=8081
+DOCKER_PORT_EXTERNAL=${DOCKER_PORT_INTERNAL}
+
+. `dirname $0`/env-docker.sh

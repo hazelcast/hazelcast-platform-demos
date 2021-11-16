@@ -24,6 +24,7 @@ import java.util.concurrent.Future;
 
 import com.hazelcast.cluster.Member;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.core.IExecutorService;
 import com.hazelcast.jet.datamodel.Tuple4;
 
@@ -206,4 +207,20 @@ public class Utils {
         }
     }
 
+    /**
+     * <p>Escape JSON to hold in a String
+     * </p>
+     *
+     * @param hazelcastJsonValue
+     * @return
+     */
+    public static String escapeJson(HazelcastJsonValue hazelcastJsonValue) {
+        if (hazelcastJsonValue == null) {
+            return Objects.toString(null);
+        }
+
+        String s = hazelcastJsonValue.toString();
+        s = s.replace('"', '`');
+        return s;
+    }
 }

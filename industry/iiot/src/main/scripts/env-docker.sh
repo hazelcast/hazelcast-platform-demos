@@ -39,7 +39,7 @@ if [ "$THIRD" == "hazelcast" ]
 then
  JAVA_ARGS="-e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP}:${DOCKER_PORT_EXTERNAL}"
 fi
-# Test Client
+# Test Client, c/f webapp
 if [ "$THIRD" == "client" ]
 then
  JAVA_ARGS="-e HOST_IP=${HOST_IP}"
@@ -48,6 +48,12 @@ fi
 # Grafana,etc - part of main demo, image name does not include "test"
 if [ "$THIRD" == "grafana" ] || [ "$THIRD" == "mongo" ] || [ "$THIRD" == "prometheus" ]
 then
+ MODULE=${THIRD}
+fi
+# Real Client
+if [ "$THIRD" == "webapp" ]
+then
+ JAVA_ARGS="-e HOST_IP=${HOST_IP}"
  MODULE=${THIRD}
 fi
 

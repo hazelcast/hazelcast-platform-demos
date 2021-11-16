@@ -18,6 +18,7 @@ package hazelcast.platform.demos.industry.iiot;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -190,7 +191,7 @@ public class StatsRunnable {
                 count++;
             }
             if (count == 0) {
-                log.info("NO LOGS");
+                log.info("NO LOGS (since " + new Date(this.lastLoggingPrint) + ")");
             }
         } catch (Exception e) {
             log.error("logLogging(): " + sql, e);

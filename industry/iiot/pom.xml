@@ -24,9 +24,7 @@
 		<module>prometheus</module>
 		<module>test</module>
 		<module>abstract-client</module>
-		<!--
 		<module>webapp</module>
-		-->
 	</modules>
 
 	<properties>

@@ -157,7 +157,7 @@ public class ServiceHistoryMapLoader implements MapLoader<String, HazelcastJsonV
             Utils.addExceptionToLogger(LOGGER, "load('" + key + "')", e);
         }
 
-        LOGGER.trace("load(" + key + ") END, '" + result + "'");
+        LOGGER.trace("load(" + key + ") END, '" + Utils.escapeJson(result) + "'");
         return result;
     }
 
