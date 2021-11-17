@@ -88,7 +88,7 @@ public class Utils {
             try {
                 List<Tuple4<String, String, List<String>, List<String>>> tuple4List =
                         iExecutorService.submit(callable).get();
-                prettyPrint(callableName, "", tuple4List);
+                result &= prettyPrint(callableName, "", tuple4List);
             } catch (Exception e) {
                 String message = String.format("Submit '%s' to any node:", callableName);
                 log.error(message, e);
@@ -104,7 +104,7 @@ public class Utils {
                     Future<List<Tuple4<String, String, List<String>, List<String>>>> future = entry.getValue();
                     try {
                         List<Tuple4<String, String, List<String>, List<String>>> tuple4List = future.get();
-                        prettyPrint(callableName, node, tuple4List);
+                        result &= prettyPrint(callableName, node, tuple4List);
                     } catch (Exception e) {
                         String message = String.format("Submit '%s' to all nodes, node '%s':", callableName, node);
                         log.error(message, e);
@@ -124,8 +124,9 @@ public class Utils {
      * @param prefix1
      * @param prefix1
      * @param tuple4list
+     * @param True if no errors
      */
-    private static void prettyPrint(String prefix1, String prefix2,
+    private static boolean prettyPrint(String prefix1, String prefix2,
                 List<Tuple4<String, String, List<String>, List<String>>> tuple4list) {
         String prefix = prefix1 + ":";
         if (prefix2 != null && prefix2.length() > 0) {
@@ -133,15 +134,17 @@ public class Utils {
         }
         if (tuple4list == null) {
             log.error("{} QUERY: null result", prefix);
-            return;
+            return false;
         }
         if (tuple4list.isEmpty()) {
             log.warn("{} QUERY: empty result", prefix);
-            return;
+            return false;
         }
+        boolean result = true;
         for (Tuple4<String, String, List<String>, List<String>> tuple4: tuple4list) {
-            prettyPrintTuple4(prefix, tuple4);
+            result &= prettyPrintTuple4(prefix, tuple4);
         }
+        return result;
     }
 
     /**
@@ -150,8 +153,10 @@ public class Utils {
      *
      * @param prefix
      * @param tuple4
+     * @param True if no errors
      */
-    private static void prettyPrintTuple4(String prefix, Tuple4<String, String, List<String>, List<String>> tuple4) {
+    private static boolean prettyPrintTuple4(String prefix, Tuple4<String, String, List<String>, List<String>> tuple4) {
+        boolean ok = true;
         String description = Objects.toString(tuple4.f0());
         if (tuple4.f1() != null && tuple4.f1().length() > 0) {
             description += ", " + tuple4.f1();
@@ -162,6 +167,7 @@ public class Utils {
             log.error("{} FAIL: {}", prefix, description);
             for (String error : tuple4.f2()) {
                 log.error("  ERROR  =>  '{}'", error);
+                ok = false;
             }
         }
         if (tuple4.f3() != null) {
@@ -169,6 +175,7 @@ public class Utils {
                 log.warn("  WARNING=>  '{}'", warning);
             }
         }
+        return ok;
     }
 
     /**

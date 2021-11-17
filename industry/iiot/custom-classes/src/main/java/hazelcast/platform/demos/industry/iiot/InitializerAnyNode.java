@@ -56,10 +56,12 @@ public class InitializerAnyNode extends Tuple4Callable {
         .stream().forEach(tuple4 -> result.add(tuple4));
 
         // Add config before touching maps that may have MapStores that use config
-        this.populateConfig(result);
-        this.addMapStores(result);
-        // Define needed objects
-        this.touchAllIMaps(result);
+        boolean ok = this.populateConfig(result);
+        if (ok) {
+            this.addMapStores(result);
+            // Define needed objects
+            this.touchAllIMaps(result);
+        }
 
         return result;
     }
@@ -69,8 +71,9 @@ public class InitializerAnyNode extends Tuple4Callable {
      * </p>
      *
      * @param result
+     * @return True if all mandatory config provided
      */
-    private void populateConfig(List<Tuple4<String, String, List<String>, List<String>>> result) {
+    private boolean populateConfig(List<Tuple4<String, String, List<String>, List<String>>> result) {
         List<String> errors = new ArrayList<>();
         List<String> warnings = new ArrayList<>();
         String diagnostic = "";
@@ -92,7 +95,21 @@ public class InitializerAnyNode extends Tuple4Callable {
             }
         }
 
+        // Validate what is present
+        Map<String, String> configMap = this.getHazelcastInstance().getMap(MyConstants.IMAP_NAME_SYS_CONFIG);
+        for (String key : MyConstants.CONFIG_REQUIRED) {
+            if (!configMap.containsKey(key)) {
+                errors.add("No value for '" + key + "'");
+            }
+        }
+        for (String key : MyConstants.CONFIG_OPTIONAL) {
+            if (!configMap.containsKey(key)) {
+                warnings.add("No value for '" + key + "'");
+            }
+        }
+
         result.add(Tuple4.tuple4(MY_NAME + ".populateConfig()", diagnostic, errors, warnings));
+        return (errors.size() == 0);
     }
 
     /**

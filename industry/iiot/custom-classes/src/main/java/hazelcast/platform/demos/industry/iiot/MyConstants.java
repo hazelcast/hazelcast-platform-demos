@@ -41,4 +41,15 @@ public class MyConstants {
     public static final String MONGO_DATABASE = MONGO_PREFIX + "database";
     public static final String MONGO_PASSWORD = MONGO_PREFIX + "password";
     public static final String MONGO_USERNAME = MONGO_PREFIX + "username";
+
+    public static final String ZOOM_PREFIX = "zoom.";
+
+    // For config validation
+    public static final List<String> CONFIG_REQUIRED = List.of(
+            MONGO_COLLECTION1, MONGO_HOST, MONGO_DATABASE,
+            MONGO_PASSWORD, MONGO_USERNAME
+    );
+    public static final List<String> CONFIG_OPTIONAL = List.of(
+    );
+
 }

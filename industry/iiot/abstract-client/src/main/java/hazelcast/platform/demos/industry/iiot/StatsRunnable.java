@@ -31,6 +31,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.hazelcast.cluster.Member;
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IExecutorService;
@@ -38,7 +39,6 @@ import com.hazelcast.jet.Job;
 import com.hazelcast.map.IMap;
 import com.hazelcast.sql.SqlResult;
 import com.hazelcast.sql.SqlRow;
-import com.hazelcast.version.MemberVersion;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,6 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 @EnableScheduling
 @Slf4j
 public class StatsRunnable {
+    private static final byte VERSION_FIVE = 5;
 
     @Autowired
     private HazelcastInstance hazelcastInstance;
@@ -71,15 +72,17 @@ public class StatsRunnable {
                         countStr, this.hazelcastInstance.getName(), countStr);
                 if (count % 3 == 0) {
                     this.logDistributedObjects();
-                    MemberVersion memberVersion = this.hazelcastInstance.getCluster().getMembers().iterator().next().getVersion();
-                    byte major = memberVersion.getMajor();
-                    // Jet added in version 5.
-                    if (major >= Byte.valueOf("5")) {
+                    Member member = this.hazelcastInstance.getCluster().getMembers().iterator().next();
+                    // Jet added in version 5.0.0. Cluster version cannot exceed version of any member
+                    if (member.getVersion().getMajor() >= VERSION_FIVE) {
                         try {
                             this.logJobs();
                         } catch (Exception e) {
                             log.error("count==" + count, e);
                         }
+                    } else {
+                        log.warn("Not attempting to log jobs, found member version ({}.{}.{})",
+                                member.getVersion().getMajor(), member.getVersion().getMinor(), member.getVersion().getPatch());
                     }
                     this.logLogging();
                 }

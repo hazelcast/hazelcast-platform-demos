@@ -60,21 +60,26 @@ public class ApplicationRunner {
             log.info("-=-=-=-=- START '{}' START -=-=-=-=-=-",
                 this.hazelcastInstance.getName());
 
+            boolean ok;
             if ("".equals(System.getProperty("HOST_IP", ""))) {
                 log.warn("Cloud mode");
-                this.initialize(Level.INFO);
-                this.listAndDeleteDistributedObject();
+                ok = this.initialize(Level.INFO);
+                if (ok) {
+                    this.listAndDeleteDistributedObject();
+                }
             } else {
                 log.warn("Local mode");
-                this.initialize(Level.TRACE);
+                ok = this.initialize(Level.TRACE);
             }
 
-            TimeUnit.SECONDS.sleep(2L);
-            this.showMappings();
-            this.queryMap(MyConstants.IMAP_NAME_SERVICE_HISTORY);
-            this.queryMap(MyConstants.IMAP_NAME_SYS_CONFIG);
-            this.queryMap(MyConstants.IMAP_NAME_SYS_LOGGING);
-            TimeUnit.HOURS.sleep(1L);
+            if (ok) {
+                TimeUnit.SECONDS.sleep(2L);
+                this.showMappings();
+                this.queryMap(MyConstants.IMAP_NAME_SERVICE_HISTORY);
+                this.queryMap(MyConstants.IMAP_NAME_SYS_CONFIG);
+                this.queryMap(MyConstants.IMAP_NAME_SYS_LOGGING);
+                TimeUnit.HOURS.sleep(1L);
+            }
 
             log.info("-=-=-=-=-  END  '{}'  END  -=-=-=-=-=-",
                     this.hazelcastInstance.getName());
@@ -146,12 +151,15 @@ public class ApplicationRunner {
             { MyConstants.MONGO_HOST, System.getProperty("HOST_IP", "") },
         };
 
-        log.info("Logging level '{}'", level);
+        log.info("Logging level for server-side '{}'", level);
         InitializerAllNodes initializerAllNodes = new InitializerAllNodes(level);
         boolean ok = Utils.runTuple4Callable(initializerAllNodes, this.hazelcastInstance, false);
         if (ok) {
             InitializerAnyNode initializerAnyNode = new InitializerAnyNode(config);
             ok = Utils.runTuple4Callable(initializerAnyNode, this.hazelcastInstance, true);
+        }
+        if (!ok) {
+            log.error("initialize(): FAILED");
         }
         return ok;
     }
