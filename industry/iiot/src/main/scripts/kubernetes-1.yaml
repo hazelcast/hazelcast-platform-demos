@@ -25,6 +25,28 @@ spec:
       targetPort: 2004
   type: LoadBalancer
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: iiot-grafana-for-hz-cloud
+spec:
+  selector:
+    app: iiot-grafana
+  ports:
+  - port: 2004
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: iiot-mongo-for-hz-cloud
+spec:
+  selector:
+    app: iiot-mongo
+  ports:
+  - port: 27017
+  type: LoadBalancer
+---
 # Service for Mongo
 ---
 apiVersion: v1
@@ -37,6 +59,17 @@ spec:
     app: iiot-mongo
   ports:
   - port: 27017
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: iiot-mongo-for-hz-cloud
+spec:
+  selector:
+    app: iiot-mongo
+  ports:
+  - port: 27017
+  type: LoadBalancer
 ---
 # Service for Prometheus
 ---
@@ -52,6 +85,18 @@ spec:
       port: 9090
       targetPort: 9090
   type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: iiot-prometheus-for-hz-cloud
+spec:
+  selector:
+    app: iiot-prometheus
+  ports:
+  - port: 9090
+  type: LoadBalancer
+---
 ---
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 # $$$$$$$$$$$$$$$$$$$$$$$ POD DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$

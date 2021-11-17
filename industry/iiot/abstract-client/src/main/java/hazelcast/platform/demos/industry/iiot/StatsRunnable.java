@@ -71,7 +71,7 @@ public class StatsRunnable {
                 log.info("-=-=-=-=- {} '{}' {} -=-=-=-=-=-",
                         countStr, this.hazelcastInstance.getName(), countStr);
                 if (count % 3 == 0) {
-                    this.logDistributedObjects();
+                    int distributedObjectCount = this.logDistributedObjects();
                     Member member = this.hazelcastInstance.getCluster().getMembers().iterator().next();
                     // Jet added in version 5.0.0. Cluster version cannot exceed version of any member
                     if (member.getVersion().getMajor() >= VERSION_FIVE) {
@@ -84,7 +84,9 @@ public class StatsRunnable {
                         log.warn("Not attempting to log jobs, found member version ({}.{}.{})",
                                 member.getVersion().getMajor(), member.getVersion().getMinor(), member.getVersion().getPatch());
                     }
-                    this.logLogging();
+                    if (distributedObjectCount > 0) {
+                        this.logLogging();
+                    }
                 }
                 count++;
             }
@@ -97,7 +99,7 @@ public class StatsRunnable {
      * <p>Confirm the data sizes for {@link IMap} instances..
      * </p>
      */
-    private void logDistributedObjects() {
+    private int logDistributedObjects() {
         Set<String> iMapNames = new TreeSet<>();
         Set<String> executorNames = new TreeSet<>();
         Map<String, Class<?>> otherNames = new TreeMap<>();
@@ -122,7 +124,7 @@ public class StatsRunnable {
                 });
 
         if (distributedObjects.isEmpty()) {
-            log.info("NO DISTRIBUTED OBJECTSs");
+            log.info("NO DISTRIBUTED OBJECTS");
         }
         if (!executorNames.isEmpty()) {
             executorNames
@@ -146,6 +148,8 @@ public class StatsRunnable {
             log.info("UNEXPECTED OBJECT, NAME '{}', CLASS '{}'",
                     entry.getKey(), klassName);
         });
+
+        return distributedObjects.size();
     }
 
     /**

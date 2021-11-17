@@ -1,7 +1,3 @@
-# May be overridden for Docker
-server:
-  port: 8080
-
 spring:
   application:
     name: '@project.artifactId@'
