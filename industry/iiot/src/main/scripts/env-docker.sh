@@ -42,7 +42,10 @@ fi
 # Test Client, c/f webapp
 if [ "$THIRD" == "client" ]
 then
- JAVA_ARGS="-e HOST_IP=${HOST_IP}"
+ if [ "$SECOND" != "cloud" ]
+ then
+  JAVA_ARGS="-e HOST_IP=${HOST_IP}"
+ fi
 fi
 
 # Grafana,etc - part of main demo, image name does not include "test"
@@ -53,7 +56,10 @@ fi
 # Real Client
 if [ "$THIRD" == "webapp" ]
 then
- JAVA_ARGS="-e HOST_IP=${HOST_IP}"
+ if [ "$SECOND" != "cloud" ]
+ then
+  JAVA_ARGS="-e HOST_IP=${HOST_IP}"
+ fi
  MODULE=${THIRD}
 fi
 

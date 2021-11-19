@@ -1,0 +1,23 @@
+import React, { Component } from 'react';
+import Config from './components/config'
+import Slf4j from './components/logging'
+
+class App extends Component {
+    render() {
+                return (
+                    	<div>
+                            <div class="minor_pane">
+				<Config />
+                    	    </div>
+                            <div>
+                                <hr class="pane_separator"/>
+                            </div>
+                            <div class="minor_pane">
+				<Slf4j />
+                            </div>
+                    	</div>
+                )
+        }
+}
+
+export default App;

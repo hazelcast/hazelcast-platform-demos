@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,11 +49,15 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 @Slf4j
 public class ApplicationRunner {
+    private static final int FOUR = 4;
+    private static final int FIFTEEN = 15;
 
     @Autowired
     private HazelcastInstance hazelcastInstance;
     @Autowired
     private MyProperties myProperties;
+    @Value("${spring.application.name}")
+    private String springApplicationName;
 
     @Bean
     public CommandLineRunner commandLineRunner() {
@@ -74,11 +79,33 @@ public class ApplicationRunner {
 
             if (ok) {
                 TimeUnit.SECONDS.sleep(2L);
+                System.out.println("");
                 this.showMappings();
+                System.out.println("");
                 this.queryMap(MyConstants.IMAP_NAME_SERVICE_HISTORY);
+                System.out.println("");
                 this.queryMap(MyConstants.IMAP_NAME_SYS_CONFIG);
-                this.queryMap(MyConstants.IMAP_NAME_SYS_LOGGING);
-                TimeUnit.HOURS.sleep(1L);
+                System.out.println("");
+
+                TimeUnit.MINUTES.sleep(2L);
+
+                // Do something every few minutes for an hour
+                int count = FIFTEEN;
+                while (count > 0 && ok) {
+                    String countStr = String.format("%05d", count);
+                    log.info("-=-=-=-=- {} '{}' {} -=-=-=-=-=-",
+                            countStr, this.hazelcastInstance.getName(), countStr);
+
+                    String caller = this.springApplicationName + "-" + myProperties.getBuildTimestamp() + "-"
+                            + myProperties.getBuildUserName();
+                    LoggingNoOpAnyNode loggingNoOpAnyNode = new LoggingNoOpAnyNode(caller);
+                    ok = Utils.runTuple4Callable(loggingNoOpAnyNode, this.hazelcastInstance, true);
+
+                    if (ok) {
+                        TimeUnit.MINUTES.sleep(FOUR);
+                    }
+                    count--;
+                }
             }
 
             log.info("-=-=-=-=-  END  '{}'  END  -=-=-=-=-=-",
@@ -176,12 +203,16 @@ public class ApplicationRunner {
 
     private void runQuery(String sql) {
         try {
+            System.out.println(sql);
             SqlResult sqlResult = this.hazelcastInstance.getSql().execute(sql);
             Iterator<SqlRow> sqlRowsIterator = sqlResult.iterator();
+            int count = 0;
             while (sqlRowsIterator.hasNext()) {
                 SqlRow sqlRow = sqlRowsIterator.next();
-                System.out.println(sqlRow);
+                System.out.println("==> " + sqlRow);
+                count++;
             }
+            System.out.println("[" + count + " row" + (count == 1 ? "" : "s") + "]");
         } catch (Exception e) {
             log.error("runQuery: " + sql, e);
         }

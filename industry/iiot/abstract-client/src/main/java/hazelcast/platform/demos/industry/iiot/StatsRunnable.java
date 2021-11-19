@@ -27,6 +27,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -54,6 +55,9 @@ public class StatsRunnable {
 
     @Autowired
     private HazelcastInstance hazelcastInstance;
+    @Autowired(required = false)
+    @Qualifier(MyConstants.BEAN_NAME_VERBOSE_LOGGING)
+    private boolean verboseLogging;
 
     private int count;
     private long lastLoggingPrint;
@@ -84,7 +88,8 @@ public class StatsRunnable {
                         log.warn("Not attempting to log jobs, found member version ({}.{}.{})",
                                 member.getVersion().getMajor(), member.getVersion().getMinor(), member.getVersion().getPatch());
                     }
-                    if (distributedObjectCount > 0) {
+                    // Only if eager initialization likely to have been run
+                    if (distributedObjectCount >= MyConstants.IMAP_NAMES.size()) {
                         this.logLogging();
                     }
                 }
@@ -194,11 +199,17 @@ public class StatsRunnable {
             int count = 0;
             while (sqlRowsIterator.hasNext()) {
                 SqlRow sqlRow = sqlRowsIterator.next();
-                System.out.println(sqlRow);
+                if (this.verboseLogging) {
+                    System.out.println(sqlRow);
+                }
                 count++;
             }
             if (count == 0) {
                 log.info("NO LOGS (since " + new Date(this.lastLoggingPrint) + ")");
+            } else {
+                log.info(count + " LOG" + (count == 1 ? "" : "S")
+                        + " (since " + new Date(this.lastLoggingPrint) + ", versbose logging=="
+                        + this.verboseLogging + ")");
             }
         } catch (Exception e) {
             log.error("logLogging(): " + sql, e);

@@ -28,6 +28,8 @@
 	</modules>
 
 	<properties>
+		<java.version>1.8</java.version>
+
 		<docker.image.prefix>iiot</docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
 
@@ -35,7 +37,7 @@
                 <my.mongo.collection1.name>serviceHistory</my.mongo.collection1.name>
 		
 		<!-- From settings.xml -->
-		<hz.cloud.cluster1.discovery.token>${my.cloud.cluster1.discovery.token}</hz.cloud.cluster1.discovery.token>
+		<hz.cloud.cluster1.discovery.token>${my.hz.cloud.cluster1.discovery.token}</hz.cloud.cluster1.discovery.token>
 		<hz.cloud.cluster1.name>${my.hz.cloud.cluster1.name}</hz.cloud.cluster1.name>
 	</properties>
 
