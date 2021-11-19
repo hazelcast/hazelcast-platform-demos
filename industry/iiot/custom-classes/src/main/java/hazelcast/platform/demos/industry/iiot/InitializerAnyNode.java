@@ -98,13 +98,15 @@ public class InitializerAnyNode extends Tuple4Callable {
         // Validate what is present
         Map<String, String> configMap = this.getHazelcastInstance().getMap(MyConstants.IMAP_NAME_SYS_CONFIG);
         for (String key : MyConstants.CONFIG_REQUIRED) {
-            if (!configMap.containsKey(key)) {
-                errors.add("No value for '" + key + "'");
+            String value = configMap.get(key);
+            if (value == null || MyConstants.CONFIG_VALUE_PLACEHOLDER.equals(value)) {
+                errors.add("No value for '" + key + "', got " + value);
             }
         }
         for (String key : MyConstants.CONFIG_OPTIONAL) {
-            if (!configMap.containsKey(key)) {
-                warnings.add("No value for '" + key + "'");
+            String value = configMap.get(key);
+            if (value == null || MyConstants.CONFIG_VALUE_PLACEHOLDER.equals(value)) {
+                errors.add("No value for '" + key + "', got " + value);
             }
         }
 
