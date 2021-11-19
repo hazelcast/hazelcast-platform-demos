@@ -208,7 +208,7 @@ public class StatsRunnable {
                 log.info("NO LOGS (since " + new Date(this.lastLoggingPrint) + ")");
             } else {
                 log.info(count + " LOG" + (count == 1 ? "" : "S")
-                        + " (since " + new Date(this.lastLoggingPrint) + ", versbose logging=="
+                        + " (since " + new Date(this.lastLoggingPrint) + ", verbose logging=="
                         + this.verboseLogging + ")");
             }
         } catch (Exception e) {

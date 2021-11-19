@@ -40,8 +40,26 @@ h2, h3, h4 {
     font-family: "Courier New", Courier, monospace;
 }
 
+.configOuterBox {
+    font-family: monospace;
+}
+.configOutputBox {
+    border: 2px dashed brown;
+    height: 300px;
+    overflow-y: auto;
+}
+
+.loggingOuterBox {
+    font-family: monospace;
+}
+.loggingOutputBox {
+    border: 2px dashed brown;
+    height: 200px;
+    overflow-y: auto;
+}
+
 .pane_separator {
-        border-top: 1px dashed salmon;
+    border-top: 1px dashed salmon;
 }
 
 .headerfooter {

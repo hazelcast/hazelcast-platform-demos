@@ -54,16 +54,16 @@ public class IMapAppender extends AppenderBase<ILoggingEvent> {
     protected void append(ILoggingEvent eventObject) {
         StringBuffer keyStringBuffer = new StringBuffer();
         keyStringBuffer.append("{");
-        keyStringBuffer.append(" \"memberAddress\" : \"" + this.memberAddress + "\"");
-        keyStringBuffer.append(", \"timestamp\" : " + eventObject.getTimeStamp());
+        keyStringBuffer.append(" \"" + MyConstants.LOGGING_FIELD_MEMBER_ADDRESS + "\" : \"" + this.memberAddress + "\"");
+        keyStringBuffer.append(", \"" + MyConstants.LOGGING_FIELD_TIMESTAMP + "\" : " + eventObject.getTimeStamp());
         keyStringBuffer.append("}");
 
         StringBuffer valueStringBuffer = new StringBuffer();
         valueStringBuffer.append("{");
-        valueStringBuffer.append(" \"loggerName\" : \"" + eventObject.getLoggerName() + "\"");
-        valueStringBuffer.append(", \"threadName\" : \"" + eventObject.getThreadName() + "\"");
-        valueStringBuffer.append(", \"level\" : \"" + eventObject.getLevel() + "\"");
-        valueStringBuffer.append(", \"message\" : \"" + eventObject.getMessage() + "\"");
+        valueStringBuffer.append(" \"" + MyConstants.LOGGING_FIELD_LOGGER_NAME + "\" : \"" + eventObject.getLoggerName() + "\"");
+        valueStringBuffer.append(", \"" + MyConstants.LOGGING_FIELD_THREAD_NAME + "\" : \"" + eventObject.getThreadName() + "\"");
+        valueStringBuffer.append(", \"" + MyConstants.LOGGING_FIELD_LEVEL + "\" : \"" + eventObject.getLevel() + "\"");
+        valueStringBuffer.append(", \"" + MyConstants.LOGGING_FIELD_MESSAGE + "\" : \"" + eventObject.getMessage() + "\"");
         valueStringBuffer.append("}");
 
         this.logMap.set(new HazelcastJsonValue(keyStringBuffer.toString()),
