@@ -17,10 +17,14 @@
 package hazelcast.platform.demos.industry.iiot;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hazelcast.core.HazelcastInstance;
+
+import ch.qos.logback.classic.Level;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -31,6 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MyRestController {
 
+    @Autowired
+    private HazelcastInstance hazelcastInstance;
     @Autowired
     private MyProperties myProperties;
 
@@ -44,6 +50,42 @@ public class MyRestController {
     public String k8s() {
         log.trace("k8s() -> {}", this.myProperties.getBuildTimestamp());
         return this.myProperties.getBuildTimestamp();
+    }
+
+    /**
+     * <p>REST endpoint to initialize the cluster.
+     * </p>
+     *
+     * @return
+     */
+    @GetMapping(value = "/initialize", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String initialize() {
+        log.debug("initialize()");
+
+        String[][] config = {};
+        String failingCallable = "";
+
+        InitializerAllNodes initializerAllNodes = new InitializerAllNodes(Level.DEBUG);
+        boolean ok = Utils.runTuple4Callable(initializerAllNodes, this.hazelcastInstance, false);
+        if (!ok) {
+            failingCallable = initializerAllNodes.getClass().getSimpleName();
+        } else {
+            InitializerAnyNode initializerAnyNode = new InitializerAnyNode(config);
+            ok = Utils.runTuple4Callable(initializerAnyNode, this.hazelcastInstance, true);
+            if (!ok) {
+                failingCallable = initializerAnyNode.getClass().getSimpleName();
+            }
+        }
+        if (!ok) {
+            log.error("initialize(): FAILED: " + failingCallable);
+        }
+
+        StringBuilder stringBuilder = new StringBuilder("{ ");
+        stringBuilder.append(" \"failing_callable\" : \"" + failingCallable + "\"");
+        stringBuilder.append(", \"error\" : " + !ok);
+        stringBuilder.append(" }");
+
+        return stringBuilder.toString();
     }
 
 }

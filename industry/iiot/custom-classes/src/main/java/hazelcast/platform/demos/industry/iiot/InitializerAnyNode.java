@@ -67,7 +67,8 @@ public class InitializerAnyNode extends Tuple4Callable {
     }
 
     /**
-     * <p>Iterate through the entries to insert to the config map.
+     * <p>Iterate through the entries to insert to the config map. May
+     * be empty if already inserted.
      * </p>
      *
      * @param result
@@ -81,17 +82,13 @@ public class InitializerAnyNode extends Tuple4Callable {
         if (this.config == null) {
             errors.add("config is null");
         } else {
-            if (this.config.length == 0) {
-                errors.add("config is empty");
-            } else {
-                int count = 0;
-                for (String[] pair : this.config) {
-                    this.populateConfigEntry(pair, count, errors, warnings);
-                    count++;
-                }
-                if (errors.size() == 0) {
-                    diagnostic = "Inserted " + count + " item" + (count == 1 ? "" : "s");
-                }
+            int count = 0;
+            for (String[] pair : this.config) {
+                this.populateConfigEntry(pair, count, errors, warnings);
+                count++;
+            }
+            if (errors.size() == 0) {
+                diagnostic = "Inserted " + count + " item" + (count == 1 ? "" : "s");
             }
         }
 

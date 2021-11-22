@@ -21,13 +21,19 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hazelcast.core.EntryEvent;
@@ -52,6 +58,8 @@ public class MyConfigHandler implements EntryAddedListener<String, String>, Entr
 
     @Autowired
     private HazelcastInstance hazelcastInstance;
+    @Autowired
+    private MyProperties myProperties;
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
@@ -85,11 +93,22 @@ public class MyConfigHandler implements EntryAddedListener<String, String>, Entr
         for (String key : MyConstants.CONFIG_OPTIONAL) {
             configMap.putIfAbsent(key, MyConstants.CONFIG_VALUE_PLACEHOLDER);
         }
+
+        // Likely values, host isn't predictable for cloud
+        configMap.replace(MyConstants.MONGO_COLLECTION1, MyConstants.CONFIG_VALUE_PLACEHOLDER,
+                this.myProperties.getMongoCollection1());
+        configMap.replace(MyConstants.MONGO_DATABASE, MyConstants.CONFIG_VALUE_PLACEHOLDER,
+                this.myProperties.getMongoDatabase());
+        configMap.replace(MyConstants.MONGO_USERNAME, MyConstants.CONFIG_VALUE_PLACEHOLDER,
+                this.myProperties.getMongoUsername());
+        configMap.replace(MyConstants.MONGO_PASSWORD, MyConstants.CONFIG_VALUE_PLACEHOLDER,
+                this.myProperties.getMongoPassword());
     }
 
     /**
      * <p>Send existing values periodically to refresh web page
      * </p>
+     * <p>Web does pull on first load, this is fallback in case this fails.
      */
     public void pushConfig() {
         this.sendAllConfig("pushConfig()");
@@ -103,16 +122,39 @@ public class MyConfigHandler implements EntryAddedListener<String, String>, Entr
      */
     @SuppressFBWarnings(value = "REC_CATCH_EXCEPTION", justification = "new JSONObject(...) can throw exception")
     private void sendAllConfig(String caller) {
+        try {
+            String s = this.getAll();
+            JSONObject json = new JSONObject(s);
+            JSONArray payload = json.getJSONArray("payload");
+
+            log.trace("sendAllConfig({}), existing items to send: {}", caller, payload.length());
+
+            String destination = MyLocalConstants.CONFIG_DESTINATION;
+
+            log.debug("Sending to websocket '{}', {}, {} bytes for {} items",
+                    caller, destination, s.length(), payload.length());
+            simpMessagingTemplate.convertAndSend(destination, s);
+        } catch (Exception e) {
+            log.error("sendAllConfig(): caller: " + caller, e);
+        }
+    }
+
+    /**
+     * <p>Complete set, formatted as JSON
+     * </p>
+     *
+     * @return
+     */
+    private String getAll() {
         IMap<String, String> configMap = this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_SYS_CONFIG);
 
         Set<String> keys = configMap.keySet().stream()
                 .collect(Collectors.toCollection(TreeSet::new));
 
-        log.trace("sendAllConfig({}), existing items to send: {}", caller, keys.size());
-        if (!keys.isEmpty()) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("{ \"payload\": [");
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("{ \"payload\": [");
 
+        if (!keys.isEmpty()) {
             int count = 0;
             for (String key : keys) {
                 if (count > 0) {
@@ -150,19 +192,47 @@ public class MyConfigHandler implements EntryAddedListener<String, String>, Entr
 
                 count++;
             }
-
-            stringBuilder.append("] }");
-
-            try {
-                String json = stringBuilder.toString();
-                String destination = MyLocalConstants.CONFIG_DESTINATION;
-
-                log.debug("Sending to websocket '{}', {}, {} bytes for {} items",
-                        caller, destination, json.length(), count);
-                simpMessagingTemplate.convertAndSend(destination, json);
-            } catch (Exception e) {
-                log.error("sendAllConfig(): caller: " + caller, e);
-            }
         }
+
+        stringBuilder.append("] }");
+        return stringBuilder.toString();
+    }
+
+    /**
+     * <p>REST endpoint to retrieve all current values.
+     * </p>
+     *
+     * @return
+     */
+    @GetMapping(value = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String get() {
+        log.debug("get()");
+        return this.getAll();
+    }
+
+    /**
+     * <p>REST endpoint to set a key/value pair.
+     * </p>
+     *
+     * @return
+     */
+    @GetMapping(value = "/set", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String set(@RequestParam("the_key") String theKey,
+            @RequestParam("the_value") String theValue) {
+        log.debug("set('{}', '{}')", theKey, theValue);
+        Object oldValue =
+                this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_SYS_CONFIG).put(theKey, theValue);
+
+        if (oldValue != null && theKey.contains("password")) {
+            oldValue = "*hidden*";
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("{ \"the_key\": \"" + theKey + "\"");
+        stringBuilder.append(", \"the_value\": \"" + theValue + "\"");
+        stringBuilder.append(", \"the_old_value\": \"" + Objects.toString(oldValue) + "\"");
+        stringBuilder.append(" }");
+
+        return stringBuilder.toString();
     }
 }
