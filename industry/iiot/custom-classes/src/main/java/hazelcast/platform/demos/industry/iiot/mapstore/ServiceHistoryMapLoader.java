@@ -43,7 +43,6 @@ import com.mongodb.client.model.Projections;
 
 import hazelcast.platform.demos.industry.iiot.MyConstants;
 import hazelcast.platform.demos.industry.iiot.Utils;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * <p>Load a value from Mongo. This version does not store back to Mongo.
@@ -53,7 +52,6 @@ import lombok.extern.slf4j.Slf4j;
  * although it is used here against Mongo 5 not Mongo 4.
  * </p>
  */
-@Slf4j
 public class ServiceHistoryMapLoader implements MapLoader<String, HazelcastJsonValue>,
     MapLoaderLifecycleSupport, Serializable {
     private static final long serialVersionUID = 1L;
@@ -64,10 +62,11 @@ public class ServiceHistoryMapLoader implements MapLoader<String, HazelcastJsonV
     private String collection;
     private String database;
     private String host;
+    private String mapName;
     private String password;
     private String username;
 
-    public ServiceHistoryMapLoader(Map<String, String> mongoProperties) {
+    public ServiceHistoryMapLoader(Map<String, String> mongoProperties, String mapName) {
         this.collection = mongoProperties.getOrDefault(MyConstants.MONGO_COLLECTION1, "");
         this.database = mongoProperties.getOrDefault(MyConstants.MONGO_DATABASE, "");
         this.host = mongoProperties.getOrDefault(MyConstants.MONGO_HOST, "");
@@ -86,6 +85,7 @@ public class ServiceHistoryMapLoader implements MapLoader<String, HazelcastJsonV
                 throw new RuntimeException(message);
             }
         }
+        this.mapName = mapName;
     }
 
     /**
@@ -94,7 +94,7 @@ public class ServiceHistoryMapLoader implements MapLoader<String, HazelcastJsonV
      */
     @Override
     public void init(HazelcastInstance hazelcastInstance, Properties properties, String mapName) {
-        log.debug("init(), START");
+        LOGGER.trace(this.mapName + ":init(), START");
         MongoClient tmpClient = null;
 
         try {
@@ -106,14 +106,14 @@ public class ServiceHistoryMapLoader implements MapLoader<String, HazelcastJsonV
 
             this.mongoDatabase = tmpClient.getDatabase(this.database);
         } catch (Exception e) {
-            Utils.addExceptionToLogger(log, "init()", e);
+            Utils.addExceptionToLogger(LOGGER, "init()", e);
         }
 
         // Only use if fully initialised and connected
         if (tmpClient != null) {
             this.mongoClient = tmpClient;
         }
-        log.debug("init(), END OK==" + Boolean.valueOf(this.mongoClient != null));
+        LOGGER.trace(this.mapName + ":init(), END OK==" + Boolean.valueOf(this.mongoClient != null));
     }
 
     /**
@@ -125,7 +125,7 @@ public class ServiceHistoryMapLoader implements MapLoader<String, HazelcastJsonV
         if (this.mongoClient != null) {
             this.mongoClient.close();
         }
-        log.debug("destroy()");
+        LOGGER.trace(this.mapName + ":destroy()");
     }
 
     /**
@@ -137,7 +137,7 @@ public class ServiceHistoryMapLoader implements MapLoader<String, HazelcastJsonV
      */
     @Override
     public HazelcastJsonValue load(String key) {
-        LOGGER.trace("load(" + key + ") START");
+        LOGGER.trace(this.mapName + ":load(" + key + ") START");
 
         HazelcastJsonValue result = null;
 
@@ -169,7 +169,7 @@ public class ServiceHistoryMapLoader implements MapLoader<String, HazelcastJsonV
      */
     @Override
     public Map<String, HazelcastJsonValue> loadAll(Collection<String> keys) {
-        LOGGER.trace("loadAll(" + new ArrayList<>(keys) + ")");
+        LOGGER.trace(this.mapName + ":loadAll(" + new ArrayList<>(keys) + ")");
 
         Map<String, HazelcastJsonValue> result = new HashMap<>();
         for (String key : keys) {
@@ -187,7 +187,7 @@ public class ServiceHistoryMapLoader implements MapLoader<String, HazelcastJsonV
         }
 
         if (result.size() != keys.size()) {
-            LOGGER.trace("loadAll(" + new ArrayList<>(keys) + ") got only " + result.size());
+            LOGGER.warn(this.mapName + ":loadAll(" + new ArrayList<>(keys) + ") got only " + result.size());
         }
         return result;
     }
@@ -199,7 +199,7 @@ public class ServiceHistoryMapLoader implements MapLoader<String, HazelcastJsonV
      */
     @Override
     public Iterable<String> loadAllKeys() {
-        LOGGER.debug("loadAllKeys(), START");
+        LOGGER.debug(this.mapName + ":loadAllKeys(), START");
         List<String> ids = new ArrayList<>();
         try {
             MongoCollection<Document> collection = this.mongoDatabase.getCollection(this.collection);
@@ -212,7 +212,7 @@ public class ServiceHistoryMapLoader implements MapLoader<String, HazelcastJsonV
         } catch (Exception e) {
             Utils.addExceptionToLogger(LOGGER, "loadAllKeys()", e);
         }
-        LOGGER.debug("loadAllKeys(), END, " + ids.size());
+        LOGGER.debug(this.mapName + ":loadAllKeys(), END, " + ids.size());
         return ids;
     }
 

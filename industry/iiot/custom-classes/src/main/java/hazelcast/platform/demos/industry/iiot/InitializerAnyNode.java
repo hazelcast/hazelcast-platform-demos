@@ -157,7 +157,8 @@ public class InitializerAnyNode extends Tuple4Callable {
                 .filter(entry -> entry.getKey().startsWith(MyConstants.MONGO_PREFIX))
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
         try {
-            ServiceHistoryMapLoader serviceHistoryMapLoader = new ServiceHistoryMapLoader(mongoProperties);
+            ServiceHistoryMapLoader serviceHistoryMapLoader =
+                    new ServiceHistoryMapLoader(mongoProperties, MyConstants.IMAP_NAME_SERVICE_HISTORY);
 
             MapStoreConfig serviceHistoryMapStoreConfig = new MapStoreConfig();
             serviceHistoryMapStoreConfig.setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER);

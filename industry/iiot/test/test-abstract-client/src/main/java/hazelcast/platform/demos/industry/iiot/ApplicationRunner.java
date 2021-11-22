@@ -91,7 +91,7 @@ public class ApplicationRunner {
 
                 // Do something every few minutes for an hour
                 int count = FIFTEEN;
-                while (count > 0 && ok) {
+                while (count > 0 && ok && this.hazelcastInstance.getLifecycleService().isRunning()) {
                     String countStr = String.format("%05d", count);
                     log.info("-=-=-=-=- {} '{}' {} -=-=-=-=-=-",
                             countStr, this.hazelcastInstance.getName(), countStr);
