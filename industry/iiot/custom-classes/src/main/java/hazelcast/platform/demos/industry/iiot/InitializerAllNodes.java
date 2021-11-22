@@ -55,7 +55,7 @@ public class InitializerAllNodes
 
 
     @SuppressFBWarnings(value = "UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR",
-            justification = "setHazelcastInstanc() gets called by Hazelcast")
+            justification = "setHazelcastInstance() gets called by Hazelcast")
     private transient HazelcastInstance hazelcastInstance;
     private Level level;
 
@@ -87,6 +87,8 @@ public class InitializerAllNodes
      *
      * @param result
      */
+    @SuppressFBWarnings(value = "REC_CATCH_EXCEPTION",
+            justification = "SpotBugs 4.4.2.2 doesn't spot exception that can be thrown by Logger casting")
     private void initialiseLogback(List<Tuple4<String, String, List<String>, List<String>>> result) {
         List<String> warnings = new ArrayList<>();
         List<String> errors = new ArrayList<>();

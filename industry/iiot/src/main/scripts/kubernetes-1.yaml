@@ -36,17 +36,6 @@ spec:
   - port: 2004
   type: LoadBalancer
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: iiot-mongo-for-hz-cloud
-spec:
-  selector:
-    app: iiot-mongo
-  ports:
-  - port: 27017
-  type: LoadBalancer
----
 # Service for Mongo
 ---
 apiVersion: v1

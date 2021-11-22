@@ -29,11 +29,22 @@ public class MyConstants {
     public static final String IMAP_NAME_SYS_CONFIG = "sys.config";
     public static final String IMAP_NAME_SYS_LOGGING = "sys.logging";
     public static final List<String> IMAP_NAMES =
-            List.of(IMAP_NAME_SERVICE_HISTORY,
+            List.of(
+                    IMAP_NAME_SERVICE_HISTORY,
                     IMAP_NAME_SYS_CONFIG, IMAP_NAME_SYS_LOGGING);
 
     public static final String SLF4J_APPENDER_NAME = "IMAP-" + IMAP_NAME_SYS_LOGGING;
     public static final String SLF4J_LOGGER_NAME = "hazelcast.platform.demos";
+
+    public static final String CONFIG_VALUE_PLACEHOLDER = "__TODO__";
+
+    // For Slf4j to IMap
+    public static final String LOGGING_FIELD_MEMBER_ADDRESS = "memberAddress";
+    public static final String LOGGING_FIELD_TIMESTAMP = "timestamp";
+    public static final String LOGGING_FIELD_LOGGER_NAME = "loggerName";
+    public static final String LOGGING_FIELD_THREAD_NAME = "threadName";
+    public static final String LOGGING_FIELD_LEVEL = "level";
+    public static final String LOGGING_FIELD_MESSAGE = "message";
 
     public static final String MONGO_PREFIX = "mongo.";
     public static final String MONGO_COLLECTION1 = MONGO_PREFIX + "collection1";
@@ -42,14 +53,18 @@ public class MyConstants {
     public static final String MONGO_PASSWORD = MONGO_PREFIX + "password";
     public static final String MONGO_USERNAME = MONGO_PREFIX + "username";
 
+    public static final String BEAN_NAME_VERBOSE_LOGGING = "verbose";
+
     public static final String ZOOM_PREFIX = "zoom.";
 
     // For config validation
-    public static final List<String> CONFIG_REQUIRED = List.of(
+    public static final List<String> CONFIG_REQUIRED =
+            List.of(
             MONGO_COLLECTION1, MONGO_HOST, MONGO_DATABASE,
             MONGO_PASSWORD, MONGO_USERNAME
     );
-    public static final List<String> CONFIG_OPTIONAL = List.of(
+    public static final List<String> CONFIG_OPTIONAL =
+            List.of(
     );
 
 }
