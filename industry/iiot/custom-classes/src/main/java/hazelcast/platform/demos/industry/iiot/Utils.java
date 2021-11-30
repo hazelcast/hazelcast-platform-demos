@@ -22,20 +22,21 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.hazelcast.cluster.Member;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.core.IExecutorService;
 import com.hazelcast.jet.datamodel.Tuple4;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * <p>Shared utility methods.
  * </p>
  */
-@Slf4j
 public class Utils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
 
     /**
      * <p>Classes the client sees wrap the real object, so expose it.
@@ -91,7 +92,7 @@ public class Utils {
                 result &= prettyPrint(callableName, "", tuple4List);
             } catch (Exception e) {
                 String message = String.format("Submit '%s' to any node:", callableName);
-                log.error(message, e);
+                LOGGER.error(message, e);
                 result = false;
             }
         } else {
@@ -107,7 +108,7 @@ public class Utils {
                         result &= prettyPrint(callableName, node, tuple4List);
                     } catch (Exception e) {
                         String message = String.format("Submit '%s' to all nodes, node '%s':", callableName, node);
-                        log.error(message, e);
+                        LOGGER.error(message, e);
                         result = false;
                     }
                 }
@@ -133,11 +134,11 @@ public class Utils {
             prefix = prefix + " " + prefix2 + ":";
         }
         if (tuple4list == null) {
-            log.error("{} QUERY: null result", prefix);
+            LOGGER.error("{} QUERY: null result", prefix);
             return false;
         }
         if (tuple4list.isEmpty()) {
-            log.warn("{} QUERY: empty result", prefix);
+            LOGGER.warn("{} QUERY: empty result", prefix);
             return false;
         }
         boolean result = true;
@@ -162,17 +163,17 @@ public class Utils {
             description += ", " + tuple4.f1();
         }
         if (tuple4.f2() == null || tuple4.f2().size() == 0) {
-            log.info("{} OK: {}", prefix, description);
+            LOGGER.info("{} OK: {}", prefix, description);
         } else {
-            log.error("{} FAIL: {}", prefix, description);
+            LOGGER.error("{} FAIL: {}", prefix, description);
             for (String error : tuple4.f2()) {
-                log.error("  ERROR  =>  '{}'", error);
+                LOGGER.error("  ERROR  =>  '{}'", error);
                 ok = false;
             }
         }
         if (tuple4.f3() != null) {
             for (String warning : tuple4.f3()) {
-                log.warn("  WARNING=>  '{}'", warning);
+                LOGGER.warn("  WARNING=>  '{}'", warning);
             }
         }
         return ok;

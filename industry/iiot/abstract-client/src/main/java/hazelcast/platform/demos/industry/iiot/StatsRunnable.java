@@ -194,15 +194,17 @@ public class StatsRunnable {
         String sql = "SELECT * FROM \"" + MyConstants.IMAP_NAME_SYS_LOGGING + "\""
                 + " WHERE \"timestamp\" >= " + this.lastLoggingPrint;
         try {
-            SqlResult sqlResult = this.hazelcastInstance.getSql().execute(sql);
-            Iterator<SqlRow> sqlRowsIterator = sqlResult.iterator();
             int count = 0;
-            while (sqlRowsIterator.hasNext()) {
-                SqlRow sqlRow = sqlRowsIterator.next();
-                if (this.verboseLogging) {
-                    System.out.println(sqlRow);
+            if (!this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_SYS_LOGGING).isEmpty()) {
+                SqlResult sqlResult = this.hazelcastInstance.getSql().execute(sql);
+                Iterator<SqlRow> sqlRowsIterator = sqlResult.iterator();
+                while (sqlRowsIterator.hasNext()) {
+                    SqlRow sqlRow = sqlRowsIterator.next();
+                    if (this.verboseLogging) {
+                        System.out.println(sqlRow);
+                    }
+                    count++;
                 }
-                count++;
             }
             if (count == 0) {
                 log.info("NO LOGS (since " + new Date(this.lastLoggingPrint) + ")");

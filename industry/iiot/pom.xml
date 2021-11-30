@@ -20,6 +20,7 @@
 	<modules>
 		<module>custom-classes</module>
 		<module>grafana</module>
+		<module>maria</module>
 		<module>mongo</module>
 		<module>prometheus</module>
 		<module>test</module>
@@ -28,7 +29,7 @@
 	</modules>
 
 	<properties>
-		<java.version>1.8</java.version>
+		<java.version>11</java.version>
 
 		<docker.image.prefix>iiot</docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
