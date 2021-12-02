@@ -69,7 +69,6 @@ public class InitializerAllNodes
      * </p>
      */
     @Override
-    @SuppressFBWarnings(value = "REC_CATCH_EXCEPTION", justification = "sleep can throw exception")
     public List<Tuple4<String, String, List<String>, List<String>>> call() throws Exception {
         List<Tuple4<String, String, List<String>, List<String>>> result = new ArrayList<>();
 
@@ -135,11 +134,11 @@ public class InitializerAllNodes
                 slf4jLogger.debug("Runtime.getRuntime().availableProcessors()=="
                         + Runtime.getRuntime().availableProcessors());
             }
-
-            result.add(Tuple4.tuple4(MY_NAME + ".initialiseLogback()", "", errors, warnings));
         } catch (Exception e) {
             Utils.addExceptionToError(errors, null, e);
         }
+
+        result.add(Tuple4.tuple4(MY_NAME + ".initialiseLogback()", "", errors, warnings));
     }
 
     @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Hazelcast instance must be shared, not cloned")

@@ -29,6 +29,7 @@ import com.hazelcast.jet.datamodel.Tuple4;
 import com.hazelcast.map.IMap;
 
 import hazelcast.platform.demos.industry.iiot.mapstore.ServiceHistoryMapLoader;
+import hazelcast.platform.demos.industry.iiot.mapstore.WearMapStore;
 
 /**
  * <p>Idempotent initialization steps to be run on any node
@@ -151,6 +152,35 @@ public class InitializerAnyNode extends Tuple4Callable {
         List<String> errors = new ArrayList<>();
         List<String> warnings = new ArrayList<>();
         String diagnostic = "";
+
+        Map<String, String> mariaProperties = configMap.entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().startsWith(MyConstants.MARIA_PREFIX))
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+        try {
+            WearMapStore wearMapStore =
+                    new WearMapStore(mariaProperties, MyConstants.IMAP_NAME_WEAR);
+
+            MapStoreConfig wearMapStoreConfig = new MapStoreConfig();
+            wearMapStoreConfig.setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER);
+            wearMapStoreConfig.setImplementation(wearMapStore);
+            // Immediate write, write-through not write-behind.
+            wearMapStoreConfig.setWriteDelaySeconds(0);
+
+            MapConfig wearMapConfig = new MapConfig(MyConstants.IMAP_NAME_WEAR);
+            wearMapConfig.setMapStoreConfig(wearMapStoreConfig);
+
+            this.getHazelcastInstance().getConfig().addMapConfig(wearMapConfig);
+
+            diagnostic = wearMapConfig.getName();
+        } catch (Exception e) {
+            Utils.addExceptionToError(errors, MyConstants.IMAP_NAME_WEAR, e);
+        }
+        result.add(Tuple4.tuple4(MY_NAME + ".addMapStores()", diagnostic, errors, warnings));
+
+        errors = new ArrayList<>();
+        warnings = new ArrayList<>();
+        diagnostic = "";
 
         Map<String, String> mongoProperties = configMap.entrySet()
                 .stream()

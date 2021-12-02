@@ -15,6 +15,7 @@ ARG MY_ADMINPASSWORD
 ENV JAVA_OPTS="-Dhazelcast.mc.healthCheck.enable=true \
  -Dhazelcast.mc.prometheusExporter.enabled=true \
  -Dhazelcast.mc.license=$MC_LICENSE \
+ -Dhazelcast.mc.rest.enabled=true \
  -Xmx3G -Xms3G"
 
 # Used by /mc-start.sh to create admin user unless MC_INIT_CMD used

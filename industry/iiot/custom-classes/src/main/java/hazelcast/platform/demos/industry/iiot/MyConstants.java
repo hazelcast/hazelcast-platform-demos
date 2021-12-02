@@ -26,11 +26,12 @@ public class MyConstants {
 
     // Map names, for eager creation
     public static final String IMAP_NAME_SERVICE_HISTORY = "service.history";
+    public static final String IMAP_NAME_WEAR = "wear";
     public static final String IMAP_NAME_SYS_CONFIG = "sys.config";
     public static final String IMAP_NAME_SYS_LOGGING = "sys.logging";
     public static final List<String> IMAP_NAMES =
             List.of(
-                    IMAP_NAME_SERVICE_HISTORY,
+                    IMAP_NAME_SERVICE_HISTORY, IMAP_NAME_WEAR,
                     IMAP_NAME_SYS_CONFIG, IMAP_NAME_SYS_LOGGING);
 
     public static final String SLF4J_APPENDER_NAME = "IMAP-" + IMAP_NAME_SYS_LOGGING;
@@ -46,6 +47,11 @@ public class MyConstants {
     public static final String LOGGING_FIELD_LEVEL = "level";
     public static final String LOGGING_FIELD_MESSAGE = "message";
 
+    public static final String MARIA_PREFIX = "maria.";
+    public static final String MARIA_HOST = MARIA_PREFIX + "host";
+    public static final String MARIA_DATABASE = MARIA_PREFIX + "database";
+    public static final String MARIA_PASSWORD = MARIA_PREFIX + "password";
+    public static final String MARIA_USERNAME = MARIA_PREFIX + "username";
     public static final String MONGO_PREFIX = "mongo.";
     public static final String MONGO_COLLECTION1 = MONGO_PREFIX + "collection1";
     public static final String MONGO_HOST = MONGO_PREFIX + "host";
@@ -60,6 +66,8 @@ public class MyConstants {
     // For config validation
     public static final List<String> CONFIG_REQUIRED =
             List.of(
+            MARIA_HOST, MARIA_DATABASE,
+            MARIA_PASSWORD, MARIA_USERNAME,
             MONGO_COLLECTION1, MONGO_HOST, MONGO_DATABASE,
             MONGO_PASSWORD, MONGO_USERNAME
     );

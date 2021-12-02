@@ -71,6 +71,10 @@ public class ApplicationConfig {
                         Objects.toString(discoveryToken));
                 throw new RuntimeException(message);
             }
+            /*FIXME Until PROD ready. Don't push as exposes internals.
+            clientConfig.setProperty("hazelcast.client.cloud.url", "https://uat.hazelcast.cloud");
+    */
+            clientConfig.setProperty("hazelcast.client.cloud.url", "https://dev.test.hazelcast.cloud");
         } else {
             log.info("Cluster '{}' : Hazelcast local configuration",
                     clientConfig.getClusterName());

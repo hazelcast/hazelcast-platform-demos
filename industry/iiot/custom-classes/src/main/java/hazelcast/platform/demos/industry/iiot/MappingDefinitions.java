@@ -45,6 +45,7 @@ public class MappingDefinitions {
         result.add(MappingDefinitions.addMappingStringString(hazelcastInstance, MyConstants.IMAP_NAME_SYS_CONFIG));
         result.add(MappingDefinitions.addMappingIMapLogging(hazelcastInstance));
         result.add(MappingDefinitions.addMappingIMapServiceHistory(hazelcastInstance));
+        result.add(MappingDefinitions.addMappingIMapWear(hazelcastInstance));
 
         return result;
     }
@@ -134,6 +135,34 @@ public class MappingDefinitions {
         List<String> warnings = new ArrayList<>();
         return Tuple4.<String, String, List<String>, List<String>>
             tuple4(MY_NAME + ".addMappingIMapServiceHistory()", mapName, errors, warnings);
+    }
+
+    /**
+     * <p>Backed by Maria, storage for machine wear level.</p>
+     *
+     * @param hazelcastInstance
+     * @return
+     */
+    private static Tuple4<String, String, List<String>, List<String>> addMappingIMapWear(
+            HazelcastInstance hazelcastInstance) {
+        String mapName = MyConstants.IMAP_NAME_WEAR;
+        String sql = "CREATE OR REPLACE MAPPING \"" + mapName + "\""
+                + " EXTERNAL NAME \"" + mapName + "\""
+                + " ("
+                + "    __key VARCHAR,"
+                + "    \"whence\" VARCHAR EXTERNAL NAME \"this.whence\","
+                + "    \"amount\" DOUBLE EXTERNAL NAME \"this.amount\""
+                + ") "
+                + "TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
+                + " 'valueFormat' = 'json-flat'"
+                + " )";
+        List<String> errors = MappingDefinitions.executeSqlMapping(hazelcastInstance, sql);
+        List<String> warnings = new ArrayList<>();
+        return Tuple4.<String, String, List<String>, List<String>>
+            tuple4(MY_NAME + ".addMappingIMapWear()", mapName, errors, warnings);
     }
 
     /**

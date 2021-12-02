@@ -95,6 +95,12 @@ public class MyConfigHandler implements EntryAddedListener<String, String>, Entr
         }
 
         // Likely values, host isn't predictable for cloud
+        configMap.replace(MyConstants.MARIA_DATABASE, MyConstants.CONFIG_VALUE_PLACEHOLDER,
+                this.myProperties.getMariaDatabase());
+        configMap.replace(MyConstants.MARIA_USERNAME, MyConstants.CONFIG_VALUE_PLACEHOLDER,
+                this.myProperties.getMariaUsername());
+        configMap.replace(MyConstants.MARIA_PASSWORD, MyConstants.CONFIG_VALUE_PLACEHOLDER,
+                this.myProperties.getMariaPassword());
         configMap.replace(MyConstants.MONGO_COLLECTION1, MyConstants.CONFIG_VALUE_PLACEHOLDER,
                 this.myProperties.getMongoCollection1());
         configMap.replace(MyConstants.MONGO_DATABASE, MyConstants.CONFIG_VALUE_PLACEHOLDER,

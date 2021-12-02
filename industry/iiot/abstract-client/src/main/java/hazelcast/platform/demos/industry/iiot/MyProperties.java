@@ -41,6 +41,12 @@ public class MyProperties {
     @NotNull
     private String buildUserName;
     @NotNull
+    private String mariaDatabase;
+    @NotNull
+    private String mariaPassword;
+    @NotNull
+    private String mariaUsername;
+    @NotNull
     private String mongoCollection1;
     @NotNull
     private String mongoDatabase;

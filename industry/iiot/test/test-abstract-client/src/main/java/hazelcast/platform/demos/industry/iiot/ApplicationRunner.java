@@ -170,6 +170,11 @@ public class ApplicationRunner {
      */
     private boolean initialize(Level level) {
         String[][] config = new String[][] {
+            { MyConstants.MARIA_DATABASE, this.myProperties.getMariaDatabase() },
+            { MyConstants.MARIA_PASSWORD, this.myProperties.getMariaPassword() },
+            { MyConstants.MARIA_USERNAME, this.myProperties.getMariaUsername() },
+            //FIXME temporary ?
+            { MyConstants.MARIA_HOST, System.getProperty("HOST_IP", "") },
             { MyConstants.MONGO_COLLECTION1, this.myProperties.getMongoCollection1() },
             { MyConstants.MONGO_DATABASE, this.myProperties.getMongoDatabase() },
             { MyConstants.MONGO_PASSWORD, this.myProperties.getMongoPassword() },
