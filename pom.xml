@@ -29,7 +29,8 @@
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
 		<dockerfile.skip>true</dockerfile.skip>
 		<failsafe.skip>true</failsafe.skip>
-		<java.version>17</java.version>
+		<!-- Need Java 11 until 5.1 GA -->
+		<java.version>11</java.version>
 		<main.basedir>${project.basedir}</main.basedir>
 		<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -50,6 +51,7 @@
 		<guava.version>29.0-jre</guava.version>
         <!-- Matches banking/credit-value-adjustment/cpp/Dockerfile2 -->
 		<grpc.version>1.31.1</grpc.version>
+		<!-- Need Java 11 until 5.1 GA -->
 		<hazelcast.version>5.1-SNAPSHOT</hazelcast.version>
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
 		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
@@ -68,7 +70,7 @@
 		<protobuf.version>3.12.2</protobuf.version>
 		<pulsar.version>2.8.0</pulsar.version>
 		<spotbugs-annotations.version>4.5.0</spotbugs-annotations.version>
-		<spring-boot.version>2.5.6</spring-boot.version>
+		<spring-boot.version>2.6.1</spring-boot.version>
         <spring-cloud.version>2020.0.3</spring-cloud.version>
         <spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
 		<springfox-swagger.version>2.9.2</springfox-swagger.version>
@@ -329,14 +331,14 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${maven-compiler-plugin.version}</version>
-				<configuration>
-					<encoding>${project.build.sourceEncoding}</encoding>
-					<release>${java.version}</release>
-				</configuration>
-			</plugin>
+                        <plugin>
+                                <artifactId>maven-compiler-plugin</artifactId>
+                                <version>${maven-compiler-plugin.version}</version>
+                                <configuration>
+                                        <encoding>${project.build.sourceEncoding}</encoding>
+                                        <release>${java.version}</release>
+                                </configuration>
+                        </plugin>
 			<plugin>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>${maven-failsafe-plugin.version}</version>
@@ -388,9 +390,6 @@
 								<mainClass>${main.class}</mainClass>
 							</manifest>
 						</archive>
-						<descriptorRefs>
-							<descriptorRef>jar-with-dependencies</descriptorRef>
-						</descriptorRefs>
                                                 <descriptors>
                                                         <descriptor>${main.basedir}/assemble/assembly.xml</descriptor>
                                                 </descriptors>
