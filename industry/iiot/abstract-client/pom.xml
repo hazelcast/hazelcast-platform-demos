@@ -24,36 +24,6 @@
 			<artifactId>iiot-jobs</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
-		<!-- Selected dependencies with scope "provided" in the above, made concrete -->
-
-		<dependency>
-			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast-sql</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet-python</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.fasterxml.jackson.dataformat</groupId>
-			<artifactId>jackson-dataformat-yaml</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-configuration-processor</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
-		</dependency>
 	</dependencies>
 
 	<build>

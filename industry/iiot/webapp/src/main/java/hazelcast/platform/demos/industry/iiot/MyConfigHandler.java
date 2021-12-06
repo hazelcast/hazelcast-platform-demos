@@ -223,9 +223,18 @@ public class MyConfigHandler implements EntryAddedListener<String, String>, Entr
      * @return
      */
     @GetMapping(value = "/set", produces = MediaType.APPLICATION_JSON_VALUE)
+    @SuppressFBWarnings(value = "RV_CHECK_FOR_POSITIVE_INDEXOF", justification = "only use if data before the colon")
     public String set(@RequestParam("the_key") String theKey,
             @RequestParam("the_value") String theValue) {
         log.debug("set('{}', '{}')", theKey, theValue);
+        // If passed URL, extract host
+        if (theValue.startsWith("http://") && theValue.length() > "http://".length()) {
+            theValue = theValue.substring("http://".length());
+            if (theValue.indexOf(":") > 0) {
+                theValue = theValue.substring(0, theValue.indexOf(":"));
+            }
+            log.debug("set('{}', '{}') [amended]", theKey, theValue);
+        }
         Object oldValue =
                 this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_SYS_CONFIG).put(theKey, theValue);
 

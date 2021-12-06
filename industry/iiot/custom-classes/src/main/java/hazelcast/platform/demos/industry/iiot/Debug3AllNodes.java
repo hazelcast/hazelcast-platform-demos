@@ -18,15 +18,11 @@ package hazelcast.platform.demos.industry.iiot;
 
 import java.io.InputStream;
 import java.io.Serializable;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.Callable;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -51,7 +47,8 @@ public class Debug3AllNodes implements Callable<List<String>>, Serializable {
 
         ClassLoader classLoader = this.getClass().getClassLoader();
 
-        // Maven build. But with multiple Jars on classpath could be any
+        // Maven build. But with multiple Jars on classpath order may be changed
+        /*XXX
         Enumeration<URL> enumeration = classLoader.getResources("META-INF/MANIFEST.MF");
         if (!enumeration.hasMoreElements()) {
             result.add("No enumeration for manifest");
@@ -62,7 +59,7 @@ public class Debug3AllNodes implements Callable<List<String>>, Serializable {
                 Attributes attributes = manifest.getMainAttributes();
                 attributes.entrySet().stream().forEach(e -> result.add(e.toString()));
             }
-        }
+        }*/
 
         Properties properties = new Properties();
         try (InputStream inputStream = classLoader.getResourceAsStream(FILENAME)) {

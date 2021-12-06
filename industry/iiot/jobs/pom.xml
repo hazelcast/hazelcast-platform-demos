@@ -1,0 +1,59 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hazelcast.platform.demos.industry.iiot</groupId>
+		<artifactId>iiot-root</artifactId>
+		<version>5.1</version>
+	</parent>
+
+	<artifactId>iiot-jobs</artifactId>
+
+	<name>Hazelcast Platform - IIOT - Jobs</name>
+	<description>Jet processing pipelines, for the more complex streaming instead of SQL</description>
+
+	<properties>
+		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>iiot-custom-classes</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- Selected dependencies with scope "provided" in the above, made concrete -->
+
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-sql</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet-python</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-yaml</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+	</dependencies>
+
+</project>

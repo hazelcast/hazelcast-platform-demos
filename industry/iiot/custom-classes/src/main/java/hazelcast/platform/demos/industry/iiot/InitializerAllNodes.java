@@ -90,7 +90,7 @@ public class InitializerAllNodes
 
             Logger logger = IMapLoggerFactory.getLogger(this.getClass());
 
-            logger.debug("Runtime.getRuntime().availableProcessors()=="
+            logger.info("Runtime.getRuntime().availableProcessors()=="
                         + Runtime.getRuntime().availableProcessors());
         } catch (Exception e) {
             Utils.addExceptionToError(errors, null, e);

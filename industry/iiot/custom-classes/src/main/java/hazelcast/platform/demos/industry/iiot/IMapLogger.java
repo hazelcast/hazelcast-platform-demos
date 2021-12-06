@@ -26,7 +26,8 @@ import com.hazelcast.map.IMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
- * FIXME
+ * <p>A logger that saves to {@link com.hazelcast.map.IMap IMap}.
+ * </p>
  */
 @SuppressWarnings("checkstyle:methodcount")
 public class IMapLogger implements Logger {
@@ -53,7 +54,7 @@ public class IMapLogger implements Logger {
      * <p>Does most of the work
      * </p>
      */
-    private void saveToHazelcast(String msg) {
+    private void saveToHazelcast(Level lvl, String msg) {
         StringBuffer keyStringBuffer = new StringBuffer();
         keyStringBuffer.append("{");
         keyStringBuffer.append(" \"" + MyConstants.LOGGING_FIELD_MEMBER_ADDRESS + "\" : \"" + this.memberAddress + "\"");
@@ -65,7 +66,7 @@ public class IMapLogger implements Logger {
         valueStringBuffer.append(" \"" + MyConstants.LOGGING_FIELD_LOGGER_NAME + "\" : \"" + this.name + "\"");
         valueStringBuffer.append(", \"" + MyConstants.LOGGING_FIELD_THREAD_NAME + "\" : \""
                 + Thread.currentThread().getName() + "\"");
-        valueStringBuffer.append(", \"" + MyConstants.LOGGING_FIELD_LEVEL + "\" : \"" + this.level + "\"");
+        valueStringBuffer.append(", \"" + MyConstants.LOGGING_FIELD_LEVEL + "\" : \"" + lvl + "\"");
         valueStringBuffer.append(", \"" + MyConstants.LOGGING_FIELD_MESSAGE + "\" : \"" + msg + "\"");
         valueStringBuffer.append("}");
 
@@ -81,7 +82,7 @@ public class IMapLogger implements Logger {
     @Override
     public void trace(String msg) {
         if (this.isTraceEnabled()) {
-            this.saveToHazelcast(msg);
+            this.saveToHazelcast(Level.TRACE, msg);
         }
     }
 
@@ -105,8 +106,9 @@ public class IMapLogger implements Logger {
 
     @Override
     public void trace(String msg, Throwable t) {
-        // TODO Auto-generated method stub
-
+        if (this.isTraceEnabled()) {
+            this.saveToHazelcast(Level.TRACE, msg + ":" + t.getMessage());
+        }
     }
 
     @Override
@@ -153,7 +155,7 @@ public class IMapLogger implements Logger {
     @Override
     public void debug(String msg) {
         if (this.isDebugEnabled()) {
-            this.saveToHazelcast(msg);
+            this.saveToHazelcast(Level.DEBUG, msg);
         }
     }
 
@@ -177,8 +179,9 @@ public class IMapLogger implements Logger {
 
     @Override
     public void debug(String msg, Throwable t) {
-        // TODO Auto-generated method stub
-
+        if (this.isDebugEnabled()) {
+            this.saveToHazelcast(Level.DEBUG, msg + ":" + t.getMessage());
+        }
     }
 
     @Override
@@ -225,7 +228,7 @@ public class IMapLogger implements Logger {
     @Override
     public void info(String msg) {
         if (this.isInfoEnabled()) {
-            this.saveToHazelcast(msg);
+            this.saveToHazelcast(Level.INFO, msg);
         }
     }
 
@@ -249,8 +252,9 @@ public class IMapLogger implements Logger {
 
     @Override
     public void info(String msg, Throwable t) {
-        // TODO Auto-generated method stub
-
+        if (this.isInfoEnabled()) {
+            this.saveToHazelcast(Level.INFO, msg + ":" + t.getMessage());
+        }
     }
 
     @Override
@@ -297,7 +301,7 @@ public class IMapLogger implements Logger {
     @Override
     public void warn(String msg) {
         if (this.isWarnEnabled()) {
-            this.saveToHazelcast(msg);
+            this.saveToHazelcast(Level.WARN, msg);
         }
     }
 
@@ -318,7 +322,9 @@ public class IMapLogger implements Logger {
 
     @Override
     public void warn(String msg, Throwable t) {
-        // TODO Auto-generated method stub
+        if (this.isWarnEnabled()) {
+            this.saveToHazelcast(Level.WARN, msg + ":" + t.getMessage());
+        }
     }
 
     @Override
@@ -366,7 +372,7 @@ public class IMapLogger implements Logger {
     @Override
     public void error(String msg) {
         if (this.isErrorEnabled()) {
-            this.saveToHazelcast(msg);
+            this.saveToHazelcast(Level.ERROR, msg);
         }
     }
 
@@ -390,8 +396,9 @@ public class IMapLogger implements Logger {
 
     @Override
     public void error(String msg, Throwable t) {
-        // TODO Auto-generated method stub
-
+        if (this.isErrorEnabled()) {
+            this.saveToHazelcast(Level.ERROR, msg + ":" + t.getMessage());
+        }
     }
 
     @Override
