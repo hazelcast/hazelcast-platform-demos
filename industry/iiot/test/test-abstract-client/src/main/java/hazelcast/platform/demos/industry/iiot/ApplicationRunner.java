@@ -24,6 +24,7 @@ import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -36,7 +37,6 @@ import com.hazelcast.map.IMap;
 import com.hazelcast.sql.SqlResult;
 import com.hazelcast.sql.SqlRow;
 
-import ch.qos.logback.classic.Level;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -99,7 +99,7 @@ public class ApplicationRunner {
                     String caller = this.springApplicationName + "-" + myProperties.getBuildTimestamp() + "-"
                             + myProperties.getBuildUserName();
                     LoggingNoOpAnyNode loggingNoOpAnyNode = new LoggingNoOpAnyNode(caller);
-                    ok = Utils.runTuple4Callable(loggingNoOpAnyNode, this.hazelcastInstance, true);
+                    ok = Utils.runTuple4Callable(log, loggingNoOpAnyNode, this.hazelcastInstance, true);
 
                     if (ok) {
                         TimeUnit.MINUTES.sleep(FOUR);
@@ -185,10 +185,10 @@ public class ApplicationRunner {
 
         log.info("Logging level for server-side '{}'", level);
         InitializerAllNodes initializerAllNodes = new InitializerAllNodes(level);
-        boolean ok = Utils.runTuple4Callable(initializerAllNodes, this.hazelcastInstance, false);
+        boolean ok = Utils.runTuple4Callable(log, initializerAllNodes, this.hazelcastInstance, false);
         if (ok) {
             InitializerAnyNode initializerAnyNode = new InitializerAnyNode(config);
-            ok = Utils.runTuple4Callable(initializerAnyNode, this.hazelcastInstance, true);
+            ok = Utils.runTuple4Callable(log, initializerAnyNode, this.hazelcastInstance, true);
         }
         if (!ok) {
             log.error("initialize(): FAILED");

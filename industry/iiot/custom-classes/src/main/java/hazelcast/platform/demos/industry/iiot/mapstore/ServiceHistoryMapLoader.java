@@ -27,7 +27,6 @@ import java.util.Properties;
 
 import org.bson.Document;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
@@ -41,6 +40,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 
+import hazelcast.platform.demos.industry.iiot.IMapLoggerFactory;
 import hazelcast.platform.demos.industry.iiot.MyConstants;
 import hazelcast.platform.demos.industry.iiot.Utils;
 
@@ -55,7 +55,7 @@ import hazelcast.platform.demos.industry.iiot.Utils;
 public class ServiceHistoryMapLoader implements MapLoader<String, HazelcastJsonValue>,
     MapLoaderLifecycleSupport, Serializable {
     private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceHistoryMapLoader.class);
+    private static final Logger LOGGER = IMapLoggerFactory.getLogger(ServiceHistoryMapLoader.class);
 
     private transient MongoClient mongoClient;
     private transient MongoDatabase mongoDatabase;

@@ -82,7 +82,7 @@ public class MappingDefinitions {
     }
 
     /**
-     * <p>Logging, based on <a href="http://logback.qos.ch/">Logback</a>.</p>
+     * <p>Logging, based on <a href="http://http://www.slf4j.org/">Slf4j</a>.</p>
      *
      * @param hazelcastInstance
      * @return

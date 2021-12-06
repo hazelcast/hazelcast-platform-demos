@@ -22,10 +22,10 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -239,7 +239,8 @@ public class StatsRunnable {
     private void runDebuggingCallables() {
         Debug1AllNodes debug1AllNodes = new Debug1AllNodes();
         Debug2AllNodes debug2AllNodes = new Debug2AllNodes();
-        List<Callable<?>> callables = List.of(debug1AllNodes, debug2AllNodes);
+        Debug3AllNodes debug3AllNodes = new Debug3AllNodes();
+        List<Callable<?>> callables = List.of(debug1AllNodes, debug2AllNodes, debug3AllNodes);
 
         int count = 0;
         boolean ok = true;

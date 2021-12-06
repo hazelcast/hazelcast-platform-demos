@@ -21,11 +21,12 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>iiot-custom-classes</artifactId>
+			<artifactId>iiot-jobs</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Dependencies with scope "provided" in the above, made concrete -->
+		<!-- Selected dependencies with scope "provided" in the above, made concrete -->
+
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-sql</artifactId>
@@ -33,10 +34,6 @@
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet-python</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
 		</dependency>
 
 		<dependency>
@@ -58,6 +55,7 @@
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
 	</dependencies>
+
 	<build>
 		<resources>
 			<resource>

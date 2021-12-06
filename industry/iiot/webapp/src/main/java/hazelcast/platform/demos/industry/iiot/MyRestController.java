@@ -16,6 +16,7 @@
 
 package hazelcast.platform.demos.industry.iiot;
 
+import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hazelcast.core.HazelcastInstance;
 
-import ch.qos.logback.classic.Level;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -66,12 +66,12 @@ public class MyRestController {
         String failingCallable = "";
 
         InitializerAllNodes initializerAllNodes = new InitializerAllNodes(Level.DEBUG);
-        boolean ok = Utils.runTuple4Callable(initializerAllNodes, this.hazelcastInstance, false);
+        boolean ok = Utils.runTuple4Callable(log, initializerAllNodes, this.hazelcastInstance, false);
         if (!ok) {
             failingCallable = initializerAllNodes.getClass().getSimpleName();
         } else {
             InitializerAnyNode initializerAnyNode = new InitializerAnyNode(config);
-            ok = Utils.runTuple4Callable(initializerAnyNode, this.hazelcastInstance, true);
+            ok = Utils.runTuple4Callable(log, initializerAnyNode, this.hazelcastInstance, true);
             if (!ok) {
                 failingCallable = initializerAnyNode.getClass().getSimpleName();
             }

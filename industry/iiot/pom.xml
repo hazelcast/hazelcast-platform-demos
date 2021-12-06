@@ -20,6 +20,7 @@
 	<modules>
 		<module>custom-classes</module>
 		<module>grafana</module>
+		<module>jobs</module>
 		<module>maria</module>
 		<module>mongo</module>
 		<module>prometheus</module>

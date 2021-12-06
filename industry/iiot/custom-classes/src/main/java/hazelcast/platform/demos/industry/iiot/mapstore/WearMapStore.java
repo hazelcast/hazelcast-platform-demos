@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
@@ -33,6 +32,7 @@ import com.hazelcast.map.MapStore;
 import com.zaxxer.hikari.HikariDataSource;
 import com.hazelcast.map.MapLoaderLifecycleSupport;
 
+import hazelcast.platform.demos.industry.iiot.IMapLoggerFactory;
 import hazelcast.platform.demos.industry.iiot.MyConstants;
 import hazelcast.platform.demos.industry.iiot.Utils;
 
@@ -46,7 +46,7 @@ import hazelcast.platform.demos.industry.iiot.Utils;
 public class WearMapStore implements MapStore<String, HazelcastJsonValue>,
     MapLoaderLifecycleSupport, Serializable {
     private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(WearMapStore.class);
+    private static final Logger LOGGER = IMapLoggerFactory.getLogger(WearMapStore.class);
 
     private transient HikariDataSource hikariDataSource;
     private String database;

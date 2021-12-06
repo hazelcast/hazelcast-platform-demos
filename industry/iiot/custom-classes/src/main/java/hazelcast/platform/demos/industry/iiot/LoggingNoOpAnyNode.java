@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.hazelcast.jet.datamodel.Tuple4;
 
@@ -31,7 +30,7 @@ import com.hazelcast.jet.datamodel.Tuple4;
  */
 public class LoggingNoOpAnyNode extends Tuple4Callable {
     private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoggingNoOpAnyNode.class);
+    private static final Logger LOGGER = IMapLoggerFactory.getLogger(LoggingNoOpAnyNode.class);
     private static final String MY_NAME = LoggingNoOpAnyNode.class.getSimpleName();
 
     private final String caller;

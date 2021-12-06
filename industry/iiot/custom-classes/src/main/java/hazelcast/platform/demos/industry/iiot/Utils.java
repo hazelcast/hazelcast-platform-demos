@@ -23,7 +23,6 @@ import java.util.Objects;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.hazelcast.cluster.Member;
 import com.hazelcast.core.HazelcastInstance;
@@ -36,7 +35,6 @@ import com.hazelcast.jet.datamodel.Tuple4;
  * </p>
  */
 public class Utils {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
 
     /**
      * <p>Classes the client sees wrap the real object, so expose it.
@@ -74,12 +72,13 @@ public class Utils {
      * </p></li>
      * </ol>
      *
+     * @param logger May be Slfj4 or customized
      * @param callable
      * @param hazelcastInstance
      * @param any Run on all members or any one.
      * @return
      */
-    static boolean runTuple4Callable(Tuple4Callable callable, HazelcastInstance hazelcastInstance, boolean any) {
+    static boolean runTuple4Callable(Logger logger, Tuple4Callable callable, HazelcastInstance hazelcastInstance, boolean any) {
         IExecutorService iExecutorService = hazelcastInstance.getExecutorService("default");
         String callableName = callable.getClass().getSimpleName();
 
@@ -89,10 +88,10 @@ public class Utils {
             try {
                 List<Tuple4<String, String, List<String>, List<String>>> tuple4List =
                         iExecutorService.submit(callable).get();
-                result &= prettyPrint(callableName, "", tuple4List);
+                result &= prettyPrint(logger, callableName, "", tuple4List);
             } catch (Exception e) {
                 String message = String.format("Submit '%s' to any node:", callableName);
-                LOGGER.error(message, e);
+                logger.error(message, e);
                 result = false;
             }
         } else {
@@ -105,10 +104,10 @@ public class Utils {
                     Future<List<Tuple4<String, String, List<String>, List<String>>>> future = entry.getValue();
                     try {
                         List<Tuple4<String, String, List<String>, List<String>>> tuple4List = future.get();
-                        result &= prettyPrint(callableName, node, tuple4List);
+                        result &= prettyPrint(logger, callableName, node, tuple4List);
                     } catch (Exception e) {
                         String message = String.format("Submit '%s' to all nodes, node '%s':", callableName, node);
-                        LOGGER.error(message, e);
+                        logger.error(message, e);
                         result = false;
                     }
                 }
@@ -123,28 +122,29 @@ public class Utils {
      * <p>Print the output
      * </p>
      *
+     * @param logger May be Slfj4 or customized
      * @param prefix1
      * @param prefix1
      * @param tuple4list
      * @param True if no errors
      */
-    private static boolean prettyPrint(String prefix1, String prefix2,
+    private static boolean prettyPrint(Logger logger, String prefix1, String prefix2,
                 List<Tuple4<String, String, List<String>, List<String>>> tuple4list) {
         String prefix = prefix1 + ":";
         if (prefix2 != null && prefix2.length() > 0) {
             prefix = prefix + " " + prefix2 + ":";
         }
         if (tuple4list == null) {
-            LOGGER.error("{} QUERY: null result", prefix);
+            logger.error("{} QUERY: null result", prefix);
             return false;
         }
         if (tuple4list.isEmpty()) {
-            LOGGER.warn("{} QUERY: empty result", prefix);
+            logger.warn("{} QUERY: empty result", prefix);
             return false;
         }
         boolean result = true;
         for (Tuple4<String, String, List<String>, List<String>> tuple4: tuple4list) {
-            result &= prettyPrintTuple4(prefix, tuple4);
+            result &= prettyPrintTuple4(logger, prefix, tuple4);
         }
         return result;
     }
@@ -153,28 +153,30 @@ public class Utils {
      * <p>Prints an individual success/failure message.
      * </p>
      *
+     * @param logger May be Slfj4 or customized
      * @param prefix
      * @param tuple4
      * @param True if no errors
      */
-    private static boolean prettyPrintTuple4(String prefix, Tuple4<String, String, List<String>, List<String>> tuple4) {
+    private static boolean prettyPrintTuple4(Logger logger, String prefix, Tuple4<String, String, List<String>,
+            List<String>> tuple4) {
         boolean ok = true;
         String description = Objects.toString(tuple4.f0());
         if (tuple4.f1() != null && tuple4.f1().length() > 0) {
             description += ", " + tuple4.f1();
         }
         if (tuple4.f2() == null || tuple4.f2().size() == 0) {
-            LOGGER.info("{} OK: {}", prefix, description);
+            logger.info("{} OK: {}", prefix, description);
         } else {
-            LOGGER.error("{} FAIL: {}", prefix, description);
+            logger.error("{} FAIL: {}", prefix, description);
             for (String error : tuple4.f2()) {
-                LOGGER.error("  ERROR  =>  '{}'", error);
+                logger.error("  ERROR  =>  '{}'", error);
                 ok = false;
             }
         }
         if (tuple4.f3() != null) {
             for (String warning : tuple4.f3()) {
-                LOGGER.warn("  WARNING=>  '{}'", warning);
+                logger.warn("  WARNING=>  '{}'", warning);
             }
         }
         return ok;
@@ -193,8 +195,12 @@ public class Utils {
             errors.add(s);
         }
         errors.add(e.getMessage());
-        for (StackTraceElement stackTraceElement : e.getStackTrace()) {
-            errors.add(stackTraceElement.toString());
+        try {
+            for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+                errors.add(stackTraceElement.toString());
+            }
+        } catch (Exception e2) {
+            errors.add(e2.getMessage());
         }
     }
 

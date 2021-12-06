@@ -42,7 +42,9 @@ public class Debug2AllNodes implements Callable<List<String>>, Serializable {
             result.add(String.format("classLoader.getName()==%s", classLoader.getName()));
 
             for (Package p : classLoader.getDefinedPackages()) {
-                if (!p.getName().startsWith("com")) {
+                if (!p.getName().startsWith("com.")
+                        && !p.getName().startsWith("javax.")
+                        && !p.getName().startsWith("org.")) {
                     result.add(String.format("package.getName()==%s", p.getName()));
                 }
             }

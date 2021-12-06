@@ -19,7 +19,6 @@ package hazelcast.platform.demos.industry.iiot;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,8 +41,6 @@ public class ApplicationRunner {
     private HazelcastInstance hazelcastInstance;
     @Autowired
     private MyConfigHandler myConfigHandler;
-    @Value("${spring.application.name}")
-    private String springApplicationName;
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
@@ -52,7 +49,6 @@ public class ApplicationRunner {
         return args -> {
             log.info("-=-=-=-=- START '{}' START -=-=-=-=-=-",
                 this.hazelcastInstance.getName());
-            log.info("${spring.applicationName}=='{}'", this.springApplicationName);
 
             // Ensure expected config has something
             this.myConfigHandler.initConfig();
