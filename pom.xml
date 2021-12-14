@@ -56,7 +56,7 @@
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
 		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
 		<jackson.version>2.12.4</jackson.version>
-		<json.version>20190722</json.version>
+		<json.version>20211205</json.version>
         <json-smart.version>2.3</json-smart.version>
 		<junit-jupiter.version>5.7.2</junit-jupiter.version>
 		<junit-vintage.version>5.7.2</junit-vintage.version>
@@ -71,6 +71,8 @@
 		<pulsar.version>2.8.0</pulsar.version>
 		<spotbugs-annotations.version>4.5.0</spotbugs-annotations.version>
 		<spring-boot.version>2.6.1</spring-boot.version>
+	<!-- TMP UNTIL SPRING_BOOT VERSION ROLLS IN FIXED LOG4J2 AGAINST SECURITY VULNERABILITY -->
+		<log4j2.version>2.15.0</log4j2.version>
         <spring-cloud.version>2020.0.3</spring-cloud.version>
         <spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
 		<springfox-swagger.version>2.9.2</springfox-swagger.version>
@@ -263,6 +265,33 @@
 				<groupId>org.python</groupId>
 				<artifactId>jython</artifactId>
 				<version>${jython.version}</version>
+			</dependency>
+
+<!-- TMP SECURITY FIX -->
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-to-slf4j</artifactId>
+				<version>${log4j2.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-api</artifactId>
+				<version>${log4j2.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-jul</artifactId>
+				<version>${log4j2.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-core</artifactId>
+				<version>${log4j2.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-slf4j-impl</artifactId>
+				<version>${log4j2.version}</version>
 			</dependency>
 
             <!-- scope==test -->
