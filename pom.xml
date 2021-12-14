@@ -72,7 +72,7 @@
 		<spotbugs-annotations.version>4.5.0</spotbugs-annotations.version>
 		<spring-boot.version>2.6.1</spring-boot.version>
 	<!-- TMP UNTIL SPRING_BOOT VERSION ROLLS IN FIXED LOG4J2 AGAINST SECURITY VULNERABILITY -->
-		<log4j2.version>2.15.0</log4j2.version>
+		<log4j2.version>2.16.0</log4j2.version>
         <spring-cloud.version>2020.0.3</spring-cloud.version>
         <spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
 		<springfox-swagger.version>2.9.2</springfox-swagger.version>

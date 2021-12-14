@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.hazelcast.platform.demos.banking.trademonitor;
+package hazelcast.platform.demos.banking.trademonitor;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -27,6 +27,8 @@ import java.util.concurrent.Callable;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * <p>
  * Idempotent callable, ensure all is setup. Runs on any node.
@@ -36,8 +38,10 @@ public class ConnectIdempotentCallable implements Callable<List<String>>, Hazelc
     private static final long serialVersionUID = 1L;
     private static final String FILENAME = "my.properties";
 
+    @SuppressFBWarnings(value = "UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR", justification = "Set by setHazelcastInstance()")
     private transient HazelcastInstance hazelcastInstance;
 
+    @SuppressFBWarnings(value = "REC_CATCH_EXCEPTION", justification = "Exception can be thrown by properties.load()")
     @Override
     public List<String> call() throws Exception {
         String clusterName = this.hazelcastInstance.getConfig().getClusterName();
@@ -64,6 +68,7 @@ public class ConnectIdempotentCallable implements Callable<List<String>>, Hazelc
         return result;
     }
 
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Safe to share mutable")
     @Override
     public void setHazelcastInstance(HazelcastInstance arg0) {
         this.hazelcastInstance = arg0;

@@ -35,6 +35,10 @@ import org.slf4j.LoggerFactory;
 
 import com.hazelcast.jet.datamodel.Tuple3;
 
+import hazelcast.platform.demos.banking.trademonitor.MyConstants;
+import hazelcast.platform.demos.banking.trademonitor.NasdaqFinancialStatus;
+import hazelcast.platform.demos.banking.trademonitor.NasdaqMarketCategory;
+
 /**
  * <p>The main "{@code run()}" method of the application, called
  * once configuration created.

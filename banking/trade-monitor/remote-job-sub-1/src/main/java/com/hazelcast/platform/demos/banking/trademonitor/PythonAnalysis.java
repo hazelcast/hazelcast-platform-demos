@@ -26,6 +26,8 @@ import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.python.PythonTransforms;
 
+import hazelcast.platform.demos.banking.trademonitor.MyConstants;
+
 /**
  * <p>A Jet pipeline that streams data from Kakfa through Python into
  * a memory cache. 4 simple steps chained together.

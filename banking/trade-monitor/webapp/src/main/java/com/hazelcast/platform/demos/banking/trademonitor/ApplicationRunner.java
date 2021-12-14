@@ -17,6 +17,8 @@
 package com.hazelcast.platform.demos.banking.trademonitor;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import hazelcast.platform.demos.banking.trademonitor.MyConstants;
+import hazelcast.platform.demos.banking.trademonitor.SymbolInfo;
 
 import java.util.ArrayList;
 import java.util.Arrays;

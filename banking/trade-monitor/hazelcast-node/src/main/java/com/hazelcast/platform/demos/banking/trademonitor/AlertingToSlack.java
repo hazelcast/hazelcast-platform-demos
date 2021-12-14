@@ -30,6 +30,8 @@ import com.hazelcast.jet.pipeline.StreamStage;
 import com.hazelcast.platform.demos.utils.UtilsConstants;
 import com.hazelcast.platform.demos.utils.UtilsSlackSink;
 
+import hazelcast.platform.demos.banking.trademonitor.MyConstants;
+
 /**
  * <p>A simple job that listens on a map and republishes to Slack.
  * </p>

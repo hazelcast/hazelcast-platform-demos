@@ -38,6 +38,11 @@ import com.hazelcast.platform.demos.utils.UtilsSlack;
 import com.hazelcast.platform.demos.utils.UtilsSlackSQLJob;
 import com.hazelcast.platform.demos.utils.UtilsSlackSink;
 
+import hazelcast.platform.demos.banking.trademonitor.MyConstants;
+import hazelcast.platform.demos.banking.trademonitor.NasdaqFinancialStatus;
+import hazelcast.platform.demos.banking.trademonitor.NasdaqMarketCategory;
+import hazelcast.platform.demos.banking.trademonitor.SymbolInfo;
+
 
 /**
  * <p>Initialise the Jet cluster to ensure the necessary extra parts

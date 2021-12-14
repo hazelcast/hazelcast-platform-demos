@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.hazelcast.platform.demos.banking.trademonitor;
+package hazelcast.platform.demos.banking.trademonitor;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -24,32 +24,27 @@ import java.util.stream.Collectors;
  * <p>From <a href="http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs">here</a>.
  * </p>
  */
-public enum NasdaqFinancialStatus {
+public enum NasdaqMarketCategory {
 
-    DEFICIENT('D'),
-    DELINQUENT('E'),
-    BANKRUPT('Q'),
-    NORMAL('N'),
-    DEFICIENT_AND_BANKRUPT('G'),
-    DEFICIENT_AND_DELINQUENT('H'),
-    DELINQUENT_AND_BANKRUPT('J'),
-    DEFICIENT_DELINQUENT_AND_BANKRUPT('K');
+    GLOBAL_SELECT_MARKET('Q'),
+    GLOBAL_MARKET('G'),
+    CAPITAL_MARKET('S');
 
-    private static Map<Character, NasdaqFinancialStatus> lookup;
+    private static Map<Character, NasdaqMarketCategory> lookup;
     static {
-        lookup = Arrays.stream(NasdaqFinancialStatus.values())
-        .collect(Collectors.<NasdaqFinancialStatus, Character, NasdaqFinancialStatus>toUnmodifiableMap(
-            nasdaqFinancialStatus -> nasdaqFinancialStatus.c,
-            nasdaqFinancialStatus -> nasdaqFinancialStatus));
+        lookup = Arrays.stream(NasdaqMarketCategory.values())
+        .collect(Collectors.<NasdaqMarketCategory, Character, NasdaqMarketCategory>toUnmodifiableMap(
+            nasdaqMarketCategory -> nasdaqMarketCategory.c,
+            nasdaqMarketCategory -> nasdaqMarketCategory));
     }
 
     private char c;
 
-    NasdaqFinancialStatus(char arg0) {
+    NasdaqMarketCategory(char arg0) {
         this.c = arg0;
     }
 
-    static NasdaqFinancialStatus valueOfFinancialtatus(String arg0) {
+    static NasdaqMarketCategory valueOfMarketCategory(String arg0) {
         return lookup.get(arg0.charAt(0));
     }
 

@@ -43,6 +43,10 @@ import com.hazelcast.sql.SqlResult;
 import com.hazelcast.sql.SqlRow;
 import com.hazelcast.sql.SqlRowMetadata;
 
+import hazelcast.platform.demos.banking.trademonitor.MyConstants;
+import hazelcast.platform.demos.banking.trademonitor.NasdaqFinancialStatus;
+import hazelcast.platform.demos.banking.trademonitor.NasdaqMarketCategory;
+
 /**
  * <p>Utility functions used in several places.
  * </p>

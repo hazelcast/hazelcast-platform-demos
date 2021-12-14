@@ -41,6 +41,10 @@ import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.pipeline.StreamStage;
 import com.hazelcast.jet.pipeline.WindowDefinition;
 
+import hazelcast.platform.demos.banking.trademonitor.MyConstants;
+import hazelcast.platform.demos.banking.trademonitor.NasdaqFinancialStatus;
+import hazelcast.platform.demos.banking.trademonitor.SymbolInfo;
+
 /**
  * <p>Creates a pipeline job to "<i>query</i>" Kafka trades.
  * </p>

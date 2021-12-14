@@ -25,6 +25,8 @@ import com.hazelcast.jet.pipeline.ServiceFactories;
 import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.pipeline.StreamStage;
 
+import hazelcast.platform.demos.banking.trademonitor.MyConstants;
+
 import java.util.Map.Entry;
 import java.util.Properties;
 
