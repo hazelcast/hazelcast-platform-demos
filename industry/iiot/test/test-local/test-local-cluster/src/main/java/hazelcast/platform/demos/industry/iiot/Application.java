@@ -41,6 +41,7 @@ public class Application {
         Config config = new Config();
         config.setClusterName(clusterName);
         config.getJetConfig().setEnabled(true).setResourceUploadEnabled(true);
+        config.getManagementCenterConfig().setConsoleEnabled(true);
 
         HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance(config);
 
