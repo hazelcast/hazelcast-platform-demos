@@ -9,31 +9,21 @@
 		<version>5.1</version>
 	</parent>
 
-	<artifactId>trade-monitor-remote-job-sub-2</artifactId>
+	<artifactId>trade-monitor-custom-classes</artifactId>
 
-	<name>Hazelcast Platform - Trade Monitor - Job sub#2 Zoom</name>
-	<description>Trade Monitor - optional Jet job #2</description>
+	<name>Hazelcast Platform - Trade Monitor - Custom Classes</name>
+	<description>Trade Monitor - Custom Classes</description>
 
 	<properties>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
-		<main.class>com.hazelcast.platform.demos.banking.trademonitor.Application</main.class>
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>trade-monitor-common-clientside</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.hazelcast.platform.demos.utils</groupId>
-			<artifactId>utils-zoom-integration</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
+		<!-- scope==provided -->
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast</artifactId>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
@@ -47,10 +37,16 @@
 
 		<plugins>
 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
+				<!-- No main class -->
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
+						</manifestEntries>
+					</archive>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

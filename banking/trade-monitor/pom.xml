@@ -37,7 +37,8 @@
 	</properties>
 
 	<modules>
-		<module>common</module>
+		<module>custom-classes</module>
+		<module>common-clientside</module>
 		<module>hazelcast-node</module>
 		<module>trade-producer</module>
 		<module>webapp</module>

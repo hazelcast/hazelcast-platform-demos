@@ -9,16 +9,22 @@
 		<version>5.1</version>
 	</parent>
 
-	<artifactId>trade-monitor-common</artifactId>
+	<artifactId>trade-monitor-common-clientside</artifactId>
 
-	<name>Hazelcast Platform - Trade Monitor - Common</name>
-	<description>Trade Monitor - Common</description>
+	<name>Hazelcast Platform - Trade Monitor - Common Clientside</name>
+	<description>Trade Monitor - Common for Clientside</description>
 
 	<properties>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>trade-monitor-custom-classes</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>

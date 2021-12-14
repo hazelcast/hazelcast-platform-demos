@@ -48,10 +48,11 @@ Docker exists and build container images for deployment.
 
 ## Modules
 
-There are 12 modules in this example, alphabetically:
+There are 13 modules in this example, alphabetically:
 
 ```
-common/
+common-clientside/
+custom-classes/
 grafana/
 hazelcast-node/
 kafdrop/
@@ -68,13 +69,17 @@ zookeeper/
 These are described below, a partial ordering on the way you should
 understand and execute them.
 
-### 1. `common`
+### 1. `custom-classes`
 
-The `common` module is not a deployed executable. As the name suggests, it is a common dependency
+The `custom-classes` module is for uploading to Hazelcast Cloud.
+
+### 2. `common-clientside`
+
+The `common-clientside` module is not a deployed executable. As the name suggests, it is a common dependency
 for many of the other modules in the project, to hold shared items such as logging configuration
 and the definition of constants.
 
-### 2. `zookeeper`
+### 3. `zookeeper`
 
 The `zookeeper` module is only used for containerized deployments (ie. Docker and Kubernetes)
 and *does not* represent a production quality Zookeeper deployment.
@@ -89,7 +94,7 @@ Zookeeper image to use. This Zookeeper is un-clustered (only one copy runs) and 
 persistent volumes, so if it is stopped all data is lost. This is ideal for a demonstration,
 but obviously not for production use.
 
-### 3. `kafka-broker`
+### 4. `kafka-broker`
 
 Similar to `zookeeper`, the `kafka-broker` module is used only for containerized deployments
 and again *does not* represent a production quality Kafka deployment.
@@ -104,7 +109,7 @@ image to use as a convenience. This is deployed in parallel (multiple copies run
 is for scaling not resilience. Kafka stored in the image is not on persistent volumes. This
 is a useful simplification for a demonstration, and again not suitable for production.
 
-### 4. `topic-create`
+### 5. `topic-create`
 
 The `topic-create` module is only for containerized deployments.
 
@@ -114,7 +119,7 @@ used by the Trade Monitor applicaiton in Hazelcast.
 It is not needed when running on localhost, the Kafka command line is used instead to
 create the topic.
 
-### 5. `kafdrop`
+### 6. `kafdrop`
 
 The `kafdrop` module is optional.
 
@@ -128,7 +133,7 @@ to flood the screen.
 
 Kafdrop itself is unchanged in this module. 
 
-### 6. `trade-producer`
+### 7. `trade-producer`
 
 The `trade-producer` module is the source of the stock market trades that the Trade
 Monitor application is monitoring.
@@ -158,7 +163,7 @@ Most of the trade fields should be intuitive. The "`symbol`" field is the lookup
 on [NASDAQ](https://www.nasdaq.com/).
 For example, the symbol "_FB_" is [Facebook](https://www.nasdaq.com/market-activity/stocks/fb).
 
-### 7. `hazelcast-node`
+### 8. `hazelcast-node`
 
 The `hazelcast-node` is the module where actual work of the Trade Monitor is done, even though
 this needs the separate `webapp` module below to visualize.
