@@ -61,6 +61,13 @@ public class Application {
             LOGGER.debug("Using port {} from command line argument.", port);
         }
 
+        String propertyName = "my.bootstrap.servers";
+        String bootstrapServers = System.getProperty(propertyName, "");
+        if (bootstrapServers.isBlank()) {
+            LOGGER.error("No value for " + propertyName);
+            System.exit(1);
+        }
+
         ClientConfig clientConfig = ApplicationConfig.buildJetClientConfig();
 
         HazelcastInstance hazelcastInstance = HazelcastClient.newHazelcastClient(clientConfig);

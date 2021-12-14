@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package com.hazelcast.platform.demos.banking.trademonitor;
+package hazelcast.platform.demos.banking.trademonitor;
 
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Deserializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -31,8 +29,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * </p>
  */
 public class TradeJsonDeserializer implements Deserializer<Trade> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TradeJsonDeserializer.class);
-
     private ObjectMapper objectMapper = new ObjectMapper();
 
     /**
@@ -42,11 +38,6 @@ public class TradeJsonDeserializer implements Deserializer<Trade> {
      */
     @Override
     public Trade deserialize(String topic, byte[] data) {
-        if (data == null) {
-            LOGGER.error("Null data from topic '{}'", topic);
-            return null;
-        }
-
         try {
             return objectMapper.readValue(data, Trade.class);
         } catch (Exception exception) {

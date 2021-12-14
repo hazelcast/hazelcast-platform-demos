@@ -44,7 +44,7 @@ public enum NasdaqMarketCategory {
         this.c = arg0;
     }
 
-    static NasdaqMarketCategory valueOfMarketCategory(String arg0) {
+    public static NasdaqMarketCategory valueOfMarketCategory(String arg0) {
         return lookup.get(arg0.charAt(0));
     }
 

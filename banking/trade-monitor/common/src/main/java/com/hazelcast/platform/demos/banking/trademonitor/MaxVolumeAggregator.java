@@ -20,9 +20,6 @@ import java.io.Serializable;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map.Entry;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.jet.aggregate.AggregateOperation;
 import com.hazelcast.jet.aggregate.AggregateOperation1;
@@ -35,7 +32,8 @@ import com.hazelcast.platform.demos.utils.UtilsFormatter;
  */
 public class MaxVolumeAggregator implements Serializable {
     private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(MaxVolumeAggregator.class);
+    // Don't log as may run in the cloud
+    // private static final Logger LOGGER = LoggerFactory.getLogger(MaxVolumeAggregator.class);
 
     private String maxSymbol;
     private long maxVolume;
@@ -112,7 +110,7 @@ public class MaxVolumeAggregator implements Serializable {
         long now = System.currentTimeMillis();
         String nowStr = UtilsFormatter.timestampToISO8601(now);
         if (this.maxSymbol == null) {
-            LOGGER.error("exportFinish() : this.max == null");
+            //LOGGER.error("exportFinish() : this.max == null");
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("{");
             stringBuilder.append("  \"symbol\" : \"<none>\"");

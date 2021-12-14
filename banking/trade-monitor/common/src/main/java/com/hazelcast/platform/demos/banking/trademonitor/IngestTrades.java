@@ -16,6 +16,9 @@
 
 package com.hazelcast.platform.demos.banking.trademonitor;
 
+import java.util.Map.Entry;
+import java.util.Properties;
+
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.jet.Util;
 import com.hazelcast.jet.accumulator.LongAccumulator;
@@ -26,9 +29,6 @@ import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.pipeline.StreamStage;
 
 import hazelcast.platform.demos.banking.trademonitor.MyConstants;
-
-import java.util.Map.Entry;
-import java.util.Properties;
 
 /**
  * <p>Creates a Jet pipeline to upload from a Kafka topic into a
@@ -57,7 +57,7 @@ public class IngestTrades {
      */
     public static Pipeline buildPipeline(String bootstrapServers) {
 
-        Properties properties = ApplicationConfig.kafkaSourceProperties(bootstrapServers);
+        Properties properties = InitializerConfig.kafkaSourceProperties(bootstrapServers);
 
         Pipeline pipeline = Pipeline.create();
 

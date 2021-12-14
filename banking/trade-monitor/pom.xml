@@ -42,7 +42,7 @@
 
 	<modules>
 		<module>custom-classes</module>
-		<module>common-clientside</module>
+		<module>common</module>
 		<module>hazelcast-node</module>
 		<module>trade-producer</module>
 		<module>webapp</module>

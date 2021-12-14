@@ -9,10 +9,10 @@
 		<version>5.1</version>
 	</parent>
 
-	<artifactId>trade-monitor-common-clientside</artifactId>
+	<artifactId>trade-monitor-common</artifactId>
 
-	<name>Hazelcast Platform - Trade Monitor - Common Clientside</name>
-	<description>Trade Monitor - Common for Clientside</description>
+	<name>Hazelcast Platform - Trade Monitor - Common</name>
+	<description>Trade Monitor - Common</description>
 
 	<properties>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
@@ -22,6 +22,11 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>trade-monitor-custom-classes</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.platform.demos.utils</groupId>
+			<artifactId>utils-slack-integration</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -35,21 +40,21 @@
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
 
-		<!-- scope==provided -->
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast</artifactId>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet-grpc</artifactId>
-			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet-kafka</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet-python</artifactId>
-			<scope>provided</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>com.hazelcast.jet</groupId>
@@ -60,7 +65,6 @@
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-sql</artifactId>
-			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 

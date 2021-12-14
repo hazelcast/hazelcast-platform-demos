@@ -16,17 +16,15 @@
 
 package com.hazelcast.platform.demos.banking.trademonitor;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import hazelcast.platform.demos.banking.trademonitor.MyConstants;
-import hazelcast.platform.demos.banking.trademonitor.SymbolInfo;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -34,6 +32,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hazelcast.cluster.Member;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.jet.datamodel.Tuple3;
@@ -41,6 +40,10 @@ import com.hazelcast.map.IMap;
 import com.hazelcast.query.impl.predicates.EqualPredicate;
 import com.hazelcast.sql.SqlResult;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import hazelcast.platform.demos.banking.trademonitor.ConnectIdempotentCallable;
+import hazelcast.platform.demos.banking.trademonitor.MyConstants;
+import hazelcast.platform.demos.banking.trademonitor.SymbolInfo;
 import io.javalin.Javalin;
 import io.javalin.core.JavalinServer;
 import io.javalin.http.HandlerType;
@@ -101,7 +104,10 @@ public class ApplicationRunner {
         System.out.println("");
         System.out.println("");
 
-        boolean ok = demoSql();
+        boolean ok = initialize();
+        if (ok) {
+            ok = demoSql();
+        }
 
         System.out.println("");
         System.out.println("");
@@ -135,7 +141,6 @@ public class ApplicationRunner {
             }
         }
     }
-
 
     /**
      * <p>Handle the start of a new browser session, stashing
@@ -279,7 +284,6 @@ public class ApplicationRunner {
         return symbolsToBeUpdated.get(symbol);
     }
 
-
     /**
      * <p>Test SQL here, as a demo, so as to provide some examples
      * to cut &amp; paste into the web client.
@@ -342,5 +346,73 @@ public class ApplicationRunner {
         }
 
         return didFail;
+    }
+
+
+    /**
+     * <p>Test serverside. Only really needed if using Hazelcast Cloud
+     * to confirm upload of custom classes hasn't been forgotten.
+     * </p>
+     * @return
+     */
+    private boolean testCustomClassesUploaded() {
+        boolean ok = true;
+        String message;
+
+        ConnectIdempotentCallable connectIdempotentCallable = new ConnectIdempotentCallable();
+
+        // Oldest
+        Member member = this.hazelcastInstance.getCluster().getMembers().iterator().next();
+
+        LOGGER.debug("Send {} to {}", connectIdempotentCallable.getClass().getSimpleName(), member.getAddress());
+        Future<List<String>> future =
+                this.hazelcastInstance.getExecutorService("default").submitToMember(connectIdempotentCallable, member);
+
+        try {
+            List<String> list = future.get();
+            if (list == null || list.isEmpty()) {
+                message = String.format("connectIdempotentCallable :: => :: '%s'", Objects.toString(list));
+                LOGGER.error(message);
+                ok = false;
+            } else {
+                for (String item : list) {
+                    message = String.format("connectIdempotentCallable :: => :: '%s'", item);
+                    LOGGER.info(message);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error("connectIdempotentCallable", e);
+            ok = false;
+        }
+        return ok;
+    }
+
+
+    /**
+     * <p>Ensure serverside set up. Idempotent as triggered by client but client
+     * may be restarted several times.
+     * </p>
+     * @return
+     */
+    private boolean initialize() {
+        LOGGER.info("initialize(): -=-=-=-=- START -=-=-=-=-=-");
+
+        String propertyName = "my.bootstrap.servers";
+        String bootstrapServers = System.getProperty(propertyName, "");
+        if (bootstrapServers.isBlank()) {
+            LOGGER.error("No value for " + propertyName);
+            return false;
+        } else {
+            LOGGER.debug("Using {}=={}", propertyName, bootstrapServers);
+        }
+
+        boolean ok = testCustomClassesUploaded();
+
+        ok &= CommonIdempotentInitialization.createNeededObjects(hazelcastInstance);
+        ok &= CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers);
+        ok &= CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers);
+
+        LOGGER.info("initialize(): -=-=-=-=- END, success=={} -=-=-=-=-=-", ok);
+        return ok;
     }
 }

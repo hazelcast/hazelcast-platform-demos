@@ -51,7 +51,7 @@ Docker exists and build container images for deployment.
 There are 13 modules in this example, alphabetically:
 
 ```
-common-clientside/
+common/
 custom-classes/
 grafana/
 hazelcast-node/
@@ -73,7 +73,7 @@ understand and execute them.
 
 The `custom-classes` module is for uploading to Hazelcast Cloud.
 
-### 2. `common-clientside`
+### 2. `common`
 
 The `common-clientside` module is not a deployed executable. As the name suggests, it is a common dependency
 for many of the other modules in the project, to hold shared items such as logging configuration

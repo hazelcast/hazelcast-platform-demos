@@ -16,13 +16,12 @@
 
 package com.hazelcast.platform.demos.banking.trademonitor;
 
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-
-import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.Map.Entry;
 
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.function.Functions;
@@ -44,6 +43,8 @@ import com.hazelcast.jet.pipeline.WindowDefinition;
 import hazelcast.platform.demos.banking.trademonitor.MyConstants;
 import hazelcast.platform.demos.banking.trademonitor.NasdaqFinancialStatus;
 import hazelcast.platform.demos.banking.trademonitor.SymbolInfo;
+import hazelcast.platform.demos.banking.trademonitor.Trade;
+import hazelcast.platform.demos.banking.trademonitor.TradeJsonDeserializer;
 
 /**
  * <p>Creates a pipeline job to "<i>query</i>" Kafka trades.
@@ -92,7 +93,7 @@ public class AggregateQuery {
     public static Pipeline buildPipeline(String bootstrapServers) {
 
         // Override the value de-serializer to produce a different type
-        Properties properties = ApplicationConfig.kafkaSourceProperties(bootstrapServers);
+        Properties properties = InitializerConfig.kafkaSourceProperties(bootstrapServers);
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, TradeJsonDeserializer.class.getName());
 
         Pipeline pipeline = Pipeline.create();

@@ -19,6 +19,25 @@
 	</properties>
 
 	<dependencies>
+		<!-- For TradeJsonDeserializer -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+		
+		<!-- For TradeJsonDeserializer -->
+		<dependency>
+			<groupId>org.apache.kafka</groupId>
+			<artifactId>kafka-clients</artifactId>
+			<exclusions>
+				<!-- On Cloud classpath -->
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>			
+			</exclusions>
+		</dependency>
+
 		<!-- scope==provided -->
 		<dependency>
 			<groupId>com.hazelcast</groupId>

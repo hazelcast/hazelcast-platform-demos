@@ -49,7 +49,7 @@ public enum NasdaqFinancialStatus {
         this.c = arg0;
     }
 
-    static NasdaqFinancialStatus valueOfFinancialtatus(String arg0) {
+    public static NasdaqFinancialStatus valueOfFinancialtatus(String arg0) {
         return lookup.get(arg0.charAt(0));
     }
 

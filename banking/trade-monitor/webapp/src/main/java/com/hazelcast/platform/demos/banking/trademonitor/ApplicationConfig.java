@@ -17,6 +17,7 @@
 package com.hazelcast.platform.demos.banking.trademonitor;
 
 import java.util.Arrays;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,9 @@ import com.hazelcast.client.config.YamlClientConfigBuilder;
  * </p>
  */
 public class ApplicationConfig {
+    private static final String FILENAME = "application.properties";
+    private static final String HZ_CLOUD_CLUSTER_DISCOVERY_TOKEN = "my.cluster1.discovery-token";
+    private static final String HZ_CLOUD_CLUSTER_NAME = "my.cluster1.name";
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
 
     /**
@@ -58,19 +62,47 @@ public class ApplicationConfig {
         } else {
             clientNetworkConfig.getKubernetesConfig().setEnabled(false);
 
-            if (System.getProperty("MY_HAZELCAST_SERVERS", "").length() != 0) {
-                clientNetworkConfig.setAddresses(Arrays.asList(System.getProperty("MY_HAZELCAST_SERVERS").split(",")));
-            } else {
-                if (System.getProperty("hazelcast.local.publicAddress", "").length() != 0) {
-                    clientNetworkConfig.setAddresses(Arrays.asList(
-                            System.getProperty("hazelcast.local.publicAddress").split(",")));
-                } else {
-                    clientNetworkConfig.setAddresses(Arrays.asList("127.0.0.1"));
-                }
+            Properties myProperties = new Properties();
+            try {
+                myProperties = MyUtils.loadProperties(FILENAME);
+            } catch (Exception e) {
+                LOGGER.error(FILENAME, e);
             }
 
-            LOGGER.info("Non-Kubernetes configuration: member-list: "
-                    + clientNetworkConfig.getAddresses());
+            // Use cloud if property set
+            if (!myProperties.getProperty(HZ_CLOUD_CLUSTER_DISCOVERY_TOKEN, "").isBlank()) {
+                clientNetworkConfig.getCloudConfig().setEnabled(true);
+                clientNetworkConfig.getCloudConfig()
+                    .setDiscoveryToken(myProperties.getProperty(HZ_CLOUD_CLUSTER_DISCOVERY_TOKEN));
+                clientConfig.setClusterName(myProperties.getProperty(HZ_CLOUD_CLUSTER_NAME));
+
+                if (clientConfig.getClusterName().startsWith("de-")) {
+                    LOGGER.info("DEV cloud");
+                    clientConfig.setProperty("hazelcast.client.cloud.url", "https://dev.test.hazelcast.cloud");
+                }
+                if (clientConfig.getClusterName().startsWith("ua-")) {
+                    LOGGER.info("UAT cloud");
+                    clientConfig.setProperty("hazelcast.client.cloud.url", "https://uat.hazelcast.cloud");
+                }
+
+                LOGGER.info("Non-Kubernetes configuration: cloud: "
+                        + clientConfig.getClusterName());
+
+            } else {
+                if (System.getProperty("MY_HAZELCAST_SERVERS", "").length() != 0) {
+                    clientNetworkConfig.setAddresses(Arrays.asList(System.getProperty("MY_HAZELCAST_SERVERS").split(",")));
+                } else {
+                    if (System.getProperty("hazelcast.local.publicAddress", "").length() != 0) {
+                        clientNetworkConfig.setAddresses(Arrays.asList(
+                                System.getProperty("hazelcast.local.publicAddress").split(",")));
+                    } else {
+                        clientNetworkConfig.setAddresses(Arrays.asList("127.0.0.1"));
+                    }
+                }
+
+                LOGGER.info("Non-Kubernetes configuration: member-list: "
+                        + clientNetworkConfig.getAddresses());
+            }
         }
 
 

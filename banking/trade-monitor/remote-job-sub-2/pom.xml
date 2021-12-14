@@ -22,7 +22,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>trade-monitor-common-clientside</artifactId>
+			<artifactId>trade-monitor-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
