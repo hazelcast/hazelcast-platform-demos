@@ -28,7 +28,7 @@ import java.io.Serializable;
  */
 public class Trade implements Serializable {
 
-    private static final long serialVersionUID = 6879762869519299003L;
+    private static final long serialVersionUID = 1L;
 
     private String id;
     private long timestamp;
