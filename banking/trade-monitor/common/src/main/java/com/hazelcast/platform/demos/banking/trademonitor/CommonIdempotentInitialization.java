@@ -59,6 +59,9 @@ public class CommonIdempotentInitialization {
      * </p>
      */
     static boolean createNeededObjects(HazelcastInstance hazelcastInstance) {
+        //FIXME TODO Config amendment required first
+        LOGGER.error("NEED INDEX ON " + MyConstants.IMAP_NAME_TRADES);
+        LOGGER.error("NEED JOURNAL ON " + MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME);
         for (String iMapName : MyConstants.IMAP_NAMES) {
             hazelcastInstance.getMap(iMapName);
         }
@@ -311,7 +314,7 @@ public class CommonIdempotentInitialization {
      * @param properties
      */
     static boolean launchNeededJobs(HazelcastInstance hazelcastInstance, String bootstrapServers, Properties properties) {
-        if (!System.getProperty("my.autostart.enabled", "").equalsIgnoreCase("true")) {
+        if (System.getProperty("my.autostart.enabled", "").equalsIgnoreCase("false")) {
             LOGGER.info("Not launching Kafka jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",
                     System.getProperty("my.autostart.enabled"));
         } else {
@@ -325,10 +328,8 @@ public class CommonIdempotentInitialization {
             jobConfigIngestTrades.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
             jobConfigIngestTrades.setName(IngestTrades.class.getSimpleName());
 
-            //FIXME Turn off but don't confuse CheckStyle
-            if ("xxx".equals(System.getProperty("user.name"))) {
-                hazelcastInstance.getJet().newJobIfAbsent(pipelineIngestTrades, jobConfigIngestTrades);
-            }
+            //FIXME Will fail until Kafka config present
+            hazelcastInstance.getJet().newJobIfAbsent(pipelineIngestTrades, jobConfigIngestTrades);
 
             // Trade aggregation
             Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(bootstrapServers);
@@ -338,10 +339,8 @@ public class CommonIdempotentInitialization {
             jobConfigAggregateQuery.setName(AggregateQuery.class.getSimpleName());
             jobConfigAggregateQuery.addClass(MaxVolumeAggregator.class);
 
-            //FIXME Turn off but don't confuse CheckStyle
-            if ("xxx".equals(System.getProperty("user.name"))) {
-                hazelcastInstance.getJet().newJobIfAbsent(pipelineAggregateQuery, jobConfigAggregateQuery);
-            }
+            //FIXME Will fail until Kafka config present
+            hazelcastInstance.getJet().newJobIfAbsent(pipelineAggregateQuery, jobConfigAggregateQuery);
         }
 
         // Remaining jobs need properties
