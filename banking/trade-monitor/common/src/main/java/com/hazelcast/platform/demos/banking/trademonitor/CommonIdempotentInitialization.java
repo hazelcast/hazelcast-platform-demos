@@ -327,6 +327,7 @@ public class CommonIdempotentInitialization {
             JobConfig jobConfigIngestTrades = new JobConfig();
             jobConfigIngestTrades.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
             jobConfigIngestTrades.setName(IngestTrades.class.getSimpleName());
+            jobConfigIngestTrades.addClass(IngestTrades.class);
 
             //FIXME Will fail until Kafka config present
             hazelcastInstance.getJet().newJobIfAbsent(pipelineIngestTrades, jobConfigIngestTrades);
@@ -337,6 +338,7 @@ public class CommonIdempotentInitialization {
             JobConfig jobConfigAggregateQuery = new JobConfig();
             jobConfigAggregateQuery.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
             jobConfigAggregateQuery.setName(AggregateQuery.class.getSimpleName());
+            jobConfigAggregateQuery.addClass(AggregateQuery.class);
             jobConfigAggregateQuery.addClass(MaxVolumeAggregator.class);
 
             //FIXME Will fail until Kafka config present
