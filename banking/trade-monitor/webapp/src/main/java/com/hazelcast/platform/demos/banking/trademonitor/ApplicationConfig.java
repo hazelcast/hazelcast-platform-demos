@@ -56,39 +56,40 @@ public class ApplicationConfig {
         ClientNetworkConfig clientNetworkConfig = clientConfig.getNetworkConfig();
         clientNetworkConfig.getAutoDetectionConfig().setEnabled(false);
 
-        if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
-            LOGGER.info("Kubernetes configuration: service-dns: "
-                    + clientNetworkConfig.getKubernetesConfig().getProperty("service-dns"));
-        } else {
-            clientNetworkConfig.getKubernetesConfig().setEnabled(false);
+        // Use cloud even if in Kubernetes if discovery token set
+        Properties myProperties = new Properties();
+        try {
+            myProperties = MyUtils.loadProperties(FILENAME);
+        } catch (Exception e) {
+            LOGGER.error(FILENAME, e);
+        }
 
-            Properties myProperties = new Properties();
-            try {
-                myProperties = MyUtils.loadProperties(FILENAME);
-            } catch (Exception e) {
-                LOGGER.error(FILENAME, e);
+        // Use cloud if property set
+        if (!myProperties.getProperty(HZ_CLOUD_CLUSTER_DISCOVERY_TOKEN, "").isBlank()) {
+            clientNetworkConfig.getKubernetesConfig().setEnabled(false);
+            clientNetworkConfig.getCloudConfig().setEnabled(true);
+            clientNetworkConfig.getCloudConfig()
+                .setDiscoveryToken(myProperties.getProperty(HZ_CLOUD_CLUSTER_DISCOVERY_TOKEN));
+            clientConfig.setClusterName(myProperties.getProperty(HZ_CLOUD_CLUSTER_NAME));
+
+            if (clientConfig.getClusterName().startsWith("de-")) {
+                LOGGER.info("DEV cloud");
+                clientConfig.setProperty("hazelcast.client.cloud.url", "https://dev.test.hazelcast.cloud");
+            }
+            if (clientConfig.getClusterName().startsWith("ua-")) {
+                LOGGER.info("UAT cloud");
+                clientConfig.setProperty("hazelcast.client.cloud.url", "https://uat.hazelcast.cloud");
             }
 
-            // Use cloud if property set
-            if (!myProperties.getProperty(HZ_CLOUD_CLUSTER_DISCOVERY_TOKEN, "").isBlank()) {
-                clientNetworkConfig.getCloudConfig().setEnabled(true);
-                clientNetworkConfig.getCloudConfig()
-                    .setDiscoveryToken(myProperties.getProperty(HZ_CLOUD_CLUSTER_DISCOVERY_TOKEN));
-                clientConfig.setClusterName(myProperties.getProperty(HZ_CLOUD_CLUSTER_NAME));
-
-                if (clientConfig.getClusterName().startsWith("de-")) {
-                    LOGGER.info("DEV cloud");
-                    clientConfig.setProperty("hazelcast.client.cloud.url", "https://dev.test.hazelcast.cloud");
-                }
-                if (clientConfig.getClusterName().startsWith("ua-")) {
-                    LOGGER.info("UAT cloud");
-                    clientConfig.setProperty("hazelcast.client.cloud.url", "https://uat.hazelcast.cloud");
-                }
-
-                LOGGER.info("Non-Kubernetes configuration: cloud: "
-                        + clientConfig.getClusterName());
-
+            LOGGER.info("Non-Kubernetes configuration: cloud: "
+                    + clientConfig.getClusterName());
+        } else {
+            if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
+                LOGGER.info("Kubernetes configuration: service-dns: "
+                        + clientNetworkConfig.getKubernetesConfig().getProperty("service-dns"));
             } else {
+                clientNetworkConfig.getKubernetesConfig().setEnabled(false);
+
                 if (System.getProperty("MY_HAZELCAST_SERVERS", "").length() != 0) {
                     clientNetworkConfig.setAddresses(Arrays.asList(System.getProperty("MY_HAZELCAST_SERVERS").split(",")));
                 } else {
@@ -104,7 +105,6 @@ public class ApplicationConfig {
                         + clientNetworkConfig.getAddresses());
             }
         }
-
 
         return clientConfig;
     }

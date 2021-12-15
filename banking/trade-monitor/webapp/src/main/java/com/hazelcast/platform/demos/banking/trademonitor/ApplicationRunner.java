@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +38,8 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.map.IMap;
+import com.hazelcast.platform.demos.utils.UtilsProperties;
+import com.hazelcast.platform.demos.utils.UtilsSlack;
 import com.hazelcast.query.impl.predicates.EqualPredicate;
 import com.hazelcast.sql.SqlResult;
 
@@ -64,6 +67,7 @@ public class ApplicationRunner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationRunner.class);
 
+    private static final String APPLICATION_PROPERTIES_FILE = "application.properties";
     private static final String DRILL_SYMBOL = "DRILL_SYMBOL";
     private static final String LOAD_SYMBOLS = "LOAD_SYMBOLS";
 
@@ -411,6 +415,19 @@ public class ApplicationRunner {
         ok &= CommonIdempotentInitialization.createNeededObjects(hazelcastInstance);
         ok &= CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers);
         ok &= CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers);
+
+        if (ok) {
+            Properties properties;
+            try {
+                properties = UtilsProperties.loadClasspathProperties(APPLICATION_PROPERTIES_FILE);
+                Properties properties2 = UtilsSlack.loadSlackAccessProperties();
+                properties.putAll(properties2);
+            } catch (Exception e) {
+                LOGGER.error("No properties:", e);
+                properties = new Properties();
+            }
+            ok = CommonIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers, properties);
+        }
 
         LOGGER.info("initialize(): -=-=-=-=- END, success=={} -=-=-=-=-=-", ok);
         return ok;

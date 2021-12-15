@@ -37,6 +37,12 @@
 				</exclusion>			
 			</exclusions>
 		</dependency>
+		
+		<!-- For Slack integration -->
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+		</dependency>
 
 		<!-- scope==provided -->
 		<dependency>
