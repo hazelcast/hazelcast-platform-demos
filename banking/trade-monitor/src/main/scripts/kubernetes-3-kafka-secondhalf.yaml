@@ -38,6 +38,8 @@ spec:
             value: "INTERNAL_PLAINTEXT"
           - name: "KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP"
             value: "EXTERNAL_PLAINTEXT:PLAINTEXT,INTERNAL_PLAINTEXT:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+          - name: KAFKA_CFG_LISTENERS
+            value: "EXTERNAL_PLAINTEXT://:9092,INTERNAL_PLAINTEXT://:19092"
           - name: "MY_POD_IP"
             valueFrom:
               fieldRef:

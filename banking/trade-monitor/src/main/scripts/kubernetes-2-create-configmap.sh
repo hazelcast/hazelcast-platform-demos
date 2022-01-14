@@ -56,6 +56,9 @@ echo "  my-env.sh: |-" >> $TMPFILE
 echo "    #!/bin/bash" >> $TMPFILE
 echo "    echo @@@@@@@@@@@@@@@@" >> $TMPFILE
 echo "    echo Running setup.sh" >> $TMPFILE
+echo "    echo @--------------@" >> $TMPFILE
+echo "    echo MY_POD_IP \"\$MY_POD_IP\"" >> $TMPFILE
+echo "    echo MY_POD_NAME \"\$MY_POD_NAME\"" >> $TMPFILE
 echo "    echo @@@@@@@@@@@@@@@@" >> $TMPFILE
 # $ID should be numeric - 0, 1 or 2
 echo "    ID=\`echo \$MY_POD_NAME | sed s/trade-monitor-kafka-broker-//\`" >> $TMPFILE
@@ -69,7 +72,7 @@ echo "    IP1=\`echo \$IPLIST | cut -d, -f2\`:\${EXTERNAL_PORT}" >> $TMPFILE
 echo "    IP2=\`echo \$IPLIST | cut -d, -f3\`:\${EXTERNAL_PORT}" >> $TMPFILE
 echo "    export KAFKA_CFG_BROKER_ID=\${ID}" >> $TMPFILE
 echo "    INTERNAL=\${MY_POD_IP}:\${INTERNAL_PORT}" >> $TMPFILE
-echo "    INTERNAL=\${MY_POD_NAME}.trade-monitor-kafka-broker.default.svc.cluster.local:\${INTERNAL_PORT}" >> $TMPFILE
+#echo "    INTERNAL=\${MY_POD_NAME}.trade-monitor-kafka-broker.default.svc.cluster.local:\${INTERNAL_PORT}" >> $TMPFILE
 echo "    if [ \"\$ID\" == 0 ]" >> $TMPFILE
 echo "    then" >> $TMPFILE
 echo "     EXTERNAL=\${IP0}" >> $TMPFILE
@@ -85,10 +88,8 @@ echo "    fi" >> $TMPFILE
 echo "    echo INTERNAL \"\$INTERNAL\"" >> $TMPFILE
 echo "    echo EXTERNAL \"\$EXTERNAL\"" >> $TMPFILE
 echo "    export KAFKA_CFG_ADVERTISED_LISTENERS=EXTERNAL_PLAINTEXT://\$EXTERNAL,INTERNAL_PLAINTEXT://\$INTERNAL" >> $TMPFILE
-echo "    export KAFKA_CFG_LISTENERS=EXTERNAL_PLAINTEXT://\$EXTERNAL,INTERNAL_PLAINTEXT://\$INTERNAL" >> $TMPFILE
 # Use below to turn off external access
 #echo "    export KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL_PLAINTEXT://\$INTERNAL" >> $TMPFILE
-#echo "    export KAFKA_CFG_LISTENERS=INTERNAL_PLAINTEXT://\$INTERNAL" >> $TMPFILE
 echo "    export MY_BOOTSTRAP_SERVERS=\${IP0},\${IP1},\${IP2}" >> $TMPFILE
 #
 echo "    echo Set: KAFKA_CFG_BROKER_ID \"\$KAFKA_CFG_BROKER_ID\"" >> $TMPFILE
