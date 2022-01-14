@@ -1,6 +1,5 @@
 ---
-# Service DNS will be "trade-monitor-webapp.default.svc.cluster.local".
-# Service DNS will be "trade-monitor-mancenter.default.svc.cluster.local".
+# Service DNS for Webapp will be "trade-monitor-webapp.default.svc.cluster.local".
 # Service DNS for Prometheus will be "trade-monitor-prometheus.default.svc.cluster.local".
 # Service DNS for Grafana will be "trade-monitor-grafana.default.svc.cluster.local".
 ---
@@ -35,10 +34,7 @@ spec:
         app: trade-monitor-webapp
     spec:
       containers:
-        - env:
-          - name: "MY_BOOTSTRAP_SERVERS"
-            value: "trade-monitor-kafka-broker-0.trade-monitor-kafka-broker.default.svc.cluster.local:9092,trade-monitor-kafka-broker-1.trade-monitor-kafka-broker.default.svc.cluster.local:9092,trade-monitor-kafka-broker-2.trade-monitor-kafka-broker.default.svc.cluster.local:9092"
-          image: "hazelcast-platform-demos/trade-monitor-webapp"
+        - image: "hazelcast-platform-demos/trade-monitor-webapp"
           imagePullPolicy: Never
           livenessProbe:
             httpGet:
@@ -50,50 +46,15 @@ spec:
               path: /
               port: 8080
             initialDelaySeconds: 30
----
-# Management Center
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: trade-monitor-management-center
-spec:
-  selector:
-    app: trade-monitor-management-center
-  ports:
-    - name: trade-monitor-management-center
-      port: 8080
-      targetPort: 8080
-  type: LoadBalancer
----
-# Only need 1 management-center
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: trade-monitor-management-center
-spec:
-  selector:
-    matchLabels:
-      app: trade-monitor-management-center
-  template:
-    metadata:
-      labels:
-        app: trade-monitor-management-center
-    spec:
-      containers:
-        - image: "hazelcast-platform-demos/trade-monitor-management-center"
-          imagePullPolicy: Never
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 8081
-          name: trade-monitor-management-center-container
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 8081
-            initialDelaySeconds: 30
+          volumeMounts:
+            - name: configmap
+              mountPath: /customize/my-env.sh
+              subPath: my-env.sh
+      volumes:
+        - name: configmap
+          configMap:
+            name: trade-monitor-configmap
+            defaultMode: 0755
 ---
 # Service for Prometheus
 ---

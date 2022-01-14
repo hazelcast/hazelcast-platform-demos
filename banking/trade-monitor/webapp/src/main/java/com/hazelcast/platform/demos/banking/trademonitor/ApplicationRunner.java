@@ -72,24 +72,18 @@ public class ApplicationRunner {
     private static final String LOAD_SYMBOLS = "LOAD_SYMBOLS";
 
     private final HazelcastInstance  hazelcastInstance;
-    private final IMap<String, Tuple3<Long, Long, Integer>> aggregateQueryResultsMap;
-    private final IMap<String, SymbolInfo> symbolsMap;
-    private final IMap<String, HazelcastJsonValue> tradesMap;
+    private IMap<String, Tuple3<Long, Long, Integer>> aggregateQueryResultsMap;
+    private IMap<String, SymbolInfo> symbolsMap;
+    private IMap<String, HazelcastJsonValue> tradesMap;
 
 
     /**
-     * <p>Obtain references to the maps that are needed.
+     * <p>Stash the Hazelcast instance reference.
      * </p>
      */
     @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Hazelcast instance must be shared, not cloned")
     public ApplicationRunner(HazelcastInstance arg0) throws Exception {
         this.hazelcastInstance = arg0;
-        this.aggregateQueryResultsMap =
-            this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS);
-        this.symbolsMap =
-            this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_SYMBOLS);
-        this.tradesMap =
-            this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_TRADES);
     }
 
     /**
@@ -102,13 +96,21 @@ public class ApplicationRunner {
      * @throws Exception
      */
     public void run() throws Exception {
+        boolean ok = initialize();
+
+        this.aggregateQueryResultsMap =
+                this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS);
+        this.symbolsMap =
+                this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_SYMBOLS);
+        this.tradesMap =
+                this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_TRADES);
+
         // Be aware of new trades
         tradesMap.addEntryListener(new TradesMapListener(), true);
 
         System.out.println("");
         System.out.println("");
 
-        boolean ok = initialize();
         if (ok) {
             ok = demoSql();
         }
@@ -298,11 +300,13 @@ public class ApplicationRunner {
     private boolean demoSql() {
         boolean didFail = false;
         String[][] queries = new String[][] {
-            /* Turn off for now, so Javalin available sooner
+            /* Turn off for now mostly, so Javalin available sooner
             { "System",  "SELECT * FROM information_schema.mappings" },
             { "System",  "SELECT mapping_name AS name FROM information_schema.mappings" },
             { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS },
+            */
             { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_SYMBOLS },
+            /*
             { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_TRADES },
             { "IMap",    "SELECT id, symbol, price FROM " + MyConstants.IMAP_NAME_TRADES
                     + " WHERE symbol LIKE 'AA%' AND price > 2510" },

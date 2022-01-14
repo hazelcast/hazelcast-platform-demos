@@ -1,4 +1,4 @@
-FROM mongo:5.0.3
+FROM mongo:5.0.5
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MY_OTHERUSER

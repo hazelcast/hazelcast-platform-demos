@@ -26,18 +26,19 @@ hazelcast:
         HEALTH_CHECK:
           enabled: true
   #
-  map:
-     # Any map with a name matching this pattern has a journal
-    'alerts*':
-      event-journal:
-        enabled: true
-     # 'trades' map needs defined as non-default configuration.
-    'trades':
-      indexes:
-        # Unordered index on Trade.getSymbol().
-        - type: HASH
-          attributes:
-            - 'symbol'
+# TURN THIS OFF, AS NOW ADDED BY `CommonIdempotentInitialization.java`  
+#  map:
+#     # Any map with a name matching this pattern has a journal
+#    'alerts*':
+#      event-journal:
+#        enabled: true
+#     # 'trades' map needs defined as non-default configuration.
+#    'trades':
+#      indexes:
+#        # Unordered index on Trade.getSymbol().
+#        - type: HASH
+#          attributes:
+#            - 'symbol'
   #
   jet:
     enabled: true

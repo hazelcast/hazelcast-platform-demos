@@ -18,8 +18,9 @@ spec:
     spec:
       containers:
         - env:
+          # Internal port 19092
           - name: "MY_BOOTSTRAP_SERVERS"
-            value: "trade-monitor-kafka-broker-0.trade-monitor-kafka-broker.default.svc.cluster.local:9092,trade-monitor-kafka-broker-1.trade-monitor-kafka-broker.default.svc.cluster.local:9092,trade-monitor-kafka-broker-2.trade-monitor-kafka-broker.default.svc.cluster.local:9092"
+            value: "trade-monitor-kafka-broker-0.trade-monitor-kafka-broker.default.svc.cluster.local:19092,trade-monitor-kafka-broker-1.trade-monitor-kafka-broker.default.svc.cluster.local:19092,trade-monitor-kafka-broker-2.trade-monitor-kafka-broker.default.svc.cluster.local:19092"
           image: "hazelcast-platform-demos/trade-monitor-trade-producer"
           imagePullPolicy: Never
           name: trade-monitor-job-trade-producer-container

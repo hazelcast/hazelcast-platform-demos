@@ -19,9 +19,12 @@ package com.hazelcast.platform.demos.banking.trademonitor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +34,7 @@ import com.hazelcast.cluster.MembershipEvent;
 import com.hazelcast.cluster.MembershipListener;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IExecutorService;
+import com.hazelcast.jet.Job;
 import com.hazelcast.jet.datamodel.Tuple2;
 
 /**
@@ -77,6 +81,8 @@ public class MyMembershipListener implements MembershipListener {
         try {
             LOGGER.info("=====================================");
             this.logPartitions();
+            LOGGER.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+            this.logJobs();
             LOGGER.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         } catch (Exception e) {
             LOGGER.error("report() -> logPartitions()", e);
@@ -219,5 +225,62 @@ public class MyMembershipListener implements MembershipListener {
         .sum();
 
         return Math.sqrt(total / collatedResults.size());
+    }
+
+    /**
+     * <p>What is running on a rebalance
+     * </p>
+     */
+    private void logJobs() {
+        List<Job> jobs = this.hazelcastInstance.getJet().getJobs();
+        int count = jobs.size();
+        Set<String> jobNames = jobs.stream().map(job -> job.getName()).collect(Collectors.toCollection(TreeSet::new));
+        LOGGER.info("-------------------------------------");
+        // Jobs with names in name order
+        for (String jobName : jobNames) {
+            this.logJobAndDeduct(jobName, jobs);
+        }
+        // Jobs without names
+        for (Job job : jobs) {
+            this.logJob(job);
+        }
+        LOGGER.info("-------------------------------------");
+        LOGGER.info("{} job{}", count, (count == 1 ? "" : "s"));
+        LOGGER.info("-------------------------------------");
+    }
+
+    /**
+     * <p>Job info</p>
+     */
+    private void logJob(Job job) {
+        if (job.getName().isBlank()) {
+            LOGGER.info("Job {}, status {}", job.getId(),
+                    String.format("%10s", job.getStatus().toString())
+                    );
+        } else {
+            LOGGER.info("Job {}, status {}, name: {}", job.getId(),
+                    String.format("%10s", job.getStatus().toString()),
+                    job.getName());
+        }
+    }
+
+    /**
+     * <p>Remove job from list after printing. Job name is not unique,
+     * this removes the first match it finds.
+     * </p>
+     * @param jobName
+     * @param jobs
+     */
+    private void logJobAndDeduct(String jobName, List<Job> jobs) {
+        int i;
+        for (i = 0; i < jobs.size(); i++) {
+            Job job = jobs.get(i);
+            if (!job.getName().isBlank() && job.getName().equals(jobName)) {
+                this.logJob(job);
+                jobs.remove(i);
+                return;
+            }
+        }
+        LOGGER.error("Jobname {} not found in {}", jobName, jobs);
     }
 }

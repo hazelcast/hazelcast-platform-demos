@@ -66,7 +66,13 @@ public class Application {
 
         HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance(config);
 
-        ApplicationInitializer.initialise(hazelcastInstance, bootstrapServers);
+        String initializerProperty = "my.initialize";
+        if (System.getProperty(initializerProperty, "").equalsIgnoreCase(Boolean.TRUE.toString())) {
+            ApplicationInitializer.initialise(hazelcastInstance, bootstrapServers);
+        } else {
+            LOGGER.info("Skip initialize as '{}'=='{}', assume client will do so",
+                    initializerProperty, System.getProperty(initializerProperty));
+        }
     }
 
 }

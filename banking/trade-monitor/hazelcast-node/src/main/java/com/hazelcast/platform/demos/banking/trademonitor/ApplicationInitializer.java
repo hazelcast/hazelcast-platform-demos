@@ -46,8 +46,8 @@ public class ApplicationInitializer {
      * </p>
      */
     public static void initialise(HazelcastInstance hazelcastInstance, String bootstrapServers) throws Exception {
-        addListeners(hazelcastInstance, bootstrapServers);
         CommonIdempotentInitialization.createNeededObjects(hazelcastInstance);
+        addListeners(hazelcastInstance, bootstrapServers);
         CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers);
         CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers);
 

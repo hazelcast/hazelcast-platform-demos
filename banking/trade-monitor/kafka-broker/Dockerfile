@@ -1,6 +1,4 @@
-FROM bitnami/kafka:2.4.0
+FROM bitnami/kafka:3.0.0
 
-# OpenJDK 11.0.6
-RUN java --version
-
-# Extra config goes here
+COPY target/classes/custom-entrypoint.sh  /
+ENTRYPOINT ["/bin/bash", "/custom-entrypoint.sh"]

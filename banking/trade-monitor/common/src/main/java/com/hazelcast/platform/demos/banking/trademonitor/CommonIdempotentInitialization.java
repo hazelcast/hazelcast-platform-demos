@@ -16,15 +16,22 @@
 
 package com.hazelcast.platform.demos.banking.trademonitor;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hazelcast.config.EventJournalConfig;
+import com.hazelcast.config.IndexConfig;
+import com.hazelcast.config.IndexType;
+import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.jet.config.JobConfig;
@@ -33,6 +40,7 @@ import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.map.IMap;
 import com.hazelcast.platform.demos.utils.UtilsConstants;
+import com.hazelcast.platform.demos.utils.UtilsJobs;
 import com.hazelcast.platform.demos.utils.UtilsSlackSQLJob;
 import com.hazelcast.platform.demos.utils.UtilsSlackSink;
 
@@ -53,19 +61,111 @@ public class CommonIdempotentInitialization {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonIdempotentInitialization.class);
 
     /**
+     * <p>Ensure objects have the necessary configuration before
+     * accessing, as the access creates them. Some configuration
+     * such as journals must be active from the outset, other
+     * such as indexes can be added while running.
+     * </p>
      * <p>Access the {@link com.hazelcast.map.IMap} and other objects
      * that are used by the example. This will create them on first
      * access, so ensuring all are visible from the outset.
      * </p>
      */
     static boolean createNeededObjects(HazelcastInstance hazelcastInstance) {
-        //FIXME TODO Config amendment required first
-        LOGGER.error("NEED INDEX ON " + MyConstants.IMAP_NAME_TRADES);
-        LOGGER.error("NEED JOURNAL ON " + MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME);
+        // Capture what was present before
+        Set<String> existingIMapNames = hazelcastInstance.getDistributedObjects()
+                .stream()
+                .filter(distributedObject -> distributedObject instanceof IMap)
+                .map(distributedObject -> distributedObject.getName())
+                .filter(name -> !name.startsWith("__"))
+                .collect(Collectors.toCollection(TreeSet::new));
+
+        // Add journals to maps before they are created
+        boolean ok = defineJournals(hazelcastInstance, existingIMapNames);
+
+        // Accessing non-existing maps does not return any failures
         for (String iMapName : MyConstants.IMAP_NAMES) {
-            hazelcastInstance.getMap(iMapName);
+            if (!existingIMapNames.contains(iMapName)) {
+                hazelcastInstance.getMap(iMapName);
+            }
         }
-        // This operation can't fail
+
+        // Add index to maps after they are created, if created in this method's run.
+        if (ok) {
+            ok = defineIndexes(hazelcastInstance, existingIMapNames);
+        }
+
+        return ok;
+    }
+
+    /**
+     * <p>Add journal configuration to maps that need them. Equivalent to:
+     * <pre>
+     *     'alerts*':
+     *       event-journal:
+     *         enabled: true
+     * </pre>
+     * <p>
+     *
+     * @param hazelcastInstance
+     * @param existingIMapNames - maps that this run of the initialiser didn't create
+     * @return true, always, either added or not needed
+     */
+    private static boolean defineJournals(HazelcastInstance hazelcastInstance, Set<String> existingIMapNames) {
+        final String alertsWildcard = "alerts*";
+
+        EventJournalConfig eventJournalConfig = new EventJournalConfig();
+        eventJournalConfig.setEnabled(true);
+
+        if (!existingIMapNames.contains(MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME)) {
+            MapConfig alertsMapConfig = new MapConfig(alertsWildcard);
+            alertsMapConfig.setEventJournalConfig(eventJournalConfig);
+
+            hazelcastInstance.getConfig().addMapConfig(alertsMapConfig);
+        } else {
+            LOGGER.trace("Don't add journal to '{}', map already exists", MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME);
+        }
+
+        return true;
+    }
+
+    /**
+     * <p>Maps that have indexes, currently just the Trades made for
+     * faster searching. When created manually it would be:
+     * <pre>
+     *     'trades':
+     *       indexes:
+     *         - type: HASH
+     *           attributes:
+     *             - 'symbol'
+     * </pre>
+     * </p>
+     * <p><b>addIndex()</b> replaces the definition, so would be idempotent.
+     * However as it has a performance cost we skip if we know the map already
+     * existed and so can presume it had the index
+     * </p>
+     *
+     * @param hazelcastInstance
+     * @param existingIMapNames - maps that this run of the initializer didn't create
+     * @return true - Always.
+     */
+    private static boolean defineIndexes(HazelcastInstance hazelcastInstance, Set<String> existingIMapNames) {
+
+        // Only add if map hadn't previously existed and so has just been created
+        if (!existingIMapNames.contains(MyConstants.IMAP_NAME_TRADES)) {
+            IMap<?, ?> tradesMap = hazelcastInstance.getMap(MyConstants.IMAP_NAME_TRADES);
+
+            IndexConfig indexConfig = new IndexConfig();
+            indexConfig.setName(MyConstants.IMAP_NAME_TRADES + "_idx");
+            indexConfig.setType(IndexType.HASH);
+            indexConfig.setAttributes(Arrays.asList("symbol"));
+
+            // Void method, hence returning true
+            tradesMap.addIndex(indexConfig);
+        } else {
+            LOGGER.trace("Don't add index to '{}', map already exists", MyConstants.IMAP_NAME_TRADES);
+        }
+
         return true;
     }
 
@@ -314,6 +414,7 @@ public class CommonIdempotentInitialization {
      * @param properties
      */
     static boolean launchNeededJobs(HazelcastInstance hazelcastInstance, String bootstrapServers, Properties properties) {
+
         if (System.getProperty("my.autostart.enabled", "").equalsIgnoreCase("false")) {
             LOGGER.info("Not launching Kafka jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",
                     System.getProperty("my.autostart.enabled"));
@@ -330,7 +431,7 @@ public class CommonIdempotentInitialization {
             jobConfigIngestTrades.addClass(IngestTrades.class);
 
             //FIXME Will fail until Kafka config present
-            hazelcastInstance.getJet().newJobIfAbsent(pipelineIngestTrades, jobConfigIngestTrades);
+            UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineIngestTrades, jobConfigIngestTrades);
 
             // Trade aggregation
             Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(bootstrapServers);
@@ -342,7 +443,7 @@ public class CommonIdempotentInitialization {
             jobConfigAggregateQuery.addClass(MaxVolumeAggregator.class);
 
             //FIXME Will fail until Kafka config present
-            hazelcastInstance.getJet().newJobIfAbsent(pipelineAggregateQuery, jobConfigAggregateQuery);
+            UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAggregateQuery, jobConfigAggregateQuery);
         }
 
         // Remaining jobs need properties
@@ -375,7 +476,7 @@ public class CommonIdempotentInitialization {
             jobConfigAlertingToSlack.addClass(AlertingToSlack.class);
             jobConfigAlertingToSlack.addClass(UtilsSlackSink.class);
 
-            hazelcastInstance.getJet().newJobIfAbsent(pipelineAlertingToSlack, jobConfigAlertingToSlack);
+            UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToSlack, jobConfigAlertingToSlack);
         } catch (Exception e) {
             LOGGER.error("launchNeededJobs:" + AlertingToSlack.class.getSimpleName(), e);
         }
