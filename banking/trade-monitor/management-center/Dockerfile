@@ -30,6 +30,6 @@ ENV MC_CLASSPATH=/application.jar
 CMD ["bash", "-c", "set -euo pipefail \
       && echo bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_ADDRESSLIST} \
       && bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_ADDRESSLIST} \
-      && echo bin/mc-start.sh \
-      && bin/mc-start.sh \
+      && echo bin/hz-mc start \
+      && bin/hz-mc start \
      "]

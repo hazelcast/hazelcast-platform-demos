@@ -41,6 +41,6 @@ CMD ["bash", "-c", "set -euo pipefail \
       && echo bin/mc-conf.sh cluster add -H=${MC_DATA} --client-config=/hazelcast-client-cluster1.xml \
       && bin/mc-conf.sh cluster add -H=${MC_DATA} --client-config=/hazelcast-client-cluster1.xml \
       && echo @@@@@@@@@@@@@@@@@@@@ \
-      && echo bin/mc-start.sh \
-      && bin/mc-start.sh \
+      && echo bin/hz-mc start \
+      && bin/hz-mc start \
      "]
