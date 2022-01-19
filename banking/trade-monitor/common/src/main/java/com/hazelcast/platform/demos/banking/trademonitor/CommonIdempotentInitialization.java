@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -430,7 +430,6 @@ public class CommonIdempotentInitialization {
             jobConfigIngestTrades.setName(IngestTrades.class.getSimpleName());
             jobConfigIngestTrades.addClass(IngestTrades.class);
 
-            //FIXME Will fail until Kafka config present
             UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineIngestTrades, jobConfigIngestTrades);
 
             // Trade aggregation
@@ -442,7 +441,6 @@ public class CommonIdempotentInitialization {
             jobConfigAggregateQuery.addClass(AggregateQuery.class);
             jobConfigAggregateQuery.addClass(MaxVolumeAggregator.class);
 
-            //FIXME Will fail until Kafka config present
             UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAggregateQuery, jobConfigAggregateQuery);
         }
 

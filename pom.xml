@@ -14,7 +14,9 @@
 
 	<modules>
 		<module>banking</module>
+		<!--
 		<module>industry</module>
+		-->
 		<module>ml</module>
 		<module>retail</module>
 		<module>telco</module>
