@@ -54,6 +54,12 @@
 			<groupId>org.apache.pulsar</groupId>
 			<artifactId>pulsar-client</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>com.hazelcast.platform.demos.utils</groupId>
+			<artifactId>utils-slack-integration</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>

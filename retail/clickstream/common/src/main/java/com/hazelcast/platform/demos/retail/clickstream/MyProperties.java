@@ -37,4 +37,6 @@ public class MyProperties {
     private String buildUserName;
     @NotNull
     private Integer initSize;
+    @NotNull
+    private String projectName;
 }

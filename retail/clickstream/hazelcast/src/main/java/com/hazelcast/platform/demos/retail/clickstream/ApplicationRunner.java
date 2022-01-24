@@ -54,6 +54,7 @@ import com.hazelcast.platform.demos.retail.clickstream.job.RetrainingControl;
 import com.hazelcast.platform.demos.retail.clickstream.job.RetrainingLaunchListener;
 import com.hazelcast.platform.demos.retail.clickstream.job.StatisticsAccuracyByOrder;
 import com.hazelcast.platform.demos.retail.clickstream.job.StatisticsLatency;
+import com.hazelcast.platform.demos.utils.UtilsSlackSQLJob;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -155,6 +156,7 @@ public class ApplicationRunner {
         // Prediction on "blue"
         if (clusterName.equals(cluster1Name)) {
             this.launchRandomForestPredictionJob();
+            this.launchSlackSQLJob();
             this.launchStatisticsAccuracyByOrderJob(clusterName, graphiteHost);
             this.launchStatisticsLatencyJob(clusterName, graphiteHost);
         }
@@ -234,6 +236,22 @@ public class ApplicationRunner {
         jobConfigRandomForestPrediction.setName(jobNameRandomForestPrediction);
 
         this.launchDAGJob(dagRandomForestPrediction, jobConfigRandomForestPrediction);
+    }
+
+    /**
+     * <p>SQL to/from Slack.
+     * </p>
+     */
+    private void launchSlackSQLJob() {
+        // Shouldn't fail but no reason to abandon if it does
+        try {
+            Object projectName = this.myProperties.getProjectName();
+
+            UtilsSlackSQLJob.submitJob(hazelcastInstance,
+                    projectName == null ? "" : projectName.toString());
+        } catch (Exception e) {
+            log.error("launchSlackSQLJob:" + UtilsSlackSQLJob.class.getSimpleName(), e);
+        }
     }
 
     /**
