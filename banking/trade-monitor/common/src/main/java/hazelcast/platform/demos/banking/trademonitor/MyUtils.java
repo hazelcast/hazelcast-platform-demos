@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.hazelcast.platform.demos.banking.trademonitor;
+package hazelcast.platform.demos.banking.trademonitor;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -42,10 +42,6 @@ import com.hazelcast.jet.python.PythonServiceConfig;
 import com.hazelcast.sql.SqlResult;
 import com.hazelcast.sql.SqlRow;
 import com.hazelcast.sql.SqlRowMetadata;
-
-import hazelcast.platform.demos.banking.trademonitor.MyConstants;
-import hazelcast.platform.demos.banking.trademonitor.NasdaqFinancialStatus;
-import hazelcast.platform.demos.banking.trademonitor.NasdaqMarketCategory;
 
 /**
  * <p>Utility functions used in several places.
@@ -203,7 +199,7 @@ public class MyUtils {
      * @param handler The function in the Python file to call
      * @return Python configuration for use in a Jet job.
      */
-    protected static PythonServiceConfig getPythonServiceConfig(String name, String handler) throws Exception {
+    public static PythonServiceConfig getPythonServiceConfig(String name, String handler) throws Exception {
         String subdir = "python";
         File temporaryDir = MyUtils.getTemporaryDir(subdir, name);
 

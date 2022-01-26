@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.hazelcast.platform.demos.banking.trademonitor;
+package hazelcast.platform.demos.banking.trademonitor;
 
 import java.io.Serializable;
 import java.util.AbstractMap.SimpleImmutableEntry;

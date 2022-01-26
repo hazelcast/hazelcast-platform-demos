@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.hazelcast.platform.demos.banking.trademonitor;
+package hazelcast.platform.demos.banking.trademonitor;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map.Entry;
@@ -39,12 +39,6 @@ import com.hazelcast.jet.pipeline.ServiceFactories;
 import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.pipeline.StreamStage;
 import com.hazelcast.jet.pipeline.WindowDefinition;
-
-import hazelcast.platform.demos.banking.trademonitor.MyConstants;
-import hazelcast.platform.demos.banking.trademonitor.NasdaqFinancialStatus;
-import hazelcast.platform.demos.banking.trademonitor.SymbolInfo;
-import hazelcast.platform.demos.banking.trademonitor.Trade;
-import hazelcast.platform.demos.banking.trademonitor.TradeJsonDeserializer;
 
 /**
  * <p>Creates a pipeline job to "<i>query</i>" Kafka trades.

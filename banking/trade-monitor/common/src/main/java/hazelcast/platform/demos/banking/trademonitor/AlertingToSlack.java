@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.hazelcast.platform.demos.banking.trademonitor;
+package hazelcast.platform.demos.banking.trademonitor;
 
 import java.util.Map;
 
@@ -29,8 +29,6 @@ import com.hazelcast.jet.pipeline.Sources;
 import com.hazelcast.jet.pipeline.StreamStage;
 import com.hazelcast.platform.demos.utils.UtilsConstants;
 import com.hazelcast.platform.demos.utils.UtilsSlackSink;
-
-import hazelcast.platform.demos.banking.trademonitor.MyConstants;
 
 /**
  * <p>A simple job that listens on a map and republishes to Slack.

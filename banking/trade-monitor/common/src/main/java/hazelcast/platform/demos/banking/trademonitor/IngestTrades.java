@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.hazelcast.platform.demos.banking.trademonitor;
+package hazelcast.platform.demos.banking.trademonitor;
 
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -27,8 +27,6 @@ import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.ServiceFactories;
 import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.pipeline.StreamStage;
-
-import hazelcast.platform.demos.banking.trademonitor.MyConstants;
 
 /**
  * <p>Creates a Jet pipeline to upload from a Kafka topic into a
@@ -70,7 +68,7 @@ public class IngestTrades {
          .withoutTimestamps();
 
         inputSource
-         .writeTo(Sinks.map("trades"));
+        .writeTo(Sinks.map(MyConstants.IMAP_NAME_TRADES));
 
         /* To help with diagnostics, allow every 100,0000th item through
          * on each node. Nulls are filtered out.

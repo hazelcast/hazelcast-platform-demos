@@ -26,6 +26,8 @@ import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
 import com.hazelcast.client.config.YamlClientConfigBuilder;
 
+import hazelcast.platform.demos.banking.trademonitor.MyUtils;
+
 /**
  * <p>Configure Jet client for connection to cluster. Use a config file, then override
  * if necessary.

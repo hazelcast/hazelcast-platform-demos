@@ -26,6 +26,7 @@ import com.hazelcast.platform.demos.utils.UtilsProperties;
 import com.hazelcast.platform.demos.utils.UtilsSlack;
 import com.hazelcast.platform.demos.utils.UtilsSlackSQLJob;
 
+import hazelcast.platform.demos.banking.trademonitor.CommonIdempotentInitialization;
 import hazelcast.platform.demos.banking.trademonitor.MyConstants;
 
 

@@ -28,6 +28,7 @@ import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.map.IMap;
 
 import hazelcast.platform.demos.banking.trademonitor.MyConstants;
+import hazelcast.platform.demos.banking.trademonitor.MyUtils;
 
 /**
  * <p>Build a single Jet job and submit it to the Hazelcast platform

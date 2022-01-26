@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import com.hazelcast.jet.datamodel.Tuple3;
 
 import hazelcast.platform.demos.banking.trademonitor.MyConstants;
+import hazelcast.platform.demos.banking.trademonitor.MyUtils;
 import hazelcast.platform.demos.banking.trademonitor.NasdaqFinancialStatus;
 import hazelcast.platform.demos.banking.trademonitor.NasdaqMarketCategory;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.hazelcast.platform.demos.banking.trademonitor;
+package hazelcast.platform.demos.banking.trademonitor;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -44,12 +44,6 @@ import com.hazelcast.platform.demos.utils.UtilsJobs;
 import com.hazelcast.platform.demos.utils.UtilsSlackSQLJob;
 import com.hazelcast.platform.demos.utils.UtilsSlackSink;
 
-import hazelcast.platform.demos.banking.trademonitor.MyConstants;
-import hazelcast.platform.demos.banking.trademonitor.NasdaqFinancialStatus;
-import hazelcast.platform.demos.banking.trademonitor.NasdaqMarketCategory;
-import hazelcast.platform.demos.banking.trademonitor.SymbolInfo;
-import hazelcast.platform.demos.banking.trademonitor.Trade;
-
 /**
  * <p>May be invoked from clientside or serverside to ensure serverside ready.
  * </p>
@@ -71,7 +65,7 @@ public class CommonIdempotentInitialization {
      * access, so ensuring all are visible from the outset.
      * </p>
      */
-    static boolean createNeededObjects(HazelcastInstance hazelcastInstance) {
+    public static boolean createNeededObjects(HazelcastInstance hazelcastInstance) {
         // Capture what was present before
         Set<String> existingIMapNames = hazelcastInstance.getDistributedObjects()
                 .stream()
@@ -177,7 +171,7 @@ public class CommonIdempotentInitialization {
      * a {@link com.hazelcast.map.IMap}.
      * </p>
      */
-    static boolean loadNeededData(HazelcastInstance hazelcastInstance, String bootstrapServers) {
+    public static boolean loadNeededData(HazelcastInstance hazelcastInstance, String bootstrapServers) {
         boolean ok = true;
         try {
             IMap<String, String> kafkaConfigMap =
@@ -232,7 +226,7 @@ public class CommonIdempotentInitialization {
      * <p>Define Hazelcast maps &amp; Kafka topics for later SQL querying.
      * </p>
      */
-    static boolean defineQueryableObjects(HazelcastInstance hazelcastInstance, String bootstrapServers) {
+    public static boolean defineQueryableObjects(HazelcastInstance hazelcastInstance, String bootstrapServers) {
         boolean ok = true;
         ok &= defineKafka(hazelcastInstance, bootstrapServers);
         ok &= defineIMap(hazelcastInstance);
@@ -413,7 +407,7 @@ public class CommonIdempotentInitialization {
      * </p>
      * @param properties
      */
-    static boolean launchNeededJobs(HazelcastInstance hazelcastInstance, String bootstrapServers, Properties properties) {
+    public static boolean launchNeededJobs(HazelcastInstance hazelcastInstance, String bootstrapServers, Properties properties) {
 
         if (System.getProperty("my.autostart.enabled", "").equalsIgnoreCase("false")) {
             LOGGER.info("Not launching Kafka jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",

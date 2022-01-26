@@ -30,6 +30,10 @@ import com.hazelcast.jet.config.ProcessingGuarantee;
 import com.hazelcast.jet.core.JobStatus;
 import com.hazelcast.jet.pipeline.Pipeline;
 
+import hazelcast.platform.demos.banking.trademonitor.AggregateQuery;
+import hazelcast.platform.demos.banking.trademonitor.IngestTrades;
+import hazelcast.platform.demos.banking.trademonitor.MaxVolumeAggregator;
+
 /**
  * <p>Starts at most one job with the given name.
  * </p>
