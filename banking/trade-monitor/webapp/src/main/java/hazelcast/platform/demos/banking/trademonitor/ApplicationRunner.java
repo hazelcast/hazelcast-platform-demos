@@ -317,6 +317,7 @@ public class ApplicationRunner {
             //{ "Join",    "SELECT * FROM (SELECT id, symbol, \"timestamp\" FROM kf_trades) AS k"
             //    + " LEFT JOIN (SELECT * FROM symbols) AS s ON k.symbol = s.__key" },
              */
+            { "IMap",    "SHOW MAPPINGS" },
         };
 
         int count = 0;

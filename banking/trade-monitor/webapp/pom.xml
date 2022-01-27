@@ -18,7 +18,7 @@
 		<docker.image.name>webapp</docker.image.name>
 		<docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
-		<main.class>com.hazelcast.platform.demos.banking.trademonitor.Application</main.class>
+		<main.class>hazelcast.platform.demos.banking.trademonitor.Application</main.class>
 
 		<!-- See comment on maven-resources-plugin -->
 		<frontend.app.dir>${project.basedir}/src/main/app</frontend.app.dir>
