@@ -29,6 +29,8 @@ import com.hazelcast.topic.ITopic;
 import com.hazelcast.topic.Message;
 import com.hazelcast.topic.MessageListener;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * <p>Create an infinite stream source by listening for messages
  * published to a Hazelcast {@link com.hazelcast.topic.ITopic ITopic}.
@@ -41,6 +43,8 @@ public class MyTopicSource implements MessageListener<String> {
     private final BlockingQueue<String> queue = new LinkedBlockingQueue<>(QUEUE_CAPACITY);
     private final String member;
 
+    @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
+            justification = "Cannot change addMessageListener()")
     public MyTopicSource(ITopic<String> topic, String member) {
         topic.addMessageListener(this);
         this.member = member;

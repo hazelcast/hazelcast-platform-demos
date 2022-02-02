@@ -16,6 +16,8 @@
 
 package hazelcast.platform.demos.banking.trademonitor;
 
+import java.util.Map;
+
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Deserializer;
 
@@ -44,5 +46,13 @@ public class TradeJsonDeserializer implements Deserializer<Trade> {
             throw new SerializationException(exception);
         }
      }
+
+    @Override
+    public void configure(Map<String, ?> configs, boolean isKey) {
+    }
+
+    @Override
+    public void close() {
+    }
 
 }
