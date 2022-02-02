@@ -40,6 +40,7 @@ import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.map.IMap;
 import com.hazelcast.platform.demos.utils.UtilsConstants;
+import com.hazelcast.platform.demos.utils.UtilsFormatter;
 import com.hazelcast.platform.demos.utils.UtilsJobs;
 import com.hazelcast.platform.demos.utils.UtilsSlackSQLJob;
 import com.hazelcast.platform.demos.utils.UtilsSlackSink;
@@ -434,6 +435,7 @@ public class CommonIdempotentInitialization {
             jobConfigAggregateQuery.setName(AggregateQuery.class.getSimpleName());
             jobConfigAggregateQuery.addClass(AggregateQuery.class);
             jobConfigAggregateQuery.addClass(MaxVolumeAggregator.class);
+            jobConfigAggregateQuery.addClass(UtilsFormatter.class);
 
             UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAggregateQuery, jobConfigAggregateQuery);
         }
