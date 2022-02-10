@@ -16,14 +16,7 @@
 
 package com.hazelcast.platform.demos.banking.cva;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * <p>Optional, activate SwaggerUI on
@@ -31,14 +24,19 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * </p>
  */
 @Configuration
-@EnableSwagger2
 public class SwaggerConfig {
+
+    static {
+        // TODO: Until this is fixed https://github.com/springfox/springfox/issues/3462
+        // TODO: Also needs fragments.html
+        System.setProperty("spring.mvc.pathmatch.matching-strategy", "ant-path-matcher");
+    }
 
     /**
      * <p>Use <a href="https://swagger.io/">Swagger</a> for easier
      * interaction for testing REST.
      * </p>
-     */
+     * TODO: Needs https://github.com/springfox/springfox/issues/3462
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
@@ -46,6 +44,6 @@ public class SwaggerConfig {
           .apis(RequestHandlerSelectors.any())
           .paths(PathSelectors.any())
           .build();
-    }
+    }*/
 
 }

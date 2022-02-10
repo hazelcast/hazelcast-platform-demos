@@ -31,8 +31,7 @@
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
 		<dockerfile.skip>true</dockerfile.skip>
 		<failsafe.skip>true</failsafe.skip>
-		<!-- Need Java 11 until 5.1 GA -->
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 		<main.basedir>${project.basedir}</main.basedir>
 		<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -74,7 +73,7 @@
 		<spring-boot.version>2.6.3</spring-boot.version>
         <spring-cloud.version>2020.0.3</spring-cloud.version>
         <spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
-		<springfox-swagger.version>2.9.2</springfox-swagger.version>
+		<springfox-swagger.version>3.0.0</springfox-swagger.version>
 		<zipkin.version>2.23.3-SNAPSHOT</zipkin.version>
 
 		<!-- Plugins -->
@@ -208,6 +207,11 @@
 			<dependency>
 				<groupId>io.springfox</groupId>
 				<artifactId>springfox-swagger-ui</artifactId>
+				<version>${springfox-swagger.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-boot-starter</artifactId>
 				<version>${springfox-swagger.version}</version>
 			</dependency>
 
