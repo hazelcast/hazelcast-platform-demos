@@ -121,6 +121,8 @@ public class CvaStpJobSubmitter {
                 System.getProperty("my.docker.enabled", "false").equalsIgnoreCase(Boolean.TRUE.toString());
         boolean kubernetesEnabled =
                 System.getProperty("my.kubernetes.enabled", "false").equalsIgnoreCase(Boolean.TRUE.toString());
+        LOGGER.info("dockerEnabled=={}", dockerEnabled);
+        LOGGER.info("kubernetesEnabled=={}", kubernetesEnabled);
 
         // If set, validate but don't reject
         if (cppService.length() > 0) {
@@ -137,6 +139,7 @@ public class CvaStpJobSubmitter {
                 cppService = CPP_KUBERNETES;
             }
         }
+        LOGGER.info("cpService=={}", cppService);
 
         return cppService;
     }
