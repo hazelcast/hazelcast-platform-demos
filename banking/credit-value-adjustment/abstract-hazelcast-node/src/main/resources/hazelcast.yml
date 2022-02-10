@@ -6,6 +6,7 @@ hazelcast:
     console-enabled: true
   #
   properties:
+    hazelcast.integrity-checker.enabled: true
     # Graceful shutdown is helpful for Kubernetes scale-down.
     hazelcast.member.naming.moby.enabled: true
     hazelcast.partition.count: ${my.partitions}
@@ -59,6 +60,5 @@ hazelcast:
   jet:
     enabled: true
     resource-upload-enabled: true
-    instance:
-      # 'true' requires Enterprise (which this demo has) and persistence enabled (which isn't used in this demo)
-      lossless-restart-enabled: false
+    # 'true' requires Enterprise (which this demo has) and persistence enabled (which isn't used in this demo)
+    lossless-restart-enabled: false
