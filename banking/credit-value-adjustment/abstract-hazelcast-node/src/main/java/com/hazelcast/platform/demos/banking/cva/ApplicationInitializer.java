@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
+import com.hazelcast.map.IMap;
 
 /**
  * <p>Ensure the server is in a ready state, by requesting all the
@@ -195,7 +196,7 @@ public class ApplicationInitializer {
                 + " ("
                 + "  __key VARCHAR,"
                 + "  curvename VARCHAR,"
-                + "  index VARCHAR,"
+                + "  \"index\" VARCHAR,"
                 + "  index_frequency INTEGER,"
                 + "  index_frequency_type INTEGER,"
                 + "  calendar VARCHAR,"
