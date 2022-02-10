@@ -21,6 +21,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
 import com.hazelcast.config.ClasspathYamlConfig;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.DiscoveryConfig;
@@ -32,12 +38,6 @@ import com.hazelcast.config.TcpIpConfig;
 import com.hazelcast.config.WanBatchPublisherConfig;
 import com.hazelcast.config.WanReplicationConfig;
 import com.hazelcast.platform.demos.banking.cva.MyConstants.Site;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * <p>Non-default configuration for Jet, to allow this example to run in Kubernetes (by default),
@@ -123,7 +123,7 @@ public class ApplicationConfig {
             LOGGER.info("Kubernetes configuration: service-dns: {}",
                     networkConfig.getJoin().getKubernetesConfig().getProperty("service-dns"));
         } else {
-            this.removeWanConfig(config.getMapConfigs());
+            this.removeWanConfig(config);
 
             networkConfig.getJoin().getKubernetesConfig().setEnabled(false);
 
@@ -225,13 +225,16 @@ public class ApplicationConfig {
 
     /**
      * <p>If WAN is not applicable, as not in Kubernetes, remove it from
-     * map configuration.
+     * configuration.
      * </p>
      *
-     * @param mapConfigs
+     * @param config
      */
-    private void removeWanConfig(Map<String, MapConfig> mapConfigs) {
-        for (MapConfig mapConfig : mapConfigs.values()) {
+    private void removeWanConfig(Config config) {
+        // Remove WAN specification
+        config.getWanReplicationConfigs().clear();
+        // Maps don't use WAN now
+        for (MapConfig mapConfig : config.getMapConfigs().values()) {
             if (mapConfig.getWanReplicationRef() != null) {
                 mapConfig.setWanReplicationRef(null);
             }
