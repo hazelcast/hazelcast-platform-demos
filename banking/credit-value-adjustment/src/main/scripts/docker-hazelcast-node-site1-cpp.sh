@@ -26,7 +26,7 @@ docker container prune --force > /dev/null 2>&1
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
 # 3 CPUs, one each for Jet and 2 x C++ workers
-PORT=50001
+PORT=30001
 CMD="docker run --cpuset-cpus=0-2 -e MY_INITSIZE=1 -e MY_KUBERNETES_ENABLED=false -e MY_PARTITIONS=271 -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP} -p 5701:5701 --rm --network=${PROJECT} ${DOCKER_IMAGE} ${PORT}"
 #echo $CMD
 

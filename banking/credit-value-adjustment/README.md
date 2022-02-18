@@ -89,7 +89,7 @@ This is a Protobuf3 definition of the gRPC communications between Jet and C++.
 
 This module contains the C++ code that executes the pricing.
 
-It has has a gRPC server that responds to incoming requests on a specific port (50001).
+It has has a gRPC server that responds to incoming requests on a specific port (30001).
 
 Each incoming request is one or usually more (default 100) lines of trades and curves
 to price. One output is given for each input.

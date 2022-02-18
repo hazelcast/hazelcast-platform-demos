@@ -9,9 +9,9 @@ spec:
   selector:
     app: cva-cpp
   ports:
-  - port: 50001
+  - port: 30001
     protocol: TCP
-    targetPort: 50001
+    targetPort: 30001
   type: LoadBalancer
 ---
 # Creates 2 pods, for double performance, the minimum to prove scaling
@@ -32,7 +32,7 @@ spec:
         app: cva-cpp
     spec:
       containers:
-        - args: ["50001"]
+        - args: ["30001"]
           image: "hazelcast-platform-demos/cva-cpp"
           imagePullPolicy: Never
           name: cva-cpp-container

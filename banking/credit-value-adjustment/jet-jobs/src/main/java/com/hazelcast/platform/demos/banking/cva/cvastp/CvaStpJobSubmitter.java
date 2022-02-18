@@ -38,7 +38,7 @@ public class CvaStpJobSubmitter {
     private static final String CPP_DOCKER = "cva-cpp";
     private static final String CPP_KUBERNETES = "cpp-service";
     private static final String CPP_LOCALHOST = "127.0.0.1";
-    private static final int PORT = 50001;
+    private static final int PORT = 30001;
 
     /**
      * <p>Try to submit the {@link CvaStpJob}, allowing only one to be running
@@ -139,7 +139,7 @@ public class CvaStpJobSubmitter {
                 cppService = CPP_KUBERNETES;
             }
         }
-        LOGGER.info("cpService=={}", cppService);
+        LOGGER.info("cppService=={}", cppService);
 
         return cppService;
     }
