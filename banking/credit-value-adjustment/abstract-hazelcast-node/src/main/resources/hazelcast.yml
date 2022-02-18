@@ -56,6 +56,14 @@ hazelcast:
       wan-replication-ref:
         my-cva-wan-publisher-group:
           merge-policy-class-name: PassThroughMergePolicy
+    'risk':
+      wan-replication-ref:
+        my-cva-wan-publisher-group:
+          merge-policy-class-name: PassThroughMergePolicy
+    'stock':
+      wan-replication-ref:
+        my-cva-wan-publisher-group:
+          merge-policy-class-name: PassThroughMergePolicy
   #
   jet:
     enabled: true

@@ -106,14 +106,26 @@ public class ApplicationInitializer {
      */
     private void defineIMap() {
         String definition1 = this.defineIMapCpCds();
+        String definition1v = this.defineIMapCpCdsView();
         String definition2 = this.defineIMapFixings();
+        String definition2v = this.defineIMapFixingsView();
         String definition3 = this.defineIMapIrCurves();
+        String definition3v = this.defineIMapIrCurvesView();
         String definition4 = this.defineIMapTrades();
+        String definition5 = this.defineIMapPosition();
+        String definition6 = this.defineIMapRisk();
+        String definition7 = this.defineIMapStock();
 
         this.define(definition1);
+        this.define(definition1v);
         this.define(definition2);
+        this.define(definition2v);
         this.define(definition3);
+        this.define(definition3v);
         this.define(definition4);
+        this.define(definition5);
+        this.define(definition6);
+        this.define(definition7);
     }
 
     /**
@@ -125,37 +137,58 @@ public class ApplicationInitializer {
     private String defineIMapCpCds() {
         return "CREATE OR REPLACE MAPPING "
                 + MyConstants.IMAP_NAME_CP_CDS
-                + " ("
-                + "  __key VARCHAR,"
-                // "date" field is held in JSON as a String and parsed later.
-                //+ "    \"date\" DATE,"
-                + "    \"date\" VARCHAR,"
-                + "    timezone VARCHAR,"
-                + "    ticker VARCHAR,"
-                + "    shortname VARCHAR,"
-                + "    redcode VARCHAR,"
-                + "    tier VARCHAR,"
-                + "    ccy VARCHAR,"
-                + "    docclause VARCHAR,"
-                //TODO `JSONArray` not supported in 5.0
-                //+ "    spread_periods,"
-                //TODO `JSONArray` not supported in 5.0
-                //+ "    spreads,"
-                + "    recovery DOUBLE,"
-                + "    datarating VARCHAR,"
-                + "    sector VARCHAR,"
-                + "    region VARCHAR,"
-                + "    country VARCHAR,"
-                + "    avrating VARCHAR,"
-                + "    impliedrating VARCHAR"
-                + ")"
-                + "TYPE IMap "
+                + " TYPE IMap "
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
                 + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
-                + " 'valueFormat' = 'json-flat',"
-                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
+                + " 'valueFormat' = 'json'"
                 + " )";
+    }
+    private String defineIMapCpCdsView() {
+        return "CREATE OR REPLACE VIEW "
+                + MyConstants.IMAP_NAME_CP_CDS + MyConstants.VIEW_SUFFIX
+                + " AS SELECT "
+                + "    __key"
+                + "      AS \"primary_key\""
+                + ",   JSON_VALUE(this, '$.date' RETURNING VARCHAR)"
+                + "      AS \"date\""
+                + ",   JSON_VALUE(this, '$.timezone' RETURNING VARCHAR)"
+                + "      AS \"timezone\""
+                + ",   JSON_VALUE(this, '$.ticker' RETURNING VARCHAR)"
+                + "      AS \"ticker\""
+                + ",   JSON_VALUE(this, '$.shortname' RETURNING VARCHAR)"
+                + "      AS \"shortname\""
+                + ",   JSON_VALUE(this, '$.redcode' RETURNING VARCHAR)"
+                + "      AS \"redcode\""
+                + ",   JSON_VALUE(this, '$.tier' RETURNING VARCHAR)"
+                + "      AS \"tier\""
+                + ",   JSON_VALUE(this, '$.ccy' RETURNING VARCHAR)"
+                + "      AS \"ccy\""
+                + ",   JSON_VALUE(this, '$.docclause' RETURNING VARCHAR)"
+                + "      AS \"docclause\""
+                + ",   JSON_VALUE(this, '$.spread_periods[0]' RETURNING DOUBLE)"
+                + "      AS \"spread_periods_0\""
+                + ",   JSON_VALUE(this, '$.spreads[0]' RETURNING DOUBLE)"
+                + "      AS \"spreads_0\""
+                + ",   JSON_QUERY(this, '$.spread_periods' WITH ARRAY WRAPPER)"
+                + "      AS \"spread_periods\""
+                + ",   JSON_QUERY(this, '$.spreads' WITH ARRAY WRAPPER)"
+                + "      AS \"spreads\""
+                + ",   JSON_VALUE(this, '$.recovery' RETURNING DOUBLE)"
+                + "      AS \"recovery\""
+                + ",   JSON_VALUE(this, '$.datarating' RETURNING VARCHAR)"
+                + "      AS \"datarating\""
+                + ",   JSON_VALUE(this, '$.sector' RETURNING VARCHAR)"
+                + "      AS \"sector\""
+                + ",   JSON_VALUE(this, '$.region' RETURNING VARCHAR)"
+                + "      AS \"region\""
+                + ",   JSON_VALUE(this, '$.country' RETURNING VARCHAR)"
+                + "      AS \"country\""
+                + ",   JSON_VALUE(this, '$.avrating' RETURNING VARCHAR)"
+                + "      AS \"avrating\""
+                + ",   JSON_VALUE(this, '$.impliedrating' RETURNING VARCHAR)"
+                + "      AS \"impliedrating\""
+                + " FROM " + MyConstants.IMAP_NAME_CP_CDS;
     }
 
     /**
@@ -167,21 +200,30 @@ public class ApplicationInitializer {
     private String defineIMapFixings() {
         return "CREATE OR REPLACE MAPPING "
                 + MyConstants.IMAP_NAME_FIXINGS
-                + " ("
-                + "  __key VARCHAR,"
-                + "  curvename VARCHAR"
-                //TODO `JSONArray` not supported in 5.0
-                //+ "    fixing_dates,"
-                //TODO `JSONArray` not supported in 5.0
-                //+ "    fixing_rates,"
-                + ")"
                 + " TYPE IMap "
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
                 + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
-                + " 'valueFormat' = 'json-flat',"
-                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
+                + " 'valueFormat' = 'json'"
                 + " )";
+    }
+    private String defineIMapFixingsView() {
+        return "CREATE OR REPLACE VIEW "
+                + MyConstants.IMAP_NAME_FIXINGS + MyConstants.VIEW_SUFFIX
+                + " AS SELECT "
+                + "    __key"
+                + "      AS \"primary_key\""
+                + ",   JSON_VALUE(this, '$.curvename' RETURNING VARCHAR)"
+                + "      AS \"curvename\""
+                + ",   JSON_VALUE(this, '$.fixing_dates[0]' RETURNING VARCHAR)"
+                + "      AS \"fixing_date_0\""
+                + ",   JSON_VALUE(this, '$.fixing_rates[0]' RETURNING DOUBLE)"
+                + "      AS \"fixing_rate_0\""
+                + ",   JSON_QUERY(this, '$.fixing_dates' WITH ARRAY WRAPPER)"
+                + "      AS \"fixing_dates\""
+                + ",   JSON_QUERY(this, '$.fixing_rates' WITH ARRAY WRAPPER)"
+                + "      AS \"fixing_rates\""
+                + " FROM " + MyConstants.IMAP_NAME_FIXINGS;
     }
 
     /**
@@ -193,31 +235,50 @@ public class ApplicationInitializer {
     private String defineIMapIrCurves() {
         return "CREATE OR REPLACE MAPPING "
                 + MyConstants.IMAP_NAME_IRCURVES
-                + " ("
-                + "  __key VARCHAR,"
-                + "  curvename VARCHAR,"
-                + "  \"index\" VARCHAR,"
-                + "  index_frequency INTEGER,"
-                + "  index_frequency_type INTEGER,"
-                + "  calendar VARCHAR,"
-                + "  bussiness_convention INTEGER,"
-                + "  dcc VARCHAR,"
-                + "  end_of_month_flag BOOLEAN,"
-                + "  settlement_days INTEGER"
-                //TODO `JSONArray` not supported in 5.0
-                //+ "  maturity_period_value OBJECT,"
-                //TODO `JSONArray` not supported in 5.0
-                //+ "  maturity_period_type OBJECT,"
-                //TODO `JSONArray` not supported in 5.0
-                //+ "  rates OBJECT,"
-                + ")"
                 + " TYPE IMap "
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
                 + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
-                + " 'valueFormat' = 'json-flat',"
-                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
+                + " 'valueFormat' = 'json'"
                 + " )";
+    }
+    private String defineIMapIrCurvesView() {
+        return "CREATE OR REPLACE VIEW "
+                + MyConstants.IMAP_NAME_IRCURVES + MyConstants.VIEW_SUFFIX
+                + " AS SELECT "
+                + "    __key"
+                + "      AS \"primary_key\""
+                + ",   JSON_VALUE(this, '$.curvename' RETURNING VARCHAR)"
+                + "      AS \"curvename\""
+                + ",   JSON_VALUE(this, '$.index' RETURNING VARCHAR)"
+                + "      AS \"index\""
+                + ",   JSON_VALUE(this, '$.index_frequency' RETURNING INTEGER)"
+                + "      AS \"index_frequency\""
+                + ",   JSON_VALUE(this, '$.index_frequency_type' RETURNING INTEGER)"
+                + "      AS \"index_frequency_type\""
+                + ",   JSON_VALUE(this, '$.calendar' RETURNING VARCHAR)"
+                + "      AS \"calendar\""
+                + ",   JSON_VALUE(this, '$.bussiness_convention' RETURNING INTEGER)"
+                + "      AS \"bussiness_convention\""
+                + ",   JSON_VALUE(this, '$.dcc' RETURNING VARCHAR)"
+                + "      AS \"dcc\""
+                + ",   JSON_VALUE(this, '$.end_of_month_flag' RETURNING BOOLEAN)"
+                + "      AS \"end_of_month_flag\""
+                + ",   JSON_VALUE(this, '$.settlement_days' RETURNING INTEGER)"
+                + "      AS \"settlement_days\""
+                + ",   JSON_VALUE(this, '$.maturity_period_value[0]' RETURNING INTEGER)"
+                + "      AS \"maturity_period_value_0\""
+                + ",   JSON_VALUE(this, '$.maturity_period_type[0]' RETURNING INTEGER)"
+                + "      AS \"maturity_period_type_0\""
+                + ",   JSON_VALUE(this, '$.rates[0]' RETURNING DOUBLE)"
+                + "      AS \"rates_0\""
+                + ",   JSON_QUERY(this, '$.maturity_period_value[0]' WITH ARRAY WRAPPER)"
+                + "      AS \"maturity_period_value_0\""
+                + ",   JSON_QUERY(this, '$.maturity_period_type[0]' WITH ARRAY WRAPPER)"
+                + "      AS \"maturity_period_type_0\""
+                + ",   JSON_QUERY(this, '$.rates[0]' WITH ARRAY WRAPPER)"
+                + "      AS \"rates_0\""
+                + " FROM " + MyConstants.IMAP_NAME_IRCURVES;
     }
 
     /**
@@ -260,6 +321,50 @@ public class ApplicationInitializer {
                 + "  float_leg_termination_day_conv INTEGER,"
                 + "  float_leg_date_gen_rule INTEGER,"
                 + "  float_leg_end_of_month_flag BOOLEAN"
+                + ")"
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
+                + " 'valueFormat' = 'json-flat',"
+                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
+                + " )";
+    }
+
+    private String defineIMapPosition() {
+        return "CREATE OR REPLACE MAPPING \""
+                + MyConstants.IMAP_NAME_POSITION + "\""
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
+                + " 'valueFormat' = 'json'"
+                + " )";
+    }
+
+    private String defineIMapRisk() {
+        return "CREATE OR REPLACE MAPPING "
+                + MyConstants.IMAP_NAME_RISK
+                + " ("
+                + "  __key VARCHAR,"
+                + "  risk DOUBLE"
+                + ")"
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
+                + " 'valueFormat' = 'json-flat',"
+                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
+                + " )";
+    }
+
+    private String defineIMapStock() {
+        return "CREATE OR REPLACE MAPPING "
+                + MyConstants.IMAP_NAME_STOCK
+                + " ("
+                + "  __key VARCHAR,"
+                + "  bid DOUBLE,"
+                + "  offer DOUBLE"
                 + ")"
                 + " TYPE IMap "
                 + " OPTIONS ( "

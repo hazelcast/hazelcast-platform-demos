@@ -23,14 +23,15 @@ docker network create $PROJECT --driver bridge > /dev/null 2>&1
 # For easier restarts
 docker container prune --force > /dev/null 2>&1
 
-echo '#################################################################################'
-echo '#' Modify cluster config to use ${HOST_IP} and give it a few seconds to refresh
-echo '#################################################################################'
-
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
+MC_CLUSTER1_ADDRESSLIST_OVERRIDE=${HOST_IP}:5701
+MC_CLUSTER2_ADDRESSLIST_OVERRIDE=${HOST_IP}:6701
 
-CMD="docker run -e JAVA_ARGS=-Dhazelcast.mc.healthCheck.enable=true -p 8080:8080 --rm ${DOCKER_IMAGE}"
-#echo $CMD
+CMD="docker run \
+ -e MC_CLUSTER1_ADDRESSLIST_OVERRIDE=$MC_CLUSTER1_ADDRESSLIST_OVERRIDE \
+ -e MC_CLUSTER2_ADDRESSLIST_OVERRIDE=$MC_CLUSTER2_ADDRESSLIST_OVERRIDE \
+ -p 8080:8080 --rm ${DOCKER_IMAGE}"
+echo $CMD
 
 $CMD
 RC=$?
