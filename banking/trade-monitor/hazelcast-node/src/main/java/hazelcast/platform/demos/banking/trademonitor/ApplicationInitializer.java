@@ -42,11 +42,8 @@ public class ApplicationInitializer {
      * hold processing results. Launch the Jet jobs for this example.
      * </p>
      */
-    public static void initialise(HazelcastInstance hazelcastInstance, String bootstrapServers) throws Exception {
-        CommonIdempotentInitialization.createNeededObjects(hazelcastInstance);
-        addListeners(hazelcastInstance, bootstrapServers);
-        CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers);
-        CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers);
+    public static void initialise(HazelcastInstance hazelcastInstance, String bootstrapServers,
+            String pulsarList) throws Exception {
 
         // Exit if properties not as expected
         Properties properties = null;
@@ -61,7 +58,16 @@ public class ApplicationInitializer {
             return;
         }
 
-        CommonIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers, properties);
+        String pulsarOrKafka = properties.getProperty(MyConstants.PULSAR_OR_KAFKA_KEY);
+        boolean usePulsar = MyUtils.usePulsar(pulsarOrKafka);
+
+        CommonIdempotentInitialization.createNeededObjects(hazelcastInstance);
+        addListeners(hazelcastInstance, bootstrapServers, pulsarList, usePulsar);
+        CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList, usePulsar);
+        CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers);
+
+        CommonIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
+                pulsarList, properties);
     }
 
 
@@ -71,11 +77,13 @@ public class ApplicationInitializer {
      *
      * @param hazelcastInstance
      */
-    static void addListeners(HazelcastInstance hazelcastInstance, String bootstrapServers) {
+    static void addListeners(HazelcastInstance hazelcastInstance, String bootstrapServers,
+            String pulsarList, boolean usePulsar) {
         MyMembershipListener myMembershipListener = new MyMembershipListener(hazelcastInstance);
         hazelcastInstance.getCluster().addMembershipListener(myMembershipListener);
 
-        JobControlListener jobControlListener = new JobControlListener(bootstrapServers);
+        JobControlListener jobControlListener =
+                new JobControlListener(bootstrapServers, pulsarList, usePulsar);
         hazelcastInstance.getMap(MyConstants.IMAP_NAME_JOB_CONTROL)
             .addLocalEntryListener(jobControlListener);
     }

@@ -50,14 +50,17 @@ public class Application {
      */
     public static void main(String[] args) throws Exception {
         String bootstrapServers = null;
+        String pulsarList = null;
 
-        if (args.length == 1) {
+        if (args.length == 2) {
             bootstrapServers = args[0];
+            pulsarList = args[1];
         } else {
-            bootstrapServers = System.getProperty("my.bootstrap.servers");
-            if (bootstrapServers == null || bootstrapServers.length() == 0) {
-                LOGGER.error("Usage: 1 arg expected: bootstrapServers");
-                LOGGER.error("eg: 127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094");
+            bootstrapServers = System.getProperty("my.bootstrap.servers", "");
+            pulsarList = System.getProperty(MyConstants.PULSAR_CONFIG_KEY, "");
+            if (bootstrapServers.isBlank() || pulsarList.isBlank()) {
+                LOGGER.error("Usage: 2 arg expected: bootstrapServers pulsarList");
+                LOGGER.error("eg: 127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094 127.0.0.1:6650");
                 System.exit(1);
             }
         }
@@ -68,7 +71,7 @@ public class Application {
 
         String initializerProperty = "my.initialize";
         if (System.getProperty(initializerProperty, "").equalsIgnoreCase(Boolean.TRUE.toString())) {
-            ApplicationInitializer.initialise(hazelcastInstance, bootstrapServers);
+            ApplicationInitializer.initialise(hazelcastInstance, bootstrapServers, pulsarList);
         } else {
             LOGGER.info("Skip initialize as '{}'=='{}', assume client will do so",
                     initializerProperty, System.getProperty(initializerProperty));

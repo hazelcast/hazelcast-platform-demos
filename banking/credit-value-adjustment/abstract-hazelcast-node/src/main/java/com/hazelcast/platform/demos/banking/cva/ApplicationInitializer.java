@@ -382,7 +382,7 @@ public class ApplicationInitializer {
      * @param definition
      */
     private void define(String definition) {
-        LOGGER.trace("Definition '{}'", definition);
+        LOGGER.info("Definition '{}'", definition);
         try {
             this.hazelcastInstance.getSql().execute(definition);
         } catch (Exception e) {

@@ -72,6 +72,7 @@ public class ApplicationConfig {
             joinConfig.setTcpIpConfig(tcpIpConfig);
 
             LOGGER.info("Non-Kubernetes configuration: member-list: {}", tcpIpConfig.getMembers());
+            LOGGER.info("Non-Kubernetes configuration: use port: {}", config.getNetworkConfig().getPort());
         }
 
         return config;

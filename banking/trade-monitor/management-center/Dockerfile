@@ -28,8 +28,12 @@ ENV MC_CLASSPATH=/application.jar
 
 # Start Management Center
 CMD ["bash", "-c", "set -euo pipefail \
-      && echo bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_ADDRESSLIST} \
-      && bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_ADDRESSLIST} \
+      && MC_EMPTY='' \
+      && MC_CLUSTER1_LIST=`echo ${MC_CLUSTER1_ADDRESSLIST_OVERRIDE:-${MC_EMPTY}} $MC_CLUSTER1_ADDRESSLIST |awk '{print $1}'` \
+      && echo MC_CLUSTER1_NAME: ${MC_CLUSTER1_NAME} \
+      && echo MC_CLUSTER1_LIST: ${MC_CLUSTER1_LIST} \
+      && echo bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_LIST} \
+      && bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_LIST} \
       && echo bin/hz-mc start \
       && bin/hz-mc start \
      "]

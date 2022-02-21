@@ -40,11 +40,15 @@ public class JobControlStartRunnable implements Runnable {
     private final HazelcastInstance hazelcastInstance;
     private final String targetJobNamePrefix;
     private final String bootstrapServers;
+    private final String pulsarList;
+    private final boolean usePulsar;
 
-    public JobControlStartRunnable(String arg0, String arg1) {
+    public JobControlStartRunnable(String arg0, String arg1, String arg2, boolean arg3) {
         this.hazelcastInstance = Hazelcast.getAllHazelcastInstances().iterator().next();
         this.targetJobNamePrefix = arg0;
         this.bootstrapServers = arg1;
+        this.pulsarList = arg2;
+        this.usePulsar = arg3;
     }
 
     @Override
@@ -71,7 +75,8 @@ public class JobControlStartRunnable implements Runnable {
         // Actually launch
         if (targetJobNamePrefix.equals(IngestTrades.class.getSimpleName())) {
             // Trade ingest
-            Pipeline pipelineIngestTrades = IngestTrades.buildPipeline(this.bootstrapServers);
+            Pipeline pipelineIngestTrades = IngestTrades.buildPipeline(this.bootstrapServers,
+                this.pulsarList, this.usePulsar);
 
             JobConfig jobConfigIngestTrades = new JobConfig();
             jobConfigIngestTrades.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
@@ -85,7 +90,8 @@ public class JobControlStartRunnable implements Runnable {
         } else {
             if (targetJobNamePrefix.equals(AggregateQuery.class.getSimpleName())) {
                 // Trade aggregation
-                Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(this.bootstrapServers);
+                Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(this.bootstrapServers,
+                        this.pulsarList, this.usePulsar);
 
                 JobConfig jobConfigAggregateQuery = new JobConfig();
                 jobConfigAggregateQuery.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);

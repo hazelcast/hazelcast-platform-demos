@@ -302,7 +302,7 @@ public class ApplicationRunner {
             { "System",  "SELECT mapping_name AS name FROM information_schema.mappings" },
             { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS },
             */
-            { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_SYMBOLS },
+            { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_SYMBOLS + " LIMIT 5" },
             /*
             { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_TRADES },
             { "IMap",    "SELECT id, symbol, price FROM " + MyConstants.IMAP_NAME_TRADES
@@ -318,6 +318,7 @@ public class ApplicationRunner {
             //    + " LEFT JOIN (SELECT * FROM symbols) AS s ON k.symbol = s.__key" },
              */
             { "IMap",    "SHOW MAPPINGS" },
+            { "IMap",    "SHOW VIEWS" },
         };
 
         int count = 0;
@@ -403,20 +404,24 @@ public class ApplicationRunner {
     private boolean initialize() {
         LOGGER.info("initialize(): -=-=-=-=- START -=-=-=-=-=-");
 
-        String propertyName = "my.bootstrap.servers";
-        String bootstrapServers = System.getProperty(propertyName, "");
+        String propertyName1 = "my.bootstrap.servers";
+        String propertyName2 = MyConstants.PULSAR_CONFIG_KEY;
+        String bootstrapServers = System.getProperty(propertyName1, "");
+        String pulsarList = System.getProperty(propertyName2, "");
         if (bootstrapServers.isBlank()) {
-            LOGGER.error("No value for " + propertyName);
+            LOGGER.error("No value for " + propertyName1);
             return false;
         } else {
-            LOGGER.debug("Using {}=={}", propertyName, bootstrapServers);
+            LOGGER.debug("Using {}=={}", propertyName1, bootstrapServers);
+        }
+        if (pulsarList.isBlank()) {
+            LOGGER.error("No value for " + propertyName2);
+            return false;
+        } else {
+            LOGGER.debug("Using {}=={}", propertyName2, pulsarList);
         }
 
         boolean ok = testCustomClassesUploaded();
-
-        ok &= CommonIdempotentInitialization.createNeededObjects(hazelcastInstance);
-        ok &= CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers);
-        ok &= CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers);
 
         if (ok) {
             Properties properties;
@@ -428,7 +433,18 @@ public class ApplicationRunner {
                 LOGGER.error("No properties:", e);
                 properties = new Properties();
             }
-            ok = CommonIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers, properties);
+
+            String pulsarOrKafka = properties.getProperty(MyConstants.PULSAR_OR_KAFKA_KEY);
+            boolean usePulsar = MyUtils.usePulsar(pulsarOrKafka);
+
+            ok &= CommonIdempotentInitialization.createNeededObjects(hazelcastInstance);
+            ok &= CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList, usePulsar);
+            ok &= CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers);
+            if (ok) {
+                // Don't even try if broken by this point
+                ok = CommonIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers, pulsarList,
+                        properties);
+            }
         }
 
         LOGGER.info("initialize(): -=-=-=-=- END, success=={} -=-=-=-=-=-", ok);

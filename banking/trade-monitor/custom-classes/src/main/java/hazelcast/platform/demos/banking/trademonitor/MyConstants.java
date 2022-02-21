@@ -26,22 +26,28 @@ public class MyConstants {
 
     public static final String KAFKA_TOPIC_MAPPING_PREFIX = "";
     public static final String KAFKA_TOPIC_NAME_TRADES = "kf_trades";
+    public static final String PULSAR_CONFIG_KEY = "my.pulsar.list";
+    public static final String PULSAR_TOPIC_NAME_TRADES = "pulsar_trades";
+    public static final String PULSAR_OR_KAFKA_KEY = "my.pulsar.or.kafka";
 
     public static final String IMAP_NAME_AGGREGATE_QUERY_RESULTS = "AggregateQuery" + "_results";
     public static final String IMAP_NAME_ALERTS_MAX_VOLUME = "alertsMaxVolume";
     public static final String IMAP_NAME_JOB_CONTROL = "job_control";
-    public static final String IMAP_NAME_KAFKA_CONFIG = "kafka_config";
+    public static final String IMAP_NAME_JOB_CONFIG = "job_config";
     public static final String IMAP_NAME_PYTHON_SENTIMENT = "python_sentiment";
     public static final String IMAP_NAME_SYMBOLS = "symbols";
     public static final String IMAP_NAME_TRADES = "trades";
 
     public static final List<String> IMAP_NAMES =
             List.of(IMAP_NAME_AGGREGATE_QUERY_RESULTS, IMAP_NAME_ALERTS_MAX_VOLUME,
-                    IMAP_NAME_JOB_CONTROL, IMAP_NAME_KAFKA_CONFIG, IMAP_NAME_PYTHON_SENTIMENT,
+                    IMAP_NAME_JOB_CONTROL, IMAP_NAME_JOB_CONFIG,
+                    IMAP_NAME_PYTHON_SENTIMENT,
                     IMAP_NAME_SYMBOLS, IMAP_NAME_TRADES);
 
     public static final String WEBSOCKET_PATH_TRADES = "/trades";
 
     // For demonstration of queries
     public static final int SQL_RESULT_THRESHOLD = 10;
+    // For SQL VIEW naming
+    public static final String VIEW_SUFFIX = "_VIEW";
 }

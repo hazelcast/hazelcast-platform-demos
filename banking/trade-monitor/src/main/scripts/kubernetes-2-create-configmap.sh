@@ -1,9 +1,12 @@
 #!/bin/bash
 
 STATEFULSET_NAME=trade-monitor-kafka-broker
+PULSAR_NAME=trade-monitor-pulsar
 IPLIST=""
+PULSARLIST=""
 TMPFILE=/tmp/`basename $0`.$$
 
+# 3 Kafkas, each with their own LB
 for REPLICA in 0 1 2
 do
  SVC=${STATEFULSET_NAME}-${REPLICA}
@@ -36,10 +39,41 @@ do
  fi
 done
 
+# One Pulsar
+SVC=${PULSAR_NAME}
+SVC_INFO=`kubectl get svc $SVC 2>&1`
+PENDING=`echo $SVC_INFO | egrep -c '<pending>'\|'<none>'`
+NOT_RUNNING=`echo $SVC_INFO | grep -c '(NotFound)'`
+if [ $PENDING -gt 0 ] || [ $NOT_RUNNING -gt 0 ]
+then
+ echo ""
+ echo `basename $0`: ERROR: Service \"$SVC\" not ready for IP capture: $SVC_INFO
+ echo ""
+ if [ $NOT_RUNNING -gt 0 ]
+ then
+  echo Was kubernetes-1-zookeeper-kafka-firsthalf.yaml run\?
+ else
+  echo Try again in 30 seconds\? '<pending>'/'<none>' will clear.
+ fi
+ echo ""
+else
+ IP=`kubectl get svc $SVC -o jsonpath='{.status.loadBalancer.ingress[0].ip}'`
+ if [ "$IP" != "" ]
+ then
+  PULSARLIST="$IP"
+ fi
+fi
+
 IPCOUNT=`echo $IPLIST | sed 's/,/ /g' | wc -w`
 if [ $IPCOUNT -ne 3 ]
 then
- echo `basename $0`: ERROR: Need 3 IPs in IP list: \"$IPLIST\"
+ echo `basename $0`: ERROR: Need 3 IPs in Kafka IP list: \"$IPLIST\"
+ exit 1
+fi
+PULSARCOUNT=`echo $PULSARLIST | sed 's/,/ /g' | wc -w`
+if [ $PULSARCOUNT -ne 1 ]
+then
+ echo `basename $0`: ERROR: Need 1 IPs in Pulsar IP list: \"$PULSARLIST\"
  exit 1
 fi
 
@@ -67,6 +101,8 @@ echo "    INTERNAL_PORT=19092" >> $TMPFILE
 echo "    echo ID \"\$ID\"" >> $TMPFILE
 echo "    IPLIST=$IPLIST" >> $TMPFILE
 echo "    echo IPLIST \"\$IPLIST\"" >> $TMPFILE
+echo "    PULSARLIST=$PULSARLIST" >> $TMPFILE
+echo "    echo PULSARLIST \"\$PULSARLIST\"" >> $TMPFILE
 echo "    IP0=\`echo \$IPLIST | cut -d, -f1\`:\${EXTERNAL_PORT}" >> $TMPFILE
 echo "    IP1=\`echo \$IPLIST | cut -d, -f2\`:\${EXTERNAL_PORT}" >> $TMPFILE
 echo "    IP2=\`echo \$IPLIST | cut -d, -f3\`:\${EXTERNAL_PORT}" >> $TMPFILE
@@ -91,11 +127,13 @@ echo "    export KAFKA_CFG_ADVERTISED_LISTENERS=EXTERNAL_PLAINTEXT://\$EXTERNAL,
 # Use below to turn off external access
 #echo "    export KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL_PLAINTEXT://\$INTERNAL" >> $TMPFILE
 echo "    export MY_BOOTSTRAP_SERVERS=\${IP0},\${IP1},\${IP2}" >> $TMPFILE
+echo "    export MY_PULSAR_LIST=\${PULSARLIST}" >> $TMPFILE
 #
 echo "    echo Set: KAFKA_CFG_BROKER_ID \"\$KAFKA_CFG_BROKER_ID\"" >> $TMPFILE
 echo "    echo Set: KAFKA_CFG_LISTENERS \"\$KAFKA_CFG_LISTENERS\"" >> $TMPFILE
 echo "    echo Set: KAFKA_CFG_ADVERTISED_LISTENERS \"\$KAFKA_CFG_ADVERTISED_LISTENERS\"" >> $TMPFILE
 echo "    echo Set: MY_BOOTSTRAP_SERVERS \"\$MY_BOOTSTRAP_SERVERS\"" >> $TMPFILE
+echo "    echo Set: MY_PULSAR_LIST \"\$MY_PULSAR_LIST\"" >> $TMPFILE
 echo "---" >> $TMPFILE
 
 cat $TMPFILE

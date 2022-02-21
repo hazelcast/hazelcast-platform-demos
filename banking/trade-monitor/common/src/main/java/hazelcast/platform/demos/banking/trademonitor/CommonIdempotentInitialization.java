@@ -172,27 +172,34 @@ public class CommonIdempotentInitialization {
      * a {@link com.hazelcast.map.IMap}.
      * </p>
      */
-    public static boolean loadNeededData(HazelcastInstance hazelcastInstance, String bootstrapServers) {
+    public static boolean loadNeededData(HazelcastInstance hazelcastInstance, String bootstrapServers,
+            String pulsarList, boolean usePulsar) {
         boolean ok = true;
         try {
-            IMap<String, String> kafkaConfigMap =
-                    hazelcastInstance.getMap(MyConstants.IMAP_NAME_KAFKA_CONFIG);
+            IMap<String, String> jobConfigMap =
+                    hazelcastInstance.getMap(MyConstants.IMAP_NAME_JOB_CONFIG);
             IMap<String, SymbolInfo> symbolsMap =
                     hazelcastInstance.getMap(MyConstants.IMAP_NAME_SYMBOLS);
 
-            if (!kafkaConfigMap.isEmpty()) {
-                LOGGER.trace("Skip loading '{}', not empty", kafkaConfigMap.getName());
+            if (!jobConfigMap.isEmpty()) {
+                LOGGER.trace("Skip loading '{}', not empty", jobConfigMap.getName());
             } else {
                 Properties properties = InitializerConfig.kafkaSourceProperties(bootstrapServers);
 
-                kafkaConfigMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                jobConfigMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
                         properties.getProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
-                kafkaConfigMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+                jobConfigMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
                         properties.getProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG));
-                kafkaConfigMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                jobConfigMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
                         properties.getProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG));
+                jobConfigMap.put(MyConstants.PULSAR_CONFIG_KEY, pulsarList);
+                if (usePulsar) {
+                    jobConfigMap.put(MyConstants.PULSAR_OR_KAFKA_KEY, "pulsar");
+                } else {
+                    jobConfigMap.put(MyConstants.PULSAR_OR_KAFKA_KEY, "kafka");
+                }
 
-                LOGGER.trace("Loaded {} into '{}'", kafkaConfigMap.size(), kafkaConfigMap.getName());
+                LOGGER.trace("Loaded {} into '{}'", jobConfigMap.size(), jobConfigMap.getName());
             }
 
             if (!symbolsMap.isEmpty()) {
@@ -305,7 +312,7 @@ public class CommonIdempotentInitialization {
                 + " )";
 
         String definition3 = "CREATE MAPPING IF NOT EXISTS "
-                + MyConstants.IMAP_NAME_KAFKA_CONFIG
+                + MyConstants.IMAP_NAME_JOB_CONFIG
                 + " TYPE IMap "
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
@@ -369,9 +376,18 @@ public class CommonIdempotentInitialization {
                 + " 'valueJavaClass' = 'java.lang.String'"
                 + " )";
 
+        // Not much of view, but shows the concept
+        String definition8 =  "CREATE OR REPLACE VIEW "
+                + MyConstants.IMAP_NAME_TRADES + MyConstants.VIEW_SUFFIX
+                + " AS SELECT "
+                + "    __key"
+                + "      AS \"primary_key\""
+                + " FROM " + MyConstants.IMAP_NAME_TRADES;
+
         boolean ok = true;
         ok &= define(definition6, hazelcastInstance);
         ok &= define(definition7, hazelcastInstance);
+        ok &= define(definition8, hazelcastInstance);
         return ok;
     }
 
@@ -384,7 +400,7 @@ public class CommonIdempotentInitialization {
      * @param hazelcastInstance
      */
     static boolean define(String definition, HazelcastInstance hazelcastInstance) {
-        LOGGER.info("Definition '{}'", definition);
+        LOGGER.debug("Definition '{}'", definition);
         try {
             hazelcastInstance.getSql().execute(definition);
             return true;
@@ -408,7 +424,8 @@ public class CommonIdempotentInitialization {
      * </p>
      * @param properties
      */
-    public static boolean launchNeededJobs(HazelcastInstance hazelcastInstance, String bootstrapServers, Properties properties) {
+    public static boolean launchNeededJobs(HazelcastInstance hazelcastInstance, String bootstrapServers,
+            String pulsarList, Properties properties) {
 
         if (System.getProperty("my.autostart.enabled", "").equalsIgnoreCase("false")) {
             LOGGER.info("Not launching Kafka jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",
@@ -417,8 +434,20 @@ public class CommonIdempotentInitialization {
             LOGGER.info("Launching Kafka jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",
                     System.getProperty("my.autostart.enabled"));
 
+            String pulsarOrKafka = hazelcastInstance
+                    .getMap(MyConstants.IMAP_NAME_JOB_CONFIG).get(MyConstants.PULSAR_OR_KAFKA_KEY).toString();
+
+            boolean usePulsar = MyUtils.usePulsar(pulsarOrKafka);
+            if (usePulsar) {
+                LOGGER.info("Using Pulsar = '{}'=='{}'",
+                        MyConstants.PULSAR_OR_KAFKA_KEY, pulsarOrKafka);
+            } else {
+                LOGGER.info("Using Kafka = '{}'=='{}'",
+                        MyConstants.PULSAR_OR_KAFKA_KEY, pulsarOrKafka);
+            }
+
             // Trade ingest
-            Pipeline pipelineIngestTrades = IngestTrades.buildPipeline(bootstrapServers);
+            Pipeline pipelineIngestTrades = IngestTrades.buildPipeline(bootstrapServers, pulsarList, usePulsar);
 
             JobConfig jobConfigIngestTrades = new JobConfig();
             jobConfigIngestTrades.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
@@ -428,7 +457,7 @@ public class CommonIdempotentInitialization {
             UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineIngestTrades, jobConfigIngestTrades);
 
             // Trade aggregation
-            Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(bootstrapServers);
+            Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(bootstrapServers, pulsarList, usePulsar);
 
             JobConfig jobConfigAggregateQuery = new JobConfig();
             jobConfigAggregateQuery.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);

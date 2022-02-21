@@ -24,6 +24,7 @@
 		<docker.image.prefix>trade-monitor</docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
 		<my.cluster1.name>grid</my.cluster1.name>
+		<my.pulsar.or.kafka>pulsar</my.pulsar.or.kafka>
 
 		<!-- Project specific versions -->
 		<javalin.version>3.13.0</javalin.version>
@@ -59,10 +60,17 @@
 		<module>management-center</module>
 		<module>prometheus</module>
 		<module>grafana</module>
+		<module>pulsar</module>
 	</modules>
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>com.hazelcast.jet.contrib</groupId>
+				<artifactId>pulsar</artifactId>
+				<version>${hazelcast-jet-pulsar.version}</version>
+			</dependency>
+
 			<dependency>
 				<groupId>io.javalin</groupId>
 				<artifactId>javalin</artifactId>
@@ -75,6 +83,12 @@
 				<version>${kafka-clients.version}</version>
 			</dependency>
 
+            <dependency>
+                <groupId>org.apache.pulsar</groupId>
+                <artifactId>pulsar-client</artifactId>
+                <version>${pulsar.version}</version>
+            </dependency>
+                
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-web</artifactId>

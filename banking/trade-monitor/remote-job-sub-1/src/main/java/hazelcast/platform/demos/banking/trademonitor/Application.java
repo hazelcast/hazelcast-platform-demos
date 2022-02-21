@@ -66,7 +66,7 @@ public class Application {
      */
     private static Properties buildKafkaProperties(HazelcastInstance hazelcastInstance) {
         IMap<String, String> kafkaConfigMap =
-                hazelcastInstance.getMap(MyConstants.IMAP_NAME_KAFKA_CONFIG);
+                hazelcastInstance.getMap(MyConstants.IMAP_NAME_JOB_CONFIG);
 
         Properties properties = new Properties();
 

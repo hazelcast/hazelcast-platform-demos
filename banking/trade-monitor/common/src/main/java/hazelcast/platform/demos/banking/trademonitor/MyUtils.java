@@ -271,4 +271,18 @@ public class MyUtils {
             }
         }
     }
+
+    /**
+     * <p>Determine input source, assume Kafka
+     * </p>
+     * @param s
+     * @return
+     */
+    public static boolean usePulsar(String s) {
+        if (s == null || s.isBlank()) {
+            return false;
+        } else {
+            return s.toLowerCase(Locale.ROOT).equals("pulsar");
+        }
+    }
 }

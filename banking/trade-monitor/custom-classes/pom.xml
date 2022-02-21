@@ -30,7 +30,7 @@
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 		</dependency>
-
+	
 		<!-- scope==provided -->
 		<dependency>
 			<groupId>com.hazelcast</groupId>
@@ -40,6 +40,11 @@
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet-kafka</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.jet.contrib</groupId>
+			<artifactId>pulsar</artifactId>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

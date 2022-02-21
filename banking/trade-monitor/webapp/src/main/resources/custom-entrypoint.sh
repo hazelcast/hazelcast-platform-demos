@@ -15,4 +15,6 @@ echo "$0: - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 # Run Java
 exec java $JAVA_ARGS $JAVA_OPTS \
  -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS \
- -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED -jar application.jar
+ -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+ -Dmy.pulsar.list=$MY_PULSAR_LIST \
+ -jar application.jar
