@@ -16,8 +16,12 @@
 
 package hazelcast.platform.demos.banking.trademonitor;
 
+import java.util.Properties;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.hazelcast.platform.demos.utils.UtilsProperties;
 
 /**
  * <p>Entry point, "{@code main()}" method.
@@ -37,19 +41,36 @@ public class Application {
      * </p>
      */
     public static void main(String[] args) throws Exception {
+        Properties properties = UtilsProperties.loadClasspathProperties("application.properties");
+        String pulsarOrKafka = properties.getProperty(MyConstants.PULSAR_OR_KAFKA_KEY);
+
+        boolean usePulsar = MyUtils.usePulsar(pulsarOrKafka);
+        if (usePulsar) {
+            LOGGER.info("Using Pulsar = '{}'=='{}'",
+                    MyConstants.PULSAR_OR_KAFKA_KEY, pulsarOrKafka);
+        } else {
+            LOGGER.info("Using Kafka = '{}'=='{}'",
+                    MyConstants.PULSAR_OR_KAFKA_KEY, pulsarOrKafka);
+        }
+
         String bootstrapServers = null;
+        String pulsarList = null;
 
         if (args.length == 1) {
             bootstrapServers = args[0];
+            pulsarList = args[0];
         } else {
-            bootstrapServers = System.getProperty("my.bootstrap.servers");
-            if (bootstrapServers == null || bootstrapServers.length() == 0) {
-                LOGGER.error("Usage: 1 arg expected: bootstrapServers");
-                LOGGER.error("eg: 127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094");
+            bootstrapServers = System.getProperty("my.bootstrap.servers", "");
+            pulsarList = System.getProperty("my.pulsar.list", "");
+            if ((bootstrapServers.isBlank() && !usePulsar)
+                    || (pulsarList.isBlank() && usePulsar)) {
+                LOGGER.error("Usage: 1 arg expected: bootstrapServers or pulsarList");
+                LOGGER.error("eg: 127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094 / 127.0.0.1:6650");
                 System.exit(1);
             }
         }
         LOGGER.info("bootstrapServers={}", bootstrapServers);
+        LOGGER.info("pulsarList={}", pulsarList);
 
         int rate = DEFAULT_RATE;
         int max = DEFAULT_MAX;
@@ -60,7 +81,7 @@ public class Application {
             max = Integer.parseInt(args[2]);
         }
 
-        new ApplicationRunner(rate, max, bootstrapServers).run();
+        new ApplicationRunner(rate, max, bootstrapServers, pulsarList, usePulsar).run();
     }
 
 }

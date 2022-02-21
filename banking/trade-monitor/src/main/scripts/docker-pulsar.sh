@@ -25,7 +25,7 @@ docker network create $PROJECT --driver bridge > /dev/null 2>&1
 # For easier restarts
 docker container prune --force > /dev/null 2>&1
 
-CMD="docker run -p 6650:6650 --name=${MODULE} --rm ${DOCKER_IMAGE}"
+CMD="docker run -p 6650:6650 --name=${MODULE} --rm --network=${PROJECT} ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD

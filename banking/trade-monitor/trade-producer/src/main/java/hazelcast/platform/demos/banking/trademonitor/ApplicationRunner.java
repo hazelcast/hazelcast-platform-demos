@@ -30,10 +30,14 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.apache.pulsar.client.api.Producer;
+import org.apache.pulsar.client.api.PulsarClient;
+import org.apache.pulsar.client.api.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hazelcast.jet.datamodel.Tuple3;
+import com.hazelcast.platform.demos.utils.UtilsUrls;
 
 /**
  * <p>The main "{@code run()}" method of the application, called
@@ -51,8 +55,10 @@ public class ApplicationRunner {
 
     private final int rate;
     private final int max;
+    private final boolean usePulsar;
     private int count;
     private final KafkaProducer<String, String> kafkaProducer;
+    private final Producer<String> pulsarProducer;
     private final List<String> symbols;
     private final Map<String, Integer> symbolToPrice;
 
@@ -65,18 +71,41 @@ public class ApplicationRunner {
      * @param arg0 Rate to produce per second
      * @param arg1 Maximum to produce before ending
      * @param arg2 Kafka broker list
+     * @param arg3 Pulsar connection list
+     * @param arg4 Which of arg2 or arg3 to use
      */
-    public ApplicationRunner(int arg0, int arg1, String arg2) throws Exception {
+    public ApplicationRunner(int arg0, int arg1, String arg2, String arg3, boolean arg4) throws Exception {
         this.rate = arg0;
         this.max = arg1;
         String bootstrapServers = arg2;
+        String pulsarList = arg3;
+        this.usePulsar = arg4;
 
-        Properties properties = new Properties();
-        properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getCanonicalName());
-        properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getCanonicalName());
+        if (this.usePulsar) {
+            String serviceUrl = UtilsUrls.getPulsarServiceUrl(pulsarList);
+            LOGGER.info("serviceUrl='{}'", serviceUrl);
 
-        this.kafkaProducer = new KafkaProducer<>(properties);
+            PulsarClient pulsarClient =
+                    PulsarClient
+                    .builder()
+                    .connectionTimeout(1, TimeUnit.SECONDS)
+                    .serviceUrl(serviceUrl)
+                    .build();
+
+            this.pulsarProducer = pulsarClient.newProducer(Schema.STRING)
+                    .topic(MyConstants.PULSAR_TOPIC_NAME_TRADES)
+                    .create();
+
+            this.kafkaProducer = null;
+        } else {
+            Properties properties = new Properties();
+            properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+            properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getCanonicalName());
+            properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getCanonicalName());
+
+            this.kafkaProducer = new KafkaProducer<>(properties);
+            this.pulsarProducer = null;
+        }
 
         Map<String, Tuple3<String, NasdaqMarketCategory, NasdaqFinancialStatus>>
             nasdaqListed = MyUtils.nasdaqListed();
@@ -98,7 +127,7 @@ public class ApplicationRunner {
      *
      * @throws Exception
      */
-    public void run() {
+    public void run() throws Exception {
         if (this.max > 0) {
             LOGGER.info("Producing {} trades per second, until {} written", this.rate, this.max);
         } else {
@@ -120,7 +149,14 @@ public class ApplicationRunner {
                     String id = UUID.randomUUID().toString();
                     String trade = this.createTrade(id, random);
 
-                    this.kafkaProducer.send(new ProducerRecord<>(MyConstants.KAFKA_TOPIC_NAME_TRADES, id, trade));
+                    if (this.usePulsar) {
+                        this.pulsarProducer.newMessage(Schema.STRING)
+                            .key(id)
+                            .value(trade)
+                            .send();
+                    } else {
+                        this.kafkaProducer.send(new ProducerRecord<>(MyConstants.KAFKA_TOPIC_NAME_TRADES, id, trade));
+                    }
 
                     if (this.count % LOG_THRESHOLD == 0) {
                         LOGGER.info("Wrote {} => \"{}\"", this.count, trade);
