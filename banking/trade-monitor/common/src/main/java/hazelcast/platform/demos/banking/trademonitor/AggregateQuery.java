@@ -16,29 +16,39 @@
 
 package hazelcast.platform.demos.banking.trademonitor;
 
+import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.pulsar.client.api.Message;
+import org.apache.pulsar.client.api.PulsarClient;
+import org.apache.pulsar.client.api.Schema;
 
 import com.hazelcast.core.HazelcastJsonValue;
+import com.hazelcast.function.FunctionEx;
 import com.hazelcast.function.Functions;
+import com.hazelcast.function.SupplierEx;
 import com.hazelcast.function.ToLongFunctionEx;
 import com.hazelcast.jet.accumulator.LongAccumulator;
 import com.hazelcast.jet.accumulator.MutableReference;
 import com.hazelcast.jet.aggregate.AggregateOperation;
 import com.hazelcast.jet.aggregate.AggregateOperation1;
 import com.hazelcast.jet.aggregate.AggregateOperations;
+import com.hazelcast.jet.contrib.pulsar.PulsarSources;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.jet.datamodel.Tuple4;
 import com.hazelcast.jet.kafka.KafkaSources;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.ServiceFactories;
 import com.hazelcast.jet.pipeline.Sinks;
+import com.hazelcast.jet.pipeline.StreamSource;
 import com.hazelcast.jet.pipeline.StreamStage;
 import com.hazelcast.jet.pipeline.WindowDefinition;
+import com.hazelcast.platform.demos.utils.UtilsUrls;
 
 /**
  * <p>Creates a pipeline job to "<i>query</i>" Kafka trades.
@@ -84,7 +94,7 @@ public class AggregateQuery {
      * @param bootstrapServers Connection list for Kafka
      * @return A pipeline job to run in Jet.
      */
-    public static Pipeline buildPipeline(String bootstrapServers) {
+    public static Pipeline buildPipeline(String bootstrapServers, String pulsarList, boolean usePulsar) {
 
         // Override the value de-serializer to produce a different type
         Properties properties = InitializerConfig.kafkaSourceProperties(bootstrapServers);
@@ -92,13 +102,20 @@ public class AggregateQuery {
 
         Pipeline pipeline = Pipeline.create();
 
-        StreamStage<Trade> inputSource =
+        StreamStage<Trade> inputSource;
+        if (usePulsar) {
+            inputSource =
+                    pipeline.readFrom(AggregateQuery.pulsarSource(pulsarList))
+                    .withoutTimestamps();
+        } else {
+            inputSource =
                 pipeline.readFrom(KafkaSources.<String, Trade, Trade>
                     kafka(properties,
                     ConsumerRecord::value,
                     MyConstants.KAFKA_TOPIC_NAME_TRADES)
                     )
             .withoutTimestamps();
+        }
 
         StreamStage<Entry<String, Tuple3<Long, Long, Long>>> aggregated =
             inputSource
@@ -191,5 +208,41 @@ public class AggregateQuery {
         .aggregate(maxVolumeAggregator)
         .map(result -> result.getValue())
         .writeTo(Sinks.map(MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME));
+    }
+
+    /**
+     * <p>This is similar to {@link IngestTrades#IngestTrades()} but
+     * returns a different type.
+     * </p>
+     *
+     * @param pulsarList
+     * @return
+     */
+    private static StreamSource<Trade> pulsarSource(String pulsarList) {
+        String serviceUrl = UtilsUrls.getPulsarServiceUrl(pulsarList);
+
+        SupplierEx<PulsarClient> pulsarConnectionSupplier =
+                () -> PulsarClient.builder()
+                .connectionTimeout(1, TimeUnit.SECONDS)
+                .serviceUrl(serviceUrl)
+                .build();
+
+        SupplierEx<Schema<String>> pulsarSchemaSupplier =
+                () -> Schema.STRING;
+
+        FunctionEx<Message<String>, Trade> pulsarProjectionFunction =
+                message -> {
+                    //TODO: A new deserializer for each message, could optimize with shared if thread-safe
+                    try (TradeJsonDeserializer tradeJsonDeserializer = new TradeJsonDeserializer()) {
+                        byte[] bytes = message.getValue().getBytes(StandardCharsets.UTF_8);
+                        return tradeJsonDeserializer.deserialize("", bytes);
+                    }
+                };
+
+        return PulsarSources.pulsarReaderBuilder(
+                    MyConstants.PULSAR_TOPIC_NAME_TRADES,
+                    pulsarConnectionSupplier,
+                    pulsarSchemaSupplier,
+                    pulsarProjectionFunction).build();
     }
 }
