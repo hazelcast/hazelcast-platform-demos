@@ -63,6 +63,20 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+			<groupId>com.hazelcast.jet.contrib</groupId>
+			<artifactId>pulsar</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.hazelcast.jet</groupId>
+					<artifactId>hazelcast-jet</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.google.code.findbugs</groupId>
+					<artifactId>jsr305</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-sql</artifactId>
 		</dependency>

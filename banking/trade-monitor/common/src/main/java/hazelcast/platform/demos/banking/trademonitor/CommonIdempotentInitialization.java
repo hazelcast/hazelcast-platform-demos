@@ -439,11 +439,9 @@ public class CommonIdempotentInitialization {
 
             boolean usePulsar = MyUtils.usePulsar(pulsarOrKafka);
             if (usePulsar) {
-                LOGGER.info("Using Pulsar = '{}'=='{}'",
-                        MyConstants.PULSAR_OR_KAFKA_KEY, pulsarOrKafka);
+                LOGGER.info("Using Pulsar = '{}'=='{}'", MyConstants.PULSAR_OR_KAFKA_KEY, pulsarOrKafka);
             } else {
-                LOGGER.info("Using Kafka = '{}'=='{}'",
-                        MyConstants.PULSAR_OR_KAFKA_KEY, pulsarOrKafka);
+                LOGGER.info("Using Kafka = '{}'=='{}'", MyConstants.PULSAR_OR_KAFKA_KEY, pulsarOrKafka);
             }
 
             // Trade ingest

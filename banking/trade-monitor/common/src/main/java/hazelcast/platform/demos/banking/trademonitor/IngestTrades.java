@@ -16,17 +16,28 @@
 
 package hazelcast.platform.demos.banking.trademonitor;
 
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.pulsar.client.api.Message;
+import org.apache.pulsar.client.api.PulsarClient;
+import org.apache.pulsar.client.api.Schema;
 
 import com.hazelcast.core.HazelcastJsonValue;
+import com.hazelcast.function.FunctionEx;
+import com.hazelcast.function.SupplierEx;
 import com.hazelcast.jet.Util;
 import com.hazelcast.jet.accumulator.LongAccumulator;
+import com.hazelcast.jet.contrib.pulsar.PulsarSources;
 import com.hazelcast.jet.kafka.KafkaSources;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.ServiceFactories;
 import com.hazelcast.jet.pipeline.Sinks;
+import com.hazelcast.jet.pipeline.StreamSource;
 import com.hazelcast.jet.pipeline.StreamStage;
+import com.hazelcast.platform.demos.utils.UtilsUrls;
 
 /**
  * <p>Creates a Jet pipeline to upload from a Kafka topic into a
@@ -53,19 +64,26 @@ public class IngestTrades {
      * @param bootstrapServers Kafka brokers list
      * @return A pipeline to run
      */
-    public static Pipeline buildPipeline(String bootstrapServers) {
+    public static Pipeline buildPipeline(String bootstrapServers, String pulsarList, boolean usePulsar) {
 
         Properties properties = InitializerConfig.kafkaSourceProperties(bootstrapServers);
 
         Pipeline pipeline = Pipeline.create();
 
-        StreamStage<Entry<String, HazelcastJsonValue>> inputSource =
-            pipeline.readFrom(KafkaSources.<String, String, Entry<String, HazelcastJsonValue>>
-                kafka(properties,
-                record -> Util.entry(record.key(), new HazelcastJsonValue(record.value())),
-                MyConstants.KAFKA_TOPIC_NAME_TRADES)
-                )
-         .withoutTimestamps();
+        StreamStage<Entry<String, HazelcastJsonValue>> inputSource;
+        if (usePulsar) {
+            inputSource =
+                    pipeline.readFrom(IngestTrades.pulsarSource(pulsarList))
+                    .withoutTimestamps();
+        } else {
+            inputSource =
+                    pipeline.readFrom(KafkaSources.<String, String, Entry<String, HazelcastJsonValue>>
+                        kafka(properties,
+                        record -> Util.entry(record.key(), new HazelcastJsonValue(record.value())),
+                        MyConstants.KAFKA_TOPIC_NAME_TRADES)
+                        )
+                 .withoutTimestamps();
+        }
 
         inputSource
         .writeTo(Sinks.map(MyConstants.IMAP_NAME_TRADES));
@@ -86,6 +104,40 @@ public class IngestTrades {
         .writeTo(Sinks.logger());
 
         return pipeline;
+    }
+
+    /**
+     * <p>This is similar to {@link AggregateQuery#IngestTrades()} but
+     * returns a different type.
+     * </p>
+     * @param pulsarList
+     * @return
+     */
+    private static StreamSource<Entry<String, HazelcastJsonValue>> pulsarSource(String pulsarList) {
+        String serviceUrl = UtilsUrls.getPulsarServiceUrl(pulsarList);
+
+        SupplierEx<PulsarClient> pulsarConnectionSupplier =
+                () -> PulsarClient.builder()
+                .connectionTimeout(1, TimeUnit.SECONDS)
+                .serviceUrl(serviceUrl)
+                .build();
+
+        SupplierEx<Schema<String>> pulsarSchemaSupplier =
+                () -> Schema.STRING;
+
+        FunctionEx<Message<String>, Entry<String, HazelcastJsonValue>> pulsarProjectionFunction =
+                message -> {
+                    String key = message.getKey();
+                    String trade = message.getValue();
+                    HazelcastJsonValue value = new HazelcastJsonValue(trade);
+                    return new SimpleImmutableEntry<>(key, value);
+                };
+
+        return PulsarSources.pulsarReaderBuilder(
+            MyConstants.PULSAR_TOPIC_NAME_TRADES,
+            pulsarConnectionSupplier,
+            pulsarSchemaSupplier,
+            pulsarProjectionFunction).build();
     }
 
 }
