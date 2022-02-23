@@ -7,6 +7,7 @@ hazelcast:
   #
   properties:
     hazelcast.integrity-checker.enabled: true
+    hazelcast.logging.emoji.enabled: false
     # Graceful shutdown is helpful for Kubernetes scale-down.
     hazelcast.member.naming.moby.enabled: true
     hazelcast.partition.count: ${my.partitions}
