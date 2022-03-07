@@ -46,7 +46,6 @@ import lombok.extern.slf4j.Slf4j;
 public class RandomForestRetraining {
     private static final String PYTHON_MODULE = "randomforest_train";
     private static final String PYTHON_HANDLER_FN = "train_model";
-    //private static final long FIVE = 5L;
 
     public static Pipeline buildPipeline(long start, long end, String modelName) {
         Pipeline pipeline = Pipeline.create();

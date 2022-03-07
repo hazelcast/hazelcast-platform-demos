@@ -33,6 +33,9 @@
 	</modules>
 
 	<properties>
+		<!-- hz-cli fails with 17 on 5.1, needs 5.1.1 -->
+		<java.version>11</java.version>
+
 		<docker.image.prefix>clickstream</docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
 

@@ -58,7 +58,7 @@ public class MyConstants {
     public static final String CSV_INPUT_FILE2 = "training_sample.csv";
 
     // For binary backoff loggers
-    public static final int MAX_LOGGING_INTERVAL = 10_000;
+    public static final int MAX_LOGGING_INTERVAL = 2_000;
     public static final int MAX_LOGGING_LINE_LENGTH = 120;
 
     // Graphite/Grafana sink
