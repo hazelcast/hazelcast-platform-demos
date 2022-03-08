@@ -285,4 +285,18 @@ public class MyUtils {
             return s.toLowerCase(Locale.ROOT).equals("pulsar");
         }
     }
+
+    /**
+     * <p>Determine target, assume Cloud
+     * </p>
+     * @param s
+     * @return
+     */
+    public static boolean useHzCloud(String s) {
+        if (s == null || s.isBlank()) {
+            return true;
+        } else {
+            return !s.toLowerCase(Locale.ROOT).equals("false");
+        }
+    }
 }

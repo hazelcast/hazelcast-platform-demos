@@ -29,6 +29,7 @@ public class MyConstants {
     public static final String PULSAR_CONFIG_KEY = "my.pulsar.list";
     public static final String PULSAR_TOPIC_NAME_TRADES = "pulsar_trades";
     public static final String PULSAR_OR_KAFKA_KEY = "my.pulsar.or.kafka";
+    public static final String USE_HZ_CLOUD = "use.hz-cloud";
 
     public static final String IMAP_NAME_AGGREGATE_QUERY_RESULTS = "AggregateQuery" + "_results";
     public static final String IMAP_NAME_ALERTS_MAX_VOLUME = "alertsMaxVolume";

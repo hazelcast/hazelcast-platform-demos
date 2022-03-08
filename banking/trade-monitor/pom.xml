@@ -24,8 +24,10 @@
 		<docker.image.prefix>trade-monitor</docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
 		<my.cluster1.name>grid</my.cluster1.name>
-		<my.pulsar.or.kafka>kafka</my.pulsar.or.kafka>
 		<my.pulsar.or.kafka>pulsar</my.pulsar.or.kafka>
+		<my.pulsar.or.kafka>kafka</my.pulsar.or.kafka>
+		<!-- Configure the build for HZ Cloud or all Kubernetes -->
+		<use.hz-cloud>false</use.hz-cloud>
 
 		<!-- Project specific versions -->
 		<javalin.version>3.13.0</javalin.version>

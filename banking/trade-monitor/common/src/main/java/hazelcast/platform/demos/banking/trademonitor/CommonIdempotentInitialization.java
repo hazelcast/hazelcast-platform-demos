@@ -173,7 +173,7 @@ public class CommonIdempotentInitialization {
      * </p>
      */
     public static boolean loadNeededData(HazelcastInstance hazelcastInstance, String bootstrapServers,
-            String pulsarList, boolean usePulsar) {
+            String pulsarList, boolean usePulsar, boolean useHzCloud) {
         boolean ok = true;
         try {
             IMap<String, String> jobConfigMap =
@@ -198,6 +198,7 @@ public class CommonIdempotentInitialization {
                 } else {
                     jobConfigMap.put(MyConstants.PULSAR_OR_KAFKA_KEY, "kafka");
                 }
+                jobConfigMap.put(MyConstants.USE_HZ_CLOUD, Boolean.valueOf(useHzCloud).toString());
 
                 LOGGER.trace("Loaded {} into '{}'", jobConfigMap.size(), jobConfigMap.getName());
             }
@@ -427,22 +428,22 @@ public class CommonIdempotentInitialization {
     public static boolean launchNeededJobs(HazelcastInstance hazelcastInstance, String bootstrapServers,
             String pulsarList, Properties properties) {
 
+        String pulsarOrKafka = hazelcastInstance
+                .getMap(MyConstants.IMAP_NAME_JOB_CONFIG).get(MyConstants.PULSAR_OR_KAFKA_KEY).toString();
+        boolean usePulsar = MyUtils.usePulsar(pulsarOrKafka);
+        logUsePulsar(usePulsar, pulsarOrKafka);
+
+        String cloudOrHzCloud = hazelcastInstance
+                .getMap(MyConstants.IMAP_NAME_JOB_CONFIG).get(MyConstants.USE_HZ_CLOUD).toString();
+        boolean useHzCloud = MyUtils.useHzCloud(cloudOrHzCloud);
+        logUseHzCloud(useHzCloud, cloudOrHzCloud);
+
         if (System.getProperty("my.autostart.enabled", "").equalsIgnoreCase("false")) {
             LOGGER.info("Not launching Kafka jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",
                     System.getProperty("my.autostart.enabled"));
         } else {
             LOGGER.info("Launching Kafka jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",
                     System.getProperty("my.autostart.enabled"));
-
-            String pulsarOrKafka = hazelcastInstance
-                    .getMap(MyConstants.IMAP_NAME_JOB_CONFIG).get(MyConstants.PULSAR_OR_KAFKA_KEY).toString();
-
-            boolean usePulsar = MyUtils.usePulsar(pulsarOrKafka);
-            if (usePulsar) {
-                LOGGER.info("Using Pulsar = '{}'=='{}'", MyConstants.PULSAR_OR_KAFKA_KEY, pulsarOrKafka);
-            } else {
-                LOGGER.info("Using Kafka = '{}'=='{}'", MyConstants.PULSAR_OR_KAFKA_KEY, pulsarOrKafka);
-            }
 
             // Trade ingest
             Pipeline pipelineIngestTrades = IngestTrades.buildPipeline(bootstrapServers, pulsarList, usePulsar);
@@ -452,7 +453,12 @@ public class CommonIdempotentInitialization {
             jobConfigIngestTrades.setName(IngestTrades.class.getSimpleName());
             jobConfigIngestTrades.addClass(IngestTrades.class);
 
-            UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineIngestTrades, jobConfigIngestTrades);
+            if (usePulsar && useHzCloud) {
+                //TODO Fix once supported by HZ Cloud
+                LOGGER.error("Pulsar is not currently supported on Hazelcast Cloud");
+            } else {
+                UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineIngestTrades, jobConfigIngestTrades);
+            }
 
             // Trade aggregation
             Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(bootstrapServers, pulsarList, usePulsar);
@@ -464,7 +470,12 @@ public class CommonIdempotentInitialization {
             jobConfigAggregateQuery.addClass(MaxVolumeAggregator.class);
             jobConfigAggregateQuery.addClass(UtilsFormatter.class);
 
-            UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAggregateQuery, jobConfigAggregateQuery);
+            if (usePulsar && useHzCloud) {
+                //TODO Fix once supported by HZ Cloud
+                LOGGER.error("Pulsar is not currently supported on Hazelcast Cloud");
+            } else {
+                UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAggregateQuery, jobConfigAggregateQuery);
+            }
         }
 
         // Remaining jobs need properties
@@ -484,6 +495,51 @@ public class CommonIdempotentInitialization {
         }
 
         // Slack alerting, indirectly uses common utils
+        if (useHzCloud) {
+            //TODO Fix once supported by HZ Cloud
+            LOGGER.error("Slack is not currently supported on Hazelcast Cloud");
+        } else {
+            launchSlackJob(hazelcastInstance, properties);
+        }
+
+        return true;
+    }
+
+    /**
+     * <p>Helper for logging.
+     * </p>
+     * @param usePulsar
+     * @param pulsarOrKafka
+     */
+    private static void logUsePulsar(boolean usePulsar, String pulsarOrKafka) {
+        if (usePulsar) {
+            LOGGER.info("Using Pulsar = '{}'=='{}'", MyConstants.PULSAR_OR_KAFKA_KEY, pulsarOrKafka);
+        } else {
+            LOGGER.info("Using Kafka = '{}'=='{}'", MyConstants.PULSAR_OR_KAFKA_KEY, pulsarOrKafka);
+        }
+    }
+
+    /**
+     * <p>Helper for logging.
+     * </p>
+     * @param useHzCloud
+     * @param cloudOrHzCloud
+     */
+    private static void logUseHzCloud(boolean useHzCloud, String cloudOrHzCloud) {
+        if (useHzCloud) {
+            LOGGER.info("Using Hazelcast Cloud = '{}'=='{}'", MyConstants.USE_HZ_CLOUD, cloudOrHzCloud);
+        } else {
+            LOGGER.info("Using Non-Hazelcast Cloud = '{}'=='{}'", MyConstants.USE_HZ_CLOUD, cloudOrHzCloud);
+        }
+    }
+
+    /**
+     * <p>Optional, but really cool, job for integration with Slack.
+     * </p>
+     * @param hazelcastInstance
+     * @param properties
+     */
+    private static void launchSlackJob(HazelcastInstance hazelcastInstance, Properties properties) {
         try {
             Pipeline pipelineAlertingToSlack = AlertingToSlack.buildPipeline(
                     properties.get(UtilsConstants.SLACK_ACCESS_TOKEN),
@@ -501,8 +557,6 @@ public class CommonIdempotentInitialization {
         } catch (Exception e) {
             LOGGER.error("launchNeededJobs:" + AlertingToSlack.class.getSimpleName(), e);
         }
-
-        return true;
     }
 
 }

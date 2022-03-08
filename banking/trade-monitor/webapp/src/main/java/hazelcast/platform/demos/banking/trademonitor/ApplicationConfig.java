@@ -64,8 +64,12 @@ public class ApplicationConfig {
             LOGGER.error(FILENAME, e);
         }
 
+        String cloudOrHzCloud = myProperties.getProperty(MyConstants.USE_HZ_CLOUD);
+        boolean useHzCloud = MyUtils.useHzCloud(cloudOrHzCloud);
+        LOGGER.info("useHzCloud='{}'", useHzCloud);
+
         // Use cloud if property set
-        if (!myProperties.getProperty(HZ_CLOUD_CLUSTER_DISCOVERY_TOKEN, "").isBlank()) {
+        if (!myProperties.getProperty(HZ_CLOUD_CLUSTER_DISCOVERY_TOKEN, "").isBlank() && useHzCloud) {
             clientNetworkConfig.getKubernetesConfig().setEnabled(false);
             clientNetworkConfig.getCloudConfig().setEnabled(true);
             clientNetworkConfig.getCloudConfig()

@@ -60,10 +60,19 @@ public class ApplicationInitializer {
 
         String pulsarOrKafka = properties.getProperty(MyConstants.PULSAR_OR_KAFKA_KEY);
         boolean usePulsar = MyUtils.usePulsar(pulsarOrKafka);
+        LOGGER.debug("usePulsar='{}'", usePulsar);
+        String cloudOrHzCloud = properties.getProperty(MyConstants.USE_HZ_CLOUD);
+        boolean useHzCloud = MyUtils.useHzCloud(cloudOrHzCloud);
+        LOGGER.debug("useHzCloud='{}'", useHzCloud);
+        if (useHzCloud) {
+            String message = String.format("useHzCloud=%b but running Hazelcast node! (property '%s'=='%s')",
+                    useHzCloud, MyConstants.USE_HZ_CLOUD, cloudOrHzCloud);
+            throw new RuntimeException(message);
+        }
 
         CommonIdempotentInitialization.createNeededObjects(hazelcastInstance);
         addListeners(hazelcastInstance, bootstrapServers, pulsarList, usePulsar);
-        CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList, usePulsar);
+        CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList, usePulsar, useHzCloud);
         CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers);
 
         CommonIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,

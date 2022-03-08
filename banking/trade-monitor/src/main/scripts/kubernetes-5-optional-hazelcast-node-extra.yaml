@@ -1,7 +1,7 @@
 ---
 # OPTIONAL
 # OPTIONAL
-# OPTIONAL
+# OPTIONAL - If not running on HZ Cloud, to run ML
 # OPTIONAL
 # OPTIONAL
 # Open to allow remote client to connect from outside Kubernetes, eg. Desktop

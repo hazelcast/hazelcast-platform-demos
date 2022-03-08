@@ -436,9 +436,14 @@ public class ApplicationRunner {
 
             String pulsarOrKafka = properties.getProperty(MyConstants.PULSAR_OR_KAFKA_KEY);
             boolean usePulsar = MyUtils.usePulsar(pulsarOrKafka);
+            LOGGER.debug("usePulsar='{}'", usePulsar);
+            String cloudOrHzCloud = properties.getProperty(MyConstants.USE_HZ_CLOUD);
+            boolean useHzCloud = MyUtils.useHzCloud(cloudOrHzCloud);
+            LOGGER.debug("useHzCloud='{}'", useHzCloud);
 
             ok &= CommonIdempotentInitialization.createNeededObjects(hazelcastInstance);
-            ok &= CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList, usePulsar);
+            ok &= CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList,
+                    usePulsar, useHzCloud);
             ok &= CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers);
             if (ok) {
                 // Don't even try if broken by this point

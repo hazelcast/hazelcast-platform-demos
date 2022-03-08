@@ -1,4 +1,9 @@
 ---
+# OPTIONAL
+# OPTIONAL
+# OPTIONAL - If not running on HZ Cloud
+# OPTIONAL
+# OPTIONAL
 # Service DNS will be "trade-monitor-hazelcast.default.svc.cluster.local".
 ---
 apiVersion: v1
