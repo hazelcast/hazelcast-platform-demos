@@ -18,6 +18,9 @@ then
  exit 1
 fi
 
+MY_BOOTSTRAP_SERVERS=kafka-broker0:9092,kafka-broker1:9093,kafka-broker2:9094
+MY_PULSAR_LIST=pulsar:6650
+
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
 # Private network so can use container names
@@ -26,7 +29,11 @@ docker network create $PROJECT --driver bridge > /dev/null 2>&1
 docker container prune --force > /dev/null 2>&1
 
 # External port 8081
-CMD="docker run -e MY_KUBERNETES_ENABLED=false -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP}:5701 -p 8081:8080 --rm ${DOCKER_IMAGE}"
+CMD="docker run -e MY_BOOTSTRAP_SERVERS=$MY_BOOTSTRAP_SERVERS \
+ -e MY_KUBERNETES_ENABLED=false \
+ -e MY_PULSAR_LIST=$MY_PULSAR_LIST \
+ -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP}:5701 \
+ -p 8081:8080 --rm ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD

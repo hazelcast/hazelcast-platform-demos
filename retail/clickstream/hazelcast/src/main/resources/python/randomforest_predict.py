@@ -43,7 +43,7 @@ from sklearn.ensemble import RandomForestClassifier
 
 tree: RandomForestClassifier = None
 # String, so can cope with version '1.0.0'
-version = "0"
+version = "@maven.build.timestamp@"
 
 def predict(input_list):
     global tree
@@ -69,7 +69,7 @@ def predict(input_list):
         else:
             version = values[1]
             update_model(values[2])
-            result.append(version)
+            result.append("model," + version)
 
     return result
 

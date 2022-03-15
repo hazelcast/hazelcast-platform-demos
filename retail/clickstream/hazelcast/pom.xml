@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.retail.clickstream</groupId>
 		<artifactId>clickstream-root</artifactId>
-		<version>5.0</version>
+		<version>5.1</version>
 	</parent>
 
 	<artifactId>clickstream-hazelcast</artifactId>
@@ -40,6 +40,12 @@
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-sql</artifactId>
+                        <exclusions>
+                            <exclusion>
+			        <groupId>com.hazelcast</groupId>
+			        <artifactId>hazelcast</artifactId>
+                            </exclusion>
+                        </exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
@@ -53,6 +59,12 @@
 		<dependency>
 			<groupId>org.apache.pulsar</groupId>
 			<artifactId>pulsar-client</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.hazelcast.platform.demos.utils</groupId>
+			<artifactId>utils-slack-integration</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 

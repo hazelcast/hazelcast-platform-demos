@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,9 @@ public class Application {
                 .get(MyConstants.CONFIG_MAP_KEY_GRAPHITE).toString();
 
         String jobName = DecisionTreePrediction.class.getSimpleName() + "@" + MyUtils.getBuildTimestamp();
+        if (jobName.endsWith("Z")) {
+            jobName = jobName.substring(0, jobName.length() - 1);
+        }
         log.info(jobName);
 
         Pipeline pipelineDecisionTreePrediction = DecisionTreePrediction.buildPipeline(graphiteHost);

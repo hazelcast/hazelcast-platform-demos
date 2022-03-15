@@ -2,7 +2,12 @@ hazelcast:
   import:
     - hazelcast-${my.site}.yml
   #
+  management-center:
+    console-enabled: true
+  #
   properties:
+    hazelcast.integrity-checker.enabled: true
+    hazelcast.logging.emoji.enabled: false
     # Graceful shutdown is helpful for Kubernetes scale-down.
     hazelcast.member.naming.moby.enabled: true
     hazelcast.partition.count: ${my.partitions}
@@ -52,10 +57,17 @@ hazelcast:
       wan-replication-ref:
         my-cva-wan-publisher-group:
           merge-policy-class-name: PassThroughMergePolicy
+    'risk':
+      wan-replication-ref:
+        my-cva-wan-publisher-group:
+          merge-policy-class-name: PassThroughMergePolicy
+    'stock':
+      wan-replication-ref:
+        my-cva-wan-publisher-group:
+          merge-policy-class-name: PassThroughMergePolicy
   #
   jet:
     enabled: true
     resource-upload-enabled: true
-    instance:
-      # 'true' requires Enterprise (which this demo has) and persistence enabled (which isn't used in this demo)
-      lossless-restart-enabled: false
+    # 'true' requires Enterprise (which this demo has) and persistence enabled (which isn't used in this demo)
+    lossless-restart-enabled: false

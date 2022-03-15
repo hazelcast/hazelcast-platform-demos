@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,8 +82,7 @@ public class RandomForestValidation {
             // Right leg, is a block of input to predict
             BatchStage<Entry<String, Tuple3<Long, Long, String>>> inputRight =
                     pipeline
-                    .readFrom(Sources.<String, Tuple3<Long, Long, String>>map(
-                            MyConstants.IMAP_NAME_CHECKOUT));
+                    .readFrom(Sources.<String, Tuple3<Long, Long, String>>map(MyConstants.IMAP_NAME_CHECKOUT));
 
             BatchStage<Tuple3<String, Long, Long>> inputRightRange =
                     inputRight
@@ -93,11 +92,13 @@ public class RandomForestValidation {
 
             // Validation doesn't get outcome prior to prediction
             // Format to this style: "data,key,publish,ingest,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1"
-            BatchStage<String> inputRightFormatted =
-                    inputRightRange
+            BatchStage<String> inputRightFormatted = inputRightRange
                     .mapUsingIMap(MyConstants.IMAP_NAME_DIGITAL_TWIN,
                             checkoutTrio -> checkoutTrio.f0(),
                             (Tuple3<String, Long, Long> checkoutTrio, Tuple3<Long, Long, String> digitalTwin) -> {
+                                if (digitalTwin == null) {
+                                    return null;
+                                }
                                 String arrPrint =
                                         Arrays.toString(MyUtils.digitalTwinCsvToBinary(null, digitalTwin.f2(), false));
                                 return "data," + checkoutTrio.f0() + "," + checkoutTrio.f1() + ","
@@ -114,14 +115,13 @@ public class RandomForestValidation {
                             MyUtils.getPythonServiceConfig(PYTHON_MODULE, PYTHON_HANDLER_FN))).setName(PYTHON_MODULE);
 
             // Reformat and add reality to prediction - prediction, reality
-            BatchStage<Tuple2<Integer, Integer>> pythonOutputAndReality =
-                    pythonOutput
+            BatchStage<Tuple2<Integer, Integer>> pythonOutputAndReality = pythonOutput
                     .map(str -> {
                         String[] tokens = str.split(",");
                         // Last field is error message, if present makes length 6
                         if (tokens.length != EXPECTED_LENGTH_OF_5) {
-                            if (tokens.length != 1) {
-                                // Length 1 is model training acceptance
+                            if (tokens.length != 2) {
+                                // Length 2 is model training acceptance
                                 log.error("Unexpected Python output: '{}'", str);
                             }
                             return null;

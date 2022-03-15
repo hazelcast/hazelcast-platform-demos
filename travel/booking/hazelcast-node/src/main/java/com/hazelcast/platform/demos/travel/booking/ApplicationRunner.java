@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,7 +104,18 @@ public class ApplicationRunner {
             .getJet()
             .getJobs()
             .stream()
-            .forEach(job -> jobs.put(job.getName(), job));
+            .forEach(job -> {
+                if (job.getName() == null) {
+                    if (job.isLightJob()) {
+                        // Concurrent SQL doesn't have a name set.
+                        log.warn("logJobs(), job.getName()==null for light job {}", job);
+                    } else {
+                        log.error("logJobs(), job.getName()==null for {}", job);
+                    }
+                } else {
+                    jobs.put(job.getName(), job);
+                }
+            });
 
         jobs
         .forEach((key, value) -> {

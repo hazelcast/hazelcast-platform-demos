@@ -107,7 +107,7 @@ spec:
         - env:
           - name: "MY_PULSAR_LIST"
             value: "clickstream-pulsar.default.svc.cluster.local"
-          image: "neil/clickstream-pulsar-feed"
+          image: "hazelcast-platform-demos/clickstream-pulsar-feed"
           imagePullPolicy: Never
           name: clickstream-job-pulsar-feed-container
       restartPolicy: Never

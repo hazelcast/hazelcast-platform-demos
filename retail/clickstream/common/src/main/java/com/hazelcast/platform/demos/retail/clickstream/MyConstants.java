@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ public class MyConstants {
     public static final String CSV_INPUT_FILE2 = "training_sample.csv";
 
     // For binary backoff loggers
-    public static final int MAX_LOGGING_INTERVAL = 10_000;
+    public static final int MAX_LOGGING_INTERVAL = 2_000;
     public static final int MAX_LOGGING_LINE_LENGTH = 120;
 
     // Graphite/Grafana sink

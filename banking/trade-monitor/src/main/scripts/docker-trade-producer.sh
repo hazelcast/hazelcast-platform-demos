@@ -19,6 +19,7 @@ then
 fi
 
 MY_BOOTSTRAP_SERVERS=kafka-broker0:9092,kafka-broker1:9093,kafka-broker2:9094
+MY_PULSAR_LIST=pulsar:6650
 
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
@@ -27,7 +28,10 @@ docker network create $PROJECT --driver bridge > /dev/null 2>&1
 # For easier restarts
 docker container prune --force > /dev/null 2>&1
 
-CMD="docker run -e MY_BOOTSTRAP_SERVERS=$MY_BOOTSTRAP_SERVERS --rm --network=${PROJECT} ${DOCKER_IMAGE}"
+CMD="docker run \
+ -e MY_BOOTSTRAP_SERVERS=$MY_BOOTSTRAP_SERVERS \
+ -e MY_PULSAR_LIST=$MY_PULSAR_LIST \
+ --rm --network=${PROJECT} ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,7 @@ import com.hazelcast.platform.demos.retail.clickstream.job.RetrainingControl;
 import com.hazelcast.platform.demos.retail.clickstream.job.RetrainingLaunchListener;
 import com.hazelcast.platform.demos.retail.clickstream.job.StatisticsAccuracyByOrder;
 import com.hazelcast.platform.demos.retail.clickstream.job.StatisticsLatency;
+import com.hazelcast.platform.demos.utils.UtilsSlackSQLJob;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -111,8 +112,12 @@ public class ApplicationRunner {
                 log.info("-=-=-=-=- {} '{}' {} -=-=-=-=-=-",
                         countStr, this.hazelcastInstance.getName(), countStr);
                 if (count % FIVE == 0) {
-                    this.logSizes();
-                    this.logJobs();
+                    try {
+                        this.logSizes();
+                        this.logJobs();
+                    } catch (Exception e) {
+                        log.error("count==" + count, e);
+                    }
                 }
             }
         };
@@ -147,12 +152,13 @@ public class ApplicationRunner {
         this.launchClickstreamHandlerJob();
         this.launchHeartbeatJob(clusterName);
         this.launchPulsarIngestJob();
-        this.launchStatisticsAccuracyByOrderJob(clusterName, graphiteHost);
-        this.launchStatisticsLatencyJob(clusterName, graphiteHost);
 
         // Prediction on "blue"
         if (clusterName.equals(cluster1Name)) {
             this.launchRandomForestPredictionJob();
+            this.launchSlackSQLJob();
+            this.launchStatisticsAccuracyByOrderJob(clusterName, graphiteHost);
+            this.launchStatisticsLatencyJob(clusterName, graphiteHost);
         }
 
         // Retraining on "green"
@@ -230,6 +236,22 @@ public class ApplicationRunner {
         jobConfigRandomForestPrediction.setName(jobNameRandomForestPrediction);
 
         this.launchDAGJob(dagRandomForestPrediction, jobConfigRandomForestPrediction);
+    }
+
+    /**
+     * <p>SQL to/from Slack.
+     * </p>
+     */
+    private void launchSlackSQLJob() {
+        // Shouldn't fail but no reason to abandon if it does
+        try {
+            Object projectName = this.myProperties.getProjectName();
+
+            UtilsSlackSQLJob.submitJob(hazelcastInstance,
+                    projectName == null ? "" : projectName.toString());
+        } catch (Exception e) {
+            log.error("launchSlackSQLJob:" + UtilsSlackSQLJob.class.getSimpleName(), e);
+        }
     }
 
     /**
@@ -363,7 +385,18 @@ public class ApplicationRunner {
             .getJet()
             .getJobs()
             .stream()
-            .forEach(job -> jobs.put(job.getName(), job));
+            .forEach(job -> {
+                if (job.getName() == null) {
+                    if (job.isLightJob()) {
+                        // Concurrent SQL doesn't have a name set.
+                        log.warn("logJobs(), job.getName()==null for light job {}", job);
+                    } else {
+                        log.error("logJobs(), job.getName()==null for {}", job);
+                    }
+                } else {
+                    jobs.put(job.getName(), job);
+                }
+            });
 
         jobs
         .forEach((key, value) -> {

@@ -1,0 +1,59 @@
+---
+# OPTIONAL
+# OPTIONAL
+# OPTIONAL - If not running on HZ Cloud
+# OPTIONAL
+# OPTIONAL
+# Service DNS will be "trade-monitor-hazelcast.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trade-monitor-grid-hazelcast
+spec:
+  clusterIP: None
+  selector:
+    app: trade-monitor-grid-hazelcast
+  ports:
+  - port: 5701
+---
+# Creates 2 pods, hazelcast-node-0 and hazelcast-node-1 in a stateful set.
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: trade-monitor-grid-hazelcast
+spec:
+  replicas: 2
+  serviceName: trade-monitor-grid-hazelcast
+  selector:
+    matchLabels:
+      app: trade-monitor-grid-hazelcast
+  template:
+    metadata:
+      labels:
+        app: trade-monitor-grid-hazelcast
+    spec:
+      containers:
+        - env:
+          - name: "MY_BOOTSTRAP_SERVERS"
+            value: "trade-monitor-kafka-broker-0.trade-monitor-kafka-broker.default.svc.cluster.local:9092,trade-monitor-kafka-broker-1.trade-monitor-kafka-broker.default.svc.cluster.local:9092,trade-monitor-kafka-broker-2.trade-monitor-kafka-broker.default.svc.cluster.local:9092"
+          - name: "MY_PULSAR_LIST"
+            value: "trade-monitor-pulsar.default.svc.cluster.local:6650"
+          image: "hazelcast-platform-demos/trade-monitor-hazelcast-node"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /hazelcast/health/node-state
+              port: 5701
+          name: trade-monitor-grid-hazelcast-container
+          readinessProbe:
+            httpGet:
+              path: /hazelcast/health/ready
+              port: 5701
+            initialDelaySeconds: 30
+          resources:
+            limits:
+              cpu: "2.0"
+            requests:
+              cpu: "2.0"

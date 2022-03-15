@@ -1,0 +1,15 @@
+hazelcast-client:
+  cluster-name: '@hz.cloud.cluster1.name@'
+  network:
+    auto-detection:
+      enabled: false
+    # Assume cloud by default, ApplicationConfig may override.
+    hazelcast-cloud:
+      enabled: true
+      discovery-token: '@hz.cloud.cluster1.discovery.token@'
+  connection-strategy:
+    reconnect-mode: OFF
+    connection-retry:
+      cluster-connect-timeout-millis: 5000
+  metrics:
+    enabled: true

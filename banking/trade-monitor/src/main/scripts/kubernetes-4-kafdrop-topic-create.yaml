@@ -1,0 +1,95 @@
+---
+# Creates a Kafka topic, and Kafdrop UI
+---
+############################################################################
+# Services
+############################################################################
+---
+# Kafdrop : DNS will be "trade-monitor-kafdrop.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trade-monitor-kafdrop
+spec:
+  selector:
+    app: trade-monitor-kafdrop
+  ports:
+  - port: 8080
+    targetPort: 9000
+  type: LoadBalancer
+---
+############################################################################
+# Jobs - runs immediately
+############################################################################
+---
+# Topic Create
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: trade-monitor-job-topic-create
+  name: trade-monitor-job-topic-create
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: trade-monitor-job-topic-create
+    spec:
+      containers:
+        - env:
+          - name: "MY_ZOOKEEPER"
+            value: "trade-monitor-zookeeper.default.svc.cluster.local"
+          image: "hazelcast-platform-demos/trade-monitor-topic-create"
+          imagePullPolicy: Never
+          name: trade-monitor-job-topic-create-container
+      restartPolicy: Never
+---
+############################################################################
+# Deployments - wait to allow jobs to run, then create
+############################################################################
+---
+# Kafdrop
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: kafdrop
+  name: trade-monitor-kafdrop
+spec:
+  selector:
+    matchLabels:
+      app: trade-monitor-kafdrop
+  template:
+    metadata:
+      labels:
+        app: trade-monitor-kafdrop
+        app.kubernetes.io/component: kafdrop
+    spec:
+      initContainers:
+        - name: wait-for-topic-create
+          image: busybox
+          command: ['sh', '-c', 'sleep 60']
+      containers:
+        - env:
+          # Internal port 19092
+          - name: "KAFKA_BROKERCONNECT"
+            value: "trade-monitor-kafka-broker-0.trade-monitor-kafka-broker.default.svc.cluster.local:19092,trade-monitor-kafka-broker-1.trade-monitor-kafka-broker.default.svc.cluster.local:19092,trade-monitor-kafka-broker-2.trade-monitor-kafka-broker.default.svc.cluster.local:19092"
+          image: "hazelcast-platform-demos/trade-monitor-kafdrop"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 9000
+          name: trade-monitor-kafdrop-container
+          ports:
+            - containerPort: 9000
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9000
+            initialDelaySeconds: 30
+---

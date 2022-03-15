@@ -108,7 +108,7 @@ spec:
         app: clickstream-cassandra
     spec:
       containers:
-        - image: "neil/clickstream-cassandra"
+        - image: "hazelcast-platform-demos/clickstream-cassandra"
           imagePullPolicy: Never
           name: clickstream-cassandra-container
 ---
@@ -128,7 +128,7 @@ spec:
         app: clickstream-grafana
     spec:
       containers:
-        - image: "neil/clickstream-grafana"
+        - image: "hazelcast-platform-demos/clickstream-grafana"
           imagePullPolicy: Never
           name: clickstream-grafana-container
 ---
@@ -148,7 +148,7 @@ spec:
         app: clickstream-management-center
     spec:
       containers:
-        - image: "neil/clickstream-management-center"
+        - image: "hazelcast-platform-demos/clickstream-management-center"
           imagePullPolicy: Never
           livenessProbe:
             httpGet:
@@ -177,7 +177,7 @@ spec:
         app: clickstream-prometheus
     spec:
       containers:
-        - image: "neil/clickstream-prometheus"
+        - image: "hazelcast-platform-demos/clickstream-prometheus"
           imagePullPolicy: Never
           name: clickstream-prometheus-container
 ---
@@ -197,7 +197,7 @@ spec:
         app: clickstream-pulsar
     spec:
       containers:
-        - image: "neil/clickstream-pulsar"
+        - image: "hazelcast-platform-demos/clickstream-pulsar"
           imagePullPolicy: Never
           name: clickstream-pulsar-container
 ---

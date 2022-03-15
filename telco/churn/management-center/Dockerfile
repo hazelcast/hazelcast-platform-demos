@@ -1,4 +1,5 @@
-FROM hazelcast/management-center:5.0
+#FROM hazelcast/management-center:latest-snapshot
+FROM hazelcast/management-center:5.1.1
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MC_LICENSE
@@ -41,6 +42,6 @@ CMD ["bash", "-c", "set -euo pipefail \
       && echo bin/mc-conf.sh cluster add -H=${MC_DATA} --client-config=/hazelcast-client-cluster1.xml \
       && bin/mc-conf.sh cluster add -H=${MC_DATA} --client-config=/hazelcast-client-cluster1.xml \
       && echo @@@@@@@@@@@@@@@@@@@@ \
-      && echo bin/mc-start.sh \
-      && bin/mc-start.sh \
+      && echo bin/hz-mc start \
+      && bin/hz-mc start \
      "]
