@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,10 +33,14 @@ public class MyConstants {
     public static final String IMAP_NAME_IRCURVES  = "cva_ircurves";
     public static final String IMAP_NAME_FIXINGS = "cva_fixings";
     public static final String IMAP_NAME_TRADES  = "cva_trades";
+    public static final String IMAP_NAME_POSITION  = "position";
+    public static final String IMAP_NAME_RISK  = "risk";
+    public static final String IMAP_NAME_STOCK  = "stock";
 
     public static final List<String> IMAP_NAMES =
             List.of(IMAP_NAME_CP_CDS, IMAP_NAME_CVA_CSV, IMAP_NAME_CVA_DATA, IMAP_NAME_CVA_XLSX,
-                    IMAP_NAME_FIXINGS, IMAP_NAME_IRCURVES, IMAP_NAME_TRADES);
+                    IMAP_NAME_FIXINGS, IMAP_NAME_IRCURVES, IMAP_NAME_TRADES,
+                    IMAP_NAME_POSITION, IMAP_NAME_RISK, IMAP_NAME_STOCK);
 
     public static final String ITOPIC_NAME_JOB_STATE  = "job_state";
 
@@ -61,6 +65,8 @@ public class MyConstants {
     public static final String BANNER = "*** *** *** ***";
     // For limiting the logging of long lines
     public static final int HALF_SCREEN_WIDTH = 66;
+    // For SQL VIEW naming
+    public static final String VIEW_SUFFIX = "_VIEW";
 
     // For calling C++, not necessarily perfect but a decent start
     public static final int DEFAULT_BATCH_SIZE = 100;

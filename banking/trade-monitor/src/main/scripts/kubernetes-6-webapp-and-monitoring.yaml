@@ -1,0 +1,128 @@
+---
+# Service DNS for Webapp will be "trade-monitor-webapp.default.svc.cluster.local".
+# Service DNS for Prometheus will be "trade-monitor-prometheus.default.svc.cluster.local".
+# Service DNS for Grafana will be "trade-monitor-grafana.default.svc.cluster.local".
+---
+# Webapp
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trade-monitor-webapp
+spec:
+  selector:
+    app: trade-monitor-webapp
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: LoadBalancer
+---
+# Only need 1 webapp
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trade-monitor-webapp
+spec:
+  selector:
+    matchLabels:
+      app: trade-monitor-webapp
+  template:
+    metadata:
+      labels:
+        app: trade-monitor-webapp
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/trade-monitor-webapp"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+          name: trade-monitor-webapp-container
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 30
+          volumeMounts:
+            - name: configmap
+              mountPath: /customize/my-env.sh
+              subPath: my-env.sh
+      volumes:
+        - name: configmap
+          configMap:
+            name: trade-monitor-configmap
+            defaultMode: 0755
+---
+# Service for Prometheus
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trade-monitor-prometheus
+spec:
+  selector:
+    app: trade-monitor-prometheus
+  ports:
+    - name: prometheus
+      port: 9090
+      targetPort: 9090
+  type: LoadBalancer
+---
+# Pods for Prometheus, only need one
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trade-monitor-prometheus
+spec:
+  selector:
+    matchLabels:
+      app: trade-monitor-prometheus
+  template:
+    metadata:
+      labels:
+        app: trade-monitor-prometheus
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/trade-monitor-prometheus"
+          imagePullPolicy: Never
+          name: trade-monitor-prometheus-container
+---
+# Service for Grafana
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trade-monitor-grafana
+spec:
+  selector:
+    app: trade-monitor-grafana
+  ports:
+    - name: grafana
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer
+---
+# Pods for Grafana, only need one
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trade-monitor-grafana
+spec:
+  selector:
+    matchLabels:
+      app: trade-monitor-grafana
+  template:
+    metadata:
+      labels:
+        app: trade-monitor-grafana
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/trade-monitor-grafana"
+          imagePullPolicy: Never
+          name: trade-monitor-grafana-container
+---

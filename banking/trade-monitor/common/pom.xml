@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
 		<artifactId>trade-monitor-root</artifactId>
-		<version>5.0</version>
+		<version>5.1</version>
 	</parent>
 
 	<artifactId>trade-monitor-common</artifactId>
@@ -20,6 +20,17 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>trade-monitor-custom-classes</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.platform.demos.utils</groupId>
+			<artifactId>utils-slack-integration</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 		</dependency>
@@ -29,21 +40,21 @@
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
 
-		<!-- scope==provided -->
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast</artifactId>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet-grpc</artifactId>
-			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet-kafka</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet-python</artifactId>
-			<scope>provided</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>com.hazelcast.jet</groupId>
@@ -52,9 +63,22 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+			<groupId>com.hazelcast.jet.contrib</groupId>
+			<artifactId>pulsar</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.hazelcast.jet</groupId>
+					<artifactId>hazelcast-jet</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.google.code.findbugs</groupId>
+					<artifactId>jsr305</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-sql</artifactId>
-			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 

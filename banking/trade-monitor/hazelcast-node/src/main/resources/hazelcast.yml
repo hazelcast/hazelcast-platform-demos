@@ -2,6 +2,9 @@ hazelcast:
   # Replaced by Maven
   cluster-name: '@my.cluster1.name@'
   #
+  management-center:
+    console-enabled: true
+  #
   properties:
     # Graceful shutdown is helpful for Kubernetes scale-down.
     hazelcast.member.naming.moby.enabled: true
@@ -23,22 +26,22 @@ hazelcast:
         HEALTH_CHECK:
           enabled: true
   #
-  map:
-     # Any map with a name matching this pattern has a journal
-    'alerts*':
-      event-journal:
-        enabled: true
-     # 'trades' map needs defined as non-default configuration.
-    'trades':
-      indexes:
-        # Unordered index on Trade.getSymbol().
-        - type: HASH
-          attributes:
-            - 'symbol'
+# TURN THIS OFF, AS NOW ADDED BY `CommonIdempotentInitialization.java`  
+#  map:
+#     # Any map with a name matching this pattern has a journal
+#    'alerts*':
+#      event-journal:
+#        enabled: true
+#     # 'trades' map needs defined as non-default configuration.
+#    'trades':
+#      indexes:
+#        # Unordered index on Trade.getSymbol().
+#        - type: HASH
+#          attributes:
+#            - 'symbol'
   #
   jet:
     enabled: true
     resource-upload-enabled: true
-    instance:
-      # 'true' requires Enterprise and persistence enabled
-      lossless-restart-enabled: false
+    # 'true' requires Enterprise and persistence enabled
+    lossless-restart-enabled: false

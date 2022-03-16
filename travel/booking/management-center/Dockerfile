@@ -1,4 +1,5 @@
-FROM hazelcast/management-center:5.0
+#FROM hazelcast/management-center:latest-snapshot
+FROM hazelcast/management-center:5.1.1
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MC_LICENSE
@@ -29,6 +30,6 @@ ENV MC_CLASSPATH=/application.jar
 CMD ["bash", "-c", "set -euo pipefail \
       && echo bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${HOST_IP:-${MC_CLUSTER1_ADDRESSLIST}} \
       && bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${HOST_IP:-${MC_CLUSTER1_ADDRESSLIST}} \
-      && echo bin/mc-start.sh \
-      && bin/mc-start.sh \
+      && echo bin/hz-mc start \
+      && bin/hz-mc start \
      "]

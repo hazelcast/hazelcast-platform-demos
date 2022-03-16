@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.telco</groupId>
 		<artifactId>telco-root</artifactId>
-		<version>5.0</version>
+		<version>5.1</version>
 	</parent>
 
 	<groupId>com.hazelcast.platform.demos.telco.churn</groupId>

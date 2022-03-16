@@ -1,4 +1,5 @@
-FROM hazelcast/management-center:5.0
+#FROM hazelcast/management-center:latest-snapshot
+FROM hazelcast/management-center:5.1.1
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MC_LICENSE
@@ -8,11 +9,8 @@ ARG MY_ADMINUSER
 ARG MY_ADMINPASSWORD
 
 # To check health, uses port 8081 but internal URL. Preconfigure license, logon/password.
-# Until https://github.com/hazelcast/hazelcast/issues/19137 fixed use
-# -Dhazelcast.mc.periodic.healthcheck.enabled=false \
 ENV JAVA_OPTS="-Dhazelcast.mc.healthCheck.enable=true \
  -Dhazelcast.mc.prometheusExporter.enabled=true \
- -Dhazelcast.mc.periodic.healthcheck.enabled=false \
  -Dhazelcast.mc.license=$MC_LICENSE"
 
 # Used by /mc-start.sh to create admin user
@@ -30,8 +28,12 @@ ENV MC_CLASSPATH=/application.jar
 
 # Start Management Center
 CMD ["bash", "-c", "set -euo pipefail \
-      && echo bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_ADDRESSLIST} \
-      && bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_ADDRESSLIST} \
-      && echo bin/mc-start.sh \
-      && bin/mc-start.sh \
+      && MC_EMPTY='' \
+      && MC_CLUSTER1_LIST=`echo ${MC_CLUSTER1_ADDRESSLIST_OVERRIDE:-${MC_EMPTY}} $MC_CLUSTER1_ADDRESSLIST |awk '{print $1}'` \
+      && echo MC_CLUSTER1_NAME: ${MC_CLUSTER1_NAME} \
+      && echo MC_CLUSTER1_LIST: ${MC_CLUSTER1_LIST} \
+      && echo bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_LIST} \
+      && bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_LIST} \
+      && echo bin/hz-mc start \
+      && bin/hz-mc start \
      "]

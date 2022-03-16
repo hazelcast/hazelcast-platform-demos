@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,6 +73,9 @@ public class GaussianPrediction {
                     .mapUsingIMap(MyConstants.IMAP_NAME_DIGITAL_TWIN,
                             FunctionEx.identity(),
                             (String key, Tuple3<Long, Long, String> digitalTwin) -> {
+                                if (digitalTwin == null) {
+                                    return null;
+                                }
                                 String arrPrint = Arrays.toString(MyUtils.digitalTwinCsvToBinary(null, digitalTwin.f2(), false));
                                 return "data," + key + "," + digitalTwin.f0() + ","
                                         + digitalTwin.f1() + "," + arrPrint.substring(1, arrPrint.length() - 1);
@@ -126,6 +129,9 @@ public class GaussianPrediction {
         Long ingestTimestamp = Long.parseLong(tokenList.get(THIRD_INGEST_TIMESTAMP));
         Long predictionTimestamp = System.currentTimeMillis();
         String version = tokenList.get(FOURTH_MODEL_VERSION);
+        if (version.endsWith("Z")) {
+            version = version.substring(0, version.length() - 1);
+        }
         Integer prediction = Integer.parseInt(tokenList.get(FIFTH_PREDICTION));
 
         PredictionKey predictionKey = new PredictionKey();

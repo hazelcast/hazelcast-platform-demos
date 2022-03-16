@@ -9,18 +9,20 @@ of streaming analytics and in-memory data.
   * [Trade Monitor](./banking/trade-monitor) Monitoring and aggregation of stock market trading volumes.
     * [Watch The Video](https://hazelcast.com/resources/continuous-query-with-drill-down-demo/)
   * [Credit Value Adjustment](./banking/credit-value-adjustment) Risk exposure calculation for Interest Rate Swaps.
-2. Machine Learning
+2. Industry 4.0
+  * [IIOT](./industry/iiot) Predictive maintenance for plant machinery
+3. Machine Learning
   * [RI](./ml/ml-ri) Reference Implementation for Machine Learning Inference, minimal dependencies.
-3. Retail
+4. Retail
   * [Clickstream](./retail/clickstream) E-Commerce analysis using ML prediction.
-4. Telco
+5. Telco
   * [Churn](./telco/churn) Uses ML to predict customer churn
-5. Travel
+6. Travel
   * [Booking](./travel/booking) Integrated travel booking for accommodation and transport
 
 Also
 
-6. Utils
+7. Utils
   * [Utils](./utils) Utillity modules for the above projects to share.
 
 ## Build Instructions
@@ -48,7 +50,8 @@ and apply the value in your build.
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <my.cloud.discovery.token>GOES HERE</my.cloud.discovery.token>
+        <my.hz.cloud.cluster1.name>GOES HERE</my.hz.cloud.cluster1.name>
+        <my.hz.cloud.cluster1.discovery.token>GOES HERE</my.hz.cloud.cluster1.discovery.token>
         <my.license.key>GOES HERE</my.license.key>
         <my.slack.bot.user.oath.access.token>GOES HERE</my.slack.bot.user.oath.access.token>
         <my.slack.bot.channel.name>GOES HERE</my.slack.bot.channel.name>
@@ -61,7 +64,7 @@ and apply the value in your build.
 
 You will need `my.license.key` for use with Hazelcast Enterprise.
 
-If using Hazelcast Cloud, you will need `my.cloud.discovery.token` from your Cloud cluster's credentials.
+If using Hazelcast Cloud, you will need `my.hz.cloud.cluster1.name` and `my.hz.cloud.cluster1.discovery.token` from your Cloud cluster's credentials.
 
 If you plan to use the Slack integration in some modules, you will also need three Slack settings,
 `my.slack.bot.user.oath.access.token`, `my.slack.bot.channel.name` and `my.slack.bot.channel.id`.

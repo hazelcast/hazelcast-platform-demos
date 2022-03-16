@@ -16,6 +16,10 @@ hazelcast:
   # Replaced by Maven
   license-key: '@my.license.key@'
 
+  #
+  management-center:
+    console-enabled: true
+
   properties:
     # Graceful shutdown is helpful for Kubernetes scale-down.
     hazelcast.member.naming.moby.enabled: true

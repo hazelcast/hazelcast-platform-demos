@@ -20,6 +20,7 @@ then
 fi
 
 MY_BOOTSTRAP_SERVERS=kafka-broker0:9092,kafka-broker1:9093,kafka-broker2:9094
+MY_PULSAR_LIST=pulsar:6650
 
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
@@ -30,8 +31,12 @@ docker container prune --force > /dev/null 2>&1
 
 PORT=$(($CLONE + 5701))
 
-CMD="docker run -e MY_BOOTSTRAP_SERVERS=$MY_BOOTSTRAP_SERVERS -e MY_KUBERNETES_ENABLED=false -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP}:${PORT} -p ${PORT}:${PORT} --name=${MODULE}${CLONE} --rm --network=${PROJECT} ${DOCKER_IMAGE}"
-#echo $CMD
+CMD="docker run -e MY_BOOTSTRAP_SERVERS=$MY_BOOTSTRAP_SERVERS \
+ -e MY_KUBERNETES_ENABLED=false \
+ -e MY_PULSAR_LIST=$MY_PULSAR_LIST \
+ -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP}:${PORT} \
+ -p ${PORT}:${PORT} --name=${MODULE}${CLONE} --rm --network=${PROJECT} ${DOCKER_IMAGE}"
+echo $CMD
 
 $CMD
 RC=$?
