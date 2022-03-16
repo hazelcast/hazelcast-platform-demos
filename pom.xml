@@ -57,7 +57,7 @@
 		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
 		<jackson.version>2.12.4</jackson.version>
 		<json.version>20211205</json.version>
-        <json-smart.version>2.3</json-smart.version>
+        <json-smart.version>2.4.5</json-smart.version>
 		<junit-jupiter.version>5.7.2</junit-jupiter.version>
 		<junit-vintage.version>5.7.2</junit-vintage.version>
 		<jython.version>2.7.2</jython.version>
