@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.travel.booking</groupId>
 		<artifactId>booking-root</artifactId>
-		<version>5.0</version>
+		<version>5.1</version>
 	</parent>
 
 	<artifactId>booking-grafana</artifactId>

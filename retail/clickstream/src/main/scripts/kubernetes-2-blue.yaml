@@ -58,6 +58,7 @@ spec:
             httpGet:
               path: /hazelcast/health/node-state
               port: 5701
+            failureThreshold: 6
           name: clickstream-blue-hazelcast-container
           readinessProbe:
             httpGet:

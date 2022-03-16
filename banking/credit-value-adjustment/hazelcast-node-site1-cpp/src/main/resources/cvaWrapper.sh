@@ -13,7 +13,7 @@ echo $# args == $*
 PORT=${1}
 RANGE=1
 if [[ -z "${1}" ]] || ! [[ $1 =~ ^[0-9]+$ ]] ; then
- PORT=50001
+ PORT=30001
 else
  PORT=${1}
  shift

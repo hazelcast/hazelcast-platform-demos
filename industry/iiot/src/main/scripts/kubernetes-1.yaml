@@ -1,0 +1,210 @@
+---
+# Service DNS for Grafana will be "iiot-grafana.default.svc.cluster.local".
+# Service DNS for Maria will be "iiot-maria.default.svc.cluster.local".
+# Service DNS for Mongo will be "iiot-mongo.default.svc.cluster.local".
+# Service DNS for Prometheus will be "iiot-prometheus.default.svc.cluster.local".
+# Service DNS for Webapp will be "iiot-webapp.default.svc.cluster.local".
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$ SERVICE DEFINITIONS $$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Service for Grafana
+# Uses:
+#  Jet in Hazelcast Cloud will save data to 2004
+#  End-user will browse to Grafana on port 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: iiot-grafana
+spec:
+  selector:
+    app: iiot-grafana
+  ports:
+    - name: grafana-http
+      port: 80
+      targetPort: 3000
+    - name: graphite
+      port: 2004
+      targetPort: 2004
+  type: LoadBalancer
+---
+# Service for Maria
+# Uses:
+#  MapStore in Hazelcast Cloud will save data to 3306
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: iiot-maria
+spec:
+  selector:
+    app: iiot-maria
+  ports:
+  - port: 3306
+  type: LoadBalancer
+---
+# Service for Mongo
+# Uses:
+#  MapLoader in Hazelcast Cloud will read data from 27017
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: iiot-mongo
+spec:
+  selector:
+    app: iiot-mongo
+  ports:
+  - port: 27017
+  type: LoadBalancer
+---
+# Service for Prometheus
+# Uses:
+#  Prometheus in Kubenetes will read data from Management Center in Hazelcast Cloud
+#  Grafana in Kubernetes will read data from 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: iiot-prometheus
+spec:
+  selector:
+    app: iiot-prometheus
+  ports:
+    - name: prometheus
+      port: 9090
+      targetPort: 9090
+  type: LoadBalancer
+---
+# Service for Webapp
+# Uses:
+#  End-user will browse to UI on port 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: iiot-webapp
+spec:
+  selector:
+    app: iiot-webapp
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: LoadBalancer
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$ POD DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Pod for Grafana
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iiot-grafana
+spec:
+  selector:
+    matchLabels:
+      app: iiot-grafana
+  template:
+    metadata:
+      labels:
+        app: iiot-grafana
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/iiot-grafana"
+          imagePullPolicy: Never
+          name: iiot-grafana-container
+---
+# Pod for Mongo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iiot-mongo
+spec:
+  selector:
+    matchLabels:
+      app: iiot-mongo
+  template:
+    metadata:
+      labels:
+        app: iiot-mongo
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/iiot-mongo"
+          imagePullPolicy: Never
+          name: iiot-mongo-container
+---
+# Pod for Maria
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iiot-maria
+spec:
+  selector:
+    matchLabels:
+      app: iiot-maria
+  template:
+    metadata:
+      labels:
+        app: iiot-maria
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/iiot-maria"
+          imagePullPolicy: Never
+          name: iiot-maria-container
+---
+# Pod for Prometheus
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iiot-prometheus
+spec:
+  selector:
+    matchLabels:
+      app: iiot-prometheus
+  template:
+    metadata:
+      labels:
+        app: iiot-prometheus
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/iiot-prometheus"
+          imagePullPolicy: Never
+          name: iiot-prometheus-container
+---
+# Pod for Webapp
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iiot-webapp
+spec:
+  selector:
+    matchLabels:
+      app: iiot-webapp
+  template:
+    metadata:
+      labels:
+        app: iiot-webapp
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/iiot-webapp"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /rest/k8s
+              port: 8080
+          name: iiot-webapp
+          readinessProbe:
+            httpGet:
+              path: /rest/k8s
+              port: 8080
+            initialDelaySeconds: 60
+---

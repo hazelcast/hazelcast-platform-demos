@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,10 @@ import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.function.BiFunctionEx;
 import com.hazelcast.function.FunctionEx;
@@ -34,10 +38,6 @@ import com.hazelcast.jet.pipeline.ServiceFactories;
 import com.hazelcast.jet.pipeline.ServiceFactory;
 import com.hazelcast.jet.pipeline.StreamStage;
 import com.hazelcast.sql.SqlResult;
-
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <p>Creates a Jet job that listens to Slack for SQL input
@@ -171,14 +171,22 @@ public class UtilsSlackSQLJob {
 
         try {
             Job job =
-                    hazelcastInstance.getJet().newJob(pipelineUtilsSlackSQLJob, jobConfigUtilsSlackSQLJob);
-            String message = String.format("%s:submitJob: job '%s' launched, status %s, id %d",
-                    UtilsSlackSQLJob.class.getSimpleName(),
-                    job.getName(),
-                    job.getStatus(),
-                    job.getId()
-                    );
-            LOGGER.info(message);
+                    UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineUtilsSlackSQLJob, jobConfigUtilsSlackSQLJob);
+            if (job == null) {
+                String message = String.format("%s:submitJob: job '%s' not launched, exists already",
+                        UtilsSlackSQLJob.class.getSimpleName(),
+                        jobConfigUtilsSlackSQLJob.getName()
+                        );
+                LOGGER.info(message);
+            } else {
+                String message = String.format("%s:submitJob: job '%s' launched, status %s, id %d",
+                        UtilsSlackSQLJob.class.getSimpleName(),
+                        job.getName(),
+                        job.getStatus(),
+                        job.getId()
+                        );
+                LOGGER.info(message);
+            }
         } catch (Exception e) {
             String message = String.format("%s:submitJob",
                     UtilsSlackSQLJob.class.getSimpleName()

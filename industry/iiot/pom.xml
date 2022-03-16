@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hazelcast.platform.demos.industry</groupId>
+		<artifactId>industry-root</artifactId>
+		<version>5.1</version>
+	</parent>
+
+	<groupId>com.hazelcast.platform.demos.industry.iiot</groupId>
+	<artifactId>iiot-root</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Hazelcast Platform - Industry 4.0 - IIOT</name>
+	<description>Part wear analysis with ML</description>
+
+	<modules>
+		<module>custom-classes</module>
+		<module>grafana</module>
+		<module>jobs</module>
+		<module>maria</module>
+		<module>mongo</module>
+		<module>prometheus</module>
+		<module>test</module>
+		<module>abstract-client</module>
+		<module>webapp</module>
+	</modules>
+
+	<properties>
+		<java.version>11</java.version>
+
+		<docker.image.prefix>iiot</docker.image.prefix>
+		<main.basedir>${project.parent.parent.basedir}</main.basedir>
+
+		<!-- Mapstores and databases -->
+                <my.mongo.collection1.name>serviceHistory</my.mongo.collection1.name>
+		
+		<!-- From settings.xml -->
+		<hz.cloud.cluster1.discovery.token>${my.hz.cloud.cluster1.discovery.token}</hz.cloud.cluster1.discovery.token>
+		<hz.cloud.cluster1.name>${my.hz.cloud.cluster1.name}</hz.cloud.cluster1.name>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-parent</artifactId>
+				<type>pom</type>
+				<scope>import</scope>
+				<version>${spring-boot.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+</project>

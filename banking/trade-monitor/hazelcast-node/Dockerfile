@@ -31,4 +31,5 @@ ENTRYPOINT exec java $JAVA_ARGS $JAVA_OPTS \
  -Dmy.autostart.enabled=$MY_AUTOSTART_ENABLED \
  -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS \
  -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+ -Dmy.pulsar.list=$MY_PULSAR_LIST \
  -jar application.jar

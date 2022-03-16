@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public class CvaStpJobSubmitter {
     private static final String CPP_DOCKER = "cva-cpp";
     private static final String CPP_KUBERNETES = "cpp-service";
     private static final String CPP_LOCALHOST = "127.0.0.1";
-    private static final int PORT = 50001;
+    private static final int PORT = 30001;
 
     /**
      * <p>Try to submit the {@link CvaStpJob}, allowing only one to be running
@@ -121,6 +121,8 @@ public class CvaStpJobSubmitter {
                 System.getProperty("my.docker.enabled", "false").equalsIgnoreCase(Boolean.TRUE.toString());
         boolean kubernetesEnabled =
                 System.getProperty("my.kubernetes.enabled", "false").equalsIgnoreCase(Boolean.TRUE.toString());
+        LOGGER.info("dockerEnabled=={}", dockerEnabled);
+        LOGGER.info("kubernetesEnabled=={}", kubernetesEnabled);
 
         // If set, validate but don't reject
         if (cppService.length() > 0) {
@@ -137,6 +139,7 @@ public class CvaStpJobSubmitter {
                 cppService = CPP_KUBERNETES;
             }
         }
+        LOGGER.info("cppService=={}", cppService);
 
         return cppService;
     }

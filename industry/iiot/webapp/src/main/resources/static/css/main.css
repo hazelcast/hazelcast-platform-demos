@@ -1,0 +1,74 @@
+:root {
+	--hazelcast-blue: #012168;
+	--hazelcast-blue-dark: #0b2a35;
+	--hazelcast-blue-light: #2e7de1;
+	--hazelcast-orange: #ff5f00;
+}
+
+body {
+	background: Gold;
+}
+
+h1 {
+    text-align: center;
+}
+h2, h3, h4 {
+    text-align: center;
+}
+
+.major_pane {
+	background: MediumSeaGreen;
+	border-style: solid;
+    border-color: var(--hazelcast-blue-dark);
+    padding: 5px 5px 5px 5px;
+}
+
+.minor_pane {
+	background: Moccasin;
+    border-top: 1px dashed;
+    border-color: var(--hazelcast-blue-light);
+    margin-left: auto;
+    margin-right: auto;
+    overflow-y: scroll;
+    vertical-align: top;
+}
+
+.whiteBox {
+    border: 4px solid DarkGray;
+    background-color: white;        
+    color: black;
+    font-family: "Courier New", Courier, monospace;
+}
+
+.configOuterBox {
+    font-family: monospace;
+}
+.configOutputBox {
+    border: 2px dashed brown;
+    height: 300px;
+    overflow-y: auto;
+}
+
+.loggingOuterBox {
+    font-family: monospace;
+}
+.loggingOutputBox {
+    border: 2px dashed brown;
+    height: 200px;
+    overflow-y: auto;
+}
+
+.pane_separator {
+    border-top: 1px dashed salmon;
+}
+
+.headerfooter {
+	color: var(--hazelcast-blue-dark);
+	font-family: "Courier New", Courier, monospace;
+	font-size: 80%;
+	text-align: center;
+}
+.headerfooterline {
+	color: var(--hazelcast-orange);
+}
+

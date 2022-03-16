@@ -11,6 +11,7 @@
 <body th:fragment="header">
 	<div class="headerfooter">
 		<h5>Build @maven.build.timestamp@</h5>
+		<!-- https://github.com/springfox/springfox/issues/3462
 		<div align="right">
 			<p>
 				<font size="-1">
@@ -18,6 +19,7 @@
 			</font>
 			</p>
 		</div>
+		-->
 		<div class="whiteBox">
 			<h1 th:text="${@siteLowerCase}">?</h1>
 		</div>

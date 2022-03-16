@@ -91,8 +91,8 @@ def train_model(input_list):
             else:
                 model_dump = codecs.encode(pickle.dumps(tree), "base64").decode()
                 output = now + "," + model_dump
-                # 4MB, max https://github.com/hazelcast/hazelcast/issues/19503
-                if len(output) < 4194304:
+                # 4MB, max https://github.com/hazelcast/hazelcast/issues/19503. Allow headroom from 4194304 for meta-data.
+                if len(output) < 4160000:
                     result.append(output)
                 else:
                     result.append("failure," + now + ",len==" + str(len(output)))

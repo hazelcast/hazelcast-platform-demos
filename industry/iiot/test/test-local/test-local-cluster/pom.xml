@@ -1,0 +1,99 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hazelcast.platform.demos.industry.iiot</groupId>
+		<artifactId>iiot-test-local-root</artifactId>
+		<version>5.1</version>
+	</parent>
+
+	<artifactId>iiot-test-local-cluster</artifactId>
+
+	<name>Hazelcast Platform - IIOT - Test - Local - Cluster</name>
+	<description>For offline testing, a cluster simulating Hazelcast Cloud</description>
+
+	<properties>
+		<docker.image.name>test-local-hazelcast</docker.image.name>
+		<docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</docker.jar.file>
+		<docker.jar.file2>iiot-custom-classes-${project.version}-jar-with-dependencies.jar</docker.jar.file2>
+		<main.basedir>${project.parent.parent.parent.parent.parent.basedir}</main.basedir>
+		<main.class>hazelcast.platform.demos.industry.iiot.Application</main.class>
+	</properties>
+
+	<dependencies>
+		<!-- Note here that we specifically don't include the custom classes on the classpath. See <plugins> below for how it is added.
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>iiot-custom-classes</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		 -->
+
+		<!-- hazelcast and hazelcast-sql are needed are dependencies, although the former is transitive of -->
+		<!-- the latter, so that maven-assembly-plugin merges their META-INF/services correctly. -->
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-sql</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet-python</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<!-- No main class -->
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<configuration>
+					<target name="Copy ${docker.jar.file2}">
+						<copy file="../../../custom-classes/target/${docker.jar.file2}" todir="${project.build.directory}"/>
+					</target>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>dockerfile-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

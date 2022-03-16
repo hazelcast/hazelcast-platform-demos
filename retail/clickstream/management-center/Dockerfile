@@ -1,4 +1,5 @@
-FROM hazelcast/management-center:latest-snapshot
+#FROM hazelcast/management-center:latest-snapshot
+FROM hazelcast/management-center:5.1.1
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MC_LICENSE
@@ -14,7 +15,9 @@ ARG MY_ADMINPASSWORD
 # To check health, uses port 8081 but internal URL. Preconfigure license, logon/password.
 ENV JAVA_OPTS="-Dhazelcast.mc.healthCheck.enable=true \
  -Dhazelcast.mc.prometheusExporter.enabled=true \
- -Dhazelcast.mc.license=$MC_LICENSE"
+ -Dhazelcast.mc.license=$MC_LICENSE \
+ -Dhazelcast.mc.rest.enabled=true \
+ -Xmx3G -Xms3G"
 
 # Used by /mc-start.sh to create admin user unless MC_INIT_CMD used
 #ENV MC_ADMIN_USER=$MY_ADMINUSER
@@ -33,9 +36,9 @@ ENV MC_CLUSTER2_PORTLIST=$MC_CLUSTER2_PORTLIST
 ENV MC_INIT_CMD="./bin/mc-conf.sh user create -n=$MY_ADMINUSER -p=$MY_ADMINPASSWORD -r=admin && ./bin/mc-conf.sh user issue-token -H=/data --username=$MY_ADMINUSER"
 
 # If want to query custom classes
-ARG JAR_FILE
-COPY target/${JAR_FILE} /application.jar
-ENV MC_CLASSPATH=/application.jar
+#ARG JAR_FILE
+#COPY target/${JAR_FILE} /application.jar
+#ENV MC_CLASSPATH=/application.jar
 
 # Start Management Center
 CMD ["bash", "-c", "set -euo pipefail \
@@ -67,6 +70,6 @@ CMD ["bash", "-c", "set -euo pipefail \
       && echo bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER2_NAME} --member-addresses=${MC_CLUSTER2_LIST} \
       && bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER2_NAME} --member-addresses=${MC_CLUSTER2_LIST} \
       && echo @@@@@@@@@@@@@@@@@@@@ \
-      && echo bin/mc-start.sh \
-      && bin/mc-start.sh \
+      && echo bin/hz-mc start \
+      && bin/hz-mc start \
      "]

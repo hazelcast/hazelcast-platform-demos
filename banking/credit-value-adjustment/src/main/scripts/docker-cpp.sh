@@ -25,8 +25,8 @@ docker container prune --force > /dev/null 2>&1
 
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
-# CPP Server on port 50001
-PORT=50001
+# CPP Server on port 30001
+PORT=30001
 CMD="docker run -p ${PORT}:${PORT} --rm --name=${MODULE} --network=${PROJECT} ${DOCKER_IMAGE} ${PORT}"
 #echo $CMD
 

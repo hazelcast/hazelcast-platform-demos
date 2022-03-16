@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2021, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,19 @@
 
 package com.hazelcast.platform.demos.banking.cva;
 
-import com.hazelcast.client.config.ClientConfig;
-import com.hazelcast.client.config.ClientNetworkConfig;
-import com.hazelcast.client.config.YamlClientConfigBuilder;
-import com.hazelcast.config.KubernetesConfig;
-
 import java.util.List;
 import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.hazelcast.client.config.ClientConfig;
+import com.hazelcast.client.config.ClientNetworkConfig;
+import com.hazelcast.client.config.YamlClientConfigBuilder;
+import com.hazelcast.config.KubernetesConfig;
 
 /**
  * <p>Common configuration for clients of the clusters. Uses
@@ -40,6 +41,8 @@ public class ApplicationConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
 
     private final String project;
+    @Value("${hazelcast.local.publicAddress:}")
+    private String publicAddress;
 
     public ApplicationConfig(MyProperties myProperties) {
         this.project = myProperties.getProject();
@@ -80,7 +83,15 @@ public class ApplicationConfig {
         } else {
             clientNetworkConfig.getKubernetesConfig().setEnabled(false);
 
-            String host = System.getProperty("hazelcast.local.publicAddress", "127.0.0.1");
+            String host;
+            if (this.publicAddress.isEmpty()) {
+                LOGGER.info("this.publicAddress.isEmpty()");
+                host = System.getProperty("hazelcast.local.publicAddress", "127.0.0.1");
+            } else {
+                LOGGER.info("!this.publicAddress.isEmpty()");
+                host = this.publicAddress;
+            }
+
             int port = MyUtils.getLocalhostBasePort(myProperties.getSite());
 
             List<String> memberList = List.of(host + ":" + port,
