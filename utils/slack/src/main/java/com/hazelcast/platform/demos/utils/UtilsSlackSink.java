@@ -42,10 +42,10 @@ public class UtilsSlackSink {
     private final String channelName;
     private final String messagePrefix;
 
-    public UtilsSlackSink(String accessToken, String channelName, String projectName) {
+    public UtilsSlackSink(String accessToken, String channelName, String projectName, String buildUser) {
         this.accessToken = accessToken;
         this.channelName = channelName;
-        this.messagePrefix = "(_" + projectName + "_): ";
+        this.messagePrefix = "(_" + projectName + "/" + buildUser + "_): ";
     }
 
     /**
@@ -55,12 +55,13 @@ public class UtilsSlackSink {
      * @param accessToken For access to Slack
      * @param channelName For job name
      * @param projectName Prefix message so to know which demo produces
+     * @param buildUser Who built, in case multiple people running same demo
      * @return
      */
-    public static Sink<JSONObject> slackSink(String accessToken, String channelName, String projectName) {
+    public static Sink<JSONObject> slackSink(String accessToken, String channelName, String projectName, String buildUser) {
         return SinkBuilder.sinkBuilder(
                     "slackSink-" + channelName,
-                    __ -> new UtilsSlackSink(accessToken, channelName, projectName)
+                    __ -> new UtilsSlackSink(accessToken, channelName, projectName, buildUser)
                 )
                 .receiveFn(
                         (UtilsSlackSink utilsSlackSink, JSONObject item) -> utilsSlackSink.receiveFn(item)

@@ -544,7 +544,8 @@ public class CommonIdempotentInitialization {
             Pipeline pipelineAlertingToSlack = AlertingToSlack.buildPipeline(
                     properties.get(UtilsConstants.SLACK_ACCESS_TOKEN),
                     properties.get(UtilsConstants.SLACK_CHANNEL_NAME),
-                    properties.get(UtilsConstants.SLACK_PROJECT_NAME)
+                    properties.get(UtilsConstants.SLACK_PROJECT_NAME),
+                    properties.get(UtilsConstants.SLACK_BUILD_USER)
                     );
 
             JobConfig jobConfigAlertingToSlack = new JobConfig();

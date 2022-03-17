@@ -1,4 +1,4 @@
-FROM grafana/grafana:8.2.2
+FROM grafana/grafana:8.4.3
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MY_ADMINUSER

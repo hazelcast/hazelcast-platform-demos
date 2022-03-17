@@ -6,7 +6,7 @@
 
 	<groupId>com.hazelcast.platform.demos</groupId>
 	<artifactId>hazelcast-platform-demos-root</artifactId>
-	<version>5.1</version>
+	<version>5.2</version>
 	<packaging>pom</packaging>
 
 	<name>Hazelcast Platform Demo Applications</name>
@@ -36,6 +36,8 @@
 		<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spotbugs.skip>true</spotbugs.skip>
+                <!-- Configure the build for HZ Cloud or all Kubernetes -->
+                <use.hz-cloud>false</use.hz-cloud>
 
                 <!-- For Management Center, Cassandra/Mongo/MySQL etc logons -->
                 <my.mc.admin.user>admin</my.mc.admin.user>
@@ -52,12 +54,12 @@
 		<guava.version>29.0-jre</guava.version>
         <!-- Matches banking/credit-value-adjustment/cpp/Dockerfile2 -->
 		<grpc.version>1.31.1</grpc.version>
-		<hazelcast.version>5.1</hazelcast.version>
+		<hazelcast.version>5.2-SNAPSHOT</hazelcast.version>
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
-		<hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
+		<hibernate-validator.version>6.1.5.Final</hibernate-validator.version>
 		<jackson.version>2.12.4</jackson.version>
 		<json.version>20211205</json.version>
-        <json-smart.version>2.3</json-smart.version>
+        <json-smart.version>2.4.8</json-smart.version>
 		<junit-jupiter.version>5.7.2</junit-jupiter.version>
 		<junit-vintage.version>5.7.2</junit-vintage.version>
 		<jython.version>2.7.2</jython.version>
@@ -418,6 +420,9 @@
 							</fileset>
 							<fileset>
 								<directory>src/main/app/node_modules</directory>
+							</fileset>
+							<fileset>
+								<directory>src/main/app/static</directory>
 							</fileset>
 						</filesets>
 					</configuration>

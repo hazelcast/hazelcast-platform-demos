@@ -86,12 +86,14 @@ public class AlertingToSlack {
      * @param accessTokenObject String from properties
      * @param channelNameObject String from properties
      * @param projectNameObject String from properties
+     * @param buildUsser String from properties
      */
     public static Pipeline buildPipeline(Object accessTokenObject,
-            Object channelNameObject, Object projectNameObject) throws Exception {
+            Object channelNameObject, Object projectNameObject, Object buildUserObject) throws Exception {
         String accessToken = validate("accessToken", accessTokenObject);
         String channelName = validate("channelName", channelNameObject);
         String projectName = validate("projectName", projectNameObject);
+        String buildUser = validate("buildUser", buildUserObject);
 
         Pipeline pipeline = Pipeline.create();
 
@@ -102,7 +104,7 @@ public class AlertingToSlack {
         .map(AlertingToSlack.myMapStage()).setName("reformat-to-JSON");
 
         input
-        .writeTo(UtilsSlackSink.slackSink(accessToken, channelName, projectName));
+        .writeTo(UtilsSlackSink.slackSink(accessToken, channelName, projectName, buildUser));
 
         input
         .writeTo(Sinks.logger());

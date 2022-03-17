@@ -54,6 +54,28 @@
   "rows": [
     {
       "collapse": false,
+      "height": 80,
+      "panels": [
+        {
+          "content": "<center><img src=\"https://hazelcast.com/brand-assets/files/hazelcast-stacked-illuminated-rev-sm.png\" width=\"100\" height=\"68\"></img></center>",
+          "height": "",
+          "id": 1,
+          "links": [],
+          "mode": "html",
+          "span": 12,
+          "title": "",
+          "type": "text"
+        }
+      ],
+      "repeat": null,
+      "repeatIteration": null,
+      "repeatRowId": null,
+      "showTitle": false,
+      "title": "Dashboard Row",
+      "titleSize": "h6"
+    },
+    {
+      "collapse": false,
       "height": 250,
       "panels": [
         {
@@ -405,7 +427,54 @@
       "showTitle": false,
       "title": "Dashboard Row",
       "titleSize": "h6"
-    }
+    },
+
+        {
+          "columns": [],
+          "datasource": "Local Graphite",
+          "fontSize": "100%",
+          "id": 6,
+          "pageSize": null,
+          "scroll": true,
+          "showHeader": true,
+          "sort": {
+            "col": 0,
+            "desc": true
+          },
+          "span": 3,
+          "styles": [
+            {
+              "alias": "Time",
+              "dateFormat": "YYYY-MM-DD HH:mm:ss",
+              "pattern": "Time",
+              "type": "date"
+            },
+            {
+              "alias": "",
+              "colorMode": null,
+              "colors": [
+                "rgba(245, 54, 54, 0.9)",
+                "rgba(237, 129, 40, 0.89)",
+                "rgba(50, 172, 45, 0.97)"
+              ],
+              "decimals": 2,
+              "pattern": "/.*/",
+              "thresholds": [],
+              "type": "number",
+              "unit": "short"
+            }
+          ],
+          "targets": [
+            {
+              "refId": "A",
+              "target": ""
+            }
+          ],
+          "title": "Panel Title",
+          "transform": "timeseries_to_columns",
+          "type": "table"
+        }
+
   ],
   "schemaVersion": 14,
   "style": "dark",

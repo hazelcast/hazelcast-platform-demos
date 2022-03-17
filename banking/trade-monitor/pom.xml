@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.banking</groupId>
 		<artifactId>banking-root</artifactId>
-		<version>5.1</version>
+		<version>5.2</version>
 	</parent>
 
 	<groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
@@ -26,14 +26,11 @@
 		<my.cluster1.name>grid</my.cluster1.name>
 		<my.pulsar.or.kafka>pulsar</my.pulsar.or.kafka>
 		<my.pulsar.or.kafka>kafka</my.pulsar.or.kafka>
-		<!-- Configure the build for HZ Cloud or all Kubernetes -->
-		<use.hz-cloud>false</use.hz-cloud>
 
 		<!-- Project specific versions -->
 		<javalin.version>3.13.0</javalin.version>
 		<!--  Kafka Clients must match cloud target -->
 		<kafka-clients.version>2.2.2</kafka-clients.version>
-		<spring-boot.version>2.5.1</spring-boot.version>
 
 		<!-- Common logons for Management Center, Grafana, Prometheus -->
 		<my.other.admin.user>admin</my.other.admin.user>

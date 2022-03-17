@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos</groupId>
 		<artifactId>hazelcast-platform-demos-root</artifactId>
-		<version>5.1</version>
+		<version>5.2</version>
 	</parent>
 
 	<groupId>com.hazelcast.platform.demos.retail</groupId>
