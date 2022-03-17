@@ -25,8 +25,6 @@
 
 		<!-- React.js app in src/main/app -->
 		<frontend.app.dir>${project.basedir}/src/main/app</frontend.app.dir>
-		<node.version>v14.15.4</node.version>
-		<npm.version>6.14.11</npm.version>
 	</properties>
 
 	<dependencies>
