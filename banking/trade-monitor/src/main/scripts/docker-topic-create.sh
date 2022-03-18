@@ -6,7 +6,7 @@ MODULE=topic-create
 BASEDIR=`dirname $0`
 cd $BASEDIR/../../../$MODULE
 
-MY_ZOOKEEPER=zookeeper:2181
+MY_BOOTSTRAP_SERVERS=kafka-broker0:9092,kafka-broker1:9093,kafka-broker2:9094
 
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
@@ -16,7 +16,7 @@ docker network create $PROJECT --driver bridge > /dev/null 2>&1
 docker container prune --force > /dev/null 2>&1
 
 # External port 8083
-CMD="docker run -e MY_ZOOKEEPER=$MY_ZOOKEEPER --rm --network=${PROJECT} ${DOCKER_IMAGE}"
+CMD="docker run -e MY_BOOTSTRAP_SERVERS=$MY_BOOTSTRAP_SERVERS --rm --network=${PROJECT} ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD

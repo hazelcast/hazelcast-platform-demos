@@ -40,8 +40,8 @@ spec:
     spec:
       containers:
         - env:
-          - name: "MY_ZOOKEEPER"
-            value: "trade-monitor-zookeeper.default.svc.cluster.local"
+          - name: "MY_BOOTSTRAP_SERVERS"
+            value: "trade-monitor-kafka-broker-0.trade-monitor-kafka-broker.default.svc.cluster.local:9092,trade-monitor-kafka-broker-1.trade-monitor-kafka-broker.default.svc.cluster.local:9092,trade-monitor-kafka-broker-2.trade-monitor-kafka-broker.default.svc.cluster.local:9092"
           image: "hazelcast-platform-demos/trade-monitor-topic-create"
           imagePullPolicy: Never
           name: trade-monitor-job-topic-create-container
