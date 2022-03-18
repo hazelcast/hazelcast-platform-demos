@@ -99,7 +99,6 @@
 		<!-- Javascript -->
 		<node.version>v17.7.1</node.version>
 		<npm.version>7.20.3</npm.version>
-                <yarn.version>v1.22.5</yarn.version>
 	</properties>
 
 	<dependencies>
