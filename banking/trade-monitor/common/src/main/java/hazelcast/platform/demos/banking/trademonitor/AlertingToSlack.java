@@ -17,6 +17,7 @@
 package hazelcast.platform.demos.banking.trademonitor;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.json.JSONObject;
 
@@ -135,18 +136,23 @@ public class AlertingToSlack {
      */
     private static FunctionEx<Map.Entry<Long, HazelcastJsonValue>, JSONObject> myMapStage() {
         return entry -> {
-            JSONObject input = new JSONObject(entry.getValue().toString());
-
-            String cleanStr =
-                    "*ALERT* `"
-                    + input.getString("timestamp")
-                    + ", stock '" + input.getString("symbol")
-                    + ", volume: " + input.getLong("volume") + "`";
-
             JSONObject output = new JSONObject();
-            output.put(UtilsConstants.SLACK_PARAM_TEXT, cleanStr);
+            try {
+                JSONObject input = new JSONObject(entry.getValue().toString());
 
-            return output;
+                String cleanStr =
+                        "*ALERT* `"
+                        + input.getString("timestamp")
+                        + ", stock '" + input.getString("symbol")
+                        + ", volume: " + input.getLong("volume") + "`";
+
+                output.put(UtilsConstants.SLACK_PARAM_TEXT, cleanStr);
+                return output;
+            } catch (Exception e) {
+                System.out.println(Objects.toString(entry) + " caused " + e.getMessage());
+                output.put(UtilsConstants.SLACK_PARAM_TEXT, "no data");
+                return output;
+            }
         };
     }
 
