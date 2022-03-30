@@ -14,6 +14,7 @@
 
 	<modules>
 		<module>banking</module>
+		<module>benchmark</module>
 		<!--
 		<module>industry</module>
 		-->
@@ -42,6 +43,7 @@
                 <!-- For Management Center, Cassandra/Mongo/MySQL etc logons -->
                 <my.mc.admin.user>admin</my.mc.admin.user>
                 <my.mc.admin.password>password1</my.mc.admin.password>
+		<my.mc.license.key>${my.license.key}</my.mc.license.key>
                 <my.other.admin.user>${my.mc.admin.user}</my.other.admin.user>
                 <my.other.admin.password>${my.mc.admin.password}</my.other.admin.password>
                 <my.other.admin.database>${docker.image.prefix}</my.other.admin.database>
@@ -94,11 +96,11 @@
 		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
 		<os-maven-plugin.version>1.6.2</os-maven-plugin.version>
 		<protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
-		<spotbugs-maven-plugin.version>4.5.3.0</spotbugs-maven-plugin.version>
+		<spotbugs-maven-plugin.version>4.6.0.0</spotbugs-maven-plugin.version>
 
 		<!-- Javascript -->
-		<node.version>v17.7.1</node.version>
-		<npm.version>7.20.3</npm.version>
+		<node.version>v17.8.0</node.version>
+		<npm.version>8.5.4</npm.version>
 	</properties>
 
 	<dependencies>
