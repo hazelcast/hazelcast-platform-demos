@@ -1,0 +1,31 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+        <parent>
+                <groupId>com.hazelcast.platform.demos.benchmark.nexmark</groupId>
+                <artifactId>nexmark-root</artifactId>
+                <version>5.2</version>
+        </parent>
+
+	<artifactId>nexmark-grafana</artifactId>
+
+	<name>Hazelcast Platform - NEXMark - Grafana</name>
+	<description>NEXMark - Grafana monitoring</description>
+
+	<properties>
+                <docker.image.name>grafana</docker.image.name>
+                <docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
+	</properties>
+
+        <build>
+                <plugins>
+                        <plugin>
+                                <groupId>com.spotify</groupId>
+                                <artifactId>dockerfile-maven-plugin</artifactId>
+                        </plugin>
+                </plugins>
+        </build>
+</project>

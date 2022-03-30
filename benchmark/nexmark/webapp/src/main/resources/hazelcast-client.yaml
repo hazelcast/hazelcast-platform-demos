@@ -1,0 +1,6 @@
+hazelcast-client:
+  cluster-name: '@my.cluster1.name@'
+  network:
+    kubernetes:
+      enabled: true
+      service-dns: '@docker.image.prefix@-hazelcast.default.svc.cluster.local'
