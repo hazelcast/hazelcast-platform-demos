@@ -193,7 +193,7 @@ class Fixings extends Component {
     }
     
     getFixings(){
-        setImmediate(() => {
+        setTimeout(() => {
 	    	var client = rest.wrap(mime);
 	    	var self = this;
 	    	
@@ -224,7 +224,7 @@ class Fixings extends Component {
 	        			});
 	        	}
 	    	});
-        })
+        }, 0)
       }
 
     componentDidMount(){
