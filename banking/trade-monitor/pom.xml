@@ -33,7 +33,7 @@
 		<javalin.version>3.13.0</javalin.version>
 		<!--  Kafka Clients must match cloud target -->
 		<kafka-clients.version>2.2.2</kafka-clients.version>
-		<spring-boot.version>2.5.1</spring-boot.version>
+		<spring-boot.version>2.5.12</spring-boot.version>
 
 		<!-- Common logons for Management Center, Grafana, Prometheus -->
 		<my.other.admin.user>admin</my.other.admin.user>
