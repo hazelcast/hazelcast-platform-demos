@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+		"allowSyntheticDefaultImports": true,
+        "jsx": "react",
+        "module": "es2022",
+	    "removeComments": true,
+        "target": "es2022",
+      },
+    "include": [
+        "src/**/*",
+    ],
+    "exclude": [
+        "node_modules",
+    ]
+}
