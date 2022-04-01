@@ -1,0 +1,72 @@
+:root {
+	--hazelcast-blue: #012168;
+	--hazelcast-blue-dark: #0b2a35;
+	--hazelcast-blue-light: #2e7de1;
+	--hazelcast-orange: #ff5f00;
+}
+
+body {
+	background: Black;
+}
+
+h1 {
+    text-align: center;
+}
+h2, h3, h4, h5 {
+    text-align: center;
+}
+
+.headerfooter {
+        color: var(--hazelcast-blue-light);
+        font-family: "Courier New", Courier, monospace;
+        font-size: 80%;
+        text-align: center;
+}
+.headerfooterline {
+        color: var(--hazelcast-orange);
+}
+
+.major_pane {
+	background: white;
+	border-style: solid;
+    border-color: var(--hazelcast-orange);
+    padding: 5px 5px 5px 5px;
+}
+
+.minor_pane {
+	background: DarkSlateGray;
+	color: YellowGreen;
+    border-top: 1px dashed;
+    border-color: var(--hazelcast-blue-light);
+    margin-left: auto;
+    margin-right: auto;
+    overflow-y: scroll;
+    vertical-align: top;
+}
+
+.pane_separator {
+    border-top: 1px dashed MediumVioletRed;
+}
+
+.formButton {
+  background-color: var(--hazelcast-orange);
+  color:   white;
+}
+.formOuterBox {
+    border: 2px dashed brown;
+    height: 50px;
+    padding: 10px;
+    padding-top: 10px;
+}
+.formOutputBox {
+    font-family: monospace;
+    padding: 5px;
+}
+
+.jobOk {
+	color: green;
+}
+.jobNotOk {
+	color: red;
+	font-weight: bold;
+}
