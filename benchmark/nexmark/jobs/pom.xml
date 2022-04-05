@@ -9,17 +9,13 @@
                 <version>5.2</version>
         </parent>
 
-	<artifactId>nexmark-hazelcast-node</artifactId>
+	<artifactId>nexmark-jobs</artifactId>
 
-	<name>Hazelcast Platform - NEXMark - Hazelcast Node</name>
-	<description>NEXMark - Hazelcast Node</description>
+	<name>Hazelcast Platform - NEXMark - Benchmark Jobs</name>
+	<description>NEXMark - Hazelcast version of code</description>
 
 	<properties>
-		<docker.image.name>hazelcast-node</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
-		<main.class>hazelcast.platform.demos.benchmark.nexmark.Application</main.class>
-		<my.cluster.name>${my.cluster1.name}</my.cluster.name>
 	</properties>
 
 	<dependencies>
@@ -28,16 +24,4 @@
 			<artifactId>hazelcast-sql</artifactId>
 		</dependency>
 	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
 </project>

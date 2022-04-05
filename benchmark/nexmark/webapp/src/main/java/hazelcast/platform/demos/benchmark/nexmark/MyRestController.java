@@ -16,6 +16,10 @@
 
 package hazelcast.platform.demos.benchmark.nexmark;
 
+import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.jet.Job;
+import com.hazelcast.jet.config.ProcessingGuarantee;
 import com.hazelcast.platform.demos.utils.UtilsFormatter;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -43,15 +48,38 @@ public class MyRestController {
     @Autowired
     private HazelcastInstance hazelcastInstance;
 
+    /**
+     * <p>Launch the selected benchmark. Not all parameters are used by all benchmarks.
+     * </p>
+     *
+     * @param kind
+     * @param eventsPerSecond
+     * @param numDistinctKeys
+     * @param slideBy
+     * @param windowSizeMillis
+     * @return
+     */
     @GetMapping(value = "/submit", produces = MediaType.APPLICATION_JSON_VALUE)
     @SuppressFBWarnings(value = "REC_CATCH_EXCEPTION", justification = "Class.forName() can throw exceptions")
     public String submit(
             @RequestParam("kind") String kind,
-            @RequestParam("eventsPerSecond") int eventsPerSecond,
-            @RequestParam("windowSizeMillis") int windowSizeMillis
+            @RequestParam("processingGuarantee") String processingGuaranteeStr,
+            @RequestParam(BenchmarkBase.PROP_EVENTS_PER_SECOND) long eventsPerSecond,
+            @RequestParam(BenchmarkBase.PROP_NUM_DISTINCT_KEYS) long numDistinctKeys,
+            @RequestParam(BenchmarkBase.PROP_SLIDING_STEP_MILLIS) long slideBy,
+            @RequestParam(BenchmarkBase.PROP_WINDOW_SIZE_MILLIS) long windowSizeMillis
             ) {
-        LOGGER.info("submit(kind='{}', eventsPerSecond={}, windowSizeMillis={})",
-                kind, eventsPerSecond, eventsPerSecond, windowSizeMillis);
+
+        Map<String, Long> params = new TreeMap<>();
+        params.put(BenchmarkBase.PROP_EVENTS_PER_SECOND, eventsPerSecond);
+        params.put(BenchmarkBase.PROP_NUM_DISTINCT_KEYS, numDistinctKeys);
+        params.put(BenchmarkBase.PROP_SLIDING_STEP_MILLIS, slideBy);
+        params.put(BenchmarkBase.PROP_WINDOW_SIZE_MILLIS, windowSizeMillis);
+
+        LOGGER.info("submit(kind=='{}'", kind);
+        LOGGER.info(" processingGuarantee=='{}'", processingGuaranteeStr);
+        params.entrySet().forEach(entry -> LOGGER.info(" '{}'=={}", entry.getKey(), entry.getValue()));
+        LOGGER.info(")");
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{");
@@ -65,7 +93,10 @@ public class MyRestController {
             long now = System.currentTimeMillis();
             String jobNameSuffix = "@" + UtilsFormatter.timestampToISO8601(now);
 
-            Job job = benchmark.run(this.hazelcastInstance, jobNameSuffix, eventsPerSecond, windowSizeMillis);
+            ProcessingGuarantee processingGuarantee =
+                    ProcessingGuarantee.valueOf(processingGuaranteeStr.toUpperCase(Locale.ROOT));
+
+            Job job = benchmark.run(this.hazelcastInstance, jobNameSuffix, now, params, processingGuarantee);
 
             stringBuilder.append(", \"id\": \"" + job.getId() + "\"");
             stringBuilder.append(", \"name\": \"" + job.getName() + "\"");

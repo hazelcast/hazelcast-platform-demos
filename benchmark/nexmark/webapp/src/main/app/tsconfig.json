@@ -1,9 +1,10 @@
 {
     "compilerOptions": {
-		"allowSyntheticDefaultImports": true,
+	"allowSyntheticDefaultImports": true,
         "jsx": "react",
         "module": "es2022",
-	    "removeComments": true,
+	"moduleResolution": "node",
+	"removeComments": true,
         "target": "es2022",
       },
     "include": [
