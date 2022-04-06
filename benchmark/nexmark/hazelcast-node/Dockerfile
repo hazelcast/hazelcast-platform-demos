@@ -14,10 +14,14 @@ ARG JAR_FILE
 COPY target/${JAR_FILE} application.jar
 
 # Default values, provide from kubernetes-2.yaml
-ENV MY_PARTITIONS "1"
+ENV MY_PARTITIONS ""
 
 ENV JAVA_HEAP_SIZE "3g"
-ENV JAVA_ARGS "-Xms$JAVA_HEAP_SIZE -Xmx$JAVA_HEAP_SIZE"
+ENV JAVA_ARGS "-Xms$JAVA_HEAP_SIZE \
+ -Xmx$JAVA_HEAP_SIZE \
+ -XX:+AlwaysPreTouch \
+ -XX:MaxMetaspaceSize=256m \
+ -XX:MaxGCPauseMillis=50"
 ENV JAVA_OPTS "--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
 
 ENTRYPOINT exec java \

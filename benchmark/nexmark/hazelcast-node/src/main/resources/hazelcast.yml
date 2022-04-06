@@ -2,7 +2,7 @@ hazelcast:
   cluster-name: '@my.cluster1.name@'
 
   properties:
-    # Property from Dockerfile, via kubernetes-2.yaml
+    # Property from Dockerfile, via kubernetes-1.yaml
     hazelcast.partition.count: '${my.partitions}'
     # Graceful shutdown is helpful for Kubernetes scale-down.
     hazelcast.shutdownhook.policy: GRACEFUL

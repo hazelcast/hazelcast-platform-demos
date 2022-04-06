@@ -24,8 +24,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast-sql</artifactId>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>nexmark-jobs</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
 	</dependencies>
 
