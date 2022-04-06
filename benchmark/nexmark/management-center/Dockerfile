@@ -9,7 +9,7 @@ ARG MY_ADMINPASSWORD
 COPY target/classes/hazelcast-client-cluster1.xml /
 
 # Any Java config for MC. Note "hazelcast.mc.metrics.consumer.large.cluster.mode"
-ENV JAVA_HEAP_SIZE="3g"
+ENV JAVA_HEAP_SIZE="11g"
 ENV JAVA_OPTS="\
  -Dhazelcast.mc.healthCheck.enable=true \
  -Dhazelcast.mc.license=$MC_LICENSE \

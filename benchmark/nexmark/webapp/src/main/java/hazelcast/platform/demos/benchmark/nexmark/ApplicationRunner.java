@@ -16,6 +16,10 @@
 
 package hazelcast.platform.demos.benchmark.nexmark;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -27,7 +31,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.HazelcastJsonValue;
 
 /**
  * <p>Mainly leave it up to React.js
@@ -54,6 +57,15 @@ public class ApplicationRunner {
                     while (true) {
                         TimeUnit.MINUTES.sleep(1L);
                         LOGGER.info("-=-=-=-=- '{}' RUNNING -=-=-=-=-=-", this.springApplicationName);
+                        Collection<String> names = List.of(BenchmarkBase.IMAP_NAME_CURRENT_LATENCIES,
+                                BenchmarkBase.IMAP_NAME_MAX_LATENCIES);
+                        for (String name : names) {
+                            Set<Entry<Object, Object>> entrySet =
+                                    this.hazelcastInstance.getMap(name).entrySet();
+                            entrySet.forEach(entry -> {
+                                LOGGER.info("{} : {}", name, entry);
+                            });
+                        }
                     }
                 } catch (InterruptedException e) {
                     LOGGER.warn("Interrupted: {}", e.getMessage());
@@ -65,57 +77,62 @@ public class ApplicationRunner {
     }
 
     /**
-     * <p>Define mappings
+     * <p>Define mappings and views. Map have same structure for maximum and current
+     * latency.
      * </p>
      * @return
      */
     private boolean init() {
-        String definitionBody1 = "("
-                + "    __key VARCHAR,"
-                + "    \"timestamp\" BIGINT,"
-                + "    timestamp_str VARCHAR,"
-                + "    latency_ms BIGINT,"
-                + "    offset_ms BIGINT"
+        String mappingBody = "("
+                + "    \"kind\" VARCHAR EXTERNAL NAME \"__key." + BenchmarkBase.PROP_KIND + "\","
+                + "    \"start_timestamp\" BIGINT EXTERNAL NAME \"__key.start_timestamp\","
+                + "    \"start_timestamp_str\" VARCHAR EXTERNAL NAME \"__key.start_timestamp_str\","
+                + "    \"processing_guarantee\" VARCHAR EXTERNAL NAME \"__key." + BenchmarkBase.PROP_PROCESSING_GUARANTEE + "\","
+                + "    \"events_per_second\" VARCHAR EXTERNAL NAME \"__key." + BenchmarkBase.PROP_EVENTS_PER_SECOND + "\","
+                + "    \"num_distinct_keys\" BIGINT EXTERNAL NAME \"__key." + BenchmarkBase.PROP_NUM_DISTINCT_KEYS + "\","
+                + "    \"sliding_step_millis\" BIGINT EXTERNAL NAME \"__key." + BenchmarkBase.PROP_SLIDING_STEP_MILLIS + "\","
+                + "    \"window_size_millis\" BIGINT EXTERNAL NAME \"__key." + BenchmarkBase.PROP_WINDOW_SIZE_MILLIS + "\","
+                + "    \"timestamp\" BIGINT EXTERNAL NAME \"this.timestamp\","
+                + "    \"timestamp_str\" VARCHAR EXTERNAL NAME \"this.timestamp_str\","
+                + "    latency_ms BIGINT EXTERNAL NAME \"this.latency_ms\","
+                + "    offset_ms BIGINT EXTERNAL NAME \"this.offset_ms\""
                 + ")"
-                 + " TYPE IMap "
+                + " TYPE IMap "
                 + " OPTIONS ( "
-                + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
-                + " 'valueFormat' = 'json-flat',"
-                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
+                + " 'keyFormat' = 'json-flat',"
+                + " 'valueFormat' = 'json-flat'"
                 + " )";
 
-        String definitionBody2 = "("
-                + "    __key VARCHAR,"
-                + "    \"timestamp\" BIGINT,"
-                + "    timestamp_str VARCHAR,"
-                + "    latency_ms BIGINT,"
-                + "    offset_ms BIGINT"
-                + ")"
-                 + " TYPE IMap "
-                + " OPTIONS ( "
-                + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
-                + " 'valueFormat' = 'json-flat',"
-                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
-                + " )";
+        String viewBody = "AS SELECT"
+                + "  JSON_VALUE(CAST(__key AS VARCHAR), '$." + BenchmarkBase.PROP_KIND  + "')"
+                + " AS \"" + BenchmarkBase.PROP_KIND + "\""
+                + ", JSON_VALUE(CAST(__key AS VARCHAR), '$." + BenchmarkBase.PROP_EVENTS_PER_SECOND  + "')"
+                + " AS \"" + BenchmarkBase.PROP_EVENTS_PER_SECOND + "\""
+                + ", JSON_VALUE(CAST(this AS VARCHAR), '$.latency_ms' RETURNING BIGINT)"
+                + " AS \"latency_ms\" "
+                ;
 
-        boolean ok = this.define(BenchmarkBase.IMAP_NAME_CURRENT_LATENCIES, definitionBody1);
-        ok = ok & this.define(BenchmarkBase.IMAP_NAME_MAX_LATENCIES, definitionBody2);
+        boolean ok = this.defineMappingAndView(BenchmarkBase.IMAP_NAME_CURRENT_LATENCIES, mappingBody, viewBody);
+        ok = ok & this.defineMappingAndView(BenchmarkBase.IMAP_NAME_MAX_LATENCIES, mappingBody, viewBody);
         return ok;
     }
 
-    private boolean define(String mapName, String definitionBody) {
-        String definition = "CREATE OR REPLACE MAPPING " + mapName + " " + definitionBody;
-        LOGGER.debug("Definition '{}'", definition);
-        try {
-            // Ensure definition and object both exist
-            this.hazelcastInstance.getSql().execute(definition);
-            this.hazelcastInstance.getMap(mapName);
-            return true;
-        } catch (Exception e) {
-            LOGGER.error(definition, e);
-            return false;
+    private boolean defineMappingAndView(String mapName, String mappingBody, String viewBody) {
+        String mapping = "CREATE OR REPLACE MAPPING \"" + mapName + "\" " + mappingBody;
+        String view = "CREATE OR REPLACE VIEW \"" + mapName + "_VIEW\" " + viewBody
+                + " FROM \"" + mapName + "\"";
+        for (String definition : List.of(mapping, view)) {
+            try {
+                LOGGER.debug("Definition '{}'", definition);
+                this.hazelcastInstance.getSql().execute(definition);
+            } catch (Exception e) {
+                LOGGER.error(mapping, e);
+                return false;
+            }
         }
+        // If definitions were ok, ensure target object exists
+        this.hazelcastInstance.getMap(mapName);
+        return true;
     }
+
 }

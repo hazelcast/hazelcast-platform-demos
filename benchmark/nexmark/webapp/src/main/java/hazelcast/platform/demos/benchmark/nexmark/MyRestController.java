@@ -62,8 +62,8 @@ public class MyRestController {
     @GetMapping(value = "/submit", produces = MediaType.APPLICATION_JSON_VALUE)
     @SuppressFBWarnings(value = "REC_CATCH_EXCEPTION", justification = "Class.forName() can throw exceptions")
     public String submit(
-            @RequestParam("kind") String kind,
-            @RequestParam("processingGuarantee") String processingGuaranteeStr,
+            @RequestParam(BenchmarkBase.PROP_KIND) String kind,
+            @RequestParam(BenchmarkBase.PROP_PROCESSING_GUARANTEE) String processingGuaranteeStr,
             @RequestParam(BenchmarkBase.PROP_EVENTS_PER_SECOND) long eventsPerSecond,
             @RequestParam(BenchmarkBase.PROP_NUM_DISTINCT_KEYS) long numDistinctKeys,
             @RequestParam(BenchmarkBase.PROP_SLIDING_STEP_MILLIS) long slideBy,

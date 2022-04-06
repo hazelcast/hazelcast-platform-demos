@@ -8,9 +8,9 @@ const JobSub: React.FunctionComponent = () => {
   const [params, setParams] = useState({
 		kind: "Q05HotItems",
 		processingGuarantee: "NONE",
-		eventsPerSecond: 10,
+		eventsPerSecond: 12000000000,
 		numDistinctKeys: 10000,
-		slidingStepMillis: 20,
+		slidingStepMillis: 500,
 		windowSizeMillis: 10000
 	});
   const [message, setMessage] = useState('');
@@ -24,11 +24,11 @@ const JobSub: React.FunctionComponent = () => {
     event.preventDefault();
 	console.log('JobSub', 'onSubmit', params);
 	var restURL = '/rest/submit/?kind=' + params.kind
-                        + '&processingGuarantee=' + params.processingGuarantee
-                        + '&events-per-second=' + params.eventsPerSecond
-                        + '&num-distinct-keys=' + params.numDistinctKeys
-                        + '&sliding-step-millis=' + params.slidingStepMillis
-                        + '&window-size-millis=' + params.windowSizeMillis;
+                        + '&processing_guarantee=' + params.processingGuarantee
+                        + '&events_per_second=' + params.eventsPerSecond
+                        + '&num_distinct_keys=' + params.numDistinctKeys
+                        + '&sliding_step_millis=' + params.slidingStepMillis
+                        + '&window_size_millis=' + params.windowSizeMillis;
 
 	setTimeout(() => {
 		var client = rest.wrap(mime);
@@ -95,7 +95,7 @@ const JobSub: React.FunctionComponent = () => {
     	    	 <input id="eventsPerSecond" name="eventsPerSecond"
 	        		value={params.eventsPerSecond}
     	      		onChange={onChange}
-        	  		type="number" min="1" max="10000000000"
+        	  		type="number" min="1" max="12000000000"
         		 />
     			</div> 
       			<div className='formField'>
