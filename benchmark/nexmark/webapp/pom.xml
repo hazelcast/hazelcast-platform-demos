@@ -12,7 +12,7 @@
 	<artifactId>nexmark-webapp</artifactId>
 
 	<name>Hazelcast Platform - NEXMark - WebApp</name>
-	<description>NEXMark - Hazelcast Node</description>
+	<description>NEXMark - Hazelcast Client</description>
 
 	<properties>
 		<docker.image.name>webapp</docker.image.name>

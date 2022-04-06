@@ -1,6 +1,12 @@
 hazelcast-client:
   cluster-name: '@my.cluster1.name@'
+  instance-name: '@project.artifactId@-@maven.build.timestamp@'
+  client-labels:
+    - 'built-by:@user.name@'
+    - 'user.language:@user.language@'
   network:
     kubernetes:
       enabled: true
       service-dns: '@docker.image.prefix@-hazelcast.default.svc.cluster.local'
+  metrics:
+    enabled: true
