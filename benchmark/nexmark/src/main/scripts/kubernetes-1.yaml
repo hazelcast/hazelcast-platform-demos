@@ -1,0 +1,83 @@
+---
+# Service DNS for Hazelcast grid will be "nexmark-hazelcast.default.svc.cluster.local".
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$ SERVICE DEFINITIONS $$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Service for Hazelcast grid
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexmark-hazelcast
+spec:
+  clusterIP: None
+  selector:
+    app: nexmark-hazelcast
+  ports:
+  - port: 5701
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$ POD DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# See https://github.com/hazelcast/charts/blob/master/stable/hazelcast/values.yaml
+# for liveness/readiness probe settings.
+---
+# Hazelcast grid, start with 1 as parallel start *THEN* scale
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nexmark-hazelcast
+spec:
+  replicas: 1
+  podManagementPolicy: Parallel
+  serviceName: nexmark-hazelcast
+  selector:
+    matchLabels:
+      app: nexmark-hazelcast
+  template:
+    metadata:
+      labels:
+        app: nexmark-hazelcast
+    spec:
+      containers:
+        - env:
+          - name: "JAVA_HEAP_SIZE"
+            value: "23g"
+          - name: "MY_GC_LOGGING"
+            value: "-Xlog:safepoint,gc*,gc+ergo=trace,gc+age=trace,gc+phases=trace,gc+humongous=trace:file=/tmp/verbosegc.log:level,tags,time,uptime:filesize=1048576000,filecount=15"
+          - name: "MY_GC_TUNING"
+            value: "-XX:+AlwaysPreTouch -XX:MaxMetaspaceSize=256m -XX:MaxGCPauseMillis=50"
+          - name: "MY_PARTITIONS"
+            value: "5011"
+          image: "hazelcast-platform-demos/nexmark-hazelcast-node"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /hazelcast/health/node-state
+              port: 5701
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 10
+          name: nexmark-hazelcast-container
+          readinessProbe:
+            httpGet:
+              path: /hazelcast/health/ready
+              port: 5701
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 10
+          resources:
+            requests:
+              cpu: 15500m
+              memory: 24Gi
+            limits:
+              cpu: 15500m
+              memory: 24Gi
+---

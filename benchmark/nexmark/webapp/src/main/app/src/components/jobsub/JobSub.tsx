@@ -8,7 +8,8 @@ const JobSub: React.FunctionComponent = () => {
   const [params, setParams] = useState({
 		kind: "Q05HotItems",
 		processingGuarantee: "NONE",
-		eventsPerSecond: 12000000000,
+		eventsPerSecondA: 12,
+		eventsPerSecondB: "BILLION",
 		numDistinctKeys: 10000,
 		slidingStepMillis: 500,
 		windowSizeMillis: 10000
@@ -23,9 +24,15 @@ const JobSub: React.FunctionComponent = () => {
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 	console.log('JobSub', 'onSubmit', params);
+	var eventsPerSecond = params.eventsPerSecondA
+	if (params.eventsPerSecondB == 'BILLION') {
+		eventsPerSecond = eventsPerSecond * 1000000000;
+	} else {
+		eventsPerSecond = eventsPerSecond * 1000000;
+	}
 	var restURL = '/rest/submit/?kind=' + params.kind
                         + '&processing_guarantee=' + params.processingGuarantee
-                        + '&events_per_second=' + params.eventsPerSecond
+                        + '&events_per_second=' + eventsPerSecond
                         + '&num_distinct_keys=' + params.numDistinctKeys
                         + '&sliding_step_millis=' + params.slidingStepMillis
                         + '&window_size_millis=' + params.windowSizeMillis;
@@ -91,12 +98,19 @@ const JobSub: React.FunctionComponent = () => {
     			 </select> 
     			</div> 
       			<div className='formField'>
-      			 <label htmlFor="eventsPerSecond">&nbsp;Events/Second: &nbsp;</label>
-    	    	 <input id="eventsPerSecond" name="eventsPerSecond"
-	        		value={params.eventsPerSecond}
+      			 <label htmlFor="eventsPerSecondA">&nbsp;Events/Second Rate: &nbsp;</label>
+    	    	 <input id="eventsPerSecondA" name="eventsPerSecondA"
+	        		value={params.eventsPerSecondA}
     	      		onChange={onChange}
-        	  		type="number" min="1" max="12000000000"
+        	  		type="number" min="1" max="999"
         		 />
+      			 <label htmlFor="eventsPerSecondB">&nbsp;Events/Second Scale: &nbsp;</label>
+      			 <select id="eventsPerSecondB" name="eventsPerSecondB"
+      				onChange={onChange}
+					>
+                    <option value="BILLION"              selected>Billion</option>
+                	<option value="MILLION"                      >Million</option>
+    			 </select> 
     			</div> 
       			<div className='formField'>
       			 <label htmlFor="numDistinctKeys">&nbsp;Number of distinct keys: &nbsp;</label>

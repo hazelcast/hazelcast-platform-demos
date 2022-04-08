@@ -37,6 +37,7 @@
 		<!-- "test" makes the webapp a standalone server for local testing. Anything else for client -->
 		<my.mode>prod</my.mode>
 		<my.mode>test</my.mode>
+		<my.mode>prod</my.mode>
 	</properties>
 
 	<build>

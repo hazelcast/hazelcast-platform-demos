@@ -1,0 +1,135 @@
+---
+# Service DNS for Management Center will be "nexmark-management-center.default.svc.cluster.local".
+# Service DNS for Prometheus will be "nexmark-prometheus.default.svc.cluster.local".
+# Service DNS for Grafana will be "nexmark-grafana.default.svc.cluster.local".
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$ SERVICE DEFINITIONS $$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Service for Grafana
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexmark-grafana
+spec:
+  selector:
+    app: nexmark-grafana
+  ports:
+    - name: grafana
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer
+---
+# Service for Management Center
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexmark-management-center
+spec:
+  selector:
+    app: nexmark-management-center
+  ports:
+    - name: nexmark-management-center
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer
+---
+# Service for Prometheus
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexmark-prometheus
+spec:
+  selector:
+    app: nexmark-prometheus
+  ports:
+    - name: prometheus
+      port: 9090
+      targetPort: 9090
+  type: LoadBalancer
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$ POD DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Pod for Grafana
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nexmark-grafana
+spec:
+  selector:
+    matchLabels:
+      app: nexmark-grafana
+  template:
+    metadata:
+      labels:
+        app: nexmark-grafana
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/nexmark-grafana"
+          imagePullPolicy: Never
+          name: nexmark-grafana-container
+---
+# Pod for Management Center
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nexmark-management-center
+spec:
+  selector:
+    matchLabels:
+      app: nexmark-management-center
+  template:
+    metadata:
+      labels:
+        app: nexmark-management-center
+    spec:
+      containers:
+        - env:
+          - name: "JAVA_HEAP_SIZE"
+            value: "11g"
+          image: "hazelcast-platform-demos/nexmark-management-center"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+          name: nexmark-management-center-container
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 30
+          resources:
+            requests:
+              memory: "12Gi"
+            limits:
+              memory: "12Gi"
+---
+# Pod for Prometheus
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nexmark-prometheus
+spec:
+  selector:
+    matchLabels:
+      app: nexmark-prometheus
+  template:
+    metadata:
+      labels:
+        app: nexmark-prometheus
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/nexmark-prometheus"
+          imagePullPolicy: Never
+          name: nexmark-prometheus-container
+---
