@@ -16,6 +16,7 @@ COPY target/${JAR_FILE} application.jar
 # Default values, provide from kubernetes-1.yaml
 ENV JAVA_ARGS ""
 ENV JAVA_HEAP_SIZE "20g"
+ENV MY_COOPERATIVE_THREAD_COUNT ""
 ENV MY_GC_LOGGING ""
 ENV MY_GC_TUNING ""
 ENV MY_PARTITIONS ""
@@ -29,6 +30,8 @@ CMD ["bash", "-c", "set -euo pipefail \
       && echo MY_GC_TUNING=${MY_GC_TUNING} \
       && echo JAVA_ARGS=${JAVA_ARGS} \
       && echo @@@@@@@@@@@@@@@@@@@@ \
-      && echo java -Dmy.partitions=${MY_PARTITIONS} $JAVA_ARGS $JAVA_OPTS $MY_GC_LOGGING $MY_GC_TUNING -jar application.jar \
-      && java -Dmy.partitions=${MY_PARTITIONS} $JAVA_ARGS $JAVA_OPTS $MY_GC_LOGGING $MY_GC_TUNING -jar application.jar \
+      && echo java -Dmy.partitions=${MY_PARTITIONS} -Dmy.cooperative.thread.count=${MY_COOPERATIVE_THREAD_COUNT} \
+       $JAVA_ARGS $JAVA_OPTS $MY_GC_LOGGING $MY_GC_TUNING -jar application.jar \
+      && java -Dmy.partitions=${MY_PARTITIONS} -Dmy.cooperative.thread.count=${MY_COOPERATIVE_THREAD_COUNT} \
+       $JAVA_ARGS $JAVA_OPTS $MY_GC_LOGGING $MY_GC_TUNING -jar application.jar \
      "]

@@ -45,9 +45,12 @@ spec:
       containers:
         - env:
           - name: "JAVA_HEAP_SIZE"
-            value: "23g"
+            value: "20g"
+          - name: "MY_COOPERATIVE_THREAD_COUNT"
+            value: "14"
           - name: "MY_GC_LOGGING"
-            value: "-Xlog:safepoint,gc*,gc+ergo=trace,gc+age=trace,gc+phases=trace,gc+humongous=trace:file=/tmp/verbosegc.log:level,tags,time,uptime:filesize=1048576000,filecount=15"
+            #value: "-Xlog:safepoint,gc*,gc+ergo=trace,gc+age=trace,gc+phases=trace,gc+humongous=trace:file=/tmp/verbosegc.log:level,tags,time,uptime:filesize=1048576000,filecount=15"
+            value: ""
           - name: "MY_GC_TUNING"
             value: "-XX:+AlwaysPreTouch -XX:MaxMetaspaceSize=256m -XX:MaxGCPauseMillis=50"
           - name: "MY_PARTITIONS"

@@ -22,7 +22,10 @@ hazelcast:
       endpoint-groups:
         HEALTH_CHECK:
           enabled: true
-  # :-)
+  #
   jet:
     enabled: true
     resource-upload-enabled: true
+    # "we size Jet’s thread pool a bit below the system capacity: up to 14 threads on 16-vCPU machines.
+    # This important trick allows the GC to work in the background without interfering with Jet’s real-time computations."
+    cooperative-thread-count: ${my.cooperative.thread.count}
