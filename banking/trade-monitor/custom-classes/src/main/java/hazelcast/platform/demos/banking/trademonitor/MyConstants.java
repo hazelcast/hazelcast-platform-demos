@@ -25,6 +25,7 @@ import java.util.List;
 public class MyConstants {
 
     public static final String KAFKA_TOPIC_MAPPING_PREFIX = "";
+    public static final String KAFKA_TOPIC_NAME_ALERTS = "kf_alerts";
     public static final String KAFKA_TOPIC_NAME_TRADES = "kf_trades";
     public static final String PULSAR_CONFIG_KEY = "my.pulsar.list";
     public static final String PULSAR_TOPIC_NAME_TRADES = "pulsar_trades";
