@@ -30,7 +30,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>trade-monitor-common</artifactId>
+			<artifactId>trade-monitor-custom-classes</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
