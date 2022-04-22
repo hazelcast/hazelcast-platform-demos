@@ -74,7 +74,7 @@ import com.hazelcast.platform.demos.utils.UtilsUrls;
 public class AggregateQuery {
 
     private static final int CONSTANT_KEY = Integer.valueOf(0);
-    private static final long TEN_MINUTES_IN_MS = 10 * 60 * 1_000L;
+    private static final long FIVE_MINUTES_IN_MS = 5 * 60 * 1_000L;
     private static final long LOG_THRESHOLD = 100_000L;
 
     private static ToLongFunctionEx<Object> nowTimestampFn = __ -> System.currentTimeMillis();
@@ -177,7 +177,7 @@ public class AggregateQuery {
     }
 
     /**
-     * <p>Periodically (every ten minutes) output the largest
+     * <p>Periodically (every <i>n</i> minutes) output the largest
      * trading stock by volume.
      * </p>
      * <p>This is the largest since the start, not in that
@@ -204,7 +204,7 @@ public class AggregateQuery {
         })
         .addTimestamps(nowTimestampFn, 0)
         .groupingKey(Functions.entryKey())
-        .window(WindowDefinition.tumbling(TEN_MINUTES_IN_MS))
+        .window(WindowDefinition.tumbling(FIVE_MINUTES_IN_MS))
         .aggregate(maxVolumeAggregator)
         .map(result -> result.getValue())
         .writeTo(Sinks.map(MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME));

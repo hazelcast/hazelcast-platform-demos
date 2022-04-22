@@ -274,7 +274,33 @@ public class CommonIdempotentInitialization {
                 + " 'bootstrap.servers' = '" + bootstrapServers + "'"
                 + " )";
 
-        return define(definition1, hazelcastInstance);
+        String definition2 = "CREATE EXTERNAL MAPPING IF NOT EXISTS "
+                // Name for our SQL
+                + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_ALERTS
+                // Name of the remote object
+                + " EXTERNAL NAME " + MyConstants.KAFKA_TOPIC_NAME_ALERTS
+                + " ( "
+                + "    __key BIGINT,"
+                //XXX + "    \"timestamp\" VARCHAR,"
+                //XXX + "    symbol VARCHAR,"
+                //XXX + "    volume BIGINT"
+                + "    this VARCHAR"
+                + " ) "
+                + " TYPE Kafka "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.Long',"
+                //XXX+ " 'valueFormat' = 'json-flat',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = 'java.lang.String',"
+                + " 'auto.offset.reset' = 'earliest',"
+                + " 'bootstrap.servers' = '" + bootstrapServers + "'"
+                + " )";
+
+        boolean ok = true;
+        ok = define(definition1, hazelcastInstance);
+        ok = ok & define(definition2, hazelcastInstance);
+        return ok;
     }
 
 
@@ -475,6 +501,8 @@ public class CommonIdempotentInitialization {
                 LOGGER.error("Pulsar is not currently supported on Hazelcast Cloud");
             } else {
                 UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAggregateQuery, jobConfigAggregateQuery);
+                // Aggregate query creates alerts to an IMap. Use a separate rather than same job to copy to Kafka.
+                launchAlertsToKafka(hazelcastInstance, bootstrapServers);
             }
         }
 
@@ -534,6 +562,32 @@ public class CommonIdempotentInitialization {
     }
 
     /**
+     * <p>Use SQL to copy alerts to Kafka outbound topic.
+     * </p>
+     *
+     * @param hazelcastInstance
+     * @param bootstrapServers
+     */
+    private static void launchAlertsToKafka(HazelcastInstance hazelcastInstance, String bootstrapServers) {
+        String sql = "SINK INTO " + MyConstants.KAFKA_TOPIC_NAME_ALERTS
+                + " SELECT * FROM " + MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME;
+        try {
+            Pipeline pipelineAlertingToKafka = AlertingToKafka.buildPipeline(bootstrapServers);
+
+            JobConfig jobConfigAlertingToKafka = new JobConfig();
+            jobConfigAlertingToKafka.setName(AlertingToKafka.class.getSimpleName());
+            jobConfigAlertingToKafka.addClass(HazelcastJsonValueSerializer.class);
+
+            UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToKafka, jobConfigAlertingToKafka);
+
+            //FIXME hazelcastInstance.getSql().execute(sql);
+            LOGGER.info("SQL running: '{}'", sql);
+        } catch (Exception e) {
+            LOGGER.error("launchAlertsSqlToKafka:" + sql, e);
+        }
+    }
+
+    /**
      * <p>Optional, but really cool, job for integration with Slack.
      * </p>
      * @param hazelcastInstance
@@ -554,7 +608,9 @@ public class CommonIdempotentInitialization {
             jobConfigAlertingToSlack.addClass(AlertingToSlack.class);
             jobConfigAlertingToSlack.addClass(UtilsSlackSink.class);
 
-            UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToSlack, jobConfigAlertingToSlack);
+            LOGGER.info("Job - {}",
+                UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToSlack, jobConfigAlertingToSlack)
+            );
         } catch (Exception e) {
             LOGGER.error("launchNeededJobs:" + AlertingToSlack.class.getSimpleName(), e);
         }
