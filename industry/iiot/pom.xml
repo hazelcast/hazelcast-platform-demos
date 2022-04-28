@@ -30,8 +30,6 @@
 	</modules>
 
 	<properties>
-		<java.version>11</java.version>
-
 		<docker.image.prefix>iiot</docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
 
