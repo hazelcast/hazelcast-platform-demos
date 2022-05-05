@@ -82,9 +82,10 @@ const JobSub: React.FunctionComponent = () => {
                 	<option value="Q04AveragePriceForCategory"  disabled>Q04 - Average Price For Category</option>
                     <option value="Q05HotItems"                 selected>Q05 - Hot Item</option>
                 	<option value="Q06AvgSellingPrice"          disabled>Q06 - Average Selling Price</option>
-                	<option value="Q07HighestBid"                       >Q07 - Highest Bid</option>
+                	<option value="Q07HighestBid"               disabled>Q07 - Highest Bid</option>
                 	<option value="Q08MonitorNewUsers"          disabled>Q08 - Monitor New Users</option>
                 	<option value="Q13BoundedSideInput"         disabled>Q13 - Bounded Side Input</option>
+                	<option value="SourceBenchmark"                     >Internal - Source Benchmark</option>
     			 </select>
     			</div> 
       			<div className='formField'>
