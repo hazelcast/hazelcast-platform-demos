@@ -2,6 +2,8 @@ hazelcast:
   cluster-name: '@my.cluster1.name@'
 
   properties:
+    # In favour of verbosegc.log
+    hazelcast.health.monitoring.level: OFF
     # Property from Dockerfile, via kubernetes-1.yaml
     hazelcast.partition.count: '${my.partitions}'
     # Graceful shutdown is helpful for Kubernetes scale-down.

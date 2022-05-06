@@ -24,9 +24,11 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
+import com.hazelcast.function.BiFunctionEx;
 import com.hazelcast.function.FunctionEx;
 import com.hazelcast.jet.Job;
 import com.hazelcast.jet.accumulator.LongAccumulator;
@@ -62,11 +64,47 @@ public abstract class BenchmarkBase {
 
     protected static final long NO_ALLOWED_LAG = 0L;
     protected static final long INITIAL_SOURCE_DELAY_MILLIS = 10L;
+    // 10 minutes warm up.
+    protected static final long WARM_UP_MILLIS = TimeUnit.MINUTES.toMillis(10L);
 
     private static final long SNAPSHOT_INTERVAL_MILLIS = 1_000L;
-    // 2.5 minutes warm up.
-    private static final long WARM_UP_MILLIS = 150_000L;
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance();
+
+    /**
+     * <p>Using a pair of timestamp as state (first timestamp and last timestamp),
+     * examine the incoming timestamp to determine the latency.
+     * Re-factored to a separate function for unit testing.
+     * </p>
+     */
+    protected static final BiFunctionEx<LongLongAccumulator, Long, Tuple2<Long, Long>> LATENCY_FN =
+            (state, timestamp) -> {
+                long lastTimestamp = state.get2();
+                if (timestamp <= lastTimestamp) {
+                    return null;
+                }
+                if (lastTimestamp == 0) {
+                    // state.startTimestamp = timestamp;
+                    state.set1(timestamp);
+                }
+                long startTimestamp = state.get1();
+                // state.lastTimestamp = timestamp;
+                state.set2(timestamp);
+
+                // Drop results in warm-up phase
+                long offset = timestamp - startTimestamp;
+                if (offset < WARM_UP_MILLIS) {
+                    return null;
+                }
+
+                // very low latencies may be reported as negative due to clock skew
+                long latency = System.currentTimeMillis() - timestamp;
+                if (latency < 0) {
+                    latency = 0;
+                }
+
+                return tuple2(offset, latency);
+            };
+
 
     /**
      * <p>Initiate a test with the given parameters.
@@ -203,36 +241,9 @@ public abstract class BenchmarkBase {
      */
     <T> FunctionEx<StreamStage<T>, StreamStage<Tuple2<Long, Long>>> determineLatency(
             FunctionEx<? super T, ? extends Long> timestampFn) {
-        return stage -> stage.map(timestampFn).mapStateful(LongLongAccumulator::new,
-                /* (startTimestamp, lastTimestamp) */
-                (state, timestamp) -> {
-                    long lastTimestamp = state.get2();
-                    if (timestamp <= lastTimestamp) {
-                        return null;
-                    }
-                    if (lastTimestamp == 0) {
-                        // state.startTimestamp = timestamp;
-                        state.set1(timestamp);
-                    }
-                    long startTimestamp = state.get1();
-                    // state.lastTimestamp = timestamp;
-                    state.set2(timestamp);
-
-                    // Drop results in warm-up phase
-                    long offset = timestamp - startTimestamp;
-                    if (offset < WARM_UP_MILLIS) {
-                        return null;
-                    }
-
-                    // very low latencies may be reported as negative due to clock skew
-                    long latency = System.currentTimeMillis() - timestamp;
-                    if (latency < 0) {
-                        latency = 0;
-                    }
-
-                    return tuple2(offset, latency);
-                });
+        return stage -> stage.map(timestampFn).mapStateful(LongLongAccumulator::new, LATENCY_FN);
     }
+
 
     /**
      * <p>Take a timestamp {@code long} and convert it into an ISO-8601
