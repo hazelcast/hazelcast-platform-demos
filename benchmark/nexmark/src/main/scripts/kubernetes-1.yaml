@@ -49,12 +49,15 @@ spec:
           - name: "MY_COOPERATIVE_THREAD_COUNT"
             value: "14"
           - name: "MY_GC_LOGGING"
-            #value: "-Xlog:safepoint,gc*,gc+ergo=trace,gc+age=trace,gc+phases=trace,gc+humongous=trace:file=/tmp/verbosegc.log:level,tags,time,uptime:filesize=1048576000,filecount=15"
-            value: ""
+            # GC Logging is optional, and adds a minor overhead
+            value: "-Xlog:safepoint,gc*,gc+ergo=trace,gc+age=trace,gc+phases=trace,gc+humongous=trace:file=/tmp/verbosegc.log:level,tags,time,uptime:filesize=1048576000,filecount=15"
+            #value: ""
           - name: "MY_GC_TUNING"
             value: "-XX:+AlwaysPreTouch -XX:MaxMetaspaceSize=256m -XX:MaxGCPauseMillis=50"
           - name: "MY_PARTITIONS"
+            # Optimize for target cluster size
             value: "5011"
+            #value: "36011"
           image: "hazelcast-platform-demos/nexmark-hazelcast-node"
           imagePullPolicy: Never
           livenessProbe:
