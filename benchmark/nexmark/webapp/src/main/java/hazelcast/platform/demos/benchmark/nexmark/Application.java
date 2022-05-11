@@ -16,19 +16,8 @@
 
 package hazelcast.platform.demos.benchmark.nexmark;
 
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
-
-import com.hazelcast.config.Config;
-import com.hazelcast.core.Hazelcast;
-import com.hazelcast.core.HazelcastInstance;
 
 /**
  * <p>Entry point. Let Spring do the work.
@@ -36,7 +25,6 @@ import com.hazelcast.core.HazelcastInstance;
  */
 @SpringBootApplication
 public class Application {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
     static {
         System.setProperty("hazelcast.logging.type", "slf4j");
@@ -45,27 +33,6 @@ public class Application {
     public static void main(String[] args) throws Exception {
         SpringApplication.run(Application.class, args);
         System.exit(0);
-    }
-
-    /**
-     * <p>For testing, make standalone cluster rather
-     * then allow client to be autowired.
-     * </p>
-     */
-    @Bean
-    @ConditionalOnProperty(prefix = "my", name = "mode", havingValue = "test")
-    public HazelcastInstance hazelcastInstance() throws Exception {
-        LOGGER.info("-=-=-=-=-");
-        LOGGER.info("TEST MODE: Run as server not client");
-        LOGGER.info("-=-=-=-=-");
-        TimeUnit.SECONDS.sleep(1L);
-
-        Config config = new Config();
-        config.getJetConfig().setEnabled(true).setResourceUploadEnabled(true);
-        config.getNetworkConfig().getJoin().getAutoDetectionConfig().setEnabled(false);
-        config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
-        config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(true).setMembers(List.of("127.0.0.1"));
-        return Hazelcast.newHazelcastInstance(config);
     }
 
 }

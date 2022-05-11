@@ -33,11 +33,6 @@
 		<my.cluster1.name>nexmark</my.cluster1.name>
 		<my.management.center.name>${docker.image.prefix}-management-center</my.management.center.name>
 		<my.prometheus.name>${docker.image.prefix}-prometheus</my.prometheus.name>
-
-		<!-- "test" makes the webapp a standalone server for local testing. Anything else for client -->
-		<my.mode>prod</my.mode>
-		<my.mode>test</my.mode>
-		<my.mode>prod</my.mode>
 	</properties>
 
 	<build>

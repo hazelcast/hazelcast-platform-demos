@@ -16,24 +16,36 @@
 
 package hazelcast.platform.demos.benchmark.nexmark;
 
+import com.hazelcast.config.ClasspathYamlConfig;
+import com.hazelcast.config.Config;
+import com.hazelcast.config.FileSystemXmlConfig;
 import com.hazelcast.core.Hazelcast;
 
 /**
  * <p>Start a Hazelcast server. Configuration will be automatically
- * loaded from default named file "{@code hazelcast.yml}". Server
- * will stay running until killed or shutdown from Management Center.
+ * loaded from named file "{@code hazelcast.yml}". Server will stay
+ * running until killed or shutdown from Management Center.
  * Jet processing job is initiated from Hazelcast client.
  * </p>
  */
 public class Application {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         System.out.println("-=-=-=-=-");
         System.out.println("Runtime.getRuntime().availableProcessors()==" + Runtime.getRuntime().availableProcessors());
         System.getProperties().list(System.out);
         System.out.println("-=-=-=-=-");
 
-        Hazelcast.newHazelcastInstance();
+        // Use "hazelcast.xml" if found to allow bare metal deployment, else default to Kubernetes.
+        Config config = null;
+        String override = System.getProperty("hazelcast.config", "");
+        if (!override.isBlank()) {
+            config = new FileSystemXmlConfig(override);
+        } else {
+            config = new ClasspathYamlConfig("hazelcast.yml");
+        }
+
+        Hazelcast.newHazelcastInstance(config);
     }
 
 }

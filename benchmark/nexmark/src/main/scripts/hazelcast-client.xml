@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hazelcast-client xmlns="http://www.hazelcast.com/schema/client-config"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://www.hazelcast.com/schema/client-config
+                  http://www.hazelcast.com/schema/client-config/hazelcast-client-config-5.2.xsd">
+
+    <cluster-name>NEXMark</cluster-name>
+
+    <network>
+        <cluster-members>
+            <address>${host.ip}</address>
+        </cluster-members>
+    </network>
+
+    <connection-strategy reconnect-mode="OFF">
+        <connection-retry>
+            <cluster-connect-timeout-millis>5000</cluster-connect-timeout-millis>
+        </connection-retry>
+    </connection-strategy>
+
+</hazelcast-client>
