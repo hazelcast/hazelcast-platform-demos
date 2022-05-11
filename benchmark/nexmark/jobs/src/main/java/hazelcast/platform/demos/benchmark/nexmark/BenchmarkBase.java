@@ -40,7 +40,9 @@ import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.pipeline.StreamStage;
 
+import hazelcast.platform.demos.benchmark.nexmark.model.Auction;
 import hazelcast.platform.demos.benchmark.nexmark.model.Bid;
+import hazelcast.platform.demos.benchmark.nexmark.model.Person;
 
 /**
  * <p>Hazelcast streaming pipeline for NEXMark queries.
@@ -134,9 +136,9 @@ public abstract class BenchmarkBase {
         jobConfig.setProcessingGuarantee(processingGuarantee);
         jobConfig.setSnapshotIntervalMillis(SNAPSHOT_INTERVAL_MILLIS);
 
-        //TODO jobConfig.registerSerializer(Auction.class, Auction.AuctionSerializer.class);
+        jobConfig.registerSerializer(Auction.class, Auction.AuctionSerializer.class);
         jobConfig.registerSerializer(Bid.class, Bid.BidSerializer.class);
-        //TODO jobConfig.registerSerializer(Person.class, Person.PersonSerializer.class);
+        jobConfig.registerSerializer(Person.class, Person.PersonSerializer.class);
 
         jobConfig.addClass(this.getClass());
         jobConfig.addClass(BenchmarkBase.class);
