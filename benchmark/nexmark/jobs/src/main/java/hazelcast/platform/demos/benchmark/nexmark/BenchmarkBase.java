@@ -136,9 +136,9 @@ public abstract class BenchmarkBase {
         jobConfig.setProcessingGuarantee(processingGuarantee);
         jobConfig.setSnapshotIntervalMillis(SNAPSHOT_INTERVAL_MILLIS);
 
-        jobConfig.registerSerializer(Auction.class, Auction.AuctionSerializer.class);
+        //TODO jobConfig.registerSerializer(Auction.class, Auction.AuctionSerializer.class);
         jobConfig.registerSerializer(Bid.class, Bid.BidSerializer.class);
-        jobConfig.registerSerializer(Person.class, Person.PersonSerializer.class);
+        //TODO jobConfig.registerSerializer(Person.class, Person.PersonSerializer.class);
 
         jobConfig.addClass(this.getClass());
         jobConfig.addClass(BenchmarkBase.class);
