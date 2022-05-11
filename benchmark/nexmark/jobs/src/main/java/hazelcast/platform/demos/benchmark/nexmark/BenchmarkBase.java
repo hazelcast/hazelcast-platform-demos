@@ -40,9 +40,7 @@ import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.pipeline.StreamStage;
 
-import hazelcast.platform.demos.benchmark.nexmark.model.Auction;
 import hazelcast.platform.demos.benchmark.nexmark.model.Bid;
-import hazelcast.platform.demos.benchmark.nexmark.model.Person;
 
 /**
  * <p>Hazelcast streaming pipeline for NEXMark queries.
