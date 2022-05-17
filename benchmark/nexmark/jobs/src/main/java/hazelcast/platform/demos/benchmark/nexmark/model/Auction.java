@@ -23,7 +23,7 @@ import com.hazelcast.nio.serialization.StreamSerializer;
 import java.io.IOException;
 
 /**
- * <p>Actions have "{@code sellerId}", a "{@code category}" and a 
+ * <p>Actions have "{@code sellerId}", a "{@code category}" and a
  * "{@code expires}", they come to an end at some point.
  * </p>
  * <p>Plus inherited fields "{@code id}" and "{@code timestamp}".

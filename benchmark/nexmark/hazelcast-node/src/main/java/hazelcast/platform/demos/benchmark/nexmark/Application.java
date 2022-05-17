@@ -16,9 +16,6 @@
 
 package hazelcast.platform.demos.benchmark.nexmark;
 
-import com.hazelcast.config.ClasspathYamlConfig;
-import com.hazelcast.config.Config;
-import com.hazelcast.config.FileSystemXmlConfig;
 import com.hazelcast.core.Hazelcast;
 
 /**
@@ -36,16 +33,7 @@ public class Application {
         System.getProperties().list(System.out);
         System.out.println("-=-=-=-=-");
 
-        // Use "hazelcast.xml" if found to allow bare metal deployment, else default to Kubernetes.
-        Config config = null;
-        String override = System.getProperty("hazelcast.config", "");
-        if (!override.isBlank()) {
-            config = new FileSystemXmlConfig(override);
-        } else {
-            config = new ClasspathYamlConfig("hazelcast.yml");
-        }
-
-        Hazelcast.newHazelcastInstance(config);
+        Hazelcast.newHazelcastInstance();
     }
 
 }
