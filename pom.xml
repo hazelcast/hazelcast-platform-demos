@@ -67,6 +67,7 @@
 		<jython.version>2.7.2</jython.version>
 		<kafka-connect.version>2.6.0</kafka-connect.version>
  		<mongo-java-driver.version>3.12.7</mongo-java-driver.version>
+		<netty-tcnative.version>2.0.52.Final</netty-tcnative.version>
 		<poi-ooxml.version>4.1.2</poi-ooxml.version>
         <!-- Run same version with 'protoc - -grpc_out=. - -plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin' 
              banking/credit-value-adjustment/common/src/main/proto/JetToCpp.proto -->
@@ -74,7 +75,7 @@
 		<pulsar.version>2.8.0</pulsar.version>
 		<spotbugs-annotations.version>4.6.0</spotbugs-annotations.version>
 		<springdoc.version>1.6.7</springdoc.version>
-		<spring-boot.version>2.6.7</spring-boot.version>
+		<spring-boot.version>2.7.0</spring-boot.version>
         <spring-cloud.version>2021.0.0</spring-cloud.version>
         <spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
 		<zipkin.version>2.23.3-SNAPSHOT</zipkin.version>
@@ -205,6 +206,12 @@
 				<artifactId>debezium-connector-mongodb</artifactId>
 				<version>${debezium-connector-mongodb.version}</version>
 			</dependency>
+
+                	<dependency>
+                        	<groupId>io.netty</groupId>
+                        	<artifactId>netty-tcnative</artifactId>
+				<version>${netty-tcnative.version}</version>
+                	</dependency>
 
 			<dependency>
 				<groupId>org.springdoc</groupId>
