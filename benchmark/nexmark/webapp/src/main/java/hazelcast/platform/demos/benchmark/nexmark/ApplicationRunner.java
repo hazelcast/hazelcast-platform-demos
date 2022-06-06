@@ -18,8 +18,10 @@ package hazelcast.platform.demos.benchmark.nexmark;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -31,6 +33,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.jet.Job;
+import com.hazelcast.jet.config.ProcessingGuarantee;
+import com.hazelcast.platform.demos.utils.UtilsFormatter;
 
 /**
  * <p>Mainly leave it up to React.js
@@ -39,9 +44,13 @@ import com.hazelcast.core.HazelcastInstance;
 @Configuration
 public class ApplicationRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationRunner.class);
+    private static final long TEN_THOUSAND = 10_000L;
+    private static final long FIVE_HUNDRED = 500L;
 
     @Autowired
     private HazelcastInstance hazelcastInstance;
+    @Value("${my.autostart.q05}")
+    private String myAutostartQ05;
     @Value("${spring.application.name}")
     private String springApplicationName;
 
@@ -53,6 +62,10 @@ public class ApplicationRunner {
             boolean ok = this.init();
 
             if (ok) {
+                if (!this.myAutostartQ05.isBlank()) {
+                    this.autostart();
+                }
+
                 try {
                     while (true) {
                         TimeUnit.MINUTES.sleep(1L);
@@ -135,4 +148,25 @@ public class ApplicationRunner {
         return true;
     }
 
+    /**
+     * <p>Kick of Q05 with pre-set params, same as "{@code JobSub.tsx}".
+     * </p>
+     */
+    private void autostart() {
+        Q05HotItems q05HotItems = new Q05HotItems();
+
+        Map<String, Long> params = new TreeMap<>();
+        params.put(BenchmarkBase.PROP_EVENTS_PER_SECOND, Long.parseLong(this.myAutostartQ05));
+        params.put(BenchmarkBase.PROP_NUM_DISTINCT_KEYS, TEN_THOUSAND);
+        params.put(BenchmarkBase.PROP_SLIDING_STEP_MILLIS, FIVE_HUNDRED);
+        params.put(BenchmarkBase.PROP_WINDOW_SIZE_MILLIS, TEN_THOUSAND);
+
+        long now = System.currentTimeMillis();
+        String jobNameSuffix = "@" + UtilsFormatter.timestampToISO8601(now);
+
+        ProcessingGuarantee processingGuarantee = ProcessingGuarantee.NONE;
+
+        Job job = q05HotItems.run(this.hazelcastInstance, jobNameSuffix, now, params, processingGuarantee);
+        LOGGER.info("Launched {}", job);
+    }
 }
