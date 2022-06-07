@@ -75,10 +75,14 @@ public class EventSourceP extends AbstractProcessor {
     private long counter;
     private long lastEmittedWm;
     private long nowNanos;
+    private long warmUpMillis;
+    private long warmUpNanos;
 
     <T> EventSourceP(long startTime, long itemsPerSecond, EventTimePolicy<? super T> eventTimePolicy,
             BiFunctionEx<? super Long, ? super Long, ? extends T> createEventFn) {
         this.startTime = MILLISECONDS.toNanos(startTime + nanoTimeMillisToCurrentTimeMillis);
+        this.warmUpMillis = this.startTime + BenchmarkBase.WARM_UP_MILLIS;
+        this.warmUpNanos = MILLISECONDS.toNanos(this.warmUpMillis);
         this.itemsPerSecond = itemsPerSecond;
         this.createEventFn = createEventFn;
         wmGranularity = eventTimePolicy.watermarkThrottlingFrameSize();
@@ -164,7 +168,7 @@ public class EventSourceP extends AbstractProcessor {
         long wmToEmit = timestamp - (timestamp % wmGranularity) + wmOffset;
         long nowMillis = nanoTimeToCurrentTimeMillis(nowNanos);
         long wmLag = nowMillis - wmToEmit;
-        if (wmLag > WM_LAG_THRESHOLD_MILLIS) {
+        if (wmLag > WM_LAG_THRESHOLD_MILLIS && nowMillis > this.warmUpMillis) {
             System.out.printf("NEXMark.%s:WATERMARK@%s for %s#%d => %,d ms behind real time%n",
                     PREFIX, LocalTime.now().toString(), name, globalProcessorIndex, wmLag);
         }
@@ -179,7 +183,7 @@ public class EventSourceP extends AbstractProcessor {
      */
     private void detectAndReportHiccup() {
         long millisSinceLastCall = NANOSECONDS.toMillis(nowNanos - lastCallNanos);
-        if (millisSinceLastCall > HICCUP_REPORT_THRESHOLD_MILLIS) {
+        if (millisSinceLastCall > HICCUP_REPORT_THRESHOLD_MILLIS && nowNanos > this.warmUpNanos) {
             System.out.printf("NEXMark.%s:HICCUP@%s for %s#%d => %,d ms%n",
                     PREFIX, LocalTime.now().toString(), name, globalProcessorIndex, millisSinceLastCall);
         }

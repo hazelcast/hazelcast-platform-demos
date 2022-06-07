@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,7 @@ import org.springframework.context.annotation.Configuration;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.jet.Job;
 import com.hazelcast.jet.config.ProcessingGuarantee;
+import com.hazelcast.jet.core.JobStatus;
 import com.hazelcast.platform.demos.utils.UtilsFormatter;
 
 /**
@@ -149,24 +151,52 @@ public class ApplicationRunner {
     }
 
     /**
-     * <p>Kick of Q05 with pre-set params, same as "{@code JobSub.tsx}".
+     * <p>If a job is running, cancel it and that's it. Otherwise
+     * kick of Q05 with pre-set params, same as "{@code JobSub.tsx}".
+     * So run the webapp once to start and once again to stop the
+     * default job.
      * </p>
      */
     private void autostart() {
-        Q05HotItems q05HotItems = new Q05HotItems();
+        LOGGER.info("@@@@@@@ '{}'", this.springApplicationName);
+        LOGGER.info("@@@@@@@ '{}' autostart() @@@@@@@", this.springApplicationName);
+        Collection<Job> jobs = this.hazelcastInstance.getJet().getJobs();
+        final AtomicLong cancelled = new AtomicLong(0L);
+        if (!jobs.isEmpty()) {
+            jobs.forEach(job -> {
+                if (job.getStatus() == JobStatus.RUNNING) {
+                    LOGGER.info("STOPPING JOB '{}'", job);
+                    job.cancel();
+                    cancelled.incrementAndGet();
+                } else {
+                    if (job.getStatus() == JobStatus.FAILED) {
+                        LOGGER.info("SKIP \"{}\" (CANCELLED?) JOB '{}'", job.getStatus(), job);
+                    } else {
+                        LOGGER.warn("SKIP \"{}\" JOB '{}'", job.getStatus(), job);
+                    }
+                }
+            });
+        }
 
-        Map<String, Long> params = new TreeMap<>();
-        params.put(BenchmarkBase.PROP_EVENTS_PER_SECOND, Long.parseLong(this.myAutostartQ05));
-        params.put(BenchmarkBase.PROP_NUM_DISTINCT_KEYS, TEN_THOUSAND);
-        params.put(BenchmarkBase.PROP_SLIDING_STEP_MILLIS, FIVE_HUNDRED);
-        params.put(BenchmarkBase.PROP_WINDOW_SIZE_MILLIS, TEN_THOUSAND);
+        if (cancelled.get() == 0) {
+            Q05HotItems q05HotItems = new Q05HotItems();
 
-        long now = System.currentTimeMillis();
-        String jobNameSuffix = "@" + UtilsFormatter.timestampToISO8601(now);
+            Map<String, Long> params = new TreeMap<>();
+            params.put(BenchmarkBase.PROP_EVENTS_PER_SECOND, Long.parseLong(this.myAutostartQ05));
+            params.put(BenchmarkBase.PROP_NUM_DISTINCT_KEYS, TEN_THOUSAND);
+            params.put(BenchmarkBase.PROP_SLIDING_STEP_MILLIS, FIVE_HUNDRED);
+            params.put(BenchmarkBase.PROP_WINDOW_SIZE_MILLIS, TEN_THOUSAND);
 
-        ProcessingGuarantee processingGuarantee = ProcessingGuarantee.NONE;
+            long now = System.currentTimeMillis();
+            String jobNameSuffix = "@" + UtilsFormatter.timestampToISO8601(now);
 
-        Job job = q05HotItems.run(this.hazelcastInstance, jobNameSuffix, now, params, processingGuarantee);
-        LOGGER.info("Launched {}", job);
+            ProcessingGuarantee processingGuarantee = ProcessingGuarantee.NONE;
+
+            Job job = q05HotItems.run(this.hazelcastInstance, jobNameSuffix, now, params, processingGuarantee);
+            LOGGER.info("STARTED JOB '{}'", job);
+        }
+
+        LOGGER.info("@@@@@@@ '{}' autostart() @@@@@@@", this.springApplicationName);
+        LOGGER.info("@@@@@@@ '{}'", this.springApplicationName);
     }
 }

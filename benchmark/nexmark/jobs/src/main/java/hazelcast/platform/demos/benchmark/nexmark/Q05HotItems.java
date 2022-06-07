@@ -64,7 +64,7 @@ public class Q05HotItems extends BenchmarkBase {
 
         StreamStage<Bid> bids = pipeline
                 .readFrom(EventSourceP.eventSource("bids", eventsPerSecond, BenchmarkBase.INITIAL_SOURCE_DELAY_MILLIS,
-                        (seq, timestamp) -> new Bid(seq, timestamp, seq % numDistinctKeys, PRICE_UNUSED)))
+                        (timestamp, seq) -> new Bid(seq, timestamp, seq % numDistinctKeys, PRICE_UNUSED)))
                 .withNativeTimestamps(BenchmarkBase.NO_ALLOWED_LAG);
 
         // NEXMark Query 5 start
