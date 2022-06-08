@@ -82,6 +82,10 @@ public class EventSourceP extends AbstractProcessor {
             BiFunctionEx<? super Long, ? super Long, ? extends T> createEventFn) {
         this.startTimeNanos = MILLISECONDS.toNanos(startTimeMillis + nanoTimeMillisToCurrentTimeMillis);
         this.warmUpEndMillis = startTimeMillis + BenchmarkBase.WARM_UP_MILLIS;
+        System.out.printf(
+                "NEXMark.%s:EventSourceP@%s : warm-up without reporting until after %s%n",
+                PREFIX, LocalTime.now().toString(),
+                new java.util.Date(this.warmUpEndMillis).toString());
         this.warmUpEndNanos = this.startTimeNanos + MILLISECONDS.toNanos(BenchmarkBase.WARM_UP_MILLIS);
         this.itemsPerSecond = itemsPerSecond;
         this.createEventFn = createEventFn;

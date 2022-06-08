@@ -4,7 +4,7 @@
                   xsi:schemaLocation="http://www.hazelcast.com/schema/client-config
                   http://www.hazelcast.com/schema/client-config/hazelcast-client-config-5.2.xsd">
 
-    <cluster-name>NEXMark</cluster-name>
+    <cluster-name>nexmark</cluster-name>
 
     <network>
         <cluster-members>

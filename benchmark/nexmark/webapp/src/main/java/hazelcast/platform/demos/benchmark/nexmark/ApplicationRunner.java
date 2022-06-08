@@ -19,6 +19,7 @@ package hazelcast.platform.demos.benchmark.nexmark;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
@@ -71,16 +72,24 @@ public class ApplicationRunner {
                 try {
                     while (true) {
                         TimeUnit.MINUTES.sleep(1L);
-                        LOGGER.info("-=-=-=-=- '{}' RUNNING -=-=-=-=-=-", this.springApplicationName);
+                        LOGGER.info("-=-=-=-=- '{}' MAPS -=-=-=-=-=-", this.springApplicationName);
                         Collection<String> names = List.of(BenchmarkBase.IMAP_NAME_CURRENT_LATENCIES,
                                 BenchmarkBase.IMAP_NAME_MAX_LATENCIES);
                         for (String name : names) {
                             Set<Entry<Object, Object>> entrySet =
                                     this.hazelcastInstance.getMap(name).entrySet();
                             entrySet.forEach(entry -> {
-                                LOGGER.info("{} : {}", name, entry);
+                                LOGGER.info("MAP '{}' : {}", name, entry);
                             });
                         }
+                        LOGGER.info("-=-=-=-=- '{}' JOBS -=-=-=-=-=-", this.springApplicationName);
+                        this.hazelcastInstance.getJet().getJobs()
+                        .forEach(job -> {
+                            LOGGER.info("JOB '{}' : {} : {}",
+                                    Objects.toString(job.getName()),
+                                    job.getStatus(), job);
+                        });
+                        LOGGER.info("-=-=-=-=-");
                     }
                 } catch (InterruptedException e) {
                     LOGGER.warn("Interrupted: {}", e.getMessage());
@@ -202,4 +211,5 @@ public class ApplicationRunner {
         LOGGER.debug("@@@@@@@ <====>");
         LOGGER.debug("@@@@@@@");
     }
+
 }
