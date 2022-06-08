@@ -50,6 +50,10 @@ public class SourceBenchmark extends BenchmarkBase {
         long windowSizeMillis = params.get(BenchmarkBase.PROP_WINDOW_SIZE_MILLIS);
         String prefix = this.getClass().getSimpleName();
 
+        long expectedInWindow = eventsPerSecond * windowSizeMillis / BenchmarkBase.ONE_SECOND_AS_MILLIS;
+        long warmUpEnd = System.currentTimeMillis() + BenchmarkBase.WARM_UP_MILLIS;
+        long windowSeconds = windowSizeMillis / BenchmarkBase.ONE_SECOND_AS_MILLIS;
+
         StreamStage<Bid> bids = pipeline
                 .readFrom(EventSourceP.eventSource("bids", eventsPerSecond, BenchmarkBase.INITIAL_SOURCE_DELAY_MILLIS,
                         (timestamp, seq) -> new Bid(seq, timestamp, seq % numDistinctKeys, PRICE_UNUSED)))
@@ -58,9 +62,30 @@ public class SourceBenchmark extends BenchmarkBase {
         StreamStage<WindowResult<Long>> queryResult = bids
                 .window(WindowDefinition.sliding(windowSizeMillis, slideBy))
                 .aggregate(AggregateOperations.counting())
-                .filter((WindowResult<Long> item) -> {
-                    System.out.printf("NEXMark.%s:FILTER@%s for %d-%d => %,d items => %s%n",
-                            prefix, LocalTime.now().toString(), item.start(), item.end(), item.result(), item.toString());
+                .filter((WindowResult<Long> window) -> {
+                    /* Report if window contents not amount expected.
+                     * During warm-up phase some windows won't be complete, a minute's
+                     * worth of data won't be produced if haven't been running for a minute.
+                     */
+                    if (window.result() != expectedInWindow) {
+                        if (window.start() > warmUpEnd) {
+                            System.out.printf(
+                                    "NEXMark.%s:filter@%s (%s): %d seconds => %,d items not %,d => %s%n",
+                                    prefix, LocalTime.now().toString(),
+                                    "MAIN",
+                                    windowSeconds, window.result(),
+                                    expectedInWindow, window.toString());
+                            /* Remove comments to see window sizes from warm-up.
+                        } else {
+                            System.out.printf(
+                                    "NEXMark.%s:filter@%s (%s): %d seconds => %,d items not %,d => %s%n",
+                                    prefix, LocalTime.now().toString(),
+                                    "WARMUP",
+                                    windowSeconds, window.result(),
+                                    expectedInWindow, window.toString());
+                             */
+                        }
+                    }
                     return true;
                 });
 
