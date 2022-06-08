@@ -67,8 +67,7 @@ public abstract class BenchmarkBase {
     protected static final long NO_ALLOWED_LAG = 0L;
     protected static final long INITIAL_SOURCE_DELAY_MILLIS = 10L;
     // 10 minutes warm up.
-    //XXX protected static final long WARM_UP_MILLIS = TimeUnit.MINUTES.toMillis(10L);
-    protected static final long WARM_UP_MILLIS = TimeUnit.MINUTES.toMillis(1L);
+    protected static final long WARM_UP_MILLIS = TimeUnit.MINUTES.toMillis(10L);
 
     private static final long SNAPSHOT_INTERVAL_MILLIS = 1_000L;
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance();
