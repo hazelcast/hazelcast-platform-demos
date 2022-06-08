@@ -158,8 +158,9 @@ public class ApplicationRunner {
      * </p>
      */
     private void autostart() {
-        LOGGER.info("@@@@@@@ '{}'", this.springApplicationName);
-        LOGGER.info("@@@@@@@ '{}' autostart() @@@@@@@", this.springApplicationName);
+        LOGGER.debug("@@@@@@@");
+        LOGGER.debug("@@@@@@@ <====>");
+        LOGGER.debug("@@@@@@@ '{}' autostart() @@@@@@@", this.springApplicationName);
         Collection<Job> jobs = this.hazelcastInstance.getJet().getJobs();
         final AtomicLong cancelled = new AtomicLong(0L);
         if (!jobs.isEmpty()) {
@@ -172,7 +173,7 @@ public class ApplicationRunner {
                     if (job.getStatus() == JobStatus.FAILED) {
                         LOGGER.info("SKIP \"{}\" (CANCELLED?) JOB '{}'", job.getStatus(), job);
                     } else {
-                        LOGGER.warn("SKIP \"{}\" JOB '{}'", job.getStatus(), job);
+                        LOGGER.error("SKIP \"{}\" JOB '{}'", job.getStatus(), job);
                     }
                 }
             });
@@ -180,7 +181,7 @@ public class ApplicationRunner {
 
         if (cancelled.get() == 0) {
             Q05HotItems q05HotItems = new Q05HotItems();
-
+            
             Map<String, Long> params = new TreeMap<>();
             params.put(BenchmarkBase.PROP_EVENTS_PER_SECOND, Long.parseLong(this.myAutostartQ05));
             params.put(BenchmarkBase.PROP_NUM_DISTINCT_KEYS, TEN_THOUSAND);
@@ -193,10 +194,12 @@ public class ApplicationRunner {
             ProcessingGuarantee processingGuarantee = ProcessingGuarantee.NONE;
 
             Job job = q05HotItems.run(this.hazelcastInstance, jobNameSuffix, now, params, processingGuarantee);
-            LOGGER.info("STARTED JOB '{}'", job);
+            LOGGER.info("STARTED JOB '{}' WITH '{}'=={}", job, BenchmarkBase.PROP_EVENTS_PER_SECOND,
+                    String.format("%,d", params.get(BenchmarkBase.PROP_EVENTS_PER_SECOND)));
         }
 
-        LOGGER.info("@@@@@@@ '{}' autostart() @@@@@@@", this.springApplicationName);
-        LOGGER.info("@@@@@@@ '{}'", this.springApplicationName);
+        LOGGER.debug("@@@@@@@ '{}' autostart() @@@@@@@", this.springApplicationName);
+        LOGGER.debug("@@@@@@@ <====>");
+        LOGGER.debug("@@@@@@@");
     }
 }
