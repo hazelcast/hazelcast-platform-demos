@@ -36,6 +36,7 @@
 
 		<!-- If not blank, start Q05 automatically with this param. Otherwise needs web UI -->
 		<my.autostart.q05>1000000000</my.autostart.q05>
+		<my.autostart.q05></my.autostart.q05>
 	</properties>
 
 	<build>
