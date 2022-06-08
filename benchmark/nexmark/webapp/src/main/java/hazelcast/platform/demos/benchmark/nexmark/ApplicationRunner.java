@@ -181,7 +181,7 @@ public class ApplicationRunner {
 
         if (cancelled.get() == 0) {
             Q05HotItems q05HotItems = new Q05HotItems();
-            
+
             Map<String, Long> params = new TreeMap<>();
             params.put(BenchmarkBase.PROP_EVENTS_PER_SECOND, Long.parseLong(this.myAutostartQ05));
             params.put(BenchmarkBase.PROP_NUM_DISTINCT_KEYS, TEN_THOUSAND);
