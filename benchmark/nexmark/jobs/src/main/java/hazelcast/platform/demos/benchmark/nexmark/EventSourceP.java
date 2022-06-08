@@ -35,6 +35,7 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.time.LocalTime;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>A source that generates generic events,
@@ -47,17 +48,16 @@ import java.time.LocalTime;
  * </p>
  */
 public class EventSourceP extends AbstractProcessor {
-    private static final long THROUGHPUT_REPORTING_THRESHOLD = 3_500_000;
 
-    private static final long SOURCE_THROUGHPUT_REPORTING_PERIOD_MILLIS = 10_000;
-    private static final long THROUGHPUT_REPORT_PERIOD_NANOS = MILLISECONDS
-            .toNanos(SOURCE_THROUGHPUT_REPORTING_PERIOD_MILLIS);
+    private static final long THROUGHPUT_REPORTING_PERIOD_MINUTES = 10;
+    private static final long THROUGHPUT_REPORT_PERIOD_NANOS = TimeUnit.MINUTES
+            .toNanos(THROUGHPUT_REPORTING_PERIOD_MINUTES);
     private static final long HICCUP_REPORT_THRESHOLD_MILLIS = 10;
     private static final long WM_LAG_THRESHOLD_MILLIS = 20;
     private static final String PREFIX = EventSourceP.class.getSimpleName();
 
     private final long itemsPerSecond;
-    private final long startTime;
+    private final long startTimeNanos;
     private final long nanoTimeMillisToCurrentTimeMillis = determineTimeOffset();
     private final long wmGranularity;
     private final long wmOffset;
@@ -75,14 +75,14 @@ public class EventSourceP extends AbstractProcessor {
     private long counter;
     private long lastEmittedWm;
     private long nowNanos;
-    private long warmUpMillis;
-    private long warmUpNanos;
+    private long warmUpEndMillis;
+    private long warmUpEndNanos;
 
-    <T> EventSourceP(long startTime, long itemsPerSecond, EventTimePolicy<? super T> eventTimePolicy,
+    <T> EventSourceP(long startTimeMillis, long itemsPerSecond, EventTimePolicy<? super T> eventTimePolicy,
             BiFunctionEx<? super Long, ? super Long, ? extends T> createEventFn) {
-        this.startTime = MILLISECONDS.toNanos(startTime + nanoTimeMillisToCurrentTimeMillis);
-        this.warmUpMillis = this.startTime + BenchmarkBase.WARM_UP_MILLIS;
-        this.warmUpNanos = MILLISECONDS.toNanos(this.warmUpMillis);
+        this.startTimeNanos = MILLISECONDS.toNanos(startTimeMillis + nanoTimeMillisToCurrentTimeMillis);
+        this.warmUpEndMillis = startTimeMillis + BenchmarkBase.WARM_UP_MILLIS;
+        this.warmUpEndNanos = this.startTimeNanos + MILLISECONDS.toNanos(BenchmarkBase.WARM_UP_MILLIS);
         this.itemsPerSecond = itemsPerSecond;
         this.createEventFn = createEventFn;
         wmGranularity = eventTimePolicy.watermarkThrottlingFrameSize();
@@ -95,7 +95,7 @@ public class EventSourceP extends AbstractProcessor {
         totalParallelism = context.totalParallelism();
         globalProcessorIndex = context.globalProcessorIndex();
         emitPeriod = SECONDS.toNanos(1) * totalParallelism / itemsPerSecond;
-        emitSchedule = startTime + SECONDS.toNanos(1) * globalProcessorIndex / itemsPerSecond;
+        emitSchedule = startTimeNanos + SECONDS.toNanos(1) * globalProcessorIndex / itemsPerSecond;
         lastReport = emitSchedule;
         lastCallNanos = emitSchedule;
     }
@@ -168,9 +168,12 @@ public class EventSourceP extends AbstractProcessor {
         long wmToEmit = timestamp - (timestamp % wmGranularity) + wmOffset;
         long nowMillis = nanoTimeToCurrentTimeMillis(nowNanos);
         long wmLag = nowMillis - wmToEmit;
-        if (wmLag > WM_LAG_THRESHOLD_MILLIS && nowMillis > this.warmUpMillis) {
-            System.out.printf("NEXMark.%s:WATERMARK@%s for %s#%d => %,d ms behind real time%n",
-                    PREFIX, LocalTime.now().toString(), name, globalProcessorIndex, wmLag);
+        if (wmLag > WM_LAG_THRESHOLD_MILLIS && nowMillis > this.warmUpEndMillis) {
+            System.out.printf(
+                    "NEXMark.%s:maybeEmitWm@%s : %s#%d => %,d behind real time%n",
+                    PREFIX, LocalTime.now().toString(),
+                    name, globalProcessorIndex,
+                    wmLag);
         }
         traverser.append(new Watermark(wmToEmit));
         lastEmittedWm = wmToEmit;
@@ -183,9 +186,12 @@ public class EventSourceP extends AbstractProcessor {
      */
     private void detectAndReportHiccup() {
         long millisSinceLastCall = NANOSECONDS.toMillis(nowNanos - lastCallNanos);
-        if (millisSinceLastCall > HICCUP_REPORT_THRESHOLD_MILLIS && nowNanos > this.warmUpNanos) {
-            System.out.printf("NEXMark.%s:HICCUP@%s for %s#%d => %,d ms%n",
-                    PREFIX, LocalTime.now().toString(), name, globalProcessorIndex, millisSinceLastCall);
+        if (millisSinceLastCall > HICCUP_REPORT_THRESHOLD_MILLIS && nowNanos > this.warmUpEndNanos) {
+            System.out.printf(
+                    "NEXMark.%s:detectAndReportHiccup@%s : %s#%d => %,d ms%n",
+                    PREFIX, LocalTime.now().toString(),
+                    name, globalProcessorIndex,
+                    millisSinceLastCall);
         }
         lastCallNanos = nowNanos;
     }
@@ -194,7 +200,10 @@ public class EventSourceP extends AbstractProcessor {
      * <p>Informational reporting.</p>
      * <p>Periodically report throughput, per processor. With multiple processors it is difficult
      * in this module to determine if the total throughput is the same as the requested level. To
-     * do this, use {@link SourceBenchmark}.
+     * do this, use {@link SourceBenchmark}.</p>
+     * <p>Throughput is reported machine readable and human readable. For the former, wish
+     * to sum all processors for the same timestamp to determine overall throughput.
+     * </p>
      */
     private void reportThroughput() {
         long nanosSinceLastReport = nowNanos - lastReport;
@@ -204,10 +213,15 @@ public class EventSourceP extends AbstractProcessor {
         lastReport = nowNanos;
         long itemCountSinceLastReport = counter - counterAtLastReport;
         counterAtLastReport = counter;
-        double throughput = itemCountSinceLastReport / ((double) nanosSinceLastReport / SECONDS.toNanos(1));
-        if (throughput >= (double) THROUGHPUT_REPORTING_THRESHOLD) {
-            System.out.printf("NEXMark.%s:THROUGHPUT@%s for %s#%d => %,.0f items/second%n",
-                    PREFIX, LocalTime.now().toString(), name, globalProcessorIndex, throughput);
+        double throughput = itemCountSinceLastReport / ((double) nanosSinceLastReport
+                / BenchmarkBase.ONE_SECOND_AS_NANOS);
+        if (nowNanos > this.warmUpEndNanos) {
+            System.out.printf(
+                    "NEXMark.%s:reportThroughput@%s : %s#%d => %d items in %d seconds => %,.0f items/second%n",
+                    PREFIX, LocalTime.now().toString(),
+                    name, globalProcessorIndex,
+                    itemCountSinceLastReport, TimeUnit.NANOSECONDS.toSeconds(nanosSinceLastReport),
+                    throughput);
         }
     }
 

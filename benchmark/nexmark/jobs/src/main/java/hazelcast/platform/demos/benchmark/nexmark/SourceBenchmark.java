@@ -70,9 +70,8 @@ public class SourceBenchmark extends BenchmarkBase {
                     if (window.result() != expectedInWindow) {
                         if (window.start() > warmUpEnd) {
                             System.out.printf(
-                                    "NEXMark.%s:filter@%s (%s): %d seconds => %,d items not %,d => %s%n",
+                                    "NEXMark.%s:filter@%s: %d seconds => %,d items not %,d => %s%n",
                                     prefix, LocalTime.now().toString(),
-                                    "MAIN",
                                     windowSeconds, window.result(),
                                     expectedInWindow, window.toString());
                             /* Remove comments to see window sizes from warm-up.

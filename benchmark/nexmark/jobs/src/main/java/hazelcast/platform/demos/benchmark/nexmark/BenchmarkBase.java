@@ -61,11 +61,14 @@ public abstract class BenchmarkBase {
     public static final String PROP_PROCESSING_GUARANTEE = "processing_guarantee";
     public static final String PROP_SLIDING_STEP_MILLIS = "sliding_step_millis";
     public static final String PROP_WINDOW_SIZE_MILLIS = "window_size_millis";
+    public static final long ONE_SECOND_AS_MILLIS = TimeUnit.SECONDS.toMillis(1);
+    public static final long ONE_SECOND_AS_NANOS = TimeUnit.SECONDS.toNanos(1);
 
     protected static final long NO_ALLOWED_LAG = 0L;
     protected static final long INITIAL_SOURCE_DELAY_MILLIS = 10L;
     // 10 minutes warm up.
-    protected static final long WARM_UP_MILLIS = TimeUnit.MINUTES.toMillis(10L);
+    //XXX protected static final long WARM_UP_MILLIS = TimeUnit.MINUTES.toMillis(10L);
+    protected static final long WARM_UP_MILLIS = TimeUnit.MINUTES.toMillis(1L);
 
     private static final long SNAPSHOT_INTERVAL_MILLIS = 1_000L;
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance();
