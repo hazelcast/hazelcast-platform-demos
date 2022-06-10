@@ -15,15 +15,11 @@
 	<modules>
 		<module>banking</module>
 		<module>benchmark</module>
-		<!--
-		<module>industry</module>
-		-->
+		<!-- <module>industry</module> -->
 		<module>ml</module>
 		<module>retail</module>
 		<module>telco</module>
-		<!--
-		<module>travel</module>
-		-->
+		<!-- <module>travel</module> -->
 		<module>utils</module>
 	</modules>
 
@@ -37,20 +33,21 @@
 		<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spotbugs.skip>true</spotbugs.skip>
-                <!-- Configure the build for HZ Cloud or all Kubernetes -->
-                <use.hz-cloud>false</use.hz-cloud>
+		<!-- Configure the build for HZ Cloud or all Kubernetes -->
+		<use.hz-cloud>false</use.hz-cloud>
 
-                <!-- For Management Center, Cassandra/Mongo/MySQL etc logons -->
-                <my.mc.admin.user>admin</my.mc.admin.user>
-                <my.mc.admin.password>password1</my.mc.admin.password>
+		<!-- For Management Center, Cassandra/Mongo/MySQL etc logons -->
+		<my.mc.admin.user>admin</my.mc.admin.user>
+		<my.mc.admin.password>password1</my.mc.admin.password>
 		<my.mc.license.key>${my.license.key}</my.mc.license.key>
-                <my.other.admin.user>${my.mc.admin.user}</my.other.admin.user>
-                <my.other.admin.password>${my.mc.admin.password}</my.other.admin.password>
-                <my.other.admin.database>${docker.image.prefix}</my.other.admin.database>
+		<my.other.admin.user>${my.mc.admin.user}</my.other.admin.user>
+		<my.other.admin.password>${my.mc.admin.password}</my.other.admin.password>
+		<my.other.admin.database>${my.docker.image.prefix}</my.other.admin.database>
 
-		<!-- docker-maven-plugin does not like empty/null. Modules using the below can override. -->
-		<docker.jar.file>unset</docker.jar.file>
-		<docker.jar.file2>unset</docker.jar.file2>
+		<!-- docker-maven-plugin does not like empty/null. Modules using the below 
+			can override. -->
+		<my.docker.jar.file>unset</my.docker.jar.file>
+		<my.docker.jar.file2>unset</my.docker.jar.file2>
 		<main.class>unset</main.class>
 		<my.mc.cluster1.name>unset</my.mc.cluster1.name>
 		<my.mc.cluster1.addresslist>unset</my.mc.cluster1.addresslist>
@@ -58,40 +55,41 @@
 		<my.mc.cluster2.addresslist>unset</my.mc.cluster2.addresslist>
 
 		<!-- Version dependencies - ${project.version} should track Hazelcast version -->
-        <cassandra-driver.version>3.5.0</cassandra-driver.version>
-        <debezium-connector-cassandra.version>1.4.0.Alpha1</debezium-connector-cassandra.version>
-        <debezium-connector-mongodb.version>1.3.1.Final</debezium-connector-mongodb.version>
+		<cassandra-driver.version>3.5.0</cassandra-driver.version>
+		<debezium-connector-cassandra.version>1.4.0.Alpha1</debezium-connector-cassandra.version>
+		<debezium-connector-mongodb.version>1.3.1.Final</debezium-connector-mongodb.version>
 		<java-annotation.version>1.3.2</java-annotation.version>
 		<guava.version>29.0-jre</guava.version>
-        <!-- Matches banking/credit-value-adjustment/cpp/Dockerfile2 -->
+		<!-- Matches banking/credit-value-adjustment/cpp/Dockerfile2 -->
 		<grpc.version>1.31.1</grpc.version>
 		<hazelcast.version>5.2-SNAPSHOT</hazelcast.version>
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
 		<hibernate-validator.version>6.1.5.Final</hibernate-validator.version>
 		<jackson.version>2.12.4</jackson.version>
 		<json.version>20211205</json.version>
-        <json-smart.version>2.4.8</json-smart.version>
+		<json-smart.version>2.4.8</json-smart.version>
 		<junit-jupiter.version>5.7.2</junit-jupiter.version>
 		<junit-vintage.version>5.7.2</junit-vintage.version>
 		<jython.version>2.7.2</jython.version>
 		<kafka-connect.version>2.6.0</kafka-connect.version>
- 		<mongo-java-driver.version>3.12.7</mongo-java-driver.version>
+		<mongo-java-driver.version>3.12.7</mongo-java-driver.version>
 		<netty-tcnative.version>2.0.52.Final</netty-tcnative.version>
 		<poi-ooxml.version>4.1.2</poi-ooxml.version>
-        <!-- Run same version with 'protoc - -grpc_out=. - -plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin' 
-             banking/credit-value-adjustment/common/src/main/proto/JetToCpp.proto -->
+		<!-- Run same version with 'protoc - -grpc_out=. - -plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin' 
+			banking/credit-value-adjustment/common/src/main/proto/JetToCpp.proto -->
 		<protobuf.version>3.12.2</protobuf.version>
 		<pulsar.version>2.8.0</pulsar.version>
 		<spotbugs-annotations.version>4.6.0</spotbugs-annotations.version>
 		<springdoc.version>1.6.7</springdoc.version>
 		<spring-boot.version>2.7.0</spring-boot.version>
-        <spring-cloud.version>2021.0.0</spring-cloud.version>
-        <spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
+		<spring-cloud.version>2021.0.0</spring-cloud.version>
+		<spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
 		<zipkin.version>2.23.3-SNAPSHOT</zipkin.version>
 
 		<!-- Plugins -->
 		<build-helper-maven-plugin.version>3.1.0</build-helper-maven-plugin.version>
-		<!-- dockerfile-maven-plugin not being updated on Maven Central, fails on Mac M1 ARM chip -->
+		<!-- dockerfile-maven-plugin not being updated on Maven Central, fails 
+			on Mac M1 ARM chip -->
 		<docker-maven-plugin.version>0.40.0</docker-maven-plugin.version>
 		<exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
 		<frontend-maven-plugin.version>1.9.1</frontend-maven-plugin.version>
@@ -133,9 +131,9 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-  	                    <groupId>com.datastax.cassandra</groupId>
-    	                    <artifactId>cassandra-driver-core</artifactId>
-                            <version>${cassandra-driver.version}</version>
+				<groupId>com.datastax.cassandra</groupId>
+				<artifactId>cassandra-driver-core</artifactId>
+				<version>${cassandra-driver.version}</version>
 			</dependency>
 
 			<dependency>
@@ -217,11 +215,11 @@
 				<version>${debezium-connector-mongodb.version}</version>
 			</dependency>
 
-                	<dependency>
-                        	<groupId>io.netty</groupId>
-                        	<artifactId>netty-tcnative</artifactId>
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-tcnative</artifactId>
 				<version>${netty-tcnative.version}</version>
-                	</dependency>
+			</dependency>
 
 			<dependency>
 				<groupId>org.springdoc</groupId>
@@ -230,9 +228,9 @@
 			</dependency>
 
 			<dependency>
-    	        <groupId>javax.annotation</groupId>
-        	    <artifactId>javax.annotation-api</artifactId>
-        	    <version>${java-annotation.version}</version>
+				<groupId>javax.annotation</groupId>
+				<artifactId>javax.annotation-api</artifactId>
+				<version>${java-annotation.version}</version>
 			</dependency>
 
 			<dependency>
@@ -284,19 +282,19 @@
 				<version>${jython.version}</version>
 			</dependency>
 
-            <!-- scope==test -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-test</artifactId>
-                <version>${spring-boot.version}</version>
-                <scope>test</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.junit.vintage</groupId>
-                        <artifactId>junit-vintage-engine</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
+			<!-- scope==test -->
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-test</artifactId>
+				<version>${spring-boot.version}</version>
+				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>org.junit.vintage</groupId>
+						<artifactId>junit-vintage-engine</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -337,14 +335,14 @@
 
 	<build>
 		<plugins>
-                        <plugin>
-                                <artifactId>maven-compiler-plugin</artifactId>
-                                <version>${maven-compiler-plugin.version}</version>
-                                <configuration>
-                                        <encoding>${project.build.sourceEncoding}</encoding>
-                                        <release>${java.version}</release>
-                                </configuration>
-                        </plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<configuration>
+					<encoding>${project.build.sourceEncoding}</encoding>
+					<release>${java.version}</release>
+				</configuration>
+			</plugin>
 			<plugin>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>${maven-failsafe-plugin.version}</version>
@@ -410,9 +408,9 @@
 								<mainClass>${main.class}</mainClass>
 							</manifest>
 						</archive>
-                                                <descriptors>
-                                                        <descriptor>${main.basedir}/assemble/assembly.xml</descriptor>
-                                                </descriptors>
+						<descriptors>
+							<descriptor>${main.basedir}/assemble/assembly.xml</descriptor>
+						</descriptors>
 						<tarLongFileMode>posix</tarLongFileMode>
 					</configuration>
 					<executions>
@@ -468,8 +466,8 @@
 							<HZ_CLOUD_CLUSTER1_DISCOVERY_TOKEN>${my.hz.cloud.cluster1.discovery.token}</HZ_CLOUD_CLUSTER1_DISCOVERY_TOKEN>
 							<HZ_CLOUD_CLUSTER1_NAME>${my.hz.cloud.cluster1.name}</HZ_CLOUD_CLUSTER1_NAME>
 							<!-- Dockerfile will use for our built modules -->
-							<JAR_FILE>${docker.jar.file}</JAR_FILE>
-							<JAR_FILE2>${docker.jar.file2}</JAR_FILE2>
+							<JAR_FILE>${my.docker.jar.file}</JAR_FILE>
+							<JAR_FILE2>${my.docker.jar.file2}</JAR_FILE2>
 							<MAIN_CLASS>${main.class}</MAIN_CLASS>
 							<!-- Dockerfile uses for Management Center. -->
 							<MC_LICENSE>${my.mc.license.key}</MC_LICENSE>
@@ -478,17 +476,22 @@
 							<MC_CLUSTER1_ADDRESSLIST>${my.mc.cluster1.addresslist}</MC_CLUSTER1_ADDRESSLIST>
 							<MC_CLUSTER2_NAME>${my.mc.cluster2.name}</MC_CLUSTER2_NAME>
 							<MC_CLUSTER2_ADDRESSLIST>${my.mc.cluster2.addresslist}</MC_CLUSTER2_ADDRESSLIST>
-                                                        <!-- Dockerfile uses for other tools -->
+							<!-- Dockerfile uses for other tools -->
 							<MY_ADMINUSER>${my.mc.admin.user}</MY_ADMINUSER>
 							<MY_ADMINPASSWORD>${my.mc.admin.password}</MY_ADMINPASSWORD>
-                                                        <MY_OTHERUSER>${my.other.admin.user}</MY_OTHERUSER>
-                                                        <MY_OTHERPASSWORD>${my.other.admin.password}</MY_OTHERPASSWORD>
-                                                        <MY_OTHERDATABASE>${my.other.admin.database}</MY_OTHERDATABASE>
+							<MY_OTHERUSER>${my.other.admin.user}</MY_OTHERUSER>
+							<MY_OTHERPASSWORD>${my.other.admin.password}</MY_OTHERPASSWORD>
+							<MY_OTHERDATABASE>${my.other.admin.database}</MY_OTHERDATABASE>
 						</buildArgs>
-						<dockerfile>Dockerfile</dockerfile>
-						<pullNewerImage>false</pullNewerImage>
-						<repository>hazelcast-platform-demos/${docker.image.prefix}-${docker.image.name}</repository>
-						<tag>latest</tag>
+						<docker.imagePullPolicy>NEVER</docker.imagePullPolicy>
+						<images>
+							<image>
+								<name>hazelcast-platform-demos/${my.docker.image.prefix}-${my.docker.image.name}</name>
+							</image>
+						</images>
+						<tags>
+							<tag>latest</tag>
+						</tags>
 					</configuration>
 					<executions>
 						<execution>
@@ -594,7 +597,8 @@
 			</build>
 		</profile>
 		<profile>
-			<!-- Full release, logically Jenkins profile plus Docker, done this way as cannot inherit profiles -->
+			<!-- Full release, logically Jenkins profile plus Docker, done this way 
+				as cannot inherit profiles -->
 			<id>release</id>
 			<properties>
 				<dockerfile.skip>false</dockerfile.skip>
