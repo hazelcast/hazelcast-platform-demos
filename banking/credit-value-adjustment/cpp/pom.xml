@@ -19,10 +19,10 @@
 		<my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 
-		<tmp.docker.image1>hazelcast-platform-demos/${docker.image.prefix}-${docker.image.name}-tmp1</tmp.docker.image1>
-		<tmp.docker.image2>hazelcast-platform-demos/${docker.image.prefix}-${docker.image.name}-tmp2</tmp.docker.image2>
-		<tmp.docker.image3>hazelcast-platform-demos/${docker.image.prefix}-${docker.image.name}-tmp3</tmp.docker.image3>
-		<final.docker.image>hazelcast-platform-demos/${docker.image.prefix}-${docker.image.name}</final.docker.image>
+		<tmp.docker.image1>hazelcast-platform-demos/${my.docker.image.prefix}-${my.docker.image.name}-tmp1</tmp.docker.image1>
+		<tmp.docker.image2>hazelcast-platform-demos/${my.docker.image.prefix}-${my.docker.image.name}-tmp2</tmp.docker.image2>
+		<tmp.docker.image3>hazelcast-platform-demos/${my.docker.image.prefix}-${my.docker.image.name}-tmp3</tmp.docker.image3>
+		<final.docker.image>hazelcast-platform-demos/${my.docker.image.prefix}-${my.docker.image.name}</final.docker.image>
 	</properties>
 
 	<!-- Multi-step Dockerfile build -->
