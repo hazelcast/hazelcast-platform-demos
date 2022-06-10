@@ -49,6 +49,7 @@
                 <my.other.admin.database>${docker.image.prefix}</my.other.admin.database>
 
 		<!-- docker-maven-plugin does not like empty/null. Modules using the below can override. -->
+		<docker.jar.file>unset</docker.jar.file>
 		<docker.jar.file2>unset</docker.jar.file2>
 		<main.class>unset</main.class>
 		<my.mc.cluster1.name>unset</my.mc.cluster1.name>
