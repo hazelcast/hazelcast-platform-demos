@@ -97,7 +97,7 @@
      							<image>
      								<name>${final.docker.image}</name>
 						       		<build>
-										<dockerFileDir>${project.basedir}/src/main/docker/Dockerfile4</dockerFileDir>
+										<dockerFileDir>${project.basedir}</dockerFileDir>
 						       		</build>
      							</image>
 						    </images>

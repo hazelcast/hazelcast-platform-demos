@@ -1,3 +1,7 @@
+###
+### Note, this is the 4th Dockerfile for this module, but has to be in
+### the default location so it can copy from ${project.basedir}/src/main/cpp
+###
 # Copy from first image, before Grpc and QuantLib build
 FROM hazelcast-platform-demos/cva-cpp-tmp1:latest AS base_build
 
