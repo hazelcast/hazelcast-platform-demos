@@ -15,8 +15,8 @@
 	<description>Credit Value Adjustment - Hazelcast Node - Site 2</description>
 
 	<properties>
-		<docker.image.name>hazelcast-node-site2</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<my.docker.image.name>hazelcast-node-site2</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 		<my.cluster.name>${my.cluster2.name}</my.cluster.name>
 		<my.init.size>${my.cluster2.init.size}</my.init.size>

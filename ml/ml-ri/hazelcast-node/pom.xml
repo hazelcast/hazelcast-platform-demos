@@ -15,8 +15,8 @@
         <description>ML Reference Implementation - Hazelcast Node</description>
 
         <properties>
-                <docker.image.name>hazelcast-node</docker.image.name>
-                <docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</docker.jar.file>
+                <my.docker.image.name>hazelcast-node</my.docker.image.name>
+                <my.docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</my.docker.jar.file>
                 <main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
                 <main.class>com.hazelcast.platform.demos.ml.ri.Application</main.class>
         </properties>

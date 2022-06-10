@@ -15,8 +15,8 @@
 	<description>Telco Churn - Hazelcast Node</description>
 
 	<properties>
-		<docker.image.name>hazelcast-node</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<my.docker.image.name>hazelcast-node</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 		<my.cluster.name>${my.cluster1.name}</my.cluster.name>
 		<my.init.size>${my.cluster1.init.size}</my.init.size>

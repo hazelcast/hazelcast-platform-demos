@@ -18,7 +18,7 @@
 	<description>Uses ML to predict customer churn</description>
 
 	<properties>
-		<docker.image.prefix>churn</docker.image.prefix>
+		<my.docker.image.prefix>churn</my.docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
 
 		<my.cluster1.init.size>1</my.cluster1.init.size>

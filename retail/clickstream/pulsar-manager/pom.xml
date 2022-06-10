@@ -15,8 +15,8 @@
 	<description>Manages the Pulsar nodes</description>
 
 	<properties>
-		<docker.image.name>pulsar-manager</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</docker.jar.file>
+		<my.docker.image.name>pulsar-manager</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 

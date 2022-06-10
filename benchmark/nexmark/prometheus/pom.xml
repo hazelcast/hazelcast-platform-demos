@@ -15,8 +15,8 @@
 	<description>NEXMark - Prometheus database</description>
 
 	<properties>
-                <docker.image.name>prometheus</docker.image.name>
-                <docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+                <my.docker.image.name>prometheus</my.docker.image.name>
+                <my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 

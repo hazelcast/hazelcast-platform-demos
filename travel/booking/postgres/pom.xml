@@ -15,7 +15,7 @@
 	<description>Travel Booking - Re-package Postgres</description>
 
 	<properties>
-		<docker.image.name>postgres</docker.image.name>
+		<my.docker.image.name>postgres</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 

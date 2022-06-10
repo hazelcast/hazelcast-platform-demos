@@ -15,8 +15,8 @@
 	<description>Credit Value Adjustment - Data Loader Job</description>
 
 	<properties>
-		<docker.image.name>data-loader</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<my.docker.image.name>data-loader</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 

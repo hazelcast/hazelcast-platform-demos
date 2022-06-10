@@ -18,7 +18,7 @@
 	<description>Example implementation for monitoring a series of trades</description>
 
 	<properties>
-		<docker.image.prefix>cva</docker.image.prefix>
+		<my.docker.image.prefix>cva</my.docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
 		<!-- Live, probably -->
 		<my.cluster1.init.size>20</my.cluster1.init.size>

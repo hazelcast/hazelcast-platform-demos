@@ -15,8 +15,8 @@
 	<description>Telco Churn - Re-package Cassandra</description>
 
 	<properties>
-		<docker.image.name>cassandra</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</docker.jar.file>
+		<my.docker.image.name>cassandra</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</my.docker.jar.file>
 		<guava.version>24.1.1-jre</guava.version>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 		<!-- Entry point of io.debezium:debezium-connector-cassandra -->

@@ -15,8 +15,8 @@
 	<description>Credit Value Adjustment - Hazelcast Node - Site 1 incl C++</description>
 
 	<properties>
-		<docker.image.name>hazelcast-node-site1-cpp</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<my.docker.image.name>hazelcast-node-site1-cpp</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 

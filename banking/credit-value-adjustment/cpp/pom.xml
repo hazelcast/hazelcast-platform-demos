@@ -15,8 +15,8 @@
 	<description>Credit Value Adjustment - C++ Pricer</description>
 
 	<properties>
-		<docker.image.name>cpp</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<my.docker.image.name>cpp</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 
 		<tmp.docker.image1>hazelcast-platform-demos/${docker.image.prefix}-${docker.image.name}-tmp1</tmp.docker.image1>
@@ -41,10 +41,15 @@
 							<goal>build</goal>
 						</goals>
 						<configuration>
-							<dockerfile>Dockerfile1</dockerfile>
-							<pullNewerImage>false</pullNewerImage>
-							<repository>${tmp.docker.image1}</repository>
-							<tag>latest</tag>
+							<docker.verbose>true</docker.verbose>
+						    <images>
+     							<image>
+     								<name>${tmp.docker.image1}</name>
+						       		<build>
+										<dockerFileDir>${project.basedir}/src/main/docker/Dockerfile1</dockerFileDir>
+						       		</build>
+     							</image>
+						    </images>
 						</configuration>
 					</execution>
 					<execution>
@@ -54,10 +59,14 @@
 							<goal>build</goal>
 						</goals>
 						<configuration>
-							<dockerfile>Dockerfile2</dockerfile>
-							<pullNewerImage>false</pullNewerImage>
-							<repository>${tmp.docker.image2}</repository>
-							<tag>latest</tag>
+						    <images>
+     							<image>
+     								<name>${tmp.docker.image2}</name>
+						       		<build>
+										<dockerFileDir>${project.basedir}/src/main/docker/Dockerfile2</dockerFileDir>
+						       		</build>
+     							</image>
+						    </images>
 						</configuration>
 					</execution>
 					<execution>
@@ -67,10 +76,14 @@
 							<goal>build</goal>
 						</goals>
 						<configuration>
-							<dockerfile>Dockerfile3</dockerfile>
-							<pullNewerImage>false</pullNewerImage>
-							<repository>${tmp.docker.image3}</repository>
-							<tag>latest</tag>
+						    <images>
+     							<image>
+     								<name>${tmp.docker.image3}</name>
+						       		<build>
+										<dockerFileDir>${project.basedir}/src/main/docker/Dockerfile3</dockerFileDir>
+						       		</build>
+     							</image>
+						    </images>
 						</configuration>
 					</execution>
 					<execution>
@@ -80,10 +93,14 @@
 							<goal>build</goal>
 						</goals>
 						<configuration>
-							<dockerfile>Dockerfile4</dockerfile>
-							<pullNewerImage>false</pullNewerImage>
-							<repository>${final.docker.image}</repository>
-							<tag>latest</tag>
+						    <images>
+     							<image>
+     								<name>${final.docker.image}</name>
+						       		<build>
+										<dockerFileDir>${project.basedir}/src/main/docker/Dockerfile4</dockerFileDir>
+						       		</build>
+     							</image>
+						    </images>
 						</configuration>
 					</execution>
 				</executions>

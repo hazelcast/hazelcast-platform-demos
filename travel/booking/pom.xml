@@ -18,8 +18,8 @@
 	<description>Integrated travel booking for accommodation and transport</description>
 
 	<properties>
-		<docker.image.prefix>booking</docker.image.prefix>
-		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<my.docker.image.prefix>booking</my.docker.image.prefix>
+		<my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
 
 		<!-- Temporary name for cluster -->
@@ -43,7 +43,9 @@
 	<modules>
 		<module>common</module>
 		<module>flight-nodejs</module>
+		<!--
 		<module>frontend</module>
+		-->
 		<module>hazelcast-initializer</module>
 		<module>hazelcast-security</module>
 		<module>hazelcast-node</module>
@@ -67,10 +69,6 @@
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-enterprise</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast-kubernetes</artifactId>
 		</dependency>
 
 		<dependency>

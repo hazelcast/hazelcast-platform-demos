@@ -15,7 +15,7 @@
 	<description>Telco Churn - Re-package Kafka Broker</description>
 
 	<properties>
-		<docker.image.name>kafka-broker</docker.image.name>
+		<my.docker.image.name>kafka-broker</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 

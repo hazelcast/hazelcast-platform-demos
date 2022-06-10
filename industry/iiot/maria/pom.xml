@@ -15,7 +15,7 @@
 	<description>Re-package Maria</description>
 
 	<properties>
-		<docker.image.name>maria</docker.image.name>
+		<my.docker.image.name>maria</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 

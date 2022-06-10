@@ -15,7 +15,7 @@
 	<description>Travel Booking - Re-package Management Center</description>
 
 	<properties>
-		<docker.image.name>management-center</docker.image.name>
+		<my.docker.image.name>management-center</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 

@@ -15,8 +15,8 @@
 	<description>Telco Churn - Read/write from/to Slack</description>
 
 	<properties>
-		<docker.image.name>slack-integration</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<my.docker.image.name>slack-integration</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 		<my.cluster.name>${my.cluster1.name}</my.cluster.name>
 		<slack.bot.user.oath.access.token>${my.slack.bot.user.oath.access.token}</slack.bot.user.oath.access.token>

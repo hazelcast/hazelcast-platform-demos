@@ -15,8 +15,8 @@
 	<description>For offline testing, a client connecting to the offline cluster</description>
 
 	<properties>
-		<docker.image.name>test-local-client</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<my.docker.image.name>test-local-client</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 

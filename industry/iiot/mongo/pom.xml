@@ -15,7 +15,7 @@
 	<description>Re-package Mongo</description>
 
 	<properties>
-		<docker.image.name>mongo</docker.image.name>
+		<my.docker.image.name>mongo</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 

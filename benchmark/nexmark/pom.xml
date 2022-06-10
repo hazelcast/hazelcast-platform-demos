@@ -27,12 +27,12 @@
 	</modules>
 
 	<properties>
-		<docker.image.prefix>nexmark</docker.image.prefix>
+		<my.docker.image.prefix>nexmark</my.docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
 
 		<my.cluster1.name>nexmark</my.cluster1.name>
-		<my.management.center.name>${docker.image.prefix}-management-center</my.management.center.name>
-		<my.prometheus.name>${docker.image.prefix}-prometheus</my.prometheus.name>
+		<my.management.center.name>${my.docker.image.prefix}-management-center</my.management.center.name>
+		<my.prometheus.name>${my.docker.image.prefix}-prometheus</my.prometheus.name>
 
 		<!-- If not blank, start Q05 automatically with this param. Otherwise needs web UI -->
 		<my.autostart.q05>1000000000</my.autostart.q05>

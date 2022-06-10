@@ -15,7 +15,7 @@
         <description>Trade Monitor - Topic Creation Script</description>
 
 	<properties>
-		<docker.image.name>topic-create</docker.image.name>
+		<my.docker.image.name>topic-create</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 

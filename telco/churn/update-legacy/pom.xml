@@ -15,8 +15,8 @@
 	<description>Telco Churn - add to Cassandra/Mongo/MySql</description>
 
 	<properties>
-		<docker.image.name>update-legacy</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<my.docker.image.name>update-legacy</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 

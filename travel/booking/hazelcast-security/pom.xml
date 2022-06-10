@@ -15,7 +15,7 @@
 	<description>Travel Booking - Hazelcast Security</description>
 
 	<properties>
-		<docker.image.name>hazelcast-initializer</docker.image.name>
+		<my.docker.image.name>hazelcast-initializer</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 

@@ -15,16 +15,16 @@
 	<description>NEXMark - Grafana monitoring</description>
 
 	<properties>
-                <docker.image.name>grafana</docker.image.name>
-                <docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+                <my.docker.image.name>grafana</my.docker.image.name>
+                <my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 
         <build>
                 <plugins>
                         <plugin>
-                                <groupId>com.spotify</groupId>
-                                <artifactId>dockerfile-maven-plugin</artifactId>
+                                <groupId>io.fabric8</groupId>
+                                <artifactId>docker-maven-plugin</artifactId>
                         </plugin>
                 </plugins>
         </build>

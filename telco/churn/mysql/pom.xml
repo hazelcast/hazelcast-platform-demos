@@ -15,7 +15,7 @@
 	<description>Telco Churn - Re-package MySql</description>
 
 	<properties>
-		<docker.image.name>mysql</docker.image.name>
+		<my.docker.image.name>mysql</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 

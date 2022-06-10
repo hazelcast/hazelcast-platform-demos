@@ -15,7 +15,7 @@
 	<description>Travel Booking - Flight processsing</description>
 
 	<properties>
-		<docker.image.name>flight-nodejs</docker.image.name>
+		<my.docker.image.name>flight-nodejs</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 

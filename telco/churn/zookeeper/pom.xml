@@ -15,7 +15,7 @@
 	<description>Telco Churn - Re-package Zookeeper</description>
 
 	<properties>
-		<docker.image.name>zookeeper</docker.image.name>
+		<my.docker.image.name>zookeeper</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 

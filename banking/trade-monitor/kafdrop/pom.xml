@@ -15,7 +15,7 @@
         <description>Trade Monitor - Re-package Kafdrop</description>
 
 	<properties>
-		<docker.image.name>kafdrop</docker.image.name>
+		<my.docker.image.name>kafdrop</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 

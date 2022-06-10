@@ -15,7 +15,7 @@
         <description>Trade Monitor - Prometheus</description>
 
 	<properties>
-		<docker.image.name>prometheus</docker.image.name>
+		<my.docker.image.name>prometheus</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 

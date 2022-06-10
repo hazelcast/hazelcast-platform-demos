@@ -15,7 +15,7 @@
 	<description>Travel Booking - Re-package Cassandra</description>
 
 	<properties>
-		<docker.image.name>cassandra</docker.image.name>
+		<my.docker.image.name>cassandra</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 
