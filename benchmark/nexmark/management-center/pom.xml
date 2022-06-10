@@ -23,8 +23,19 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
+				<artifactId>maven-antrun-plugin</artifactId>
+                <configuration>
+                	<target>
+                    	<echo message="====================================" />
+                        <echo message="$my.mc.admin.user=${my.mc.admin.user}" />
+                        <echo message="$my.mc.admin.password=${my.mc.admin.password}" />
+                        <echo message="====================================" />
+                    </target>
+                </configuration>			
+			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

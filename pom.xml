@@ -48,6 +48,14 @@
                 <my.other.admin.password>${my.mc.admin.password}</my.other.admin.password>
                 <my.other.admin.database>${docker.image.prefix}</my.other.admin.database>
 
+		<!-- docker-maven-plugin does not like empty/null. Modules using the below can override. -->
+		<docker.jar.file2>unset</docker.jar.file2>
+		<main.class>unset</main.class>
+		<my.mc.cluster1.name>unset</my.mc.cluster1.name>
+		<my.mc.cluster1.addresslist>unset</my.mc.cluster1.addresslist>
+		<my.mc.cluster2.name>unset</my.mc.cluster2.name>
+		<my.mc.cluster2.addresslist>unset</my.mc.cluster2.addresslist>
+
 		<!-- Version dependencies - ${project.version} should track Hazelcast version -->
         <cassandra-driver.version>3.5.0</cassandra-driver.version>
         <debezium-connector-cassandra.version>1.4.0.Alpha1</debezium-connector-cassandra.version>
@@ -82,7 +90,8 @@
 
 		<!-- Plugins -->
 		<build-helper-maven-plugin.version>3.1.0</build-helper-maven-plugin.version>
-		<dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>
+		<!-- dockerfile-maven-plugin not being updated on Maven Central, fails on Mac M1 ARM chip -->
+		<docker-maven-plugin.version>0.40.0</docker-maven-plugin.version>
 		<exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
 		<frontend-maven-plugin.version>1.9.1</frontend-maven-plugin.version>
 		<maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
@@ -327,19 +336,6 @@
 
 	<build>
 		<plugins>
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>${maven-antrun-plugin.version}</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<id>default</id>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
                         <plugin>
                                 <artifactId>maven-compiler-plugin</artifactId>
                                 <version>${maven-compiler-plugin.version}</version>
@@ -391,6 +387,20 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
+					<artifactId>maven-antrun-plugin</artifactId>
+					<version>${maven-antrun-plugin.version}</version>
+					<executions>
+						<execution>
+							<phase>package</phase>
+							<id>default</id>
+							<goals>
+								<goal>run</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-assembly-plugin</artifactId>
 					<version>${maven-assembly-plugin.version}</version>
 					<configuration>
@@ -448,9 +458,9 @@
 					<version>${frontend-maven-plugin.version}</version>
 				</plugin>
 				<plugin>
-					<groupId>com.spotify</groupId>
-					<artifactId>dockerfile-maven-plugin</artifactId>
-					<version>${dockerfile-maven-plugin.version}</version>
+					<groupId>io.fabric8</groupId>
+					<artifactId>docker-maven-plugin</artifactId>
+					<version>${docker-maven-plugin.version}</version>
 					<configuration>
 						<buildArgs>
 							<!-- Hazelcast cloud -->
@@ -487,11 +497,6 @@
 								<goal>build</goal>
 							</goals>
 						</execution>
-						<!-- <execution> <phase>package</phase> <id>tag-for-gcp</id> <goals> 
-							<goal>tag</goal> </goals> <configuration> <repository>${gcp.registry}/${gcp.project}/${docker.image.prefix}/${docker.image.name}</repository> 
-							</configuration> </execution> <execution> <phase>deploy</phase> <id>deploy-to-gcp</id> 
-							<goals> <goal>push</goal> </goals> <configuration> <repository>${gcp.registry}/${gcp.project}/${docker.image.prefix}/${docker.image.name}</repository> 
-							</configuration> </execution> -->
 					</executions>
 				</plugin>
 				<plugin>
@@ -528,6 +533,30 @@
 	</distributionManagement>
 
 	<profiles>
+		<profile>
+			<!-- docker-maven-plugin does not like null properties -->
+			<id>no-null-docker-maven-plugin-cluster1-name</id>
+			<properties>
+				<my.hz.cloud.cluster1.name>unset</my.hz.cloud.cluster1.name>
+			</properties>
+			<activation>
+				<property>
+					<name>!my.hz.cloud.cluster1.name</name>
+				</property>
+			</activation>
+		</profile>
+		<profile>
+			<!-- docker-maven-plugin does not like null properties -->
+			<id>no-null-docker-maven-plugin-cluster1-token</id>
+			<properties>
+				<my.hz.cloud.cluster1.discovery.token>unset</my.hz.cloud.cluster1.discovery.token>
+			</properties>
+			<activation>
+				<property>
+					<name>!my.hz.cloud.cluster1.discovery.token</name>
+				</property>
+			</activation>
+		</profile>
 		<profile>
 			<!-- For Jenkins, all validation sections except Docker build -->
 			<id>jenkins</id>

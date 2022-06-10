@@ -8,12 +8,11 @@ ARG MY_ADMINPASSWORD
 # Connection to cluster1
 COPY target/classes/hazelcast-client-cluster1.xml /
 
-# Any Java config for MC. Note "hazelcast.mc.metrics.consumer.large.cluster.mode"
-ENV JAVA_HEAP_SIZE="3g"
+# Any Java config for MC.
+ENV JAVA_HEAP_SIZE="12g"
 ENV JAVA_OPTS="\
  -Dhazelcast.mc.healthCheck.enable=true \
  -Dhazelcast.mc.license=$MC_LICENSE \
- -Dhazelcast.mc.metrics.consumer.large.cluster.mode=true \
  -Dhazelcast.mc.prometheusExporter.enabled=true"
  
 # Used by /start.sh to create admin user unless MC_INIT_CMD used

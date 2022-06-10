@@ -71,6 +71,20 @@ If using Hazelcast Cloud, you will need `my.hz.cloud.cluster1.name` and `my.hz.c
 If you plan to use the Slack integration in some modules, you will also need three Slack settings,
 `my.slack.bot.user.oath.access.token`, `my.slack.bot.channel.name` and `my.slack.bot.channel.id`.
 
+### `docker-maven-plugin`
+
+If building Docker images (activated by `mvn install -Prelease`), not all properties are needed.
+
+For example, `my.hz.cloud.cluster1.discovery.token` can be set, omitted but not null. (docker-maven-plugin)[https://dmp.fabric8.io/]
+rejects empty string as a null value.
+
+So do not have this in your `settings.xml`:
+
+```
+        <my.hz.cloud.cluster1.discovery.token></my.hz.cloud.cluster1.discovery.token>
+```
+
+Omit the line if you have no token.
 
 ## 3rd Party Software
 
