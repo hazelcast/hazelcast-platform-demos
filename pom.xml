@@ -562,6 +562,18 @@
 			</activation>
 		</profile>
 		<profile>
+			<!-- docker-maven-plugin does not like null properties -->
+			<id>no-null-docker-maven-plugin-mc-licens</id>
+			<properties>
+				<my.license.key>unset</my.license.key>
+			</properties>
+			<activation>
+				<property>
+					<name>!my.license.key</name>
+				</property>
+			</activation>
+		</profile>
+		<profile>
 			<!-- For Jenkins, all validation sections except Docker build -->
 			<id>jenkins</id>
 			<properties>
