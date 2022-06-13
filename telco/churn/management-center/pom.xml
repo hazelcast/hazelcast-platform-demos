@@ -24,7 +24,7 @@
 		<my.mc.admin.password>${my.other.admin.password}</my.mc.admin.password>
 		<my.mc.license.key>${my.license.key}</my.mc.license.key>
 		<my.mc.cluster1.name>${my.cluster1.name}</my.mc.cluster1.name>
-		<my.mc.cluster1.addresslist>${docker.image.prefix}-${my.cluster1.name}-hazelcast.default.svc.cluster.local</my.mc.cluster1.addresslist>
+		<my.mc.cluster1.addresslist>${my.docker.image.prefix}-${my.cluster1.name}-hazelcast.default.svc.cluster.local</my.mc.cluster1.addresslist>
 	</properties>
 
 	<dependencies>

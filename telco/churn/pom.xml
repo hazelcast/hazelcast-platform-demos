@@ -30,9 +30,9 @@
 		<my.other.admin.database>${my.docker.image.prefix}</my.other.admin.database>
 
 		<!-- So Grafana can find Prometheus service, must match K8S YAML -->
-		<my.prometheus.name>${docker.image.prefix}-prometheus</my.prometheus.name>
+		<my.prometheus.name>${my.docker.image.prefix}-prometheus</my.prometheus.name>
 		<my.prometheus.port>9090</my.prometheus.port>
-		<my.management.center.name>${docker.image.prefix}-management-center</my.management.center.name>
+		<my.management.center.name>${my.docker.image.prefix}-management-center</my.management.center.name>
 	</properties>
 
 	<modules>
