@@ -27,7 +27,7 @@
 		<!-- Common logons for Management Center, Grafana, Prometheus -->
 		<my.other.admin.user>admin</my.other.admin.user>
 		<my.other.admin.password>password1</my.other.admin.password>
-		<my.other.admin.database>${docker.image.prefix}</my.other.admin.database>
+		<my.other.admin.database>${my.docker.image.prefix}</my.other.admin.database>
 
 		<!-- So Grafana can find Prometheus service, must match K8S YAML -->
 		<my.prometheus.name>${docker.image.prefix}-prometheus</my.prometheus.name>
