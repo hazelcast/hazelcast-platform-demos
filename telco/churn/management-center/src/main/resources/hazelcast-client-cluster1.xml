@@ -19,7 +19,7 @@
         -->
         
         <kubernetes enabled="true">
-            <service-dns>@docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local</service-dns>
+            <service-dns>@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local</service-dns>
         </kubernetes>        
     </network>
 

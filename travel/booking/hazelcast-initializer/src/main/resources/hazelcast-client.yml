@@ -14,7 +14,7 @@ hazelcast-client:
     auto-detection:
       enabled: false
     cluster-members:
-      - '@docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local'
+      - '@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local'
   #
   connection-strategy:
     reconnect-mode: OFF

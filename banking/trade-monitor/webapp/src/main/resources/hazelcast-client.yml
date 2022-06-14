@@ -12,4 +12,4 @@ hazelcast-client:
     smart-routing: false
     kubernetes:
       enabled: true
-      service-dns: '@docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local'
+      service-dns: '@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local'
