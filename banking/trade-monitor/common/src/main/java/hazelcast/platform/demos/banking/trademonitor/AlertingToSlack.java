@@ -143,8 +143,9 @@ public class AlertingToSlack {
                 String cleanStr =
                         "*ALERT* `"
                         + input.getString("whence")
-                        + ", stock '" + input.getString("symbol")
-                        + ", volume: " + input.getLong("volume") + "`";
+                        + ", stock '" + input.getString("symbol") + "'"
+                        + ", volume: " + input.getLong("volume") + ""
+                        + ", provenance: '" + input.getString("provenance") + "'`";
 
                 output.put(UtilsConstants.SLACK_PARAM_TEXT, cleanStr);
                 return output;
