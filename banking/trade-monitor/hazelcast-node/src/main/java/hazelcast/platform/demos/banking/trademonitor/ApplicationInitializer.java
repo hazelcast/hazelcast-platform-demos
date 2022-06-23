@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.platform.demos.utils.UtilsConstants;
 import com.hazelcast.platform.demos.utils.UtilsProperties;
 import com.hazelcast.platform.demos.utils.UtilsSlack;
 import com.hazelcast.platform.demos.utils.UtilsSlackSQLJob;
@@ -43,7 +44,7 @@ public class ApplicationInitializer {
      * </p>
      */
     public static void initialise(HazelcastInstance hazelcastInstance, String bootstrapServers,
-            String pulsarList) throws Exception {
+            String pulsarList, String postgresAddress) throws Exception {
 
         // Exit if properties not as expected
         Properties properties = null;
@@ -70,13 +71,21 @@ public class ApplicationInitializer {
             throw new RuntimeException(message);
         }
 
-        CommonIdempotentInitialization.createNeededObjects(hazelcastInstance);
-        addListeners(hazelcastInstance, bootstrapServers, pulsarList, usePulsar);
+        // Address from environment/command line, others from application.properties file.
+        properties.put(MyConstants.POSTGRES_ADDRESS, postgresAddress);
+        String ourProjectProvenance = properties.getProperty(MyConstants.PROJECT_PROVENANCE);
+        String projectName = properties.getOrDefault(UtilsConstants.SLACK_PROJECT_NAME,
+                ApplicationInitializer.class.getSimpleName()).toString();
+
+        Properties postgresProperties = MyUtils.getPostgresProperties(properties);
+        CommonIdempotentInitialization.createNeededObjects(hazelcastInstance,
+                postgresProperties, ourProjectProvenance);
+        addListeners(hazelcastInstance, bootstrapServers, pulsarList, usePulsar, projectName);
         CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList, usePulsar, useHzCloud);
         CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers);
 
         CommonIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
-                pulsarList, properties);
+                pulsarList, postgresProperties, properties);
     }
 
 
@@ -87,12 +96,12 @@ public class ApplicationInitializer {
      * @param hazelcastInstance
      */
     static void addListeners(HazelcastInstance hazelcastInstance, String bootstrapServers,
-            String pulsarList, boolean usePulsar) {
+            String pulsarList, boolean usePulsar, String projectName) {
         MyMembershipListener myMembershipListener = new MyMembershipListener(hazelcastInstance);
         hazelcastInstance.getCluster().addMembershipListener(myMembershipListener);
 
         JobControlListener jobControlListener =
-                new JobControlListener(bootstrapServers, pulsarList, usePulsar);
+                new JobControlListener(bootstrapServers, pulsarList, usePulsar, projectName);
         hazelcastInstance.getMap(MyConstants.IMAP_NAME_JOB_CONTROL)
             .addLocalEntryListener(jobControlListener);
     }

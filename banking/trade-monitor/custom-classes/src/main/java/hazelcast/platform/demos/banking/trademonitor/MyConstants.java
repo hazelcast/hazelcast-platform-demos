@@ -27,6 +27,19 @@ public class MyConstants {
     public static final String KAFKA_TOPIC_MAPPING_PREFIX = "";
     public static final String KAFKA_TOPIC_NAME_ALERTS = "kf_alerts";
     public static final String KAFKA_TOPIC_NAME_TRADES = "kf_trades";
+    public static final String POSTGRES_CONFIG_KEY = "my.postgres.address";
+    public static final String POSTGRES_ADDRESS = "my.postgres.address";
+    public static final String POSTGRES_DATABASE = "my.postgres.db";
+    public static final String POSTGRES_SCHEMA = "my.postgres.schema";
+    public static final String POSTGRES_USER = "my.postgres.user";
+    public static final String POSTGRES_PASSWORD = "my.postgres.password";
+    // Table name should match "init.sql" in Postgres module.
+    public static final String POSTGRES_TABLE_NAME = "alerts_max_volume";
+    public static final String POSTGRES_TABLE_KEY_NAME = "now";
+    public static final String PROJECT_MODULE = "my.project.module";
+    public static final String PROJECT_NAME = "my.project.name";
+    // Label used on MapStore saved, so can later identify change soure
+    public static final String PROJECT_PROVENANCE = PROJECT_NAME;
     public static final String PULSAR_CONFIG_KEY = "my.pulsar.list";
     public static final String PULSAR_TOPIC_NAME_TRADES = "pulsar_trades";
     public static final String PULSAR_OR_KAFKA_KEY = "my.pulsar.or.kafka";

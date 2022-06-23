@@ -35,13 +35,20 @@ public class MaxVolumeAggregator implements Serializable {
     // Don't log as may run in the cloud
     // private static final Logger LOGGER = LoggerFactory.getLogger(MaxVolumeAggregator.class);
 
+    private final String provenance;
     private String maxSymbol;
     private long maxVolume;
 
+    public MaxVolumeAggregator(String arg0, String arg1) {
+        this.provenance = arg0 + ":" + arg1;
+    }
+
     public static AggregateOperation1<Entry<Integer, Tuple4<String, Long, Long, Long>>,
-        MaxVolumeAggregator, Entry<Long, HazelcastJsonValue>> buildMaxVolumeAggregation() {
+        MaxVolumeAggregator, Entry<Long, HazelcastJsonValue>> buildMaxVolumeAggregation(
+                String projectName, String jobName
+                ) {
         return AggregateOperation
-                .withCreate(MaxVolumeAggregator::new)
+                .withCreate(() -> new MaxVolumeAggregator(projectName, jobName))
                 .andAccumulate((MaxVolumeAggregator maxVolumeAggregator,
                         Entry<Integer, Tuple4<String, Long, Long, Long>> entry)
                         -> maxVolumeAggregator.accumulate(entry.getValue()))
@@ -103,18 +110,20 @@ public class MaxVolumeAggregator implements Serializable {
     }
 
     /**
-     * <p>Format result
+     * <p>Format result. Format needs to match or at least correspond with
+     * Postgres database definition, and with mapping in {@link CommonIdempotentInitialization}.
+     * and {@link PostgresCDC}
      * </p>
      */
     public Entry<Long, HazelcastJsonValue> exportFinish() {
         long now = System.currentTimeMillis();
         String nowStr = UtilsFormatter.timestampToISO8601(now);
         if (this.maxSymbol == null) {
-            //LOGGER.error("exportFinish() : this.max == null");
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("{");
             stringBuilder.append("  \"symbol\" : \"<none>\"");
-            stringBuilder.append(", \"timestamp\" : \"" + nowStr + "\"");
+            stringBuilder.append(", \"provenance\" : \"" + this.provenance + "\"");
+            stringBuilder.append(", \"whence\" : \"" + nowStr + "\"");
             stringBuilder.append(", \"volume\" : 0");
             stringBuilder.append("}");
             Entry<Long, HazelcastJsonValue> entry =
@@ -124,7 +133,8 @@ public class MaxVolumeAggregator implements Serializable {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("{");
             stringBuilder.append("  \"symbol\" : \"" + this.maxSymbol + "\"");
-            stringBuilder.append(", \"timestamp\" : \"" + nowStr + "\"");
+            stringBuilder.append(", \"provenance\" : \"" + this.provenance + "\"");
+            stringBuilder.append(", \"whence\" : \"" + nowStr + "\"");
             stringBuilder.append(", \"volume\" : " + this.maxVolume);
             stringBuilder.append("}");
             Entry<Long, HazelcastJsonValue> entry =

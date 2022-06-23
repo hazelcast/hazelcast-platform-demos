@@ -406,19 +406,18 @@ public class ApplicationRunner {
 
         String propertyName1 = "my.bootstrap.servers";
         String propertyName2 = MyConstants.PULSAR_CONFIG_KEY;
+        String propertyName3 = MyConstants.POSTGRES_CONFIG_KEY;
         String bootstrapServers = System.getProperty(propertyName1, "");
         String pulsarList = System.getProperty(propertyName2, "");
-        if (bootstrapServers.isBlank()) {
-            LOGGER.error("No value for " + propertyName1);
-            return false;
-        } else {
-            LOGGER.debug("Using {}=={}", propertyName1, bootstrapServers);
-        }
-        if (pulsarList.isBlank()) {
-            LOGGER.error("No value for " + propertyName2);
-            return false;
-        } else {
-            LOGGER.debug("Using {}=={}", propertyName2, pulsarList);
+        String postgresAddress = System.getProperty(propertyName3, "");
+        for (String propertyName : List.of(propertyName1, propertyName2, propertyName3)) {
+            String propertyValue = System.getProperty(propertyName, "");
+            if (propertyValue.isBlank()) {
+                LOGGER.error("No value for '{}' " + propertyName1);
+                return false;
+            } else {
+                LOGGER.debug("Using '{}'=='{}'", propertyName, propertyValue);
+            }
         }
 
         boolean ok = testCustomClassesUploaded();
@@ -441,14 +440,27 @@ public class ApplicationRunner {
             boolean useHzCloud = MyUtils.useHzCloud(cloudOrHzCloud);
             LOGGER.debug("useHzCloud='{}'", useHzCloud);
 
-            ok &= CommonIdempotentInitialization.createNeededObjects(hazelcastInstance);
+            // Address from environment/command line, others from application.properties file.
+            properties.put(MyConstants.POSTGRES_ADDRESS, postgresAddress);
+            String ourProjectProvenance = properties.getProperty(MyConstants.PROJECT_PROVENANCE);
+
+            Properties postgresProperties = null;
+            try {
+                postgresProperties = MyUtils.getPostgresProperties(properties);
+            } catch (Exception e) {
+                LOGGER.error("initialize()", e);
+                return false;
+            }
+
+            ok &= CommonIdempotentInitialization.createNeededObjects(hazelcastInstance,
+                    postgresProperties, ourProjectProvenance);
             ok &= CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList,
                     usePulsar, useHzCloud);
             ok &= CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers);
             if (ok) {
                 // Don't even try if broken by this point
-                ok = CommonIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers, pulsarList,
-                        properties);
+                ok = CommonIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
+                        pulsarList, postgresProperties, properties);
             }
         }
 

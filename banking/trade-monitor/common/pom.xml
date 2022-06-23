@@ -46,6 +46,14 @@
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet-cdc-debezium</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet-cdc-postgres</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet-grpc</artifactId>
 		</dependency>
 		<dependency>

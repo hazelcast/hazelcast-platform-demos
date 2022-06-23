@@ -142,7 +142,7 @@ public class AlertingToSlack {
 
                 String cleanStr =
                         "*ALERT* `"
-                        + input.getString("timestamp")
+                        + input.getString("whence")
                         + ", stock '" + input.getString("symbol")
                         + ", volume: " + input.getLong("volume") + "`";
 

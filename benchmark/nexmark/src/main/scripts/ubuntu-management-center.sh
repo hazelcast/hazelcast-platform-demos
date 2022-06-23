@@ -1,6 +1,6 @@
 #!/bin/bash
 
-HEAP_SIZE=12g
+HEAP_SIZE=24g
 
 MODULE=management-center
 JAVA_ARGS="${JAVA_ARGS} -Xms${HEAP_SIZE} -Xmx${HEAP_SIZE}"
@@ -12,7 +12,8 @@ JAVA_OPTS="\
  --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED \
  --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
 
-CMD="java -server $JAVA_ARGS $JAVA_OPTS -cp $JAR_FILE com.hazelcast.webmonitor.Launcher"
+# Pre-5.2 - CMD="java -server $JAVA_ARGS $JAVA_OPTS -cp $JAR_FILE com.hazelcast.webmonitor.Launcher"
+CMD="java -server $JAVA_ARGS $JAVA_OPTS -cp $JAR_FILE org.springframework.boot.loader.JarLauncher"
 echo $CMD
 
 nohup $CMD > log.$MODULE 2>&1 &

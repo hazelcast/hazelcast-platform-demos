@@ -299,4 +299,24 @@ public class MyUtils {
             return !s.toLowerCase(Locale.ROOT).equals("false");
         }
     }
+
+    /**
+     * <p>Extract Postgres properties
+     */
+    public static Properties getPostgresProperties(Properties properties) throws Exception {
+        Properties result = new Properties();
+        List<String> names = List.of(
+                MyConstants.POSTGRES_ADDRESS, MyConstants.POSTGRES_DATABASE, MyConstants.POSTGRES_SCHEMA,
+                MyConstants.POSTGRES_USER, MyConstants.POSTGRES_PASSWORD);
+        for (String name : names) {
+            String value = properties.getProperty(name, "");
+            if (value.isBlank()) {
+                String message = String.format("No value for property '%s'", name);
+                throw new RuntimeException(message);
+            }
+            result.put(name, value);
+        }
+        return result;
+    }
+
 }

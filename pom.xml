@@ -180,6 +180,11 @@
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>
+				<artifactId>hazelcast-jet-cdc-postgres</artifactId>
+				<version>${hazelcast.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.hazelcast.jet</groupId>
 				<artifactId>hazelcast-jet-cdc-mysql</artifactId>
 				<version>${hazelcast.version}</version>
 			</dependency>
@@ -489,9 +494,8 @@
 								<name>hazelcast-platform-demos/${my.docker.image.prefix}-${my.docker.image.name}</name>
 							</image>
 						</images>
-						<tags>
-							<tag>latest</tag>
-						</tags>
+						<skip>${dockerfile.skip}</skip>
+						<verbose>true</verbose>
 					</configuration>
 					<executions>
 						<execution>

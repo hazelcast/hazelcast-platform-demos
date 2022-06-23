@@ -51,19 +51,25 @@ public class Application {
     public static void main(String[] args) throws Exception {
         String bootstrapServers = null;
         String pulsarList = null;
+        String postgresAddress = null;
 
-        if (args.length == 2) {
+        if (args.length == 3) {
             bootstrapServers = args[0];
             pulsarList = args[1];
+            postgresAddress = args[2];
         } else {
             bootstrapServers = System.getProperty("my.bootstrap.servers", "");
             pulsarList = System.getProperty(MyConstants.PULSAR_CONFIG_KEY, "");
-            if (bootstrapServers.isBlank() || pulsarList.isBlank()) {
-                LOGGER.error("Usage: 2 arg expected: bootstrapServers pulsarList");
-                LOGGER.error("eg: 127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094 127.0.0.1:6650");
+            postgresAddress = System.getProperty(MyConstants.POSTGRES_CONFIG_KEY, "");
+            if (bootstrapServers.isBlank() || pulsarList.isBlank() || postgresAddress.isBlank()) {
+                LOGGER.error("Usage: 2 arg expected: bootstrapServers pulsarList postgresAddress");
+                LOGGER.error("eg: 127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094 127.0.0.1:6650 127.0.0.1:5432");
                 System.exit(1);
             }
         }
+        LOGGER.info("'bootstrapServers'=='{}'", bootstrapServers);
+        LOGGER.info("'pulsarList'=='{}'", pulsarList);
+        LOGGER.info("'postgresAddress'=='{}'", postgresAddress);
 
         Config config = ApplicationConfig.buildConfig();
 
@@ -71,7 +77,7 @@ public class Application {
 
         String initializerProperty = "my.initialize";
         if (System.getProperty(initializerProperty, "").equalsIgnoreCase(Boolean.TRUE.toString())) {
-            ApplicationInitializer.initialise(hazelcastInstance, bootstrapServers, pulsarList);
+            ApplicationInitializer.initialise(hazelcastInstance, bootstrapServers, pulsarList, postgresAddress);
         } else {
             LOGGER.info("Skip initialize as '{}'=='{}', assume client will do so",
                     initializerProperty, System.getProperty(initializerProperty));

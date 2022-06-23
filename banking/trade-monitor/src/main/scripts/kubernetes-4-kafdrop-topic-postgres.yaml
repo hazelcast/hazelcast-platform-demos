@@ -93,3 +93,28 @@ spec:
               port: 9000
             initialDelaySeconds: 30
 ---
+# Postgres
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: postgres
+  name: trade-monitor-postgres
+spec:
+  selector:
+    matchLabels:
+      app: trade-monitor-postgres
+  template:
+    metadata:
+      labels:
+        app: trade-monitor-postgres
+        app.kubernetes.io/component: postgres
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/trade-monitor-postgres"
+          imagePullPolicy: Never
+          name: trade-monitor-postgres-container
+          ports:
+            - containerPort: 5432
+---

@@ -41,7 +41,6 @@
 							<goal>build</goal>
 						</goals>
 						<configuration>
-							<docker.verbose>true</docker.verbose>
 						    <images>
      							<image>
      								<name>${tmp.docker.image1}</name>

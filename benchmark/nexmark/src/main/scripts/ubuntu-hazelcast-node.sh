@@ -12,6 +12,7 @@ JAVA_ARGS="${JAVA_ARGS} -Dmy.cooperative.thread.count=14"
 JAVA_ARGS="${JAVA_ARGS} -Dhazelcast.local.publicAddress=$PUBLIC_IP"
 JAVA_ARGS="${JAVA_ARGS} -Dhost.ip=$HOST_IP"
 JAVA_ARGS="${JAVA_ARGS} -Dmy.partitions=271"
+JAVA_ARGS="${JAVA_ARGS} -Xlog:safepoint,gc*,gc+ergo=trace,gc+age=trace,gc+phases=trace,gc+humongous=trace:file=/home/ubuntu/verbosegc.log:level,tags,time,uptime:filesize=1048576000,filecount=15"
 
 JAVA_OPTS="\
  --add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED \

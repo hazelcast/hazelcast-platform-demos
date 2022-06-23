@@ -32,10 +32,6 @@
 		<!--  Kafka Clients must match cloud target -->
 		<kafka-clients.version>2.2.2</kafka-clients.version>
 
-		<!-- Common logons for Management Center, Grafana, Prometheus -->
-		<my.other.admin.user>admin</my.other.admin.user>
-		<my.other.admin.password>password1</my.other.admin.password>
-
 		<!-- From ~/.m2/settings.xml. If token set, use cloud. Name not used unless token set -->
 		<hz.cloud.cluster1.discovery.token>${my.hz.cloud.cluster1.discovery.token}</hz.cloud.cluster1.discovery.token>
 		<hz.cloud.cluster1.name>${my.hz.cloud.cluster1.name}</hz.cloud.cluster1.name>
@@ -59,6 +55,7 @@
 		<module>topic-create</module>
 		<module>management-center</module>
 		<module>prometheus</module>
+		<module>postgres</module>
 		<module>grafana</module>
 		<module>pulsar</module>
 	</modules>

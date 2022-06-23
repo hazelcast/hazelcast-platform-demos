@@ -17,7 +17,7 @@ JAVA_OPTS="\
 CMD="java $JAVA_ARGS $JAVA_OPTS -jar $JAR_FILE"
 echo $CMD
 
-$CMD 2>&1 | tee -a ${HOME}/log.webapp
+nohup $CMD > log.$MODULE 2>&1 &
 RC=$?
 echo RC=${RC}
 exit ${RC}
