@@ -49,6 +49,7 @@ public class MyConstants {
     public static final String IMAP_NAME_ALERTS_MAX_VOLUME = "alertsMaxVolume";
     public static final String IMAP_NAME_JOB_CONTROL = "job_control";
     public static final String IMAP_NAME_JOB_CONFIG = "job_config";
+    public static final String IMAP_NAME_PORTFOLIOS = "portfolios";
     public static final String IMAP_NAME_PYTHON_SENTIMENT = "python_sentiment";
     public static final String IMAP_NAME_SYMBOLS = "symbols";
     public static final String IMAP_NAME_TRADES = "trades";
@@ -56,7 +57,7 @@ public class MyConstants {
     public static final List<String> IMAP_NAMES =
             List.of(IMAP_NAME_AGGREGATE_QUERY_RESULTS, IMAP_NAME_ALERTS_MAX_VOLUME,
                     IMAP_NAME_JOB_CONTROL, IMAP_NAME_JOB_CONFIG,
-                    IMAP_NAME_PYTHON_SENTIMENT,
+                    IMAP_NAME_PORTFOLIOS, IMAP_NAME_PYTHON_SENTIMENT,
                     IMAP_NAME_SYMBOLS, IMAP_NAME_TRADES);
 
     public static final String WEBSOCKET_PATH_TRADES = "/trades";
@@ -65,4 +66,14 @@ public class MyConstants {
     public static final int SQL_RESULT_THRESHOLD = 10;
     // For SQL VIEW naming
     public static final String VIEW_SUFFIX = "_VIEW";
+
+    // For exponential loggers
+    public static final int MAX_LOGGING_INTERVAL = 3_000;
+
+    //FIXME Update list of sample stocks
+    public static final List<String> SAMPLE_STOCKS =
+            List.of("AAPL", "MSFT", "GOOG", "JPM", "IBM", "TPL",
+                    "NDP", "PBA", "ESTE", "DWAC", "IBA", "MTRN",
+                    "LPI", "CVX", "EOG", "GHC", "FRPT", "EXPD"
+                    );
 }

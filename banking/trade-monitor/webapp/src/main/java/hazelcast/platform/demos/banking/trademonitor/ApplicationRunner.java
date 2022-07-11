@@ -25,6 +25,8 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -68,7 +70,9 @@ public class ApplicationRunner {
     private static final String DRILL_SYMBOL = "DRILL_SYMBOL";
     private static final String LOAD_SYMBOLS = "LOAD_SYMBOLS";
 
+    private final Executor executor = Executors.newSingleThreadExecutor();
     private final HazelcastInstance  hazelcastInstance;
+    private final boolean localhost;
     private IMap<String, Tuple3<Long, Long, Integer>> aggregateQueryResultsMap;
     private IMap<String, SymbolInfo> symbolsMap;
     private IMap<String, HazelcastJsonValue> tradesMap;
@@ -81,6 +85,9 @@ public class ApplicationRunner {
     @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Hazelcast instance must be shared, not cloned")
     public ApplicationRunner(HazelcastInstance arg0) throws Exception {
         this.hazelcastInstance = arg0;
+        // If specifically indicated as localhost, don't do some steps
+        this.localhost =
+           System.getProperty("my.docker.enabled", "").equalsIgnoreCase("false");
     }
 
     /**
@@ -109,6 +116,11 @@ public class ApplicationRunner {
         System.out.println("");
 
         if (ok) {
+            PortfolioUpdater portfolioUpdater
+                = new PortfolioUpdater(this.hazelcastInstance);
+            LOGGER.info("process(): execute {}", System.identityHashCode(portfolioUpdater));
+            this.executor.execute(portfolioUpdater);
+
             ok = demoSql();
         }
 
@@ -317,6 +329,7 @@ public class ApplicationRunner {
             //{ "Join",    "SELECT * FROM (SELECT id, symbol, \"timestamp\" FROM kf_trades) AS k"
             //    + " LEFT JOIN (SELECT * FROM symbols) AS s ON k.symbol = s.__key" },
              */
+            { "IMap",    "SELECT stock FROM " + MyConstants.IMAP_NAME_PORTFOLIOS + " ORDER BY 1 DESC LIMIT 3"},
             { "IMap",    "SHOW MAPPINGS" },
             { "IMap",    "SHOW VIEWS" },
         };
@@ -457,10 +470,12 @@ public class ApplicationRunner {
             ok &= CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList,
                     usePulsar, useHzCloud);
             ok &= CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers);
-            if (ok) {
+            if (ok && !this.localhost) {
                 // Don't even try if broken by this point
                 ok = CommonIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
                         pulsarList, postgresProperties, properties);
+            } else {
+                LOGGER.info("ok=={}, localhost=={} - no job submission", ok, this.localhost);
             }
         }
 

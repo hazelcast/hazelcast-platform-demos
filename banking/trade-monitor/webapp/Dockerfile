@@ -6,6 +6,7 @@ COPY target/${JAR_FILE} application.jar
 
 # Default values provided
 ENV MY_BOOTSTRAP_SERVERS "0.0.0.0:9092,0.0.0.0:9093,0.0.0.0:9094"
+ENV MY_DOCKER_ENABLED "true"
 ENV MY_KUBERNETES_ENABLED "true"
 
 ENV JAVA_ARGS ""

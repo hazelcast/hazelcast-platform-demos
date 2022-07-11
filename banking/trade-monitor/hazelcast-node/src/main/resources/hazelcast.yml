@@ -45,3 +45,11 @@ hazelcast:
     resource-upload-enabled: true
     # 'true' requires Enterprise and persistence enabled
     lossless-restart-enabled: false
+
+  serialization:
+    compact-serialization:
+      enabled: true
+      registered-classes:
+        - class: hazelcast.platform.demos.banking.trademonitor.Portfolio
+          type-name: 'Portfolio'
+          serializer: hazelcast.platform.demos.banking.trademonitor.PortfolioSerializer

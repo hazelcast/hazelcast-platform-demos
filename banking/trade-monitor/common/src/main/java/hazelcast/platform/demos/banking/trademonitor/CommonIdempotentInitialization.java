@@ -341,7 +341,7 @@ public class CommonIdempotentInitialization {
                 + " 'keyFormat' = 'java',"
                 + " 'keyJavaClass' = 'java.lang.String',"
                 + " 'valueFormat' = 'java',"
-                + " 'valueJavaClass' = '" + Tuple3.class.getCanonicalName() + "'"
+                + " 'valueJavaClass' = '" + Tuple3.class.getName() + "'"
                 + " )";
 
         // See also AggregateQuery writing to map, and Postgres table definition for MapStore
@@ -359,7 +359,7 @@ public class CommonIdempotentInitialization {
                 + " 'keyFormat' = 'java',"
                 + " 'keyJavaClass' = 'java.lang.Long',"
                 + " 'valueFormat' = 'json-flat',"
-                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
+                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getName() + "'"
                 + " )";
 
         String definition3 = "CREATE MAPPING IF NOT EXISTS "
@@ -367,36 +367,32 @@ public class CommonIdempotentInitialization {
                 + " TYPE IMap "
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
+                + " 'keyJavaClass' = '" + String.class.getName() + "',"
                 + " 'valueFormat' = 'java',"
-                + " 'valueJavaClass' = '" + String.class.getCanonicalName() + "'"
+                + " 'valueJavaClass' = '" + String.class.getName() + "'"
                 + " )";
 
         String definition4 = "CREATE MAPPING IF NOT EXISTS "
-                + MyConstants.IMAP_NAME_SYMBOLS
+                + MyConstants.IMAP_NAME_PORTFOLIOS
+                + " ("
+                + "    __key VARCHAR,"
+                + "    stock VARCHAR,"
+                + "    sold INTEGER,"
+                + "    bought INTEGER,"
+                + "    change INTEGER"
+                + ")"
                 + " TYPE IMap "
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = 'java.lang.String',"
-                + " 'valueFormat' = 'java',"
-                + " 'valueJavaClass' = '" + SymbolInfo.class.getCanonicalName() + "'"
-                + " )";
-
-        String definition5 = "CREATE MAPPING IF NOT EXISTS "
-                + MyConstants.IMAP_NAME_TRADES
-                + " TYPE IMap "
-                + " OPTIONS ( "
-                + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = 'java.lang.String',"
-                + " 'valueFormat' = 'java',"
-                + " 'valueJavaClass' = '" + Trade.class.getCanonicalName() + "'"
+                + " 'keyJavaClass' = '" + String.class.getName() + "',"
+                + " 'valueFormat' = 'compact',"
+                + " 'valueCompactTypeName' = '" + Portfolio.class.getSimpleName() + "'"
                 + " )";
 
         boolean ok = define(definition1, hazelcastInstance);
         ok &= define(definition2, hazelcastInstance);
         ok &= define(definition3, hazelcastInstance);
         ok &= define(definition4, hazelcastInstance);
-        ok &= define(definition5, hazelcastInstance);
         return ok;
     }
 
@@ -406,7 +402,27 @@ public class CommonIdempotentInitialization {
      * @param hazelcastInstance
      */
      static boolean defineIMap2(HazelcastInstance hazelcastInstance) {
-        String definition6 = "CREATE MAPPING IF NOT EXISTS "
+         String definition5 = "CREATE MAPPING IF NOT EXISTS "
+                 + MyConstants.IMAP_NAME_SYMBOLS
+                 + " TYPE IMap "
+                 + " OPTIONS ( "
+                 + " 'keyFormat' = 'java',"
+                 + " 'keyJavaClass' = 'java.lang.String',"
+                 + " 'valueFormat' = 'java',"
+                 + " 'valueJavaClass' = '" + SymbolInfo.class.getName() + "'"
+                 + " )";
+
+         String definition6 = "CREATE MAPPING IF NOT EXISTS "
+                 + MyConstants.IMAP_NAME_TRADES
+                 + " TYPE IMap "
+                 + " OPTIONS ( "
+                 + " 'keyFormat' = 'java',"
+                 + " 'keyJavaClass' = 'java.lang.String',"
+                 + " 'valueFormat' = 'java',"
+                 + " 'valueJavaClass' = '" + Trade.class.getName() + "'"
+                 + " )";
+
+         String definition7 = "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_PYTHON_SENTIMENT
                 + " TYPE IMap "
                 + " OPTIONS ( "
@@ -416,7 +432,7 @@ public class CommonIdempotentInitialization {
                 + " 'valueJavaClass' = 'java.lang.String'"
                 + " )";
 
-        String definition7 = "CREATE MAPPING IF NOT EXISTS "
+        String definition8 = "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_JOB_CONTROL
                 + " TYPE IMap "
                 + " OPTIONS ( "
@@ -427,7 +443,7 @@ public class CommonIdempotentInitialization {
                 + " )";
 
         // Not much of view, but shows the concept
-        String definition8 =  "CREATE OR REPLACE VIEW "
+        String definition9 =  "CREATE OR REPLACE VIEW "
                 + MyConstants.IMAP_NAME_TRADES + MyConstants.VIEW_SUFFIX
                 + " AS SELECT "
                 + "    __key"
@@ -435,9 +451,11 @@ public class CommonIdempotentInitialization {
                 + " FROM " + MyConstants.IMAP_NAME_TRADES;
 
         boolean ok = true;
+        ok &= define(definition5, hazelcastInstance);
         ok &= define(definition6, hazelcastInstance);
         ok &= define(definition7, hazelcastInstance);
         ok &= define(definition8, hazelcastInstance);
+        ok &= define(definition9, hazelcastInstance);
         return ok;
     }
 
