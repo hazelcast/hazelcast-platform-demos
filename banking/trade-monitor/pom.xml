@@ -53,6 +53,7 @@
 		<module>kafka-broker</module>
 		<module>kafdrop</module>
 		<module>topic-create</module>
+		<module>finos-python</module>
 		<module>management-center</module>
 		<module>prometheus</module>
 		<module>postgres</module>
