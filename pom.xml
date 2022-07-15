@@ -72,7 +72,7 @@
 		<junit-vintage.version>5.7.2</junit-vintage.version>
 		<jython.version>2.7.2</jython.version>
 		<kafka-connect.version>2.6.0</kafka-connect.version>
-		<mongo-java-driver.version>3.12.7</mongo-java-driver.version>
+		<mongo-java-driver.version>3.12.8</mongo-java-driver.version>
 		<netty-tcnative.version>2.0.52.Final</netty-tcnative.version>
 		<poi-ooxml.version>4.1.2</poi-ooxml.version>
 		<!-- Run same version with 'protoc - -grpc_out=. - -plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin' 
@@ -108,8 +108,8 @@
 		<spotbugs-maven-plugin.version>4.6.0.0</spotbugs-maven-plugin.version>
 
 		<!-- Javascript -->
-		<node.version>v18.1.0</node.version>
-		<npm.version>8.11.0</npm.version>
+		<node.version>v18.5.0</node.version>
+		<npm.version>8.12.1</npm.version>
 	</properties>
 
 	<dependencies>
