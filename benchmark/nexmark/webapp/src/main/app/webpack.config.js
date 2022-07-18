@@ -1,4 +1,3 @@
-const PerspectivePlugin = require("@finos/perspective-webpack-plugin");
 const path = require('path');
 
 module.exports = {
@@ -8,7 +7,6 @@ module.exports = {
         extensions: [".ts", ".tsx", ".js"],
     },
     plugins: [
-        new PerspectivePlugin()
     ],        
     output: {
         path: __dirname,

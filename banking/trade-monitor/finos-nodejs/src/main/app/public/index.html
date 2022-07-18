@@ -2,10 +2,24 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>@my.docker.image.name@ - @maven.build.timestamp@</title>
+    <link rel="shortcut icon" href="./favicon.ico">
+    <link rel="stylesheet" type="text/css" href="./main.css" />
+    <title>@my.docker.image.name@</title>
   </head>
   <body>
+    <div class="headerfooter">
+      <div>
+        <center><img src="./hazelcast-horz-flat-rev-sm.png"
+                     alt="Hazelcast logo" width="200" height="42"></img></center>
+                        <h5>Build @maven.build.timestamp@</h5>
+      </div>
+      <hr class="headerfooterline"/>
+    </div>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div class="major_pane" id="root"></div>
+    <div class="major_pane"><div id="root"></div></div>
+    <div class="headerfooter">
+      <hr class="headerfooterline"/>
+      <p>&copy; Hazelcast <span id="copyrightyear">2022</span></p>
+    </div>
   </body> 
 </html>
