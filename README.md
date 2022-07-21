@@ -69,6 +69,7 @@ and apply the value in your build.
 You will need `my.license.key` for use with Hazelcast Enterprise.
 
 If using Hazelcast Cloud, you will need `my.hz.cloud.cluster1.name`, `my.hz.cloud.cluster1.password`, `my.hz.cloud.cluster1.keys.location` and `my.hz.cloud.cluster1.discovery.token` from your Cloud cluster's credentials. See [Hazelcast Cloud](#Hazelcast-Cloud) below.
+Also set `use.hz-cloud` in the top level *pom.xml*.
 
 If you plan to use the Slack integration in some modules, you will also need three Slack settings,
 `my.slack.bot.user.oath.access.token`, `my.slack.bot.channel.name` and `my.slack.bot.channel.id`.

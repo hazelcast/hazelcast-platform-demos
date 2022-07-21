@@ -3,8 +3,6 @@ hazelcast-client:
   cluster-name: '@my.cluster1.name@'
   # Replaced by Maven
   instance-name: '@project.artifactId@'
-  properties:
-    hazelcast.client.statistics.enabled: true
   #
   # Assuming Kubernetes, but override from Java code if we detect otherwise
   network:
@@ -21,3 +19,7 @@ hazelcast-client:
         - class: hazelcast.platform.demos.banking.trademonitor.Portfolio
           type-name: 'Portfolio'
           serializer: hazelcast.platform.demos.banking.trademonitor.PortfolioSerializer
+
+  metrics:
+    enabled: true
+          

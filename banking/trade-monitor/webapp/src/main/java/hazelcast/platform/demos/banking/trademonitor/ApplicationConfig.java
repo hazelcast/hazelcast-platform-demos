@@ -16,7 +16,9 @@
 
 package hazelcast.platform.demos.banking.trademonitor;
 
+import java.io.File;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -25,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
 import com.hazelcast.client.config.YamlClientConfigBuilder;
+import com.hazelcast.config.SSLConfig;
 
 /**
  * <p>Configure Jet client for connection to cluster. Use a config file, then override
@@ -39,6 +42,7 @@ public class ApplicationConfig {
     private static final String FILENAME = "application.properties";
     private static final String HZ_CLOUD_CLUSTER_DISCOVERY_TOKEN = "my.cluster1.discovery-token";
     private static final String HZ_CLOUD_CLUSTER_NAME = "my.cluster1.name";
+    private static final String HZ_CLOUD_CLUSTER_PASSWORD = "my.cluster1.password";
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
 
     /**
@@ -76,6 +80,11 @@ public class ApplicationConfig {
                 .setDiscoveryToken(myProperties.getProperty(HZ_CLOUD_CLUSTER_DISCOVERY_TOKEN));
             clientConfig.setClusterName(myProperties.getProperty(HZ_CLOUD_CLUSTER_NAME));
 
+            // Cloud uses SSL
+            String password = myProperties.getProperty(HZ_CLOUD_CLUSTER_PASSWORD);
+            Properties sslProps = getSSLProperties(password);
+            clientConfig.getNetworkConfig().setSSLConfig(new SSLConfig().setEnabled(true).setProperties(sslProps));
+
             if (clientConfig.getClusterName().startsWith("de-")) {
                 LOGGER.info("DEV cloud");
                 clientConfig.setProperty("hazelcast.client.cloud.url", "https://dev.test.hazelcast.cloud");
@@ -84,6 +93,12 @@ public class ApplicationConfig {
                 LOGGER.info("UAT cloud");
                 clientConfig.setProperty("hazelcast.client.cloud.url", "https://uat.hazelcast.cloud");
             }
+
+            // Confirm password not null without disclosing
+            LOGGER.info("Cluster name:'{}'", clientConfig.getClusterName());
+            LOGGER.info("Discovery token.length():'{}'",
+                    Objects.toString(clientConfig.getNetworkConfig().getCloudConfig().getDiscoveryToken()).length());
+            LOGGER.info("SSL keystore/truststore password.length():'{}'", Objects.toString(password).length());
 
             LOGGER.info("Non-Kubernetes configuration: cloud: "
                     + clientConfig.getClusterName());
@@ -111,6 +126,26 @@ public class ApplicationConfig {
         }
 
         return clientConfig;
+    }
+
+    /**
+     * <p>Properties for SSL
+     * </p>
+     *
+     * @param password
+     * @return
+     */
+    private static Properties getSSLProperties(String password) {
+        Properties properties = new Properties();
+
+        properties.setProperty("javax.net.ssl.keyStore",
+                new File("./client.keystore").toURI().getPath());
+        properties.setProperty("javax.net.ssl.keyStorePassword", password);
+        properties.setProperty("javax.net.ssl.trustStore",
+                new File("./client.truststore").toURI().getPath());
+        properties.setProperty("javax.net.ssl.trustStorePassword", password);
+
+        return properties;
     }
 
 }

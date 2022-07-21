@@ -33,6 +33,12 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>trade-monitor-common</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.hazelcast</groupId>
+					<artifactId>hazelcast</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -43,10 +49,17 @@
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-sql</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.hazelcast</groupId>
+					<artifactId>hazelcast</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
+		<!-- Need this for SSL for HZ Cloud -->
 		<dependency>
 			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast</artifactId>
+			<artifactId>hazelcast-enterprise</artifactId>
 		</dependency>
 
 		<dependency>
