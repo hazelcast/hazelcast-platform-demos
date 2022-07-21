@@ -35,6 +35,7 @@
 		<!-- From ~/.m2/settings.xml. If token set, use cloud. Name not used unless token set -->
 		<hz.cloud.cluster1.discovery.token>${my.hz.cloud.cluster1.discovery.token}</hz.cloud.cluster1.discovery.token>
 		<hz.cloud.cluster1.name>${my.hz.cloud.cluster1.name}</hz.cloud.cluster1.name>
+		<hz.cloud.cluster1.password>${my.hz.cloud.cluster1.password}</hz.cloud.cluster1.password>
 
 		<!-- So Grafana can find Prometheus service, must match K8S YAML -->
 		<my.prometheus.name>${my.docker.image.prefix}-prometheus</my.prometheus.name>

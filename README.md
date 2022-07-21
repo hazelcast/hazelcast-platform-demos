@@ -102,8 +102,8 @@ If using Hazelcast Cloud, use the "*Connect Your Application*" page to find the 
   * Use this for `my.hz.cloud.cluster1.discovery.token` in your `settings.xml` file.
 3. Keystore File
   * A client connecting from the outside world requires a *keystore* and *truststore* file that store its access credentials.
-  * Use `my.hz.cloud.cluster1.file.location` to hold the directory where these files are stored.
-  * eg `<my.hz.cloud.cluster1.file.location>${user.home}/Downloads/hzcloud_1234_keys</my.hz.cloud.cluster1.file.location>`
+  * Use `my.hz.cloud.cluster1.keys.location` to hold the directory where these files are stored.
+  * eg `<my.hz.cloud.cluster1.keys.location>${user.home}/Downloads/hzcloud_1234_keys</my.hz.cloud.cluster1.keys.location>`
 4. Keystore/Truststore Password
   * This is the password to unlock the above *keystore* and *truststore*, the same value for both.
   * Use this for `my.hz.cloud.cluster1.password` in your `settings.xml` file.

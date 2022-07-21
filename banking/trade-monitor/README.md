@@ -643,6 +643,13 @@ aggregate, so the format is the same as for `trade-producer` log and the `Ingest
 14:43:11.181 INFO  trade-monitor-webapp.event-2 c.h.p.d.b.trademonitor.TradesMapListener - Received 1 => "{"id": "5af8cf39-4db7-4663-8b31-1169dd9398ca","timestamp": 1583934191165,"symbol": "MTGE","price": 2501,"quantity": 5729}" 
 ```
 
+## Running -- Hazelcast Cloud
+
+Create a Hazelcast Cloud cluster if you don't have one.
+
+Follow the instructions in [here](../../README.md) to obtain cloud credentials, save them to your `settings.xml`
+and compile.
+
 ## Summary
 
 This is an example showing real-time aggregation of data from a Kafka topic, giving a live

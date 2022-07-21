@@ -25,7 +25,7 @@
 
 		<!-- Temp uptil upgraded to Node 17, and remove Yarn -->
 		<node.version>v16.4.0</node.version>
-                <yarn.version>v1.22.5</yarn.version>
+		<yarn.version>v1.22.5</yarn.version>
 	</properties>
 
 	<dependencies>
@@ -68,6 +68,15 @@
 		</resources>
 
 		<plugins>
+			<!-- Copy keystore/truststore if found -->
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<configuration>
+					<target>
+						<ant antfile="src/main/scripts/build.xml" target="conditionalcopy"/>
+					</target>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
@@ -105,21 +114,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- This resources plugin is a very important step, its job is to take 
-				the client application artifacts built by the frontend plugin and copy them 
-				to the "right place". The "right place" to copy the artifacts to, and where 
-				to copy them from, can change depending on which client framework is being 
-				used. For all client frameworks: - client application root is "src/main/app" 
-				- install directory is the Maven ${project.build.directory} which will translate 
-				to "target/classes" Note that "app" is an arbitrary choice, it could be something 
-				else if you wanted - so long as you change it everywhere. For ReactJS: - 
-				react-scripts build default output directory is "<app-root>/build", so "src/main/app/build" 
-				- directory to copy the built application to is "target/classes/app" - the 
-				Java router code uses this "app" directory on the classpath The "app" directory 
-				on the classpath is used so as to partition the client application from any 
-				other classes and resources that may be part of the application. Again, the 
-				choice of "app" here is arbitrary and you can choose something else if you 
-				want - so long as you change the Java routing configuration. -->
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<executions>
