@@ -95,10 +95,10 @@ public class ApplicationConfig {
             }
 
             // Confirm password not null without disclosing
-            LOGGER.info("Cluster name:'{}'", clientConfig.getClusterName());
-            LOGGER.info("Discovery token.length():'{}'",
+            LOGGER.info("Cluster name=='{}'", clientConfig.getClusterName());
+            LOGGER.info("Discovery token.length()=={}",
                     Objects.toString(clientConfig.getNetworkConfig().getCloudConfig().getDiscoveryToken()).length());
-            LOGGER.info("SSL keystore/truststore password.length():'{}'", Objects.toString(password).length());
+            LOGGER.info("SSL keystore/truststore password.length()=={}", Objects.toString(password).length());
 
             LOGGER.info("Non-Kubernetes configuration: cloud: "
                     + clientConfig.getClusterName());
