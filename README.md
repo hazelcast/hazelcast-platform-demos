@@ -54,6 +54,8 @@ and apply the value in your build.
       <properties>
         <my.hz.cloud.cluster1.name>GOES HERE</my.hz.cloud.cluster1.name>
         <my.hz.cloud.cluster1.discovery.token>GOES HERE</my.hz.cloud.cluster1.discovery.token>
+        <my.hz.cloud.cluster1.password>GOES HERE</my.hz.cloud.cluster1.password>
+        <my.hz.cloud.cluster1.keys.location>GOES HERE</my.hz.cloud.cluster1.keys.location>
         <my.license.key>GOES HERE</my.license.key>
         <my.slack.bot.user.oath.access.token>GOES HERE</my.slack.bot.user.oath.access.token>
         <my.slack.bot.channel.name>GOES HERE</my.slack.bot.channel.name>
@@ -66,7 +68,7 @@ and apply the value in your build.
 
 You will need `my.license.key` for use with Hazelcast Enterprise.
 
-If using Hazelcast Cloud, you will need `my.hz.cloud.cluster1.name` and `my.hz.cloud.cluster1.discovery.token` from your Cloud cluster's credentials.
+If using Hazelcast Cloud, you will need `my.hz.cloud.cluster1.name`, `my.hz.cloud.cluster1.password`, `my.hz.cloud.cluster1.keys.location` and `my.hz.cloud.cluster1.discovery.token` from your Cloud cluster's credentials. See [Hazelcast Cloud](#Hazelcast-Cloud) below.
 
 If you plan to use the Slack integration in some modules, you will also need three Slack settings,
 `my.slack.bot.user.oath.access.token`, `my.slack.bot.channel.name` and `my.slack.bot.channel.id`.
@@ -85,6 +87,27 @@ So do not have this in your `settings.xml`:
 ```
 
 Omit the line if you have no token.
+
+## Hazelcast Cloud
+
+If using Hazelcast Cloud, use the "*Connect Your Application*" page to find the following:
+
+1. Cluster Name
+  * This will be something like `pr-1234`.
+  * This is the external name of the cluster, the value a client uses. It may not be the same as the internal name, used on the Hazelcast Cloud administration panels.
+  * Use this for `my.hz.cloud.cluster1.name` in your `settings.xml` file.
+2. Discovery Token
+  * This is a text string like `a0b1c2d3e4f56g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z`.
+  * It is used as part of connecting to the cluster.
+  * Use this for `my.hz.cloud.cluster1.discovery.token` in your `settings.xml` file.
+3. Keystore File
+  * A client connecting from the outside world requires a *keystore* and *truststore* file that store its access credentials.
+  * Use `my.hz.cloud.cluster1.file.location` to hold the directory where these files are stored.
+  * eg `<my.hz.cloud.cluster1.file.location>${user.home}/Downloads/hzcloud_1234_keys</my.hz.cloud.cluster1.file.location>`
+4. Keystore/Truststore Password
+  * This is the password to unlock the above *keystore* and *truststore*, the same value for both.
+  * Use this for `my.hz.cloud.cluster1.password` in your `settings.xml` file.
+
 
 ## 3rd Party Software
 
