@@ -17,5 +17,9 @@ MC_EMPTY=''
 MC_CLUSTER1_LIST=`echo ${MC_CLUSTER1_ADDRESSLIST_OVERRIDE:-${MC_EMPTY}} $MC_CLUSTER1_ADDRESSLIST |awk '{print $1}'`
 
 # Run Node.js
-echo npm --loglevel=error start $MC_CLUSTER1_NAME $MC_CLUSTER1_LIST
-npm --loglevel=error start $MC_CLUSTER1_NAME $MC_CLUSTER1_LIST
+echo REACT_APP_MC_CLUSTER1_NAME=$MC_CLUSTER1_NAME > .env
+echo REACT_APP_MC_CLUSTER1_LIST=$MC_CLUSTER1_LIST >> .env
+echo REACT_APP_MY_KUBERNETES_ENABLED=$MY_KUBERNETES_ENABLED >> .env
+cat .env
+echo npm --loglevel=error start
+npm --loglevel=error start

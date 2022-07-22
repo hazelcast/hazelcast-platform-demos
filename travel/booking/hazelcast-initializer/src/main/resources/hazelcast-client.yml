@@ -7,9 +7,6 @@ hazelcast-client:
   client-labels:
     - '@maven.build.timestamp@'
   #
-  properties:
-    hazelcast.client.statistics.enabled: true
-  #
   network:
     auto-detection:
       enabled: false
@@ -20,3 +17,6 @@ hazelcast-client:
     reconnect-mode: OFF
     connection-retry:
       cluster-connect-timeout-millis: 5000 
+  #
+  metrics:
+    enabled: true

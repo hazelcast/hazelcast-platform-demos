@@ -3,5 +3,5 @@ hazelcast-client:
   instance-name: webapp-@maven.build.timestamp@
   client-labels:
     - webapp
-  properties:
-    hazelcast.client.statistics.enabled: true
+  metrics:
+    enabled: true

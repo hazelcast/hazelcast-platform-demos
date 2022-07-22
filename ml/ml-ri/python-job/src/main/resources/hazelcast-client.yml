@@ -3,8 +3,6 @@ hazelcast-client:
   cluster-name: '@my.cluster.name@'
   # Replaced by Maven
   instance-name: '@project.artifactId@'
-  properties:
-    hazelcast.client.statistics.enabled: true
   #
   # Assuming Kubernetes, but override from Java code if we detect otherwise
   network:
@@ -13,3 +11,6 @@ hazelcast-client:
     kubernetes:
       enabled: true
       service-dns: '@my.cluster.name@-service.default.svc.cluster.local'
+  #
+  metrics:
+    enabled: true

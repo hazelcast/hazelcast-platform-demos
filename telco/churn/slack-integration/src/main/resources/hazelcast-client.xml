@@ -9,15 +9,13 @@
     <cluster-name>@my.cluster.name@</cluster-name>
     <instance-name>@project.artifactId@</instance-name>
 
-    <properties>
-        <property name="hazelcast.client.statistics.enabled">true</property>
-    </properties>
-
     <client-labels>
         <label>job-submitter</label>
     </client-labels>
 
 	<!-- Networking connectivity is set in Java -->
+
+    <metrics enabled="true"/>
 
 </hazelcast-client>        
 

@@ -6,10 +6,6 @@
                   
     <cluster-name>@my.cluster1.name@</cluster-name>
 
-    <properties>
-        <property name="hazelcast.client.statistics.enabled">true</property>
-    </properties>
-
    	<network>
    		<!-- Use "cluster-members" and the right address for Docker instead of K8S   -->
         <!-- 
@@ -22,6 +18,8 @@
             <service-dns>@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local</service-dns>
         </kubernetes>        
     </network>
+
+    <metrics enabled="true"/>
 
     <security>
     	<!-- Connect with username/password or use a factory to generate credentials -->

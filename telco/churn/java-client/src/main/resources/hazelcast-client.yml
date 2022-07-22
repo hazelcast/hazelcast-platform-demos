@@ -6,11 +6,12 @@ hazelcast-client:
   cluster-name: '@my.cluster.name@'
   # Replaced by Maven
   instance-name: '@project.artifactId@'
-  properties:
-    hazelcast.client.statistics.enabled: true
   network:
     # Default, but make it obvious webapp can multiplex
     smart-routing: true
+
+  metrics:
+    enabled:true
 
   # Value must match MyConstants.java
   serialization:
