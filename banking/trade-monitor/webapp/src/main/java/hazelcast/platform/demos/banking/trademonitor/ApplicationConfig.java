@@ -44,6 +44,8 @@ public class ApplicationConfig {
     private static final String HZ_CLOUD_CLUSTER_NAME = "my.cluster1.name";
     private static final String HZ_CLOUD_CLUSTER_PASSWORD = "my.cluster1.password";
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
+    private static final int EXPECTED_PASSWORD_LENGTH = 11;
+    private static final int EXPECTED_TOKEN_LENGTH = 50;
 
     /**
      * <p>Load the configuration for this job to connect to a Jet cluster as
@@ -94,11 +96,7 @@ public class ApplicationConfig {
                 clientConfig.setProperty("hazelcast.client.cloud.url", "https://uat.hazelcast.cloud");
             }
 
-            // Confirm password not null without disclosing
-            LOGGER.info("Cluster name=='{}'", clientConfig.getClusterName());
-            LOGGER.info("Discovery token.length()=={}",
-                    Objects.toString(clientConfig.getNetworkConfig().getCloudConfig().getDiscoveryToken()).length());
-            LOGGER.info("SSL keystore/truststore password.length()=={}", Objects.toString(password).length());
+            logCloudConfig(clientConfig);
 
             LOGGER.info("Non-Kubernetes configuration: cloud: "
                     + clientConfig.getClusterName());
@@ -146,6 +144,40 @@ public class ApplicationConfig {
         properties.setProperty("javax.net.ssl.trustStorePassword", password);
 
         return properties;
+    }
+
+    /**
+     * <p>Confirms properties set correctly for Maven to pick up.
+     * </p>
+     *
+     * @param clientConfig
+     */
+    private static void logCloudConfig(ClientConfig clientConfig) {
+        LOGGER.info("Cluster name=='{}'", clientConfig.getClusterName());
+
+        String token = Objects.toString(clientConfig.getNetworkConfig()
+                .getCloudConfig().getDiscoveryToken());
+        if (token.length() == EXPECTED_TOKEN_LENGTH) {
+            LOGGER.info("Discovery token.length()=={}, ending '{}'", token.length(),
+                    token.substring(EXPECTED_TOKEN_LENGTH - 1, EXPECTED_TOKEN_LENGTH));
+        } else {
+            LOGGER.warn("Discovery token.length()=={}, expected {}, ending '{}'",
+                    token.length(),
+                    EXPECTED_TOKEN_LENGTH,
+                    token.substring(EXPECTED_TOKEN_LENGTH - 1, EXPECTED_TOKEN_LENGTH));
+        }
+
+        String password = Objects.toString(clientConfig.getNetworkConfig()
+                .getSSLConfig().getProperty("javax.net.ssl.trustStorePassword"));
+        if (password.length() == EXPECTED_PASSWORD_LENGTH) {
+            LOGGER.info("SSL password.length()=={}, ending '{}'", password.length(),
+                    password.substring(EXPECTED_PASSWORD_LENGTH - 1, EXPECTED_PASSWORD_LENGTH));
+        } else {
+            LOGGER.warn("SSL password.length()=={}, expected {}, ending '{}'",
+                    password.length(),
+                    EXPECTED_PASSWORD_LENGTH,
+                    password.substring(EXPECTED_PASSWORD_LENGTH - 1, EXPECTED_PASSWORD_LENGTH));
+        }
     }
 
 }
