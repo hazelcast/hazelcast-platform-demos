@@ -72,7 +72,7 @@ public class ApplicationRunner {
                 try {
                     while (true) {
                         TimeUnit.MINUTES.sleep(1L);
-                        LOGGER.info("-=-=-=-=- '{}' MAPS -=-=-=-=-=-", this.springApplicationName);
+                        LOGGER.info("-=-=-=-=- MAPS -=-=-=-=-=-");
                         Collection<String> names = List.of(BenchmarkBase.IMAP_NAME_CURRENT_LATENCIES,
                                 BenchmarkBase.IMAP_NAME_MAX_LATENCIES);
                         for (String name : names) {
@@ -82,7 +82,7 @@ public class ApplicationRunner {
                                 LOGGER.info("MAP '{}' : {}", name, entry);
                             });
                         }
-                        LOGGER.info("-=-=-=-=- '{}' JOBS -=-=-=-=-=-", this.springApplicationName);
+                        LOGGER.info("-=-=-=-=- JOBS -=-=-=-=-=-");
                         this.hazelcastInstance.getJet().getJobs()
                         .forEach(job -> {
                             LOGGER.info("JOB '{}' : {} : {}",
@@ -169,7 +169,7 @@ public class ApplicationRunner {
     private void autostart() {
         LOGGER.debug("@@@@@@@");
         LOGGER.debug("@@@@@@@ <====>");
-        LOGGER.debug("@@@@@@@ '{}' autostart() @@@@@@@", this.springApplicationName);
+        LOGGER.debug("@@@@@@@ autostart() @@@@@@@");
         Collection<Job> jobs = this.hazelcastInstance.getJet().getJobs();
         final AtomicLong cancelled = new AtomicLong(0L);
         if (!jobs.isEmpty()) {
@@ -207,7 +207,7 @@ public class ApplicationRunner {
                     String.format("%,d", params.get(BenchmarkBase.PROP_EVENTS_PER_SECOND)));
         }
 
-        LOGGER.debug("@@@@@@@ '{}' autostart() @@@@@@@", this.springApplicationName);
+        LOGGER.debug("@@@@@@@ autostart() @@@@@@@");
         LOGGER.debug("@@@@@@@ <====>");
         LOGGER.debug("@@@@@@@");
     }

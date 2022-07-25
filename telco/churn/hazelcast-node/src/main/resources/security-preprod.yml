@@ -48,6 +48,12 @@ hazelcast:
         - principal: "ManagementCenter"
       map:
         #
+        - name: "cdr"
+          principal: "ManagementCenter"
+          actions:
+            - create
+            - put
+            - read
         - name: "customer"
           principal: churn-java-client
           actions:
@@ -65,7 +71,6 @@ hazelcast:
             - create
             - put
             - read
-        #
         - name: "sentiment"
           principal: churn-java-client
           actions:
@@ -90,14 +95,14 @@ hazelcast:
             - create
             - put
             - read
-        - name: "*"
-          principal: "JobSubmitter"
+        - name: "tariff"
+          principal: "ManagementCenter"
           actions:
             - create
             - put
             - read
-        - name: "*"
-          principal: "ManagementCenter"
+        - name: "__jet*"
+          principal: "JobSubmitter"
           actions:
             - create
             - put
