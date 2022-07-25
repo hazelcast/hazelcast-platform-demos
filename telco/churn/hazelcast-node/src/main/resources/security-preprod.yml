@@ -54,6 +54,12 @@ hazelcast:
             - create
             - put
             - read
+        - name: "cdr"
+          principal: "JobSubmitter"
+          actions:
+            - create
+            - put
+            - read
         - name: "customer"
           principal: churn-java-client
           actions:
