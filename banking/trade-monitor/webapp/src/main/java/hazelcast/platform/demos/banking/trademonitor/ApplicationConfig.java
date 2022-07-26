@@ -75,7 +75,9 @@ public class ApplicationConfig {
         LOGGER.info("useHzCloud='{}'", useHzCloud);
 
         // Use cloud if property set
-        if (!myProperties.getProperty(HZ_CLOUD_CLUSTER_DISCOVERY_TOKEN, "").isBlank() && useHzCloud) {
+        if (!myProperties.getProperty(HZ_CLOUD_CLUSTER_DISCOVERY_TOKEN, "").isBlank()
+                && !myProperties.getProperty(HZ_CLOUD_CLUSTER_DISCOVERY_TOKEN, "").equals("unset")
+                && useHzCloud) {
             clientNetworkConfig.getKubernetesConfig().setEnabled(false);
             clientNetworkConfig.getCloudConfig().setEnabled(true);
             clientNetworkConfig.getCloudConfig()
@@ -159,24 +161,22 @@ public class ApplicationConfig {
                 .getCloudConfig().getDiscoveryToken());
         if (token.length() == EXPECTED_TOKEN_LENGTH) {
             LOGGER.info("Discovery token.length()=={}, ending '{}'", token.length(),
-                    token.substring(EXPECTED_TOKEN_LENGTH - 1, EXPECTED_TOKEN_LENGTH));
+                    token.substring(token.length() - 1, token.length()));
         } else {
-            LOGGER.warn("Discovery token.length()=={}, expected {}, ending '{}'",
+            LOGGER.warn("Discovery token.length()=={}, expected {}",
                     token.length(),
-                    EXPECTED_TOKEN_LENGTH,
-                    token.substring(EXPECTED_TOKEN_LENGTH - 1, EXPECTED_TOKEN_LENGTH));
+                    EXPECTED_TOKEN_LENGTH);
         }
 
         String password = Objects.toString(clientConfig.getNetworkConfig()
                 .getSSLConfig().getProperty("javax.net.ssl.trustStorePassword"));
         if (password.length() == EXPECTED_PASSWORD_LENGTH) {
             LOGGER.info("SSL password.length()=={}, ending '{}'", password.length(),
-                    password.substring(EXPECTED_PASSWORD_LENGTH - 1, EXPECTED_PASSWORD_LENGTH));
+                    password.substring(password.length() - 1, password.length()));
         } else {
-            LOGGER.warn("SSL password.length()=={}, expected {}, ending '{}'",
+            LOGGER.warn("SSL password.length()=={}, expected {}",
                     password.length(),
-                    EXPECTED_PASSWORD_LENGTH,
-                    password.substring(EXPECTED_PASSWORD_LENGTH - 1, EXPECTED_PASSWORD_LENGTH));
+                    EXPECTED_PASSWORD_LENGTH);
         }
     }
 
