@@ -34,7 +34,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spotbugs.skip>true</spotbugs.skip>
                 <!-- Configure the build for HZ Cloud or all Kubernetes -->
-                <use.hz-cloud>true</use.hz-cloud>
+                <use.hz-cloud>false</use.hz-cloud>
 
 		<!-- For Management Center, Cassandra/Mongo/MySQL etc logons -->
 		<my.mc.admin.user>admin</my.mc.admin.user>
@@ -66,7 +66,7 @@
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
 		<hibernate-validator.version>6.1.5.Final</hibernate-validator.version>
 		<jackson.version>2.12.4</jackson.version>
-		<json.version>20211205</json.version>
+		<json.version>20220320</json.version>
 		<json-smart.version>2.4.8</json-smart.version>
 		<junit-jupiter.version>5.7.2</junit-jupiter.version>
 		<junit-vintage.version>5.7.2</junit-vintage.version>
