@@ -16,7 +16,8 @@ COPY target/classes/tsconfig.json ./
 COPY target/classes/webpack.config.js ./
 
 RUN npm install -g npm@8.15.1
-RUN npm install hazelcast-client --save
+RUN npm install -g hazelcast-client --save
+RUN npm install -g fs
 RUN npm install
 #RUN npm audit fix
 
