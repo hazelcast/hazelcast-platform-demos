@@ -189,7 +189,9 @@ saved here, as an example of data we might wish to keep a history of.
 ### 10. `abstract-hazelcast-node`
 
 The `abstract-hazelcast-node` is the module where actual work of the Trade Monitor is done, even though
-this needs the separate `webapp` module below to visualize.
+this needs the separate `webapp` module below to visualize. It is bundled in to `hazelcast-node`
+for open-source, and into `hazelcast-node-enterprise-1` & `hazelcast-node-enterprise-2` for
+demonstrating commercial features.
 
 This module creates a single Hazelcast node with both in-memory data grid (IMDG) and Jet functionality.
 
