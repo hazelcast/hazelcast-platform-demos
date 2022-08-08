@@ -49,9 +49,13 @@ public class UtilsJobs {
         String jobName = jobConfig.getName();
         List<Job> jobs = hazelcastInstance.getJet().getJobs();
         for (Job job : jobs) {
-            if (!job.getName().isBlank() && job.getName().equals(jobName)) {
-                logger.debug("myNewJobIfAbsent: skip '{}', exists with status {}", jobName, job.getStatus());
-                return null;
+            if (job.getName() == null) {
+                logger.error("Job with null name: {}", job);
+            } else {
+                if (!job.getName().isBlank() && job.getName().equals(jobName)) {
+                    logger.debug("myNewJobIfAbsent: skip '{}', exists with status {}", jobName, job.getStatus());
+                    return null;
+                }
             }
         }
         try {
