@@ -173,6 +173,10 @@ public class PostgresCDC {
 
                 Tuple2<Long, HazelcastJsonValue> tuple2 = Tuple2.tuple2(key, value);
                 if (provenance.toString().startsWith(ourProvenanceProject)) {
+                    /* Anything starting "trade-monitor" is either initial
+                     * test data loaded by MapLoader or writes by Jet which
+                     * we don't wish to re-read.
+                     */
                     LOGGER.info("Skip re-read of own write ('{}'): {}", provenance, tuple2);
                     return null;
                 } else {

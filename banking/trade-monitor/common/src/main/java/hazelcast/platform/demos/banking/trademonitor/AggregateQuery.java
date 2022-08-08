@@ -95,7 +95,7 @@ public class AggregateQuery {
      * @return A pipeline job to run in Jet.
      */
     public static Pipeline buildPipeline(String bootstrapServers, String pulsarList,
-            boolean usePulsar, String projectName, String jobName) {
+            boolean usePulsar, String projectName, String jobName, String clusterName) {
 
         // Override the value de-serializer to produce a different type
         Properties properties = InitializerConfig.kafkaSourceProperties(bootstrapServers);
@@ -151,7 +151,7 @@ public class AggregateQuery {
         .writeTo(Sinks.logger());
 
         // Extra stages for alert generation
-        AggregateQuery.addMaxVolumeAlert(aggregated, projectName, jobName);
+        AggregateQuery.addMaxVolumeAlert(aggregated, projectName, clusterName, jobName);
 
         return pipeline;
     }
@@ -189,13 +189,13 @@ public class AggregateQuery {
      */
     private static void addMaxVolumeAlert(
             StreamStage<Entry<String, Tuple3<Long, Long, Long>>> aggregated,
-            String projectName, String jobName) {
+            String projectName, String jobName, String clusterName) {
         AggregateOperation1<
             Entry<Integer, Tuple4<String, Long, Long, Long>>,
             MaxVolumeAggregator,
             Entry<Long, HazelcastJsonValue>>
                 maxVolumeAggregator =
-                    MaxVolumeAggregator.buildMaxVolumeAggregation(projectName, jobName);
+                    MaxVolumeAggregator.buildMaxVolumeAggregation(projectName, clusterName, jobName);
 
         aggregated
         .map(entry -> {

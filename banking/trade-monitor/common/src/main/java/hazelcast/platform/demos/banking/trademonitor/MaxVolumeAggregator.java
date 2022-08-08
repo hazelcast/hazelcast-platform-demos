@@ -39,16 +39,16 @@ public class MaxVolumeAggregator implements Serializable {
     private String maxSymbol;
     private long maxVolume;
 
-    public MaxVolumeAggregator(String arg0, String arg1) {
-        this.provenance = arg0 + ":" + arg1;
+    public MaxVolumeAggregator(String arg0, String arg1, String arg2) {
+        this.provenance = arg0 + ":" + arg1 + ":" + arg2;
     }
 
     public static AggregateOperation1<Entry<Integer, Tuple4<String, Long, Long, Long>>,
         MaxVolumeAggregator, Entry<Long, HazelcastJsonValue>> buildMaxVolumeAggregation(
-                String projectName, String jobName
+                String projectName, String clusterName, String jobName
                 ) {
         return AggregateOperation
-                .withCreate(() -> new MaxVolumeAggregator(projectName, jobName))
+                .withCreate(() -> new MaxVolumeAggregator(projectName, clusterName, jobName))
                 .andAccumulate((MaxVolumeAggregator maxVolumeAggregator,
                         Entry<Integer, Tuple4<String, Long, Long, Long>> entry)
                         -> maxVolumeAggregator.accumulate(entry.getValue()))

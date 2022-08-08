@@ -45,13 +45,15 @@ public class JobControlListener implements EntryAddedListener<String, String>, E
     private final String pulsarList;
     private final boolean usePulsar;
     private final String projectName;
+    private final String clusterName;
 
-    public JobControlListener(String arg0, String arg1, boolean arg2, String arg3) {
+    public JobControlListener(String arg0, String arg1, boolean arg2, String arg3, String arg4) {
         this.executor = Executors.newSingleThreadExecutor();
         this.bootstrapServers = arg0;
         this.pulsarList = arg1;
         this.usePulsar = arg2;
         this.projectName = arg3;
+        this.clusterName = arg4;
     }
 
     @Override
@@ -83,7 +85,7 @@ public class JobControlListener implements EntryAddedListener<String, String>, E
         if (verb.toUpperCase(Locale.ROOT).equals("START")) {
             JobControlStartRunnable jobControlStartRunnable =
                     new JobControlStartRunnable(noun, this.bootstrapServers, this.pulsarList, this.usePulsar,
-                            this.projectName);
+                            this.projectName, this.clusterName);
             this.executor.execute(jobControlStartRunnable);
         } else {
             if (verb.toUpperCase(Locale.ROOT).equals("STOP")) {

@@ -455,8 +455,7 @@ public class ApplicationRunner {
 
             // Address from environment/command line, others from application.properties file.
             properties.put(MyConstants.POSTGRES_ADDRESS, postgresAddress);
-            String ourProjectProvenance = properties.getProperty(MyConstants.PROJECT_PROVENANCE)
-                    + "-" + clusterName;
+            String ourProjectProvenance = properties.getProperty(MyConstants.PROJECT_PROVENANCE);
 
             Properties postgresProperties = null;
             try {
@@ -474,7 +473,7 @@ public class ApplicationRunner {
             if (ok && !this.localhost) {
                 // Don't even try if broken by this point
                 ok = CommonIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
-                        pulsarList, postgresProperties, properties);
+                        pulsarList, postgresProperties, properties, clusterName);
             } else {
                 LOGGER.info("ok=={}, localhost=={} - no job submission", ok, this.localhost);
             }

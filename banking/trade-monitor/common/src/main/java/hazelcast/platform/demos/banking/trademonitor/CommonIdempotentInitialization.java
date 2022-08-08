@@ -540,7 +540,7 @@ public class CommonIdempotentInitialization {
      * @param properties
      */
     public static boolean launchNeededJobs(HazelcastInstance hazelcastInstance, String bootstrapServers,
-            String pulsarList, Properties postgresProperties, Properties properties) {
+            String pulsarList, Properties postgresProperties, Properties properties, String clusterName) {
         String projectName = properties.getOrDefault(UtilsConstants.SLACK_PROJECT_NAME,
                 CommonIdempotentInitialization.class.getSimpleName()).toString();
 
@@ -585,7 +585,8 @@ public class CommonIdempotentInitialization {
             jobConfigAggregateQuery.addClass(UtilsFormatter.class);
 
             Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(bootstrapServers,
-                    pulsarList, usePulsar, projectName, jobConfigAggregateQuery.getName());
+                    pulsarList, usePulsar, projectName, jobConfigAggregateQuery.getName(),
+                    clusterName);
 
             if (usePulsar && useHzCloud) {
                 //TODO Fix once supported by HZ Cloud
