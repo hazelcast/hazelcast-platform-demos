@@ -48,13 +48,18 @@ Docker exists and build container images for deployment.
 
 ## Modules
 
-There are 15 modules in this example, alphabetically:
+There are 20 modules in this example, alphabetically:
 
 ```
+abstract-hazelcast-node/
 common/
 custom-classes/
+finos-nodejs/
+finos-python/
 grafana/
 hazelcast-node/
+hazelcast-node-enterprise-1/
+hazelcast-node-enterprise-2/
 kafdrop/
 kafka-broker/
 management-center/
@@ -181,9 +186,9 @@ So `kafdrop` etc won't show anything useful.
 To show interaction with external stores, a Postgres database is used. Max volume alerts are
 saved here, as an example of data we might wish to keep a history of.
 
-### 10. `hazelcast-node`
+### 10. `abstract-hazelcast-node`
 
-The `hazelcast-node` is the module where actual work of the Trade Monitor is done, even though
+The `abstract-hazelcast-node` is the module where actual work of the Trade Monitor is done, even though
 this needs the separate `webapp` module below to visualize.
 
 This module creates a single Hazelcast node with both in-memory data grid (IMDG) and Jet functionality.
@@ -256,6 +261,16 @@ For each trade that comes in, the running total for that trade is updated in the
 Jet job `AggregatedQuery` processes the same input as Jet job `IngestTrades`, and at the same
 time. So they could be merged for efficiency, but here they are kept apart for clarity of understanding.
 
+### 10.A `hazelcast-node`
+
+Builds the open-source version, named `grid1`.
+
+### 10.b `hazelcast-node-enterprise-1` & `hazelcast-node-enterprise-2`
+
+Builds the enterprise version, two clusters `grid1` and `grid2` connected for data replication.
+
+In this version, data replication is one-way, for selected maps.
+
 ### 11. `webapp`
 
 The last main module in the demo is a web-based UI to display the trade data and trade aggregation
@@ -309,6 +324,11 @@ This module is an optional extra to show how to package and submit from the comm
 The job involvd is an extra, it does not produce data for the web application. You can
 browse it's output with the Management Center.
 
+### 16. `finos-nodejs` (optional) & `finos-python` (optional)
+
+Two options clients using the [Perspective](https://perspective.finos.org/) plugin from
+[FinOS](https://www.finos.org/).
+
 ## Running -- sequence
 
 The following sections describe how to run the example on your local machine, on Docker
@@ -334,6 +354,9 @@ configuration
 4.== `hazelcast-node` The Hazelcast node has Jet jobs that read from the Kafka topic created. There doesn't
 need to be anything being written to the Kafka topic, but if there is no input there is no output from
 a streaming job.
+
+If you want to run the enterprise version, start both `hazelcast-node-enterprise-1` and `hazelcast-node-enterprise-2`
+instead of `hazelcast-node`.
 
 5.== `webapp` The web UI is a client of the Hazelcast cluster, so needs Hazelcast node(s) to be runnning.
 
@@ -478,8 +501,8 @@ If all looks well, you should something like this listed for the default namespa
 $ kubectl get pods
 NAME                                               READY   STATUS      RESTARTS   AGE
 trade-monitor-grafana-7b56d947b4-phsnj             1/1     Running     0          61s
-trade-monitor-grid-hazelcast-0                     1/1     Running     0          3m2s
-trade-monitor-grid-hazelcast-1                     1/1     Running     0          2m2s
+trade-monitor-grid1-hazelcast-0                    1/1     Running     0          3m2s
+trade-monitor-grid1-hazelcast-1                    1/1     Running     0          2m2s
 trade-monitor-job-topic-create-pxnjq               0/1     Completed   0          57m
 trade-monitor-job-trade-producer-xkgwn             1/1     Running     0          61s
 trade-monitor-kafdrop-679dcd8568-72f87             1/1     Running     0          57m
@@ -506,8 +529,8 @@ For example, for this output from Google Kubernetes Engine:
 $ kubectl get services | egrep 'trade-monitor|EXTERNAL'
 NAME                                 TYPE           CLUSTER-IP      EXTERNAL-IP      PORT(S)                         AGE
 trade-monitor-grafana                LoadBalancer   10.176.14.167   34.76.251.40     80:30801/TCP                    2m22s
-trade-monitor-grid-hazelcast         ClusterIP      None            <none>           5701/TCP                        4m24s
-trade-monitor-grid-hazelcast-extra   LoadBalancer   10.176.10.53    35.205.8.203     5701:32162/TCP                  4m23s
+trade-monitor-grid1-hazelcast        ClusterIP      None            <none>           5701/TCP                        4m24s
+trade-monitor-grid1-hazelcast-extra  LoadBalancer   10.176.10.53    35.205.8.203     5701:32162/TCP                  4m23s
 trade-monitor-kafdrop                LoadBalancer   10.176.10.128   34.79.56.218     8080:30157/TCP                  58m
 trade-monitor-kafka-broker           ClusterIP      None            <none>           19092/TCP                       68m
 trade-monitor-kafka-broker-0         LoadBalancer   10.176.11.46    35.240.1.234     9092:30066/TCP                  68m
@@ -544,23 +567,23 @@ producer can produce.
 
 ## Running `remote-job-sub-1` from the command line
 
-If you download Jet from [here](https://jet-start.sh/download), there is a utility
-in the `bin` folder called `jet`.
+If you download Hazelcast from [here](https://hazelcast.com/open-source-projects/downloads/), there is a utility
+in the `bin` folder called `hz-cli`.
 
 Try this to begin with:
 
 ```
-hazelcast-jet-4.5/bin/jet -t grid@123.456.789.0 list-jobs
+hazelcast/bin/hz-cli -t grid1@123.456.789.0 list-jobs
 ```
 
-The cluster name here is `grid` but you will need to substitue the IP address of one of
+The cluster name here is `grid1` but you will need to substitute the IP address of one of
 the member. Once successful, this should list the running jobs in the cluster,
 `AggregateQuery` and `IngestTrades`.
 
 Then do this to launch the additional job
 
 ```
-hazelcast-jet-4.5/bin/jet -t grid@123.456.789.0 submit target/trade-monitor-remote-job-sub-1-5.0.jar
+hazelcast/bin/hz-cli -t grid1@123.456.789.0 submit target/trade-monitor-remote-job-sub-1-5.0.jar
 ```
 
 This will send the job from your machine to wherever in the world the cluster

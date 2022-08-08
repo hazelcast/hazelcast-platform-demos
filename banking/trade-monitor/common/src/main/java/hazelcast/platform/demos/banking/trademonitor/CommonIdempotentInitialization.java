@@ -17,6 +17,7 @@
 package hazelcast.platform.demos.banking.trademonitor;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Map.Entry;
@@ -56,6 +57,14 @@ import com.hazelcast.platform.demos.utils.UtilsSlackSink;
  */
 public class CommonIdempotentInitialization {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonIdempotentInitialization.class);
+
+    /**
+     * <p>Mappings needed for WAN, rather than replicate "{@code __sql.catalog}"
+     * </p>
+     */
+    public static boolean createMinimalMappings(HazelcastInstance hazelcastInstance) {
+        return defineWANIMaps(hazelcastInstance);
+    }
 
     /**
      * <p>Ensure objects have the necessary configuration before
@@ -264,8 +273,10 @@ public class CommonIdempotentInitialization {
     public static boolean defineQueryableObjects(HazelcastInstance hazelcastInstance, String bootstrapServers) {
         boolean ok = true;
         ok &= defineKafka(hazelcastInstance, bootstrapServers);
-        ok &= defineIMap(hazelcastInstance);
-        ok &= defineIMap2(hazelcastInstance);
+        ok &= defineWANIMaps(hazelcastInstance);
+        ok &= defineIMaps1(hazelcastInstance);
+        ok &= defineIMaps2(hazelcastInstance);
+        ok &= defineIMaps3(hazelcastInstance);
         return ok;
     }
 
@@ -325,6 +336,56 @@ public class CommonIdempotentInitialization {
         return ok;
     }
 
+    /**
+     * <p>Mappings only for WAN replicated IMap.
+     * <p>
+     *
+     * @param hazelcastInstance
+     * @return
+     */
+    static boolean defineWANIMaps(HazelcastInstance hazelcastInstance) {
+        String definition3 = "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_AUDIT_LOG
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.Long',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = 'java.lang.String'"
+                + " )";
+
+        String definition4 = "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_JOB_CONFIG
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = '" + String.class.getName() + "',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = '" + String.class.getName() + "'"
+                + " )";
+
+        String definition5 = "CREATE MAPPING IF NOT EXISTS "
+                 + MyConstants.IMAP_NAME_SYMBOLS
+                 + " TYPE IMap "
+                 + " OPTIONS ( "
+                 + " 'keyFormat' = 'java',"
+                 + " 'keyJavaClass' = 'java.lang.String',"
+                 + " 'valueFormat' = 'java',"
+                 + " 'valueJavaClass' = '" + SymbolInfo.class.getName() + "'"
+                 + " )";
+
+        boolean ok = true;
+        List<String> definitions = List.of(definition3, definition4, definition5);
+        for (String definition : definitions) {
+            ok &= define(definition, hazelcastInstance);
+        }
+        if (definitions.size() != MyConstants.WAN_IMAP_NAMES.size()) {
+            LOGGER.error("Not all WAN maps defined");
+            return false;
+        }
+        return ok;
+    }
+
 
     /**
      * <p>Without this metadata, cannot query an empty
@@ -333,8 +394,8 @@ public class CommonIdempotentInitialization {
      *
      * @param hazelcastInstance
      */
-    static boolean defineIMap(HazelcastInstance hazelcastInstance) {
-        String definition1 = "CREATE MAPPING IF NOT EXISTS "
+    static boolean defineIMaps1(HazelcastInstance hazelcastInstance) {
+        String definition6 = "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS
                 + " TYPE IMap "
                 + " OPTIONS ( "
@@ -345,7 +406,7 @@ public class CommonIdempotentInitialization {
                 + " )";
 
         // See also AggregateQuery writing to map, and Postgres table definition for MapStore
-        String definition2 = "CREATE MAPPING IF NOT EXISTS "
+        String definition7 = "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME
                 + " ("
                 + "    __key BIGINT,"
@@ -362,17 +423,18 @@ public class CommonIdempotentInitialization {
                 + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getName() + "'"
                 + " )";
 
-        String definition3 = "CREATE MAPPING IF NOT EXISTS "
-                + MyConstants.IMAP_NAME_JOB_CONFIG
-                + " TYPE IMap "
-                + " OPTIONS ( "
-                + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = '" + String.class.getName() + "',"
-                + " 'valueFormat' = 'java',"
-                + " 'valueJavaClass' = '" + String.class.getName() + "'"
-                + " )";
+        boolean ok = define(definition6, hazelcastInstance);
+        ok &= define(definition7, hazelcastInstance);
+        return ok;
+    }
 
-        String definition4 = "CREATE MAPPING IF NOT EXISTS "
+    /**
+     * <p>More map definitions
+     * </p>
+     * @param hazelcastInstance
+     */
+    static boolean defineIMaps2(HazelcastInstance hazelcastInstance) {
+        String definition8 = "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_PORTFOLIOS
                 + " ("
                 + "    __key VARCHAR,"
@@ -389,30 +451,7 @@ public class CommonIdempotentInitialization {
                 + " 'valueCompactTypeName' = '" + Portfolio.class.getSimpleName() + "'"
                 + " )";
 
-        boolean ok = define(definition1, hazelcastInstance);
-        ok &= define(definition2, hazelcastInstance);
-        ok &= define(definition3, hazelcastInstance);
-        ok &= define(definition4, hazelcastInstance);
-        return ok;
-    }
-
-    /**
-     * <p>More map definitions
-     * </p>
-     * @param hazelcastInstance
-     */
-     static boolean defineIMap2(HazelcastInstance hazelcastInstance) {
-         String definition5 = "CREATE MAPPING IF NOT EXISTS "
-                 + MyConstants.IMAP_NAME_SYMBOLS
-                 + " TYPE IMap "
-                 + " OPTIONS ( "
-                 + " 'keyFormat' = 'java',"
-                 + " 'keyJavaClass' = 'java.lang.String',"
-                 + " 'valueFormat' = 'java',"
-                 + " 'valueJavaClass' = '" + SymbolInfo.class.getName() + "'"
-                 + " )";
-
-         String definition6 = "CREATE MAPPING IF NOT EXISTS "
+        String definition9 = "CREATE MAPPING IF NOT EXISTS "
                  + MyConstants.IMAP_NAME_TRADES
                  + " TYPE IMap "
                  + " OPTIONS ( "
@@ -422,7 +461,7 @@ public class CommonIdempotentInitialization {
                  + " 'valueJavaClass' = '" + Trade.class.getName() + "'"
                  + " )";
 
-         String definition7 = "CREATE MAPPING IF NOT EXISTS "
+        String definition10 = "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_PYTHON_SENTIMENT
                 + " TYPE IMap "
                 + " OPTIONS ( "
@@ -432,7 +471,7 @@ public class CommonIdempotentInitialization {
                 + " 'valueJavaClass' = 'java.lang.String'"
                 + " )";
 
-        String definition8 = "CREATE MAPPING IF NOT EXISTS "
+        String definition11 = "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_JOB_CONTROL
                 + " TYPE IMap "
                 + " OPTIONS ( "
@@ -442,8 +481,21 @@ public class CommonIdempotentInitialization {
                 + " 'valueJavaClass' = 'java.lang.String'"
                 + " )";
 
+        boolean ok = define(definition8, hazelcastInstance);
+        ok &= define(definition9, hazelcastInstance);
+        ok &= define(definition10, hazelcastInstance);
+        ok &= define(definition11, hazelcastInstance);
+        return ok;
+    }
+
+    /**
+     * <p>Even more map definitions
+     * </p>
+     * @param hazelcastInstance
+     */
+    static boolean defineIMaps3(HazelcastInstance hazelcastInstance) {
         // Not much of view, but shows the concept
-        String definition9 =  "CREATE OR REPLACE VIEW "
+        String definition12 =  "CREATE OR REPLACE VIEW "
                 + MyConstants.IMAP_NAME_TRADES + MyConstants.VIEW_SUFFIX
                 + " AS SELECT "
                 + "    __key"
@@ -451,14 +503,9 @@ public class CommonIdempotentInitialization {
                 + " FROM " + MyConstants.IMAP_NAME_TRADES;
 
         boolean ok = true;
-        ok &= define(definition5, hazelcastInstance);
-        ok &= define(definition6, hazelcastInstance);
-        ok &= define(definition7, hazelcastInstance);
-        ok &= define(definition8, hazelcastInstance);
-        ok &= define(definition9, hazelcastInstance);
+        ok &= define(definition12, hazelcastInstance);
         return ok;
     }
-
 
     /**
      * <p>Generic handler to loading definitions
@@ -546,7 +593,7 @@ public class CommonIdempotentInitialization {
             } else {
                 UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAggregateQuery, jobConfigAggregateQuery);
                 // Aggregate query creates alerts to an IMap. Use a separate rather than same job to copy to Kafka.
-                launchAlertsToKafka(hazelcastInstance, bootstrapServers);
+                launchAlertsToKafkaAndToLog(hazelcastInstance, bootstrapServers);
             }
 
         }
@@ -602,7 +649,7 @@ public class CommonIdempotentInitialization {
      * @param hazelcastInstance
      * @param bootstrapServers
      */
-    private static void launchAlertsToKafka(HazelcastInstance hazelcastInstance, String bootstrapServers) {
+    private static void launchAlertsToKafkaAndToLog(HazelcastInstance hazelcastInstance, String bootstrapServers) {
         //FIXME Don't do twice
         //FIXME https://github.com/hazelcast/hazelcast/issues/21288
         //FIXME https://github.com/hazelcast/hazelcast/issues/21650
@@ -620,6 +667,15 @@ public class CommonIdempotentInitialization {
             UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToKafka, jobConfigAlertingToKafka);
             //FIXME hazelcastInstance.getSql().execute(sql);
             //FIXME LOGGER.info("SQL running: '{}'", sql);
+
+            String topic = MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_ALERTS;
+            String sqlJob =
+                    "CREATE JOB IF NOT EXISTS " + MyConstants.SQL_JOB_NAME_KAFKA_TO_IMAP
+                    + " AS "
+                    + " INSERT INTO " + MyConstants.IMAP_NAME_AUDIT_LOG
+                    + " SELECT * FROM " + topic;
+            hazelcastInstance.getSql().execute(sqlJob);
+            LOGGER.info("SQL running: '{}'", sqlJob);
         } catch (Exception e) {
             LOGGER.error("launchAlertsSqlToKafka:" + sql, e);
         }

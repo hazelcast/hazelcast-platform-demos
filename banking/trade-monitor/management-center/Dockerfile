@@ -4,6 +4,8 @@ FROM hazelcast/management-center:latest-snapshot
 ARG MC_LICENSE
 ARG MC_CLUSTER1_NAME
 ARG MC_CLUSTER1_ADDRESSLIST
+ARG MC_CLUSTER2_NAME
+ARG MC_CLUSTER2_ADDRESSLIST
 ARG MY_ADMINUSER
 ARG MY_ADMINPASSWORD
 
@@ -19,6 +21,8 @@ ENV MC_ADMIN_PASSWORD=$MY_ADMINPASSWORD
 # Preconfigure cluster connections
 ENV MC_CLUSTER1_NAME=$MC_CLUSTER1_NAME
 ENV MC_CLUSTER1_ADDRESSLIST=$MC_CLUSTER1_ADDRESSLIST
+ENV MC_CLUSTER2_NAME=$MC_CLUSTER2_NAME
+ENV MC_CLUSTER2_ADDRESSLIST=$MC_CLUSTER2_ADDRESSLIST
 
 # If want to query custom classes
 ARG JAR_FILE
@@ -28,11 +32,19 @@ ENV MC_CLASSPATH=/application.jar
 # Start Management Center
 CMD ["bash", "-c", "set -euo pipefail \
       && MC_EMPTY='' \
+      && echo @@@@@@@@@@ \
       && MC_CLUSTER1_LIST=`echo ${MC_CLUSTER1_ADDRESSLIST_OVERRIDE:-${MC_EMPTY}} $MC_CLUSTER1_ADDRESSLIST |awk '{print $1}'` \
       && echo MC_CLUSTER1_NAME: ${MC_CLUSTER1_NAME} \
       && echo MC_CLUSTER1_LIST: ${MC_CLUSTER1_LIST} \
       && echo bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_LIST} \
       && bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_LIST} \
+      && echo @@@@@@@@@@ \
+      && MC_CLUSTER2_LIST=`echo ${MC_CLUSTER2_ADDRESSLIST_OVERRIDE:-${MC_EMPTY}} $MC_CLUSTER2_ADDRESSLIST |awk '{print $1}'` \
+      && echo MC_CLUSTER2_NAME: ${MC_CLUSTER2_NAME} \
+      && echo MC_CLUSTER2_LIST: ${MC_CLUSTER2_LIST} \
+      && echo bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER2_NAME} --member-addresses=${MC_CLUSTER2_LIST} \
+      && bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER2_NAME} --member-addresses=${MC_CLUSTER2_LIST} \
+      && echo @@@@@@@@@@ \
       && echo bin/hz-mc start \
       && bin/hz-mc start \
      "]

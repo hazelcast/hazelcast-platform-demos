@@ -46,6 +46,7 @@ public class ApplicationConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
     private static final int EXPECTED_PASSWORD_LENGTH = 11;
     private static final int EXPECTED_TOKEN_LENGTH = 50;
+    private static String clusterName = "";
 
     /**
      * <p>Load the configuration for this job to connect to a Jet cluster as
@@ -58,6 +59,7 @@ public class ApplicationConfig {
      */
     public static ClientConfig buildJetClientConfig() {
         ClientConfig clientConfig = new YamlClientConfigBuilder().build();
+        clusterName = clientConfig.getClusterName();
 
         ClientNetworkConfig clientNetworkConfig = clientConfig.getNetworkConfig();
         clientNetworkConfig.getAutoDetectionConfig().setEnabled(false);
@@ -180,4 +182,7 @@ public class ApplicationConfig {
         }
     }
 
+    public static String getClusterName() {
+        return ApplicationConfig.clusterName;
+    }
 }

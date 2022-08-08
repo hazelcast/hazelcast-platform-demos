@@ -1,0 +1,45 @@
+hazelcast:
+  #
+  management-center:
+    console-enabled: true
+  #
+  properties:
+    # Graceful shutdown is helpful for Kubernetes scale-down.
+    hazelcast.member.naming.moby.enabled: true
+    hazelcast.shutdownhook.policy: GRACEFUL
+  #
+  # Assuming Kubernetes, but override from Java code if we detect otherwise
+  network:
+    rest-api:
+      enabled: true
+      endpoint-groups:
+        HEALTH_CHECK:
+          enabled: true
+  #
+# TURN THIS OFF, AS NOW ADDED BY `CommonIdempotentInitialization.java`  
+#  map:
+#     # Any map with a name matching this pattern has a journal
+#    'alerts*':
+#      event-journal:
+#        enabled: true
+#     # 'trades' map needs defined as non-default configuration.
+#    'trades':
+#      indexes:
+#        # Unordered index on Trade.getSymbol().
+#        - type: HASH
+#          attributes:
+#            - 'symbol'
+  #
+  jet:
+    enabled: true
+    resource-upload-enabled: true
+    # 'true' requires Enterprise and persistence enabled
+    lossless-restart-enabled: false
+
+  serialization:
+    compact-serialization:
+      enabled: true
+      registered-classes:
+        - class: hazelcast.platform.demos.banking.trademonitor.Portfolio
+          type-name: 'Portfolio'
+          serializer: hazelcast.platform.demos.banking.trademonitor.PortfolioSerializer

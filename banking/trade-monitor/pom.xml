@@ -23,7 +23,8 @@
 
 		<my.docker.image.prefix>trade-monitor</my.docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
-		<my.cluster1.name>grid</my.cluster1.name>
+		<my.cluster1.name>grid1</my.cluster1.name>
+		<my.cluster2.name>grid2</my.cluster2.name>
 		<my.pulsar.or.kafka>pulsar</my.pulsar.or.kafka>
 		<my.pulsar.or.kafka>kafka</my.pulsar.or.kafka>
 
@@ -44,9 +45,12 @@
 	</properties>
 
 	<modules>
+		<module>abstract-hazelcast-node</module>
 		<module>custom-classes</module>
 		<module>common</module>
 		<module>hazelcast-node</module>
+		<module>hazelcast-node-enterprise-1</module>
+		<module>hazelcast-node-enterprise-2</module>
 		<module>trade-producer</module>
 		<module>webapp</module>
 		<module>remote-job-sub-1</module>
@@ -55,9 +59,7 @@
 		<module>kafdrop</module>
 		<module>topic-create</module>
 		<module>finos-nodejs</module>
-		<!--
 		<module>finos-python</module>
-		-->
 		<module>management-center</module>
 		<module>prometheus</module>
 		<module>postgres</module>

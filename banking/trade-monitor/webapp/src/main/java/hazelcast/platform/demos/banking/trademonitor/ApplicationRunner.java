@@ -100,7 +100,7 @@ public class ApplicationRunner {
      * @throws Exception
      */
     public void run() throws Exception {
-        boolean ok = initialize();
+        boolean ok = initialize(ApplicationConfig.getClusterName());
 
         this.aggregateQueryResultsMap =
                 this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS);
@@ -414,7 +414,7 @@ public class ApplicationRunner {
      * </p>
      * @return
      */
-    private boolean initialize() {
+    private boolean initialize(String clusterName) {
         LOGGER.info("initialize(): -=-=-=-=- START -=-=-=-=-=-");
 
         String propertyName1 = "my.bootstrap.servers";
@@ -455,7 +455,8 @@ public class ApplicationRunner {
 
             // Address from environment/command line, others from application.properties file.
             properties.put(MyConstants.POSTGRES_ADDRESS, postgresAddress);
-            String ourProjectProvenance = properties.getProperty(MyConstants.PROJECT_PROVENANCE);
+            String ourProjectProvenance = properties.getProperty(MyConstants.PROJECT_PROVENANCE)
+                    + "-" + clusterName;
 
             Properties postgresProperties = null;
             try {

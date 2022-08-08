@@ -47,6 +47,7 @@ public class MyConstants {
 
     public static final String IMAP_NAME_AGGREGATE_QUERY_RESULTS = "AggregateQuery" + "_results";
     public static final String IMAP_NAME_ALERTS_MAX_VOLUME = "alertsMaxVolume";
+    public static final String IMAP_NAME_AUDIT_LOG = "audit_log";
     public static final String IMAP_NAME_JOB_CONTROL = "job_control";
     public static final String IMAP_NAME_JOB_CONFIG = "job_config";
     public static final String IMAP_NAME_PORTFOLIOS = "portfolios";
@@ -60,9 +61,15 @@ public class MyConstants {
                     IMAP_NAME_PORTFOLIOS, IMAP_NAME_PYTHON_SENTIMENT,
                     IMAP_NAME_SYMBOLS, IMAP_NAME_TRADES);
 
+    // Maps that are replicated over WAN in enterprise only. Avoid clashing with
+    // CommonIdempotentInitialization.java configures some maps with map stores and journals
+    public static final List<String> WAN_IMAP_NAMES =
+            List.of(IMAP_NAME_AUDIT_LOG, IMAP_NAME_JOB_CONFIG, IMAP_NAME_SYMBOLS);
+
     public static final String WEBSOCKET_PATH_TRADES = "/trades";
 
     // For demonstration of queries
+    public static final String SQL_JOB_NAME_KAFKA_TO_IMAP = "kafka2IMap";
     public static final int SQL_RESULT_THRESHOLD = 10;
     // For SQL VIEW naming
     public static final String VIEW_SUFFIX = "_VIEW";
