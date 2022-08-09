@@ -17,6 +17,7 @@
 package hazelcast.platform.demos.banking.trademonitor;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -673,7 +674,7 @@ public class CommonIdempotentInitialization {
             String sqlJob =
                     "CREATE JOB IF NOT EXISTS " + MyConstants.SQL_JOB_NAME_KAFKA_TO_IMAP
                     + " AS "
-                    + " INSERT INTO " + MyConstants.IMAP_NAME_AUDIT_LOG
+                    + " SINK INTO " + MyConstants.IMAP_NAME_AUDIT_LOG
                     + " SELECT * FROM " + topic;
             hazelcastInstance.getSql().execute(sqlJob);
             LOGGER.info("SQL running: '{}'", sqlJob);
@@ -789,8 +790,9 @@ public class CommonIdempotentInitialization {
         LOGGER.info("logJobs()");
         LOGGER.info("---------");
         hazelcastInstance.getJet().getJobs().forEach(job -> {
-            LOGGER.info("Job name '{}', id {}, status {}",
-                    job.getName(), job.getId(), job.getStatus());
+            LOGGER.info("Job name '{}', id {}, status {}, submission {} ({})",
+                    Objects.toString(job.getName()), job.getId(), job.getStatus(),
+                    job.getSubmissionTime(), new Date(job.getSubmissionTime()));
         });
         LOGGER.info("---------");
         LOGGER.info("~_~_~_~_~");
