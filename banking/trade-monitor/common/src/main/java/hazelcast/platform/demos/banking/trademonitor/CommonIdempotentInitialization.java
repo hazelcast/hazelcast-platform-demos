@@ -39,6 +39,7 @@ import com.hazelcast.config.MapStoreConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.jet.config.JobConfig;
+import com.hazelcast.jet.config.JobConfigArguments;
 import com.hazelcast.jet.config.ProcessingGuarantee;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.jet.pipeline.Pipeline;
@@ -793,6 +794,16 @@ public class CommonIdempotentInitialization {
             LOGGER.info("Job name '{}', id {}, status {}, submission {} ({})",
                     Objects.toString(job.getName()), job.getId(), job.getStatus(),
                     job.getSubmissionTime(), new Date(job.getSubmissionTime()));
+            try {
+                JobConfig jobConfig = job.getConfig();
+                Object originalSql =
+                        jobConfig.getArgument(JobConfigArguments.KEY_SQL_QUERY_TEXT);
+                if (originalSql != null) {
+                    LOGGER.info(" Original SQL: {}", originalSql);
+                }
+            } catch (Exception e) {
+                LOGGER.info("JobConfig", e);
+            }
         });
         LOGGER.info("---------");
         LOGGER.info("~_~_~_~_~");
