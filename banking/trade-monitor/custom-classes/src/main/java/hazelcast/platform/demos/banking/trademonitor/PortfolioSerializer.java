@@ -44,4 +44,14 @@ public class PortfolioSerializer implements CompactSerializer<Portfolio> {
         out.writeInt32("change", portfolio.getChange());
     }
 
+    @Override
+    public Class<Portfolio> getCompactClass() {
+        return Portfolio.class;
+    }
+
+    @Override
+    public String getTypeName() {
+        return Portfolio.class.getName();
+    }
+
 }

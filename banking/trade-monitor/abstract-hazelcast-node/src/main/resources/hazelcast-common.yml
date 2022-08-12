@@ -39,7 +39,5 @@ hazelcast:
   serialization:
     compact-serialization:
       enabled: true
-      registered-classes:
-        - class: hazelcast.platform.demos.banking.trademonitor.Portfolio
-          type-name: 'Portfolio'
-          serializer: hazelcast.platform.demos.banking.trademonitor.PortfolioSerializer
+      serializers:
+        - serializer: hazelcast.platform.demos.banking.trademonitor.PortfolioSerializer
