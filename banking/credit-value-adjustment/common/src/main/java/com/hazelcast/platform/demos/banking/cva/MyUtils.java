@@ -187,6 +187,8 @@ public class MyUtils {
      * @return
      */
     public static ManagedChannelBuilder<?> getManagedChannelBuilder(String host) {
+        LOGGER.info("ManagedChannelBuild for '{}'", host);
+
         ManagedChannelBuilder<?> managedChannelBuilder =
                 // ManagedChannelBuilder.forAddress(host, port);
                 // Use Netty directly for "withOption"

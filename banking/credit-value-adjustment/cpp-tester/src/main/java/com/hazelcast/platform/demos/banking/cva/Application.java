@@ -70,6 +70,7 @@ public class Application {
 
         // Sending batch async
         pendingResponses.incrementAndGet();
+        LOGGER.info("Sending batch of {}", inputMessage.getInputValueCount());
         requestObserver.onNext(inputMessage);
 
         // Wait for responses
