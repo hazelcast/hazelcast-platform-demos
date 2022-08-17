@@ -1,18 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-        <modelVersion>4.0.0</modelVersion>
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-        <parent>
-                <groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
-                <artifactId>trade-monitor-root</artifactId>
-                <version>5.2</version>
-        </parent>
+	<parent>
+		<groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
+		<artifactId>trade-monitor-root</artifactId>
+		<version>5.2</version>
+	</parent>
 
-        <artifactId>trade-monitor-management-center</artifactId>
+	<artifactId>trade-monitor-management-center</artifactId>
 
-        <name>Hazelcast Platform - Trade Monitor - Management Center</name>
-        <description>Trade Monitor - Management Center</description>
+	<name>Hazelcast Platform - Trade Monitor - Management Center</name>
+	<description>Trade Monitor - Management Center</description>
 
 	<properties>
 		<my.docker.image.name>management-center</my.docker.image.name>
@@ -20,10 +20,10 @@
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 
 		<!-- Pre-configure the build image -->
-                <my.mc.cluster1.name>${my.cluster1.name}</my.mc.cluster1.name>
-                <my.mc.cluster1.addresslist>${my.docker.image.prefix}-${my.cluster1.name}-hazelcast.default.svc.cluster.local</my.mc.cluster1.addresslist>
-                <my.mc.cluster2.name>${my.cluster2.name}</my.mc.cluster2.name>
-                <my.mc.cluster2.addresslist>${my.docker.image.prefix}-${my.cluster2.name}-hazelcast.default.svc.cluster.local</my.mc.cluster2.addresslist>
+		<my.mc.cluster1.name>${my.cluster1.name}</my.mc.cluster1.name>
+		<my.mc.cluster1.addresslist>${my.docker.image.prefix}-${my.cluster1.name}-hazelcast.default.svc.cluster.local</my.mc.cluster1.addresslist>
+		<my.mc.cluster2.name>${my.cluster2.name}</my.mc.cluster2.name>
+		<my.mc.cluster2.addresslist>${my.docker.image.prefix}-${my.cluster2.name}-hazelcast.default.svc.cluster.local</my.mc.cluster2.addresslist>
 	</properties>
 
 	<dependencies>

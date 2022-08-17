@@ -50,10 +50,13 @@
 		<module>hazelcast-node-site2</module>
 		<module>abstract-hazelcast-client</module>
 		<module>cpp</module>
+		<module>cpp-tester</module>
 		<module>data-loader</module>
 		<module>jet-jobs</module>
 		<module>webapp</module>
+		<!-- Not used, only for diagnostics
 		<module>hazelcast-node-site1-cpp</module>
+		-->
 	</modules>
 
 	<dependencies>
