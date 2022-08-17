@@ -19,9 +19,6 @@ package com.hazelcast.platform.demos.banking.cva;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -30,33 +27,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
-import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
-import io.grpc.netty.shaded.io.netty.channel.ChannelOption;
 import io.grpc.stub.StreamObserver;
 
 /**
  * <p>Tests a single send down a bi-directional gRPC channel.
  * </p>
  * <p>
- * <b>Note:</b> No Hazelcast or Spring, standard Java
+ * <b>Note:</b> No Hazelcast or Spring, standard Java.
+ * </p>
+ * <p>See also module <i>cpp-tester2</i> which uses a simple
+ * Jet job to test the pipeline.
  * </p>
  */
 public class Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
     private static final String DATAFILE = "testdata.json";
     private static final long ONE_HUNDRED_MS = 100L;
-    // Needs to match C++ gRPC Server.
-    private static final int PORT = 30001;
-    private static final int FIVE_ATTEMPTS = 5;
-    private static final int TEN_THOUSAND = 10_000;
 
     private static AtomicBoolean exceptions = new AtomicBoolean(false);
     private static AtomicLong pendingResponses = new AtomicLong(0);
 
     /**
-     * <p>
-     * Run the {@link ApplicationRunner} then shutdown.
+     * <p>Send and receive, then shutdown.
      * </p>
      */
     public static void main(String[] args) throws Exception {
@@ -64,7 +56,7 @@ public class Application {
         String host = getTargetHost();
 
         LOGGER.info("Channel to target host: {}", host);
-        ManagedChannel managedChannel = getManagedChannelBuilder(host, PORT).build();
+        ManagedChannel managedChannel = MyUtils.getManagedChannelBuilder(host).build();
         JetToCppGrpc.JetToCppStub jetToCppStub = JetToCppGrpc.newStub(managedChannel);
 
         // Input batch contains one data item
@@ -108,6 +100,9 @@ public class Application {
             public void onNext(OutputMessage outputMessage) {
                 LOGGER.info("requestObserver.onNext() - received batch of {}",
                         outputMessage.getOutputValueCount());
+                for (int i = 0; i < outputMessage.getOutputValueCount(); i++) {
+                    LOGGER.info(" {} - {}", i, outputMessage.getOutputValue(i));
+                }
                 pendingResponses.decrementAndGet();
             }
 
@@ -122,6 +117,7 @@ public class Application {
             }
         };
     }
+
     /**
      * <p>
      * Determine target host. If provided with an IP (which may be a load balancer
@@ -142,44 +138,5 @@ public class Application {
             return hostIp;
         }
     }
-
-    public static ManagedChannelBuilder<?> getManagedChannelBuilder(String host, int port) {
-        ManagedChannelBuilder<?> managedChannelBuilder =
-                // ManagedChannelBuilder.forAddress(host, port);
-                // Use Netty directly for "withOption"
-                NettyChannelBuilder.forAddress(host, port).withOption(ChannelOption.CONNECT_TIMEOUT_MILLIS,
-                        TEN_THOUSAND);
-
-        // No SSL, only a demo.
-        managedChannelBuilder.usePlaintext();
-
-        // May retries for each RPC
-        Map<String, Object> retryPolicy = new HashMap<>();
-        retryPolicy.put("maxAttempts", Double.valueOf(FIVE_ATTEMPTS));
-        retryPolicy.put("initialBackoff", "0.2s");
-        retryPolicy.put("maxBackoff", "10s");
-        retryPolicy.put("backoffMultiplier", Double.valueOf(2));
-        retryPolicy.put("retryableStatusCodes", List.of("RESOURCE_EXHAUSTED"));
-
-        Map<String, Object> methodConfig = new HashMap<>();
-        Map<String, Object> name = new HashMap<>();
-        name.put("service", "com_hazelcast_platform_demos_banking_cva.JetToCpp");
-        name.put("method", "streamingCall");
-
-        methodConfig.put("name", List.of(name));
-        methodConfig.put("retryPolicy", retryPolicy);
-
-        Map<String, Object> serviceConfig = new HashMap<>();
-        serviceConfig.put("methodConfig", List.of(methodConfig));
-
-        managedChannelBuilder.defaultServiceConfig(serviceConfig);
-
-        // Deactivates stats
-        managedChannelBuilder.enableRetry();
-
-        // Don't use - May not be fully implemented. Max retries for all RPCs
-        //managedChannelBuilder.maxRetryAttempts(3);
-
-        return managedChannelBuilder;    }
 
 }

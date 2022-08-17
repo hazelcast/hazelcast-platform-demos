@@ -51,6 +51,7 @@
 		<module>abstract-hazelcast-client</module>
 		<module>cpp</module>
 		<module>cpp-tester</module>
+		<module>cpp-tester2</module>
 		<module>data-loader</module>
 		<module>jet-jobs</module>
 		<module>webapp</module>
