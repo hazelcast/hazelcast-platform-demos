@@ -564,11 +564,11 @@
         },
         {
           "exemplar": true,
-          "expr": "max(hz_map_putCount{mc_cluster='site1',name='cva_ircurves'})",
+          "expr": "max(hz_map_setCount{mc_cluster='site1',name='cva_ircurves'})",
           "interval": "",
           "legendFormat": "site1.sets",
           "refId": "D",
-          "target": "alias(max(hz_map_putCount{mc_cluster='site1',name='cva_ircurves'}), 'site1.sets')"
+          "target": "alias(max(hz_map_setCount{mc_cluster='site1',name='cva_ircurves'}), 'site1.sets')"
         },
         {
           "exemplar": true,
@@ -596,11 +596,11 @@
         },
         {
           "exemplar": true,
-          "expr": "max(hz_map_putCount{mc_cluster='site2',name='cva_ircurves'})",
+          "expr": "max(hz_map_setCount{mc_cluster='site2',name='cva_ircurves'})",
           "interval": "",
           "legendFormat": "site2.sets",
           "refId": "H",
-          "target": "alias(max(hz_map_putCount{mc_cluster='site2',name='cva_ircurves'}), 'site2.sets')"
+          "target": "alias(max(hz_map_setCount{mc_cluster='site2',name='cva_ircurves'}), 'site2.sets')"
         }
       ],
       "thresholds": [],
