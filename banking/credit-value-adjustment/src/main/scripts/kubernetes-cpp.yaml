@@ -14,14 +14,14 @@ spec:
     targetPort: 30001
   type: LoadBalancer
 ---
-# Creates 2 pods, for double performance, the minimum to prove scaling
+# Replicas should be greater or equal to Hazelcast replicas * their CPU count
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: cva-cpp
 spec:
-  replicas: 2
+  replicas: 4
   serviceName: cva-cpp
   selector:
     matchLabels:
