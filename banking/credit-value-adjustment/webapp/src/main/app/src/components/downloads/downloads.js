@@ -188,6 +188,7 @@ class Downloads extends Component {
         return (
         	<div>
     		    <h2>Downloads</h2>
+				<center><font size="small">Refreshes for local jobs</font></center>
         		<SockJsClient 
                 	url={WS_URL}
         			topics={WS_TOPICS}
