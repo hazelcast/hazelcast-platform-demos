@@ -1,4 +1,4 @@
-FROM amd64/ubuntu:20.04
+FROM amd64/ubuntu:22.04
 
 # Add Java 17 to Ubuntu image
 RUN apt-get update && \

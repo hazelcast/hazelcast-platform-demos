@@ -22,5 +22,10 @@ spec:
           image: "hazelcast-platform-demos/cva-cpp-tester3"
           imagePullPolicy: Never
           name: cva-cpp-tester3-container
+#          resources:
+#            limits:
+#              cpu: "2.0"
+#            requests:
+#              cpu: "2.0"
       restartPolicy: Never
 ---

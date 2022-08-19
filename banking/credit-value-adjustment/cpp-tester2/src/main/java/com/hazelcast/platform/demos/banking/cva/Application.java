@@ -51,8 +51,6 @@ public class Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
     private static final String DATAFILE = "testdata.json";
     private static final long ONE_HUNDRED_MS = 100L;
-    // Needs to match C++ gRPC Server.
-    private static final int PORT = 30001;
 
     /**
      * <p>Create a Hazelcast cluster of one node, submit the Jet
@@ -60,6 +58,8 @@ public class Application {
      * </p>
      */
     public static void main(String[] args) throws Exception {
+        LOGGER.info("=== START ===");
+        LOGGER.info("Runtime.getRuntime().availableProcessors()=={}", Runtime.getRuntime().availableProcessors());
         String datum = Files.readAllLines(Paths.get(File.separator + DATAFILE)).get(0);
         String host = getTargetHost();
 
@@ -80,6 +80,7 @@ public class Application {
         }
 
         hazelcastInstance.shutdown();
+        LOGGER.info("===  END  ===");
     }
 
     /**

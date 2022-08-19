@@ -25,8 +25,8 @@ docker container prune --force > /dev/null 2>&1
 
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
-CMD="docker run -e HOST_IP=${HOST_IP} --network=${PROJECT} --rm ${DOCKER_IMAGE} $@"
-#echo $CMD
+CMD="docker run -e HOST_IP=${HOST_IP} --network=${PROJECT} --cpus=1.0 --rm ${DOCKER_IMAGE} $@"
+echo $CMD
 
 $CMD
 RC=$?

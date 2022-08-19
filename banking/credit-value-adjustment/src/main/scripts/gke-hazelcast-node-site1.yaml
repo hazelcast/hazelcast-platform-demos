@@ -36,8 +36,8 @@ spec:
             value: "2"
           - name: "MY_PARTITIONS"
             value: "271"
-          image: "hazelcast-platform-demos/cva-hazelcast-node-site1"
-          imagePullPolicy: Never
+          image: "eu.gcr.io/hazelcast-33/neilstevenson/cva-hazelcast-node-site1"
+          imagePullPolicy: Always
           livenessProbe:
             httpGet:
               path: /hazelcast/health/node-state

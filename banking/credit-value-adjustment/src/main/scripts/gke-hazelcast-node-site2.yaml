@@ -1,14 +1,14 @@
 ---
-# Service DNS will be "cva-site1-hazelcast.default.svc.cluster.local".
+# Service DNS will be "cva-site2-hazelcast.default.svc.cluster.local".
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: cva-site1-hazelcast
+  name: cva-site2-hazelcast
 spec:
   clusterIP: None
   selector:
-    app: cva-site1-hazelcast
+    app: cva-site2-hazelcast
   ports:
   - port: 5701
 ---
@@ -17,18 +17,18 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: cva-site1-hazelcast
+  name: cva-site2-hazelcast
 spec:
   # Not more than the number of CPP pods
   replicas: 2
-  serviceName: cva-site1-hazelcast
+  serviceName: cva-site2-hazelcast
   selector:
     matchLabels:
-      app: cva-site1-hazelcast
+      app: cva-site2-hazelcast
   template:
     metadata:
       labels:
-        app: cva-site1-hazelcast
+        app: cva-site2-hazelcast
     spec:
       containers:
         - env:
@@ -36,13 +36,13 @@ spec:
             value: "2"
           - name: "MY_PARTITIONS"
             value: "271"
-          image: "hazelcast-platform-demos/cva-hazelcast-node-site1"
-          imagePullPolicy: Never
+          image: "eu.gcr.io/hazelcast-33/neilstevenson/cva-hazelcast-node-site2"
+          imagePullPolicy: Always
           livenessProbe:
             httpGet:
               path: /hazelcast/health/node-state
               port: 5701
-          name: cva-site1-hazelcast-container
+          name: cva-site2-hazelcast-container
           readinessProbe:
             httpGet:
               path: /hazelcast/health/ready

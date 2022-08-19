@@ -38,6 +38,5 @@ hazelcast:
 
   serialization:
     compact-serialization:
-      enabled: true
       serializers:
         - serializer: hazelcast.platform.demos.banking.trademonitor.PortfolioSerializer

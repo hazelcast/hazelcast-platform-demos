@@ -52,6 +52,8 @@ public class Application {
      * </p>
      */
     public static void main(String[] args) throws Exception {
+        LOGGER.info("=== START ===");
+        LOGGER.info("Runtime.getRuntime().availableProcessors()=={}", Runtime.getRuntime().availableProcessors());
         String datum = Files.readAllLines(Paths.get(File.separator + DATAFILE)).get(0);
         String host = getTargetHost();
 
@@ -86,6 +88,7 @@ public class Application {
         requestObserver.onCompleted();
         responseObserver.onCompleted();
         managedChannel.shutdown();
+        LOGGER.info("===  END  ===");
     }
 
     /**
@@ -99,7 +102,7 @@ public class Application {
         return new StreamObserver<OutputMessage>() {
             @Override
             public void onNext(OutputMessage outputMessage) {
-                LOGGER.info("requestObserver.onNext() - received batch of {}",
+                LOGGER.info("responseObserver.onNext() - received batch of {}",
                         outputMessage.getOutputValueCount());
                 for (int i = 0; i < outputMessage.getOutputValueCount(); i++) {
                     LOGGER.info(" {} - {}", i, outputMessage.getOutputValue(i));
@@ -109,12 +112,13 @@ public class Application {
 
             @Override
             public void onError(Throwable t) {
-                LOGGER.error("requestObserver.onError()", t);
+                LOGGER.error("responseObserver.onError()", t);
                 exceptions.set(true);
             }
 
             @Override
             public void onCompleted() {
+                LOGGER.info("responseObserver.onCompleted()");
             }
         };
     }
