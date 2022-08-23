@@ -60,18 +60,18 @@ spec:
 ---
 # FinOS Node.js
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: trade-monitor-finos-nodejs
-spec:
-  selector:
-    app: trade-monitor-finos-nodejs
-  ports:
-  - port: 8080
-    protocol: TCP
-    targetPort: 8080
-  type: LoadBalancer
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: trade-monitor-finos-nodejs
+#spec:
+#  selector:
+#    app: trade-monitor-finos-nodejs
+#  ports:
+#  - port: 8080
+#    protocol: TCP
+#    targetPort: 8080
+#  type: LoadBalancer
 ---
 # Only need 1
 ---

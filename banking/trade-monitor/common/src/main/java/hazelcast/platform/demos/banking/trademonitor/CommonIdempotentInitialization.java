@@ -653,13 +653,22 @@ public class CommonIdempotentInitialization {
      * @param bootstrapServers
      */
     private static void launchAlertsToKafkaAndToLog(HazelcastInstance hazelcastInstance, String bootstrapServers) {
-        //FIXME Don't do twice
-        //FIXME https://github.com/hazelcast/hazelcast/issues/21288
-        //FIXME https://github.com/hazelcast/hazelcast/issues/21650
-        String sql = "SINK INTO "
+        String topic = MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_ALERTS;
+
+        /*FIXME 5.3. Make both jobs streaming SQL
+        String sqlJobMapToKafka = "SINK INTO "
                 + MyConstants.KAFKA_TOPIC_NAME_ALERTS
                 + " SELECT __key, symbol || ',' || provenance || ',' || whence || ',' || volume FROM "
                 + MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME;
+                */
+
+        String sqlJobKafkaToMap =
+                "CREATE JOB IF NOT EXISTS " + MyConstants.SQL_JOB_NAME_KAFKA_TO_IMAP
+                + " AS "
+                + " SINK INTO " + MyConstants.IMAP_NAME_AUDIT_LOG
+                + " SELECT * FROM " + topic;
+
+        // 5.2 Style, to be removed in favor of SQL for both.
         try {
             Pipeline pipelineAlertingToKafka = AlertingToKafka.buildPipeline(bootstrapServers);
 
@@ -668,19 +677,17 @@ public class CommonIdempotentInitialization {
             jobConfigAlertingToKafka.addClass(HazelcastJsonValueSerializer.class);
 
             UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToKafka, jobConfigAlertingToKafka);
-            //FIXME hazelcastInstance.getSql().execute(sql);
-            //FIXME LOGGER.info("SQL running: '{}'", sql);
-
-            String topic = MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_ALERTS;
-            String sqlJob =
-                    "CREATE JOB IF NOT EXISTS " + MyConstants.SQL_JOB_NAME_KAFKA_TO_IMAP
-                    + " AS "
-                    + " SINK INTO " + MyConstants.IMAP_NAME_AUDIT_LOG
-                    + " SELECT * FROM " + topic;
-            hazelcastInstance.getSql().execute(sqlJob);
-            LOGGER.info("SQL running: '{}'", sqlJob);
         } catch (Exception e) {
-            LOGGER.error("launchAlertsSqlToKafka:" + sql, e);
+            LOGGER.error("launchAlertsSqlToKafka:", e);
+        }
+
+        for (String sql : List.of(sqlJobKafkaToMap)) {
+            try {
+                hazelcastInstance.getSql().execute(sql);
+                LOGGER.info("SQL running: '{}'", sql);
+            } catch (Exception e) {
+                LOGGER.error("launchAlertsSqlToKafka:" + sql, e);
+            }
         }
     }
 
