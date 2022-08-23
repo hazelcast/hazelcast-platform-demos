@@ -60,55 +60,55 @@ spec:
 ---
 # FinOS Node.js
 ---
-#apiVersion: v1
-#kind: Service
-#metadata:
-#  name: trade-monitor-finos-nodejs
-#spec:
-#  selector:
-#    app: trade-monitor-finos-nodejs
-#  ports:
-#  - port: 8080
-#    protocol: TCP
-#    targetPort: 8080
-#  type: LoadBalancer
----
-# Only need 1
----
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Service
 metadata:
   name: trade-monitor-finos-nodejs
 spec:
   selector:
-    matchLabels:
-      app: trade-monitor-finos-nodejs
-  template:
-    metadata:
-      labels:
-        app: trade-monitor-finos-nodejs
-    spec:
-      containers:
-        - image: "hazelcast-platform-demos/trade-monitor-finos-nodejs"
-          imagePullPolicy: Never
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 8080
-          name: trade-monitor-finos-nodejs-container
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 8080
-          volumeMounts:
-            - name: configmap
-              mountPath: /customize/my-env.sh
-              subPath: my-env.sh
-      volumes:
-        - name: configmap
-          configMap:
-            name: trade-monitor-configmap
-            defaultMode: 0755
+    app: trade-monitor-finos-nodejs
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: LoadBalancer
+---
+# Only need 1
+---
+#apiVersion: apps/v1
+#kind: Deployment
+#metadata:
+#  name: trade-monitor-finos-nodejs
+#spec:
+#  selector:
+#    matchLabels:
+#      app: trade-monitor-finos-nodejs
+#  template:
+#    metadata:
+#      labels:
+#        app: trade-monitor-finos-nodejs
+#    spec:
+#      containers:
+#        - image: "hazelcast-platform-demos/trade-monitor-finos-nodejs"
+#          imagePullPolicy: Never
+#          livenessProbe:
+#            httpGet:
+#              path: /
+#              port: 8080
+#          name: trade-monitor-finos-nodejs-container
+#          readinessProbe:
+#            httpGet:
+#              path: /
+#              port: 8080
+#          volumeMounts:
+#            - name: configmap
+#              mountPath: /customize/my-env.sh
+#              subPath: my-env.sh
+#      volumes:
+#        - name: configmap
+#          configMap:
+#            name: trade-monitor-configmap
+#            defaultMode: 0755
 ---
 # FinOS Python
 ---
@@ -127,40 +127,40 @@ spec:
 ---
 # Only need 1
 ---
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: trade-monitor-finos-python
-spec:
-  selector:
-    matchLabels:
-      app: trade-monitor-finos-python
-  template:
-    metadata:
-      labels:
-        app: trade-monitor-finos-python
-    spec:
-      containers:
-        - image: "hazelcast-platform-demos/trade-monitor-finos-python"
-          imagePullPolicy: Never
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 8080
-          name: trade-monitor-finos-python-container
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 8080
-          volumeMounts:
-            - name: configmap
-              mountPath: /customize/my-env.sh
-              subPath: my-env.sh
-      volumes:
-        - name: configmap
-          configMap:
-            name: trade-monitor-configmap
-            defaultMode: 0755
+#apiVersion: apps/v1
+#kind: Deployment
+#metadata:
+#  name: trade-monitor-finos-python
+#spec:
+#  selector:
+#    matchLabels:
+#      app: trade-monitor-finos-python
+#  template:
+#    metadata:
+#      labels:
+#        app: trade-monitor-finos-python
+#    spec:
+#      containers:
+#        - image: "hazelcast-platform-demos/trade-monitor-finos-python"
+#          imagePullPolicy: Never
+#          livenessProbe:
+#            httpGet:
+#              path: /
+#              port: 8080
+#          name: trade-monitor-finos-python-container
+#          readinessProbe:
+#            httpGet:
+#              path: /
+#              port: 8080
+#          volumeMounts:
+#            - name: configmap
+#              mountPath: /customize/my-env.sh
+#              subPath: my-env.sh
+#      volumes:
+#        - name: configmap
+#          configMap:
+#            name: trade-monitor-configmap
+#            defaultMode: 0755
 ---
 # Service for Prometheus
 ---

@@ -113,6 +113,12 @@ hazelcast:
             - create
             - put
             - read
+        - name: "__mc*"
+          principal: "ManagementCenter"
+          actions:
+            - create
+            - put
+            - read
       topic:
         #
         - name: "slack"
