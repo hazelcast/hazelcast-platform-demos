@@ -1,0 +1,142 @@
+:root {
+	--hazelcast-blue: #012168;
+	--hazelcast-blue-dark: #0b2a35;
+	--hazelcast-blue-light: #2e7de1;
+	--hazelcast-orange: #ff5f00;
+}
+
+body {
+	background: Black;
+}
+
+h1 {
+    text-align: center;
+}
+h2, h3, h4, h5 {
+    text-align: center;
+}
+
+.headerfooter {
+        color: var(--hazelcast-blue-light);
+        font-family: "Courier New", Courier, monospace;
+        font-size: 80%;
+        text-align: center;
+}
+.headerfooterline {
+        color: var(--hazelcast-orange);
+}
+
+.major_pane {
+	background: white;
+	border-style: solid;
+    border-color: var(--hazelcast-orange);
+    padding: 5px 5px 5px 5px;
+}
+
+.minor_pane {
+	background: DarkSlateGray;
+	color: YellowGreen;
+    border-top: 1px dashed;
+    border-color: var(--hazelcast-blue-light);
+    margin-left: auto;
+    margin-right: auto;
+    overflow-y: scroll;
+    vertical-align: top;
+}
+
+.pane_separator {
+    border-top: 1px dashed MediumVioletRed;
+}
+
+.formButton {
+  background-color: var(--hazelcast-orange);
+  color:   white;
+}
+.formInputBox {
+    border: 2px dashed brown;
+    height: 180px;
+    padding: 10px;
+    padding-top: 10px;
+}
+.formOuterBox {
+    text-align: center;
+}
+.formOutputBox {
+    font-family: monospace;
+    height: 30px;
+    padding: 5px;
+}
+.formComponent {
+	align: left;
+	border-color: gray;
+	border-style: dashed;
+	border-width: 1px;
+    text-align: left;
+}
+
+.jobOk {
+	color: green;
+}
+.jobNotOk {
+	color: red;
+	font-weight: bold;
+}
+
+
+/* ===================== */
+/* For react-collapsible */
+/* ===================== */
+
+/* When closed */
+.Collapsible {
+  background-color: var(--hazelcast-blue-light);
+}
+
+/* When opened */
+.Collapsible-opened {
+  background-color: var(--hazelcast-blue-light);
+}
+
+/* Trigger when closed */
+.Collapsible__trigger {
+  background-color: var(--hazelcast-blue-light);
+  border: 2px solid var(--color-mid-blue);
+  color:   Salmon;
+  text-align: center;
+  text-decoration: underline overline;
+}
+.Collapsible__trigger::before {
+  content: "\21CA \21CA \21CA ";
+  text-align: center;
+}
+.Collapsible__trigger::after {
+  content: " \21CA \21CA \21CA";
+  text-align: center;
+}
+
+/* Trigger when opened */
+.Collapsible__trigger-opened {
+  background-color: var(--hazelcast-blue-light);
+  color: var(--color-midnight-blue);
+  text-align: center;
+}
+.Collapsible__trigger-opened::before {
+  content: "\21C8 \21C8 \21C8 ";
+  text-align: center;
+}
+.Collapsible__trigger-opened::after {
+  content: " \21C8 \21C8 \21C8";
+  text-align: center;
+}
+
+/* Inner */
+.Collapsible__contentInner {
+  background-color: White;
+  color: Green;
+}
+
+/* Outer */
+.Collapsible__contentOuter {
+  background-color: Yellow;
+  color: Salmon;
+}

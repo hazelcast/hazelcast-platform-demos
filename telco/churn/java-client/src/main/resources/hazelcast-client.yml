@@ -1,16 +1,18 @@
 hazelcast-client:
   import:
-    - client-labels.yml
+#    - client-labels.yml
     - client-security-${my.environment}.yml
   # Replaced by Maven
   cluster-name: '@my.cluster.name@'
   # Replaced by Maven
   instance-name: '@project.artifactId@'
-  properties:
-    hazelcast.client.statistics.enabled: true
   network:
     # Default, but make it obvious webapp can multiplex
     smart-routing: true
+
+  # https://github.com/hazelcast/hazelcast/issues/22025
+  #metrics:
+  #  enabled:true
 
   # Value must match MyConstants.java
   serialization:

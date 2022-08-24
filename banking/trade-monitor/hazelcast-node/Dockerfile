@@ -32,4 +32,5 @@ ENTRYPOINT exec java $JAVA_ARGS $JAVA_OPTS \
  -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS \
  -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
  -Dmy.pulsar.list=$MY_PULSAR_LIST \
+ -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
  -jar application.jar

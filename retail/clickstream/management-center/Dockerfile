@@ -1,5 +1,5 @@
 #FROM hazelcast/management-center:latest-snapshot
-FROM hazelcast/management-center:5.1.1
+FROM hazelcast/management-center:5.2-BETA-1
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MC_LICENSE

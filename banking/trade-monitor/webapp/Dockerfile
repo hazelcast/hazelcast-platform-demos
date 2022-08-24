@@ -1,11 +1,18 @@
 FROM library/openjdk:17-slim
 
-# Maven compiled target
 ARG JAR_FILE
+
+# Maven compiled target
 COPY target/${JAR_FILE} application.jar
+
+# Need existing file so Docker copy does not fail if not keystore/truststore found. Put in target by maven-antrun-plugin
+COPY target/${JAR_FILE} target/client.keystore* /
+COPY target/${JAR_FILE} target/client.truststore* /
+RUN rm /${JAR_FILE}
 
 # Default values provided
 ENV MY_BOOTSTRAP_SERVERS "0.0.0.0:9092,0.0.0.0:9093,0.0.0.0:9094"
+ENV MY_DOCKER_ENABLED "true"
 ENV MY_KUBERNETES_ENABLED "true"
 
 ENV JAVA_ARGS ""

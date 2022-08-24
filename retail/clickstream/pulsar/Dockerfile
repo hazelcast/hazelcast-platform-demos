@@ -1,4 +1,4 @@
-FROM apachepulsar/pulsar:2.8.1
+FROM apachepulsar/pulsar:2.8.2
 
 CMD ["bash", "-c", "set -euo pipefail \
       && echo @@@@@@@@@@@@@@@@@@@@ \

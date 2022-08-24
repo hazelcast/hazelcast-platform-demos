@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hazelcast.platform.demos.benchmark</groupId>
+		<artifactId>benchmark-root</artifactId>
+		<version>5.2</version>
+	</parent>
+
+	<groupId>com.hazelcast.platform.demos.benchmark.nexmark</groupId>
+	<artifactId>nexmark-root</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Hazelcast Platform - Benchmark - NEXMark</name>
+	<description>NEXMark, https://datalab.cs.pdx.edu/niagara/NEXMark</description>
+
+	<modules>
+		<module>grafana</module>
+		<module>hazelcast-node</module>
+		<module>jobs</module>
+		<module>management-center</module>
+		<module>prometheus</module>
+		<module>webapp</module>
+	</modules>
+
+	<properties>
+		<my.docker.image.prefix>nexmark</my.docker.image.prefix>
+		<main.basedir>${project.parent.parent.basedir}</main.basedir>
+
+		<my.cluster1.name>nexmark</my.cluster1.name>
+		<my.management.center.name>${my.docker.image.prefix}-management-center</my.management.center.name>
+		<my.prometheus.name>${my.docker.image.prefix}-prometheus</my.prometheus.name>
+
+		<!-- If not blank, start Q05 automatically with this param. Otherwise needs web UI -->
+		<my.autostart.q05>1000000000</my.autostart.q05>
+		<my.autostart.q05></my.autostart.q05>
+	</properties>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+	</build>
+
+	<dependencies>
+		<!-- scope==test -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-parent</artifactId>
+				<type>pom</type>
+				<scope>import</scope>
+				<version>${spring-boot.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+</project>

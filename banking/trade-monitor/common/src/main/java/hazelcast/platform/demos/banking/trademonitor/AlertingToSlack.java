@@ -17,6 +17,7 @@
 package hazelcast.platform.demos.banking.trademonitor;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.json.JSONObject;
 
@@ -86,12 +87,14 @@ public class AlertingToSlack {
      * @param accessTokenObject String from properties
      * @param channelNameObject String from properties
      * @param projectNameObject String from properties
+     * @param buildUsser String from properties
      */
     public static Pipeline buildPipeline(Object accessTokenObject,
-            Object channelNameObject, Object projectNameObject) throws Exception {
+            Object channelNameObject, Object projectNameObject, Object buildUserObject) throws Exception {
         String accessToken = validate("accessToken", accessTokenObject);
         String channelName = validate("channelName", channelNameObject);
         String projectName = validate("projectName", projectNameObject);
+        String buildUser = validate("buildUser", buildUserObject);
 
         Pipeline pipeline = Pipeline.create();
 
@@ -102,7 +105,7 @@ public class AlertingToSlack {
         .map(AlertingToSlack.myMapStage()).setName("reformat-to-JSON");
 
         input
-        .writeTo(UtilsSlackSink.slackSink(accessToken, channelName, projectName));
+        .writeTo(UtilsSlackSink.slackSink(accessToken, channelName, projectName, buildUser));
 
         input
         .writeTo(Sinks.logger());
@@ -133,18 +136,24 @@ public class AlertingToSlack {
      */
     private static FunctionEx<Map.Entry<Long, HazelcastJsonValue>, JSONObject> myMapStage() {
         return entry -> {
-            JSONObject input = new JSONObject(entry.getValue().toString());
-
-            String cleanStr =
-                    "*ALERT* `"
-                    + input.getString("timestamp")
-                    + ", stock '" + input.getString("symbol")
-                    + ", volume: " + input.getLong("volume") + "`";
-
             JSONObject output = new JSONObject();
-            output.put(UtilsConstants.SLACK_PARAM_TEXT, cleanStr);
+            try {
+                JSONObject input = new JSONObject(entry.getValue().toString());
 
-            return output;
+                String cleanStr =
+                        "*ALERT* `"
+                        + input.getString("whence")
+                        + ", stock '" + input.getString("symbol") + "'"
+                        + ", volume: " + input.getLong("volume") + ""
+                        + ", provenance: '" + input.getString("provenance") + "'`";
+
+                output.put(UtilsConstants.SLACK_PARAM_TEXT, cleanStr);
+                return output;
+            } catch (Exception e) {
+                System.out.println(Objects.toString(entry) + " caused " + e.getMessage());
+                output.put(UtilsConstants.SLACK_PARAM_TEXT, "no data");
+                return output;
+            }
         };
     }
 

@@ -63,8 +63,10 @@ public class Application {
 
         String propertyName1 = "my.bootstrap.servers";
         String propertyName2 = MyConstants.PULSAR_CONFIG_KEY;
+        String propertyName3 = MyConstants.POSTGRES_CONFIG_KEY;
         String bootstrapServers = System.getProperty(propertyName1, "");
         String pulsarList = System.getProperty(propertyName2, "");
+        String postgresAddress = System.getProperty(propertyName3, "");
         if (bootstrapServers.isBlank()) {
             LOGGER.error("No value for " + propertyName1);
             System.exit(1);
@@ -73,8 +75,13 @@ public class Application {
             LOGGER.error("No value for " + propertyName2);
             System.exit(1);
         }
+        if (postgresAddress.isBlank()) {
+            LOGGER.error("No value for " + propertyName3);
+            System.exit(1);
+        }
         LOGGER.info("'bootstrapServers'=='{}'", bootstrapServers);
         LOGGER.info("'pulsarList'=='{}'", pulsarList);
+        LOGGER.info("'postgresAddress'=='{}'", postgresAddress);
 
         ClientConfig clientConfig = ApplicationConfig.buildJetClientConfig();
 

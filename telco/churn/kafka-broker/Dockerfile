@@ -1,4 +1,4 @@
-FROM bitnami/kafka:2.4.0
+FROM bitnami/kafka:3.1.0
 
 # OpenJDK 11.0.6
 RUN java --version

@@ -74,7 +74,7 @@ import com.hazelcast.platform.demos.utils.UtilsUrls;
 public class AggregateQuery {
 
     private static final int CONSTANT_KEY = Integer.valueOf(0);
-    private static final long TEN_MINUTES_IN_MS = 10 * 60 * 1_000L;
+    private static final long FIVE_MINUTES_IN_MS = 5 * 60 * 1_000L;
     private static final long LOG_THRESHOLD = 100_000L;
 
     private static ToLongFunctionEx<Object> nowTimestampFn = __ -> System.currentTimeMillis();
@@ -94,7 +94,8 @@ public class AggregateQuery {
      * @param bootstrapServers Connection list for Kafka
      * @return A pipeline job to run in Jet.
      */
-    public static Pipeline buildPipeline(String bootstrapServers, String pulsarList, boolean usePulsar) {
+    public static Pipeline buildPipeline(String bootstrapServers, String pulsarList,
+            boolean usePulsar, String projectName, String jobName, String clusterName) {
 
         // Override the value de-serializer to produce a different type
         Properties properties = InitializerConfig.kafkaSourceProperties(bootstrapServers);
@@ -150,7 +151,7 @@ public class AggregateQuery {
         .writeTo(Sinks.logger());
 
         // Extra stages for alert generation
-        AggregateQuery.addMaxVolumeAlert(aggregated);
+        AggregateQuery.addMaxVolumeAlert(aggregated, projectName, clusterName, jobName);
 
         return pipeline;
     }
@@ -177,7 +178,7 @@ public class AggregateQuery {
     }
 
     /**
-     * <p>Periodically (every ten minutes) output the largest
+     * <p>Periodically (every <i>n</i> minutes) output the largest
      * trading stock by volume.
      * </p>
      * <p>This is the largest since the start, not in that
@@ -187,13 +188,14 @@ public class AggregateQuery {
      * @param aggregated
      */
     private static void addMaxVolumeAlert(
-            StreamStage<Entry<String, Tuple3<Long, Long, Long>>> aggregated) {
+            StreamStage<Entry<String, Tuple3<Long, Long, Long>>> aggregated,
+            String projectName, String jobName, String clusterName) {
         AggregateOperation1<
             Entry<Integer, Tuple4<String, Long, Long, Long>>,
             MaxVolumeAggregator,
             Entry<Long, HazelcastJsonValue>>
                 maxVolumeAggregator =
-                    MaxVolumeAggregator.buildMaxVolumeAggregation();
+                    MaxVolumeAggregator.buildMaxVolumeAggregation(projectName, clusterName, jobName);
 
         aggregated
         .map(entry -> {
@@ -204,7 +206,7 @@ public class AggregateQuery {
         })
         .addTimestamps(nowTimestampFn, 0)
         .groupingKey(Functions.entryKey())
-        .window(WindowDefinition.tumbling(TEN_MINUTES_IN_MS))
+        .window(WindowDefinition.tumbling(FIVE_MINUTES_IN_MS))
         .aggregate(maxVolumeAggregator)
         .map(result -> result.getValue())
         .writeTo(Sinks.map(MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME));

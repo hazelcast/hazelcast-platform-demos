@@ -38,7 +38,6 @@ public class CvaStpJobSubmitter {
     private static final String CPP_DOCKER = "cva-cpp";
     private static final String CPP_KUBERNETES = "cpp-service";
     private static final String CPP_LOCALHOST = "127.0.0.1";
-    private static final int PORT = 30001;
 
     /**
      * <p>Try to submit the {@link CvaStpJob}, allowing only one to be running
@@ -90,7 +89,7 @@ public class CvaStpJobSubmitter {
         String cppLoadBalancer = getLoadBalancer();
 
         Pipeline pipeline = CvaStpJob.buildPipeline(jobName, timestamp, calcDate, cppLoadBalancer,
-                PORT, batchSize, parallelism, debug);
+                batchSize, parallelism, debug);
 
         JobConfig jobConfig = new JobConfig();
         jobConfig.setName(jobName);
