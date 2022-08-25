@@ -24,7 +24,7 @@ of streaming analytics and in-memory data.
 
 Also
 
-7. Utils
+8. Utils
   * [Utils](./utils) Utillity modules for the above projects to share.
 
 ## Build Instructions
