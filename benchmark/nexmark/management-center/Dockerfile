@@ -1,5 +1,4 @@
-#FROM hazelcast/management-center:latest-snapshot
-FROM hazelcast/management-center:5.2-BETA-1
+FROM hazelcast/management-center:latest-snapshot
 
 # From pom.xml
 ARG MC_LICENSE

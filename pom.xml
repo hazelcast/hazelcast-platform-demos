@@ -62,7 +62,7 @@
 		<guava.version>29.0-jre</guava.version>
 		<!-- Matches banking/credit-value-adjustment/cpp/Dockerfile2 -->
 		<grpc.version>1.31.1</grpc.version>
-		<hazelcast.version>5.2-BETA-1</hazelcast.version>
+		<hazelcast.version>5.2-SNAPSHOT</hazelcast.version>
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
 		<hibernate-validator.version>6.1.5.Final</hibernate-validator.version>
 		<jackson.version>2.12.4</jackson.version>

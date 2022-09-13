@@ -91,15 +91,15 @@ spec:
 #      containers:
 #        - image: "hazelcast-platform-demos/trade-monitor-finos-nodejs"
 #          imagePullPolicy: Never
-#          livenessProbe:
-#            httpGet:
-#              path: /
-#              port: 8080
+##          livenessProbe:
+##            httpGet:
+##              path: /
+##              port: 8080
 #          name: trade-monitor-finos-nodejs-container
-#          readinessProbe:
-#            httpGet:
-#              path: /
-#              port: 8080
+##          readinessProbe:
+##            httpGet:
+##              path: /
+##              port: 8080
 #          volumeMounts:
 #            - name: configmap
 #              mountPath: /customize/my-env.sh
@@ -143,15 +143,15 @@ spec:
 #      containers:
 #        - image: "hazelcast-platform-demos/trade-monitor-finos-python"
 #          imagePullPolicy: Never
-#          livenessProbe:
-#            httpGet:
-#              path: /
-#              port: 8080
+##          livenessProbe:
+##            httpGet:
+##              path: /
+##              port: 8080
 #          name: trade-monitor-finos-python-container
-#          readinessProbe:
-#            httpGet:
-#              path: /
-#              port: 8080
+##          readinessProbe:
+##            httpGet:
+##              path: /
+##              port: 8080
 #          volumeMounts:
 #            - name: configmap
 #              mountPath: /customize/my-env.sh
