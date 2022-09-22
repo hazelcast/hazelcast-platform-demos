@@ -60,8 +60,8 @@
 		<module>topic-create</module>
 		<!--
 		<module>finos-nodejs</module>
-		-->
 		<module>finos-python</module>
+		-->
 		<module>management-center</module>
 		<module>prometheus</module>
 		<module>postgres</module>
