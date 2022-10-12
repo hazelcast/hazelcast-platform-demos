@@ -4,10 +4,14 @@ FROM library/python:3.7-buster
 
 # Add Java
 RUN apt update
-RUN cd /tmp ; \
+RUN mkdir /tmp/aarch64 /tmp/i386
+RUN cd /tmp/aarch64 ; \
+    wget -q https://download.java.net/java/GA/jdk17/0d483333a00540d886896bac774ff48b/35/GPL/openjdk-17_linux-aarch64_bin.tar.gz ; \
+    tar xf openjdk-17_linux-aarch64_bin.tar.gz ; 
+RUN cd /tmp/i386 ; \
     wget -q https://download.java.net/java/GA/jdk17/0d483333a00540d886896bac774ff48b/35/GPL/openjdk-17_linux-x64_bin.tar.gz ; \
     tar xf openjdk-17_linux-x64_bin.tar.gz ; 
-RUN update-alternatives --install /usr/bin/java java /tmp/jdk-17/bin/java 1
+RUN update-alternatives --install /usr/bin/java java /tmp/`arch`/jdk-17/bin/java 1
 RUN java --version
 
 # Download requirements into image makes start up faster when growing cluster
