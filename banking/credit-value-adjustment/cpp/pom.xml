@@ -16,13 +16,13 @@
 
 	<properties>
 		<my.docker.image.name>cpp</my.docker.image.name>
-		<my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
-
+		<!--
 		<tmp.docker.image1>hazelcast-platform-demos/${my.docker.image.prefix}-${my.docker.image.name}-tmp1</tmp.docker.image1>
 		<tmp.docker.image2>hazelcast-platform-demos/${my.docker.image.prefix}-${my.docker.image.name}-tmp2</tmp.docker.image2>
 		<tmp.docker.image3>hazelcast-platform-demos/${my.docker.image.prefix}-${my.docker.image.name}-tmp3</tmp.docker.image3>
 		<final.docker.image>hazelcast-platform-demos/${my.docker.image.prefix}-${my.docker.image.name}</final.docker.image>
+		-->
 	</properties>
 
 	<!-- Multi-step Dockerfile build -->
@@ -30,11 +30,34 @@
 		features enabled -->
 	<build>
 		<plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <configuration>
+                        <target>
+                        <echo message="====================================" />
+                        <echo message="TODO: Multi-step Maven build?" />
+                        <echo message="====================================" />
+                    </target>
+                </configuration>
+            </plugin>
 			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
+			</plugin>
+				<!-- ================================================== -->
+				<!-- Fabric8 would need to publish to a Docker registry -->
+				<!-- for a multi-step build. But we generally need all  -->
+				<!-- stages anyway.                                     -->
+				<!-- ================================================== -->
+				<!-- So use "Dockerfile1", "Dockerfile2", "Dockerfile3",-->
+				<!-- "Dockerfile4" for phased build instead of the      -->
+				<!-- single "Dockerfile"                                -->
+				<!-- ================================================== -->
+				<!--
 				<executions>
+				-->
 					<!-- No <id>, Anonymous execution goes first -->
+					<!--
 					<execution>
 						<phase>package</phase>
 						<goals>
@@ -93,17 +116,20 @@
 						</goals>
 						<configuration>
 						    <images>
-     							<image>
-     								<name>${final.docker.image}</name>
+							<image>
+								<name>${tmp.docker.image}</name>
 						       		<build>
-										<dockerFileDir>${project.basedir}</dockerFileDir>
+										<dockerFileDir>${project.basedir}/src/main/docker/Dockerfile4</dockerFileDir>
 						       		</build>
      							</image>
 						    </images>
 						</configuration>
 					</execution>
+					-->
+				<!--
 				</executions>
 			</plugin>
+			-->
 			<!-- This step deletes the intermediate builds. It saves space. If you keep them, another
                              build recognises the intermediate builds can be re-used so starts from step 4, much faster
                           -->

@@ -1,22 +1,22 @@
 # Use Python 3.7 as Grppcio:1.26.0 is incompatible with Python 3.8.
 # Use Buster (Debian) as Alpine does not work well with wheel packages.
-FROM library/python:3.7-buster
+FROM --platform=linux/amd64 library/python:3.7-buster
 
+# Add and confirm Java installed
+RUN apt upgrade
+RUN apt update
+RUN apt-get install -y wget
 # Add Java
 RUN apt update
-RUN mkdir /tmp/aarch64 /tmp/i386
-RUN cd /tmp/aarch64 ; \
-    wget -q https://download.java.net/java/GA/jdk17/0d483333a00540d886896bac774ff48b/35/GPL/openjdk-17_linux-aarch64_bin.tar.gz ; \
-    tar xf openjdk-17_linux-aarch64_bin.tar.gz ; 
-RUN cd /tmp/i386 ; \
+RUN cd /tmp ; \
     wget -q https://download.java.net/java/GA/jdk17/0d483333a00540d886896bac774ff48b/35/GPL/openjdk-17_linux-x64_bin.tar.gz ; \
-    tar xf openjdk-17_linux-x64_bin.tar.gz ; 
-RUN update-alternatives --install /usr/bin/java java /tmp/`arch`/jdk-17/bin/java 1
-RUN java --version
+    tar xf openjdk-17_linux-x64_bin.tar.gz ;
+RUN update-alternatives --install /usr/bin/java java /tmp/jdk-17/bin/java 1
 
 # Download requirements into image makes start up faster when growing cluster
 COPY target/classes/requirements.txt /
-RUN pip3 install -r ./requirements.txt
+RUN pip install --upgrade pip
+RUN pip install -r ./requirements.txt
 
 # Maven compiled target
 ARG JAR_FILE
@@ -28,4 +28,13 @@ ENV MY_KUBERNETES_ENABLED "true"
 ENV JAVA_ARGS ""
 ENV JAVA_OPTS "--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
 
-ENTRYPOINT exec java $JAVA_ARGS $JAVA_OPTS -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED -jar application.jar
+CMD ["bash", "-c", "set -euo pipefail \
+      && echo @@@@@@@@@@ \
+      && echo arch \
+      && arch \
+      && echo @@@@@@@@@@ \
+      && echo java --version \
+      && java --version \
+      && echo @@@@@@@@@@ \
+      && java $JAVA_ARGS $JAVA_OPTS -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED -jar application.jar \
+     "]
