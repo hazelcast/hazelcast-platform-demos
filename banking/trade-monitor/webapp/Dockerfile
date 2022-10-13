@@ -37,5 +37,7 @@ CMD ["bash", "-c", "set -euo pipefail \
       && echo java --version \
       && java --version \
       && echo @@@@@@@@@@ \
+      && chmod 755 /custom-entrypoint.sh \
+      && echo /custom-entrypoint.sh \
       && /custom-entrypoint.sh \
      "]

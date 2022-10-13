@@ -35,6 +35,13 @@ CMD ["bash", "-c", "set -euo pipefail \
       && echo java --version \
       && java --version \
       && echo @@@@@@@@@@ \
+      && echo java $JAVA_ARGS $JAVA_OPTS \
+ -Dmy.autostart.enabled=$MY_AUTOSTART_ENABLED \
+ -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS \
+ -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+ -Dmy.pulsar.list=$MY_PULSAR_LIST \
+ -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
+ -jar application.jar \
       && java $JAVA_ARGS $JAVA_OPTS \
  -Dmy.autostart.enabled=$MY_AUTOSTART_ENABLED \
  -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS \
