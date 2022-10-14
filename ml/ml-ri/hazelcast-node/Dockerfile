@@ -36,5 +36,6 @@ CMD ["bash", "-c", "set -euo pipefail \
       && echo java --version \
       && java --version \
       && echo @@@@@@@@@@ \
+      && echo java $JAVA_ARGS $JAVA_OPTS -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED -jar application.jar \
       && java $JAVA_ARGS $JAVA_OPTS -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED -jar application.jar \
      "]
