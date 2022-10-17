@@ -142,10 +142,10 @@ public class AlertingToSlack {
 
                 String cleanStr =
                         "*ALERT* `"
-                        + input.getString("whence")
-                        + ", stock '" + input.getString("symbol") + "'"
-                        + ", volume: " + input.getLong("volume") + ""
-                        + ", provenance: '" + input.getString("provenance") + "'`";
+                        + safeGetString(input, "whence")
+                        + ", stock '" + safeGetString(input, "symbol") + "'"
+                        + ", volume: " + safeGetLong(input, "volume") + ""
+                        + ", provenance: '" + safeGetString(input, "provenance") + "'`";
 
                 output.put(UtilsConstants.SLACK_PARAM_TEXT, cleanStr);
                 return output;
@@ -157,4 +157,35 @@ public class AlertingToSlack {
         };
     }
 
+    /**
+     * <p>Defensive access to JSON
+     * </p>
+     *
+     * @param input
+     * @param field
+     * @return
+     */
+    private static String safeGetString(JSONObject input, String field) {
+        try {
+            return Objects.toString(input.getString(field));
+        } catch (Exception e) {
+            return String.format("Exception for %s:%s", field, e.getMessage());
+        }
+    }
+
+    /**
+     * <p>Defensive access to JSON
+     * </p>
+     *
+     * @param input
+     * @param field
+     * @return
+     */
+    private static String safeGetLong(JSONObject input, String field) {
+        try {
+            return Objects.toString(input.getLong(field));
+        } catch (Exception e) {
+            return String.format("Exception for %s:%s", field, e.getMessage());
+        }
+    }
 }
