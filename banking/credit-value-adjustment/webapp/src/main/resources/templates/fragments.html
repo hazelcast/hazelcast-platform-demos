@@ -11,16 +11,16 @@
 <body th:fragment="header">
 	<div class="headerfooter">
 		<h5>Build @maven.build.timestamp@</h5>
-		<!-- https://github.com/springfox/springfox/issues/3462
 		<div align="right">
 			<p>
 				<font size="-1">
-					<a th:target="_blank" th:href="@{/swagger-ui.html#/}">Swagger</a>
+					<a th:target="_blank" th:href="@{/swagger-ui.html#/}">REST test</a>
 			</font>
 			</p>
 		</div>
-		-->
-		<div class="whiteBox">
+		<div>
+			<center><img th:src="@{/images/hazelcast-horz-flat-rev-sm.png}"
+			             alt="Hazelcast logo" width="200" height="42"></img></center>
 			<h1 th:text="${@siteLowerCase}">?</h1>
 		</div>
 		<hr class="headerfooterline"/>

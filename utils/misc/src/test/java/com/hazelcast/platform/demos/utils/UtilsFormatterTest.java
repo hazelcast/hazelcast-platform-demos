@@ -146,4 +146,16 @@ public class UtilsFormatterTest {
       assertEquals(expected, output);
     }
 
+    @Test
+    public void testSafeForJsonMultiLine(TestInfo testInfo) {
+      String input = "one" + System.getProperty("line.separator") + "two" + System.getProperty("line.separator") + "three";
+      String expected = "one+two+three";
+      String output = UtilsFormatter.safeForJsonStr(input);
+      LOGGER.info("{} :: input=='{}', output=='{}'", testInfo.getDisplayName(), input, output);
+
+      assertNotNull(output);
+      assertTrue(output instanceof String);
+      assertEquals(expected, output);
+    }
+
 }

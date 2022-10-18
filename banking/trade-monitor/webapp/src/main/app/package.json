@@ -5,9 +5,9 @@
   "dependencies": {
     "detect-browser-language": "^0.0.2",
     "immutability-helper": "^3.1.1",
-    "prop-types": "^15.7.2",
+    "prop-types": "^15.8.1",
     "react": "^16.14.0",
-    "react-collapsible": "^2.8.3",
+    "react-collapsible": "^2.8.4",
     "react-dom": "^16.14.0",
     "react-router": "^5.0.1",
     "react-router-dom": "^5.0.1",
@@ -15,7 +15,7 @@
     "react-table": "^6.11.0",
     "react-websocket": "^2.1.0",
     "rest": "^2.0.0",
-    "styled-components": "^5.2.1"
+    "styled-components": "^5.3.3"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -29,6 +29,7 @@ then
 fi
 
 MY_BOOTSTRAP_SERVERS=kafka-broker0:9092,kafka-broker1:9093,kafka-broker2:9094
+MY_POSTGRES_ADDRESS=postgres:5432
 MY_PULSAR_LIST=pulsar:6650
 
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
@@ -42,6 +43,7 @@ PORT=$(($CLONE + 5701))
 
 CMD="docker run -e MY_BOOTSTRAP_SERVERS=$MY_BOOTSTRAP_SERVERS \
  -e MY_KUBERNETES_ENABLED=false \
+ -e MY_POSTGRES_ADDRESS=$MY_POSTGRES_ADDRESS \
  -e MY_PULSAR_LIST=$MY_PULSAR_LIST \
  -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP}:${PORT} \
  -p ${PORT}:${PORT} --name=${MODULE}${CLONE} --rm --network=${PROJECT} ${DOCKER_IMAGE}"

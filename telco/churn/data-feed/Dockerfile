@@ -1,4 +1,4 @@
-FROM library/openjdk:17-slim
+FROM --platform=linux/amd64 library/openjdk:17-slim
 
 # Maven compiled target
 ARG JAR_FILE

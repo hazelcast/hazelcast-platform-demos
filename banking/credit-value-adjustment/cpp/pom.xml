@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.banking.cva</groupId>
 		<artifactId>cva-root</artifactId>
-		<version>5.1</version>
+		<version>5.2</version>
 	</parent>
 
 	<artifactId>cva-cpp</artifactId>
@@ -15,14 +15,14 @@
 	<description>Credit Value Adjustment - C++ Pricer</description>
 
 	<properties>
-		<docker.image.name>cpp</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<my.docker.image.name>cpp</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
-
-		<tmp.docker.image1>hazelcast-platform-demos/${docker.image.prefix}-${docker.image.name}-tmp1</tmp.docker.image1>
-		<tmp.docker.image2>hazelcast-platform-demos/${docker.image.prefix}-${docker.image.name}-tmp2</tmp.docker.image2>
-		<tmp.docker.image3>hazelcast-platform-demos/${docker.image.prefix}-${docker.image.name}-tmp3</tmp.docker.image3>
-		<final.docker.image>hazelcast-platform-demos/${docker.image.prefix}-${docker.image.name}</final.docker.image>
+		<!--
+		<tmp.docker.image1>hazelcast-platform-demos/${my.docker.image.prefix}-${my.docker.image.name}-tmp1</tmp.docker.image1>
+		<tmp.docker.image2>hazelcast-platform-demos/${my.docker.image.prefix}-${my.docker.image.name}-tmp2</tmp.docker.image2>
+		<tmp.docker.image3>hazelcast-platform-demos/${my.docker.image.prefix}-${my.docker.image.name}-tmp3</tmp.docker.image3>
+		<final.docker.image>hazelcast-platform-demos/${my.docker.image.prefix}-${my.docker.image.name}</final.docker.image>
+		-->
 	</properties>
 
 	<!-- Multi-step Dockerfile build -->
@@ -30,21 +30,48 @@
 		features enabled -->
 	<build>
 		<plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <configuration>
+                        <target>
+                        <echo message="====================================" />
+                        <echo message="TODO: Multi-step Maven build?" />
+                        <echo message="====================================" />
+                    </target>
+                </configuration>
+            </plugin>
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+			</plugin>
+				<!-- ================================================== -->
+				<!-- Fabric8 would need to publish to a Docker registry -->
+				<!-- for a multi-step build. But we generally need all  -->
+				<!-- stages anyway.                                     -->
+				<!-- ================================================== -->
+				<!-- So use "Dockerfile1", "Dockerfile2", "Dockerfile3",-->
+				<!-- "Dockerfile4" for phased build instead of the      -->
+				<!-- single "Dockerfile"                                -->
+				<!-- ================================================== -->
+				<!--
 				<executions>
+				-->
 					<!-- No <id>, Anonymous execution goes first -->
+					<!--
 					<execution>
 						<phase>package</phase>
 						<goals>
 							<goal>build</goal>
 						</goals>
 						<configuration>
-							<dockerfile>Dockerfile1</dockerfile>
-							<pullNewerImage>false</pullNewerImage>
-							<repository>${tmp.docker.image1}</repository>
-							<tag>latest</tag>
+						    <images>
+     							<image>
+     								<name>${tmp.docker.image1}</name>
+						       		<build>
+										<dockerFileDir>${project.basedir}/src/main/docker/Dockerfile1</dockerFileDir>
+						       		</build>
+     							</image>
+						    </images>
 						</configuration>
 					</execution>
 					<execution>
@@ -54,10 +81,14 @@
 							<goal>build</goal>
 						</goals>
 						<configuration>
-							<dockerfile>Dockerfile2</dockerfile>
-							<pullNewerImage>false</pullNewerImage>
-							<repository>${tmp.docker.image2}</repository>
-							<tag>latest</tag>
+						    <images>
+     							<image>
+     								<name>${tmp.docker.image2}</name>
+						       		<build>
+										<dockerFileDir>${project.basedir}/src/main/docker/Dockerfile2</dockerFileDir>
+						       		</build>
+     							</image>
+						    </images>
 						</configuration>
 					</execution>
 					<execution>
@@ -67,10 +98,14 @@
 							<goal>build</goal>
 						</goals>
 						<configuration>
-							<dockerfile>Dockerfile3</dockerfile>
-							<pullNewerImage>false</pullNewerImage>
-							<repository>${tmp.docker.image3}</repository>
-							<tag>latest</tag>
+						    <images>
+     							<image>
+     								<name>${tmp.docker.image3}</name>
+						       		<build>
+										<dockerFileDir>${project.basedir}/src/main/docker/Dockerfile3</dockerFileDir>
+						       		</build>
+     							</image>
+						    </images>
 						</configuration>
 					</execution>
 					<execution>
@@ -80,14 +115,21 @@
 							<goal>build</goal>
 						</goals>
 						<configuration>
-							<dockerfile>Dockerfile4</dockerfile>
-							<pullNewerImage>false</pullNewerImage>
-							<repository>${final.docker.image}</repository>
-							<tag>latest</tag>
+						    <images>
+							<image>
+								<name>${tmp.docker.image}</name>
+						       		<build>
+										<dockerFileDir>${project.basedir}/src/main/docker/Dockerfile4</dockerFileDir>
+						       		</build>
+     							</image>
+						    </images>
 						</configuration>
 					</execution>
+					-->
+				<!--
 				</executions>
 			</plugin>
+			-->
 			<!-- This step deletes the intermediate builds. It saves space. If you keep them, another
                              build recognises the intermediate builds can be re-used so starts from step 4, much faster
                           -->

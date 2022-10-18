@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.retail</groupId>
 		<artifactId>retail-root</artifactId>
-		<version>5.1</version>
+		<version>5.2</version>
 	</parent>
 
 	<groupId>com.hazelcast.platform.demos.retail.clickstream</groupId>
@@ -33,10 +33,7 @@
 	</modules>
 
 	<properties>
-		<!-- hz-cli fails with 17 on 5.1, needs 5.1.1 -->
-		<java.version>11</java.version>
-
-		<docker.image.prefix>clickstream</docker.image.prefix>
+		<my.docker.image.prefix>clickstream</my.docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
 
 		<!-- Environment variables -->
@@ -52,10 +49,10 @@
 		<my.other.admin.database>clickstream</my.other.admin.database>
 
 		<my.mc.cluster1.name>${my.cluster1.name}</my.mc.cluster1.name>
-		<my.mc.cluster1.addresslist>${docker.image.prefix}-${my.cluster1.name}-hazelcast.default.svc.cluster.local</my.mc.cluster1.addresslist>
+		<my.mc.cluster1.addresslist>${my.docker.image.prefix}-${my.cluster1.name}-hazelcast.default.svc.cluster.local</my.mc.cluster1.addresslist>
 		<my.mc.cluster1.portlist>5701,5702,5703</my.mc.cluster1.portlist>
 		<my.mc.cluster2.name>${my.cluster2.name}</my.mc.cluster2.name>
-		<my.mc.cluster2.addresslist>${docker.image.prefix}-${my.cluster2.name}-hazelcast.default.svc.cluster.local</my.mc.cluster2.addresslist>
+		<my.mc.cluster2.addresslist>${my.docker.image.prefix}-${my.cluster2.name}-hazelcast.default.svc.cluster.local</my.mc.cluster2.addresslist>
 		<my.mc.cluster2.portlist>6701,6702,6703</my.mc.cluster2.portlist>
 
 		<!-- From settings.xml -->

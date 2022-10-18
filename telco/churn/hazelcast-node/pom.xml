@@ -3,11 +3,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-        <parent>
-                <groupId>com.hazelcast.platform.demos.telco.churn</groupId>
-                <artifactId>churn-root</artifactId>
-                <version>5.1</version>
-        </parent>
+	<parent>
+		<groupId>com.hazelcast.platform.demos.telco.churn</groupId>
+		<artifactId>churn-root</artifactId>
+		<version>5.2</version>
+	</parent>
 
 	<artifactId>churn-hazelcast-node</artifactId>
 
@@ -15,14 +15,25 @@
 	<description>Telco Churn - Hazelcast Node</description>
 
 	<properties>
-		<docker.image.name>hazelcast-node</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<my.docker.image.name>hazelcast-node</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 		<my.cluster.name>${my.cluster1.name}</my.cluster.name>
 		<my.init.size>${my.cluster1.init.size}</my.init.size>
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.hazelcast.platform.demos.utils</groupId>
+			<artifactId>utils-miscellaneous</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.platform.demos.utils</groupId>
+			<artifactId>utils-slack-integration</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>churn-common-cassandra</artifactId>
@@ -43,29 +54,41 @@
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-enterprise</artifactId>
 		</dependency>
-                <dependency>
-                        <groupId>com.hazelcast</groupId>
-                        <artifactId>hazelcast-spring</artifactId>
-                </dependency>
 		<dependency>
-			<groupId>com.hazelcast.jet</groupId>
-            <artifactId>hazelcast-jet-cdc-debezium</artifactId>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-spring</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.hazelcast</groupId>
+					<artifactId>hazelcast</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
-            <artifactId>hazelcast-jet-cdc-mysql</artifactId>
+			<artifactId>hazelcast-jet-cdc-debezium</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
-            <artifactId>hazelcast-jet-kafka</artifactId>
+			<artifactId>hazelcast-jet-cdc-mysql</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
-            <artifactId>hazelcast-jet-python</artifactId>
+			<artifactId>hazelcast-jet-kafka</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet-python</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast</groupId>
-            <artifactId>hazelcast-sql</artifactId>
+			<artifactId>hazelcast-sql</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.hazelcast</groupId>
+					<artifactId>hazelcast</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -88,8 +111,8 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

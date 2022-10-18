@@ -57,4 +57,9 @@ spec:
             timeoutSeconds: 10
             successThreshold: 1
             failureThreshold: 10
+          resources:
+            limits:
+              cpu: "2.0"
+            requests:
+              cpu: "2.0"
 ---

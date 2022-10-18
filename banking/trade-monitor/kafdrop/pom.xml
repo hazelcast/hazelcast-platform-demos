@@ -6,7 +6,7 @@
         <parent>
 		<groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
         	<artifactId>trade-monitor-root</artifactId>
-                <version>5.1</version>
+                <version>5.2</version>
         </parent>
 
         <artifactId>trade-monitor-kafdrop</artifactId>
@@ -15,15 +15,15 @@
         <description>Trade Monitor - Re-package Kafdrop</description>
 
 	<properties>
-		<docker.image.name>kafdrop</docker.image.name>
+		<my.docker.image.name>kafdrop</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

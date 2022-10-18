@@ -17,7 +17,10 @@
 package hazelcast.platform.demos.banking.trademonitor;
 
 import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
@@ -32,9 +35,11 @@ import com.hazelcast.config.EventJournalConfig;
 import com.hazelcast.config.IndexConfig;
 import com.hazelcast.config.IndexType;
 import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.MapStoreConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.jet.config.JobConfig;
+import com.hazelcast.jet.config.JobConfigArguments;
 import com.hazelcast.jet.config.ProcessingGuarantee;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.jet.pipeline.Pipeline;
@@ -56,6 +61,14 @@ public class CommonIdempotentInitialization {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonIdempotentInitialization.class);
 
     /**
+     * <p>Mappings needed for WAN, rather than replicate "{@code __sql.catalog}"
+     * </p>
+     */
+    public static boolean createMinimalMappings(HazelcastInstance hazelcastInstance) {
+        return defineWANIMaps(hazelcastInstance);
+    }
+
+    /**
      * <p>Ensure objects have the necessary configuration before
      * accessing, as the access creates them. Some configuration
      * such as journals must be active from the outset, other
@@ -66,7 +79,8 @@ public class CommonIdempotentInitialization {
      * access, so ensuring all are visible from the outset.
      * </p>
      */
-    public static boolean createNeededObjects(HazelcastInstance hazelcastInstance) {
+    public static boolean createNeededObjects(HazelcastInstance hazelcastInstance,
+            Properties postgresProperties, String ourProjectProvenance) {
         // Capture what was present before
         Set<String> existingIMapNames = hazelcastInstance.getDistributedObjects()
                 .stream()
@@ -75,8 +89,9 @@ public class CommonIdempotentInitialization {
                 .filter(name -> !name.startsWith("__"))
                 .collect(Collectors.toCollection(TreeSet::new));
 
-        // Add journals to maps before they are created
-        boolean ok = defineJournals(hazelcastInstance, existingIMapNames);
+        // Add journals and map stores to maps before they are created
+        boolean ok = dynamicMapConfig(hazelcastInstance, existingIMapNames,
+                postgresProperties, ourProjectProvenance);
 
         // Accessing non-existing maps does not return any failures
         for (String iMapName : MyConstants.IMAP_NAMES) {
@@ -94,19 +109,27 @@ public class CommonIdempotentInitialization {
     }
 
     /**
-     * <p>Add journal configuration to maps that need them. Equivalent to:
+     * <p>Add journal and map store configuration to maps that need them. Equivalent to:
      * <pre>
      *     'alerts*':
      *       event-journal:
      *         enabled: true
+     *       map-store:
+     *         enabled: true
+     *         class-name: hazelcast.platform.demos.banking.trademonitor.AlertingToPostgresStore
+     *       properties:
+     *         address: '12.34.56.78'
+     *         user: 'admin'
      * </pre>
      * <p>
      *
      * @param hazelcastInstance
      * @param existingIMapNames - maps that this run of the initialiser didn't create
+     * @param postgresProperties - external db to connect to
      * @return true, always, either added or not needed
      */
-    private static boolean defineJournals(HazelcastInstance hazelcastInstance, Set<String> existingIMapNames) {
+    private static boolean dynamicMapConfig(HazelcastInstance hazelcastInstance,
+            Set<String> existingIMapNames, Properties postgresProperties, String ourProjectProvenance) {
         final String alertsWildcard = "alerts*";
 
         EventJournalConfig eventJournalConfig = new EventJournalConfig();
@@ -115,6 +138,20 @@ public class CommonIdempotentInitialization {
         if (!existingIMapNames.contains(MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME)) {
             MapConfig alertsMapConfig = new MapConfig(alertsWildcard);
             alertsMapConfig.setEventJournalConfig(eventJournalConfig);
+
+            AlertingToPostgresMapStore alertingToPostgresMapStore
+                = new AlertingToPostgresMapStore();
+
+            MapStoreConfig mapStoreConfig = new MapStoreConfig();
+            mapStoreConfig.setEnabled(true);
+            mapStoreConfig.setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER);
+            mapStoreConfig.setImplementation(alertingToPostgresMapStore);
+            Properties properties = new Properties();
+            properties.putAll(postgresProperties);
+            properties.put(MyConstants.PROJECT_PROVENANCE, ourProjectProvenance);
+            mapStoreConfig.setProperties(properties);
+
+            alertsMapConfig.setMapStoreConfig(mapStoreConfig);
 
             hazelcastInstance.getConfig().addMapConfig(alertsMapConfig);
         } else {
@@ -238,8 +275,10 @@ public class CommonIdempotentInitialization {
     public static boolean defineQueryableObjects(HazelcastInstance hazelcastInstance, String bootstrapServers) {
         boolean ok = true;
         ok &= defineKafka(hazelcastInstance, bootstrapServers);
-        ok &= defineIMap(hazelcastInstance);
-        ok &= defineIMap2(hazelcastInstance);
+        ok &= defineWANIMaps(hazelcastInstance);
+        ok &= defineIMaps1(hazelcastInstance);
+        ok &= defineIMaps2(hazelcastInstance);
+        ok &= defineIMaps3(hazelcastInstance);
         return ok;
     }
 
@@ -274,7 +313,79 @@ public class CommonIdempotentInitialization {
                 + " 'bootstrap.servers' = '" + bootstrapServers + "'"
                 + " )";
 
-        return define(definition1, hazelcastInstance);
+        String definition2 = "CREATE EXTERNAL MAPPING IF NOT EXISTS "
+                // Name for our SQL
+                + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_ALERTS
+                // Name of the remote object
+                + " EXTERNAL NAME " + MyConstants.KAFKA_TOPIC_NAME_ALERTS
+                + " ( "
+                + "    __key BIGINT,"
+                + "    this VARCHAR"
+                + " ) "
+                + " TYPE Kafka "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.Long',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = 'java.lang.String',"
+                + " 'auto.offset.reset' = 'earliest',"
+                + " 'bootstrap.servers' = '" + bootstrapServers + "'"
+                + " )";
+
+        boolean ok = true;
+        ok = define(definition1, hazelcastInstance);
+        ok = ok & define(definition2, hazelcastInstance);
+        return ok;
+    }
+
+    /**
+     * <p>Mappings only for WAN replicated IMap.
+     * <p>
+     *
+     * @param hazelcastInstance
+     * @return
+     */
+    static boolean defineWANIMaps(HazelcastInstance hazelcastInstance) {
+        String definition3 = "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_AUDIT_LOG
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.Long',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = 'java.lang.String'"
+                + " )";
+
+        String definition4 = "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_JOB_CONFIG
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = '" + String.class.getName() + "',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = '" + String.class.getName() + "'"
+                + " )";
+
+        String definition5 = "CREATE MAPPING IF NOT EXISTS "
+                 + MyConstants.IMAP_NAME_SYMBOLS
+                 + " TYPE IMap "
+                 + " OPTIONS ( "
+                 + " 'keyFormat' = 'java',"
+                 + " 'keyJavaClass' = 'java.lang.String',"
+                 + " 'valueFormat' = 'java',"
+                 + " 'valueJavaClass' = '" + SymbolInfo.class.getName() + "'"
+                 + " )";
+
+        boolean ok = true;
+        List<String> definitions = List.of(definition3, definition4, definition5);
+        for (String definition : definitions) {
+            ok &= define(definition, hazelcastInstance);
+        }
+        if (definitions.size() != MyConstants.WAN_IMAP_NAMES.size()) {
+            LOGGER.error("Not all WAN maps defined");
+            return false;
+        }
+        return ok;
     }
 
 
@@ -285,23 +396,25 @@ public class CommonIdempotentInitialization {
      *
      * @param hazelcastInstance
      */
-    static boolean defineIMap(HazelcastInstance hazelcastInstance) {
-        String definition1 = "CREATE MAPPING IF NOT EXISTS "
+    static boolean defineIMaps1(HazelcastInstance hazelcastInstance) {
+        String definition6 = "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS
                 + " TYPE IMap "
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
                 + " 'keyJavaClass' = 'java.lang.String',"
                 + " 'valueFormat' = 'java',"
-                + " 'valueJavaClass' = '" + Tuple3.class.getCanonicalName() + "'"
+                + " 'valueJavaClass' = '" + Tuple3.class.getName() + "'"
                 + " )";
 
-        String definition2 = "CREATE MAPPING IF NOT EXISTS "
+        // See also AggregateQuery writing to map, and Postgres table definition for MapStore
+        String definition7 = "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME
                 + " ("
                 + "    __key BIGINT,"
-                + "    \"timestamp\" VARCHAR,"
                 + "    symbol VARCHAR,"
+                + "    provenance VARCHAR,"
+                + "    whence VARCHAR,"
                 + "    volume BIGINT"
                 + ")"
                  + " TYPE IMap "
@@ -309,45 +422,11 @@ public class CommonIdempotentInitialization {
                 + " 'keyFormat' = 'java',"
                 + " 'keyJavaClass' = 'java.lang.Long',"
                 + " 'valueFormat' = 'json-flat',"
-                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
+                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getName() + "'"
                 + " )";
 
-        String definition3 = "CREATE MAPPING IF NOT EXISTS "
-                + MyConstants.IMAP_NAME_JOB_CONFIG
-                + " TYPE IMap "
-                + " OPTIONS ( "
-                + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
-                + " 'valueFormat' = 'java',"
-                + " 'valueJavaClass' = '" + String.class.getCanonicalName() + "'"
-                + " )";
-
-        String definition4 = "CREATE MAPPING IF NOT EXISTS "
-                + MyConstants.IMAP_NAME_SYMBOLS
-                + " TYPE IMap "
-                + " OPTIONS ( "
-                + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = 'java.lang.String',"
-                + " 'valueFormat' = 'java',"
-                + " 'valueJavaClass' = '" + SymbolInfo.class.getCanonicalName() + "'"
-                + " )";
-
-        String definition5 = "CREATE MAPPING IF NOT EXISTS "
-                + MyConstants.IMAP_NAME_TRADES
-                + " TYPE IMap "
-                + " OPTIONS ( "
-                + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = 'java.lang.String',"
-                + " 'valueFormat' = 'java',"
-                + " 'valueJavaClass' = '" + Trade.class.getCanonicalName() + "'"
-                + " )";
-
-        boolean ok = true;
-        ok &= define(definition1, hazelcastInstance);
-        ok &= define(definition2, hazelcastInstance);
-        ok &= define(definition3, hazelcastInstance);
-        ok &= define(definition4, hazelcastInstance);
-        ok &= define(definition5, hazelcastInstance);
+        boolean ok = define(definition6, hazelcastInstance);
+        ok &= define(definition7, hazelcastInstance);
         return ok;
     }
 
@@ -356,8 +435,35 @@ public class CommonIdempotentInitialization {
      * </p>
      * @param hazelcastInstance
      */
-     static boolean defineIMap2(HazelcastInstance hazelcastInstance) {
-        String definition6 = "CREATE MAPPING IF NOT EXISTS "
+    static boolean defineIMaps2(HazelcastInstance hazelcastInstance) {
+        String definition8 = "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_PORTFOLIOS
+                + " ("
+                + "    __key VARCHAR,"
+                + "    stock VARCHAR,"
+                + "    sold INTEGER,"
+                + "    bought INTEGER,"
+                + "    change INTEGER"
+                + ")"
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = '" + String.class.getName() + "',"
+                + " 'valueFormat' = 'compact',"
+                + " 'valueCompactTypeName' = '" + Portfolio.class.getSimpleName() + "'"
+                + " )";
+
+        String definition9 = "CREATE MAPPING IF NOT EXISTS "
+                 + MyConstants.IMAP_NAME_TRADES
+                 + " TYPE IMap "
+                 + " OPTIONS ( "
+                 + " 'keyFormat' = 'java',"
+                 + " 'keyJavaClass' = 'java.lang.String',"
+                 + " 'valueFormat' = 'java',"
+                 + " 'valueJavaClass' = '" + Trade.class.getName() + "'"
+                 + " )";
+
+        String definition10 = "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_PYTHON_SENTIMENT
                 + " TYPE IMap "
                 + " OPTIONS ( "
@@ -367,7 +473,7 @@ public class CommonIdempotentInitialization {
                 + " 'valueJavaClass' = 'java.lang.String'"
                 + " )";
 
-        String definition7 = "CREATE MAPPING IF NOT EXISTS "
+        String definition11 = "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_JOB_CONTROL
                 + " TYPE IMap "
                 + " OPTIONS ( "
@@ -377,8 +483,21 @@ public class CommonIdempotentInitialization {
                 + " 'valueJavaClass' = 'java.lang.String'"
                 + " )";
 
+        boolean ok = define(definition8, hazelcastInstance);
+        ok &= define(definition9, hazelcastInstance);
+        ok &= define(definition10, hazelcastInstance);
+        ok &= define(definition11, hazelcastInstance);
+        return ok;
+    }
+
+    /**
+     * <p>Even more map definitions
+     * </p>
+     * @param hazelcastInstance
+     */
+    static boolean defineIMaps3(HazelcastInstance hazelcastInstance) {
         // Not much of view, but shows the concept
-        String definition8 =  "CREATE OR REPLACE VIEW "
+        String definition12 =  "CREATE OR REPLACE VIEW "
                 + MyConstants.IMAP_NAME_TRADES + MyConstants.VIEW_SUFFIX
                 + " AS SELECT "
                 + "    __key"
@@ -386,12 +505,9 @@ public class CommonIdempotentInitialization {
                 + " FROM " + MyConstants.IMAP_NAME_TRADES;
 
         boolean ok = true;
-        ok &= define(definition6, hazelcastInstance);
-        ok &= define(definition7, hazelcastInstance);
-        ok &= define(definition8, hazelcastInstance);
+        ok &= define(definition12, hazelcastInstance);
         return ok;
     }
-
 
     /**
      * <p>Generic handler to loading definitions
@@ -426,7 +542,9 @@ public class CommonIdempotentInitialization {
      * @param properties
      */
     public static boolean launchNeededJobs(HazelcastInstance hazelcastInstance, String bootstrapServers,
-            String pulsarList, Properties properties) {
+            String pulsarList, Properties postgresProperties, Properties properties, String clusterName) {
+        String projectName = properties.getOrDefault(UtilsConstants.SLACK_PROJECT_NAME,
+                CommonIdempotentInitialization.class.getSimpleName()).toString();
 
         String pulsarOrKafka = hazelcastInstance
                 .getMap(MyConstants.IMAP_NAME_JOB_CONFIG).get(MyConstants.PULSAR_OR_KAFKA_KEY).toString();
@@ -461,8 +579,6 @@ public class CommonIdempotentInitialization {
             }
 
             // Trade aggregation
-            Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(bootstrapServers, pulsarList, usePulsar);
-
             JobConfig jobConfigAggregateQuery = new JobConfig();
             jobConfigAggregateQuery.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
             jobConfigAggregateQuery.setName(AggregateQuery.class.getSimpleName());
@@ -470,12 +586,19 @@ public class CommonIdempotentInitialization {
             jobConfigAggregateQuery.addClass(MaxVolumeAggregator.class);
             jobConfigAggregateQuery.addClass(UtilsFormatter.class);
 
+            Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(bootstrapServers,
+                    pulsarList, usePulsar, projectName, jobConfigAggregateQuery.getName(),
+                    clusterName);
+
             if (usePulsar && useHzCloud) {
                 //TODO Fix once supported by HZ Cloud
                 LOGGER.error("Pulsar is not currently supported on Hazelcast Cloud");
             } else {
                 UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAggregateQuery, jobConfigAggregateQuery);
+                // Aggregate query creates alerts to an IMap. Use a separate rather than same job to copy to Kafka.
+                launchAlertsToKafkaAndToLog(hazelcastInstance, bootstrapServers);
             }
+
         }
 
         // Remaining jobs need properties
@@ -484,24 +607,13 @@ public class CommonIdempotentInitialization {
             return false;
         }
 
-        // Slack SQL integration from common utils
-        try {
-            Object projectName = properties.get(UtilsConstants.SLACK_PROJECT_NAME);
+        // Slack SQL integration (reading/writing) from common utils
+        launchSlackReadWrite(useHzCloud, projectName, hazelcastInstance, properties);
 
-            UtilsSlackSQLJob.submitJob(hazelcastInstance,
-                    projectName == null ? "" : projectName.toString());
-        } catch (Exception e) {
-            LOGGER.error("launchNeededJobs:" + UtilsSlackSQLJob.class.getSimpleName(), e);
-        }
+        launchPostgresCDC(hazelcastInstance, postgresProperties,
+                Objects.toString(properties.get(MyConstants.PROJECT_PROVENANCE)));
 
-        // Slack alerting, indirectly uses common utils
-        if (useHzCloud) {
-            //TODO Fix once supported by HZ Cloud
-            LOGGER.error("Slack is not currently supported on Hazelcast Cloud");
-        } else {
-            launchSlackJob(hazelcastInstance, properties);
-        }
-
+        logStuff(hazelcastInstance);
         return true;
     }
 
@@ -534,6 +646,81 @@ public class CommonIdempotentInitialization {
     }
 
     /**
+     * <p>Use SQL to copy alerts to Kafka outbound topic.
+     * </p>
+     *
+     * @param hazelcastInstance
+     * @param bootstrapServers
+     */
+    private static void launchAlertsToKafkaAndToLog(HazelcastInstance hazelcastInstance, String bootstrapServers) {
+        String topic = MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_ALERTS;
+
+        /*FIXME 5.3. Make both jobs streaming SQL
+        String sqlJobMapToKafka = "SINK INTO "
+                + MyConstants.KAFKA_TOPIC_NAME_ALERTS
+                + " SELECT __key, symbol || ',' || provenance || ',' || whence || ',' || volume FROM "
+                + MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME;
+                */
+
+        String sqlJobKafkaToMap =
+                "CREATE JOB IF NOT EXISTS " + MyConstants.SQL_JOB_NAME_KAFKA_TO_IMAP
+                + " AS "
+                + " SINK INTO " + MyConstants.IMAP_NAME_AUDIT_LOG
+                + " SELECT * FROM " + topic;
+
+        // 5.2 Style, to be removed in favor of SQL for both.
+        try {
+            Pipeline pipelineAlertingToKafka = AlertingToKafka.buildPipeline(bootstrapServers);
+
+            JobConfig jobConfigAlertingToKafka = new JobConfig();
+            jobConfigAlertingToKafka.setName(AlertingToKafka.class.getSimpleName());
+            jobConfigAlertingToKafka.addClass(HazelcastJsonValueSerializer.class);
+
+            UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToKafka, jobConfigAlertingToKafka);
+        } catch (Exception e) {
+            LOGGER.error("launchAlertsSqlToKafka:", e);
+        }
+
+        for (String sql : List.of(sqlJobKafkaToMap)) {
+            try {
+                hazelcastInstance.getSql().execute(sql);
+                LOGGER.info("SQL running: '{}'", sql);
+            } catch (Exception e) {
+                LOGGER.error("launchAlertsSqlToKafka:" + sql, e);
+            }
+        }
+    }
+
+    /**
+     * <p>Launch Slack jobs for SQL (read/write) and alerting (write)
+     * </p>
+     *
+     * @param useHzCloud
+     * @param projectName
+     * @param hazelcastInstance
+     * @param properties
+     */
+    private static void launchSlackReadWrite(boolean useHzCloud, Object projectName,
+            HazelcastInstance hazelcastInstance, Properties properties) {
+
+        try {
+            UtilsSlackSQLJob.submitJob(hazelcastInstance,
+                    projectName == null ? "" : projectName.toString());
+        } catch (Exception e) {
+            LOGGER.error("launchNeededJobs:" + UtilsSlackSQLJob.class.getSimpleName(), e);
+        }
+
+        // Slack alerting (writing), indirectly uses common utils
+        if (useHzCloud) {
+            //TODO Fix once supported by HZ Cloud
+            LOGGER.error("Slack is not currently supported on Hazelcast Cloud");
+        } else {
+            launchSlackJob(hazelcastInstance, properties);
+        }
+
+    }
+
+    /**
      * <p>Optional, but really cool, job for integration with Slack.
      * </p>
      * @param hazelcastInstance
@@ -544,7 +731,8 @@ public class CommonIdempotentInitialization {
             Pipeline pipelineAlertingToSlack = AlertingToSlack.buildPipeline(
                     properties.get(UtilsConstants.SLACK_ACCESS_TOKEN),
                     properties.get(UtilsConstants.SLACK_CHANNEL_NAME),
-                    properties.get(UtilsConstants.SLACK_PROJECT_NAME)
+                    properties.get(UtilsConstants.SLACK_PROJECT_NAME),
+                    properties.get(UtilsConstants.SLACK_BUILD_USER)
                     );
 
             JobConfig jobConfigAlertingToSlack = new JobConfig();
@@ -553,10 +741,101 @@ public class CommonIdempotentInitialization {
             jobConfigAlertingToSlack.addClass(AlertingToSlack.class);
             jobConfigAlertingToSlack.addClass(UtilsSlackSink.class);
 
-            UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToSlack, jobConfigAlertingToSlack);
+            LOGGER.info("Job - {}",
+                UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToSlack, jobConfigAlertingToSlack)
+            );
         } catch (Exception e) {
             LOGGER.error("launchNeededJobs:" + AlertingToSlack.class.getSimpleName(), e);
         }
     }
 
+    /**
+     * <p>Launch a job to read changes from Postgres (that you can make
+     * by directly connecting) into Hazelcast
+     * </p>
+     *
+     * @param hazelcastInstance
+     * @param properties
+     */
+    private static void launchPostgresCDC(HazelcastInstance hazelcastInstance,
+            Properties properties, String ourProjectProvenance) {
+        try {
+            Pipeline pipelinePostgresCDC = PostgresCDC.buildPipeline(
+                    Objects.toString(properties.get(MyConstants.POSTGRES_ADDRESS)),
+                    Objects.toString(properties.get(MyConstants.POSTGRES_DATABASE)),
+                    Objects.toString(properties.get(MyConstants.POSTGRES_SCHEMA)),
+                    Objects.toString(properties.get(MyConstants.POSTGRES_USER)),
+                    Objects.toString(properties.get(MyConstants.POSTGRES_PASSWORD)),
+                    hazelcastInstance.getConfig().getClusterName(),
+                    MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME,
+                    ourProjectProvenance
+                    );
+
+            JobConfig jobConfigPostgresCDC = new JobConfig();
+            jobConfigPostgresCDC.setName(PostgresCDC.class.getSimpleName());
+            jobConfigPostgresCDC.addClass(PostgresCDC.class);
+
+            LOGGER.info("Job - {}",
+                UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelinePostgresCDC, jobConfigPostgresCDC)
+            );
+        } catch (Exception e) {
+            LOGGER.error("launchNeededJobs:" + PostgresCDC.class.getSimpleName(), e);
+        }
+
+    }
+
+    private static void logStuff(HazelcastInstance hazelcastInstance) {
+        logJobs(hazelcastInstance);
+        logMaps(hazelcastInstance);
+    }
+
+    /**
+     * <p>Confirm the running jobs to the console.
+     * </p>
+     */
+    private static void logJobs(HazelcastInstance hazelcastInstance) {
+        LOGGER.info("~_~_~_~_~");
+        LOGGER.info("logJobs()");
+        LOGGER.info("---------");
+        hazelcastInstance.getJet().getJobs().forEach(job -> {
+            LOGGER.info("Job name '{}', id {}, status {}, submission {} ({})",
+                    Objects.toString(job.getName()), job.getId(), job.getStatus(),
+                    job.getSubmissionTime(), new Date(job.getSubmissionTime()));
+            try {
+                JobConfig jobConfig = job.getConfig();
+                Object originalSql =
+                        jobConfig.getArgument(JobConfigArguments.KEY_SQL_QUERY_TEXT);
+                if (originalSql != null) {
+                    LOGGER.info(" Original SQL: {}", originalSql);
+                }
+            } catch (Exception e) {
+                LOGGER.info("JobConfig", e);
+            }
+        });
+        LOGGER.info("---------");
+        LOGGER.info("~_~_~_~_~");
+    }
+
+    /**
+     * <p>Confirm the maps sizes to the console.
+     * </p>
+     */
+    private static void logMaps(HazelcastInstance hazelcastInstance) {
+        Set<String> iMapNames = hazelcastInstance.getDistributedObjects()
+                .stream()
+                .filter(distributedObject -> distributedObject instanceof IMap)
+                .filter(distributedObject -> !distributedObject.getName().startsWith("__"))
+                .map(distributedObject -> distributedObject.getName())
+                .collect(Collectors.toCollection(TreeSet::new));
+
+        LOGGER.info("~_~_~_~_~");
+        LOGGER.info("logMaps()");
+        LOGGER.info("---------");
+        for (String iMapName : iMapNames) {
+            LOGGER.info("IMap: name '{}', size {}",
+                    iMapName, hazelcastInstance.getMap(iMapName).size());
+        }
+        LOGGER.info("---------");
+        LOGGER.info("~_~_~_~_~");
+    }
 }
