@@ -126,7 +126,7 @@ class Downloads extends Component {
     
     getData(){
 		//console.log('downloads.js','getData');
-        setImmediate(() => {
+        setTimeout(() => {
 	    	var client = rest.wrap(mime);
 	    	var self = this;
 	    	
@@ -177,7 +177,7 @@ class Downloads extends Component {
 	        			});
 	        	
 	    	});
-        })
+        }, 0)
       }
 
     componentDidMount(){

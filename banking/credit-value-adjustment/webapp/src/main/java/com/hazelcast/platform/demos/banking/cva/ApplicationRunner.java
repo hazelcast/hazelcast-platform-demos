@@ -71,11 +71,14 @@ public class ApplicationRunner implements CommandLineRunner {
 
         Map<Long, JobStatus> currentState;
         Map<Long, JobStatus> previousState = new TreeMap<>(Collections.reverseOrder());
+        Tuple2<HazelcastJsonValue, JobStatus> dummyMessage = Tuple2.tuple2(this.jobToJson(null), JobStatus.NOT_RUNNING);
 
         while (true) {
             try {
                 // Checkstyle thinks the below is more obvious than "TimeUnit.SECONDS.sleep(5)"
                 TimeUnit.SECONDS.sleep(FIVE);
+                // Nudge page to refresh even when nothing happening
+                jobStateTopic.publish(dummyMessage);
 
                 currentState = this.hazelcastInstance.getJet().getJobs()
                         .stream()
@@ -146,11 +149,18 @@ public class ApplicationRunner implements CommandLineRunner {
 
         stringBuilder.append("{ ");
 
+        stringBuilder.append(" \"dummy\": " + (job == null));
+
         if (job != null) {
-            stringBuilder.append("\"id\": \"" + job.getId() + "\"");
+            stringBuilder.append(", \"id\": \"" + job.getId() + "\"");
             stringBuilder.append(", \"name\": \"" + (job.getName() == null ? "" : job.getName()) + "\"");
             stringBuilder.append(", \"status\": \"" + job.getStatus() + "\"");
             stringBuilder.append(", \"submission_time\": \"" + job.getSubmissionTime() + "\"");
+        } else {
+            stringBuilder.append(", \"id\": \"\"");
+            stringBuilder.append(", \"name\": \"\"");
+            stringBuilder.append(", \"status\": \"\"");
+            stringBuilder.append(", \"submission_time\": \"\"");
         }
 
         stringBuilder.append(" }");

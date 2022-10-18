@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.banking</groupId>
 		<artifactId>banking-root</artifactId>
-		<version>5.1</version>
+		<version>5.2</version>
 	</parent>
 
 	<groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
@@ -21,38 +21,36 @@
 		<!-- TMP Java 17 not yet supported in Cloud -->
 		<java.version>11</java.version>
 
-		<docker.image.prefix>trade-monitor</docker.image.prefix>
+		<my.docker.image.prefix>trade-monitor</my.docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
-		<my.cluster1.name>grid</my.cluster1.name>
+		<my.cluster1.name>grid1</my.cluster1.name>
+		<my.cluster2.name>grid2</my.cluster2.name>
 		<my.pulsar.or.kafka>pulsar</my.pulsar.or.kafka>
 		<my.pulsar.or.kafka>kafka</my.pulsar.or.kafka>
-		<!-- Configure the build for HZ Cloud or all Kubernetes -->
-		<use.hz-cloud>false</use.hz-cloud>
 
 		<!-- Project specific versions -->
 		<javalin.version>3.13.0</javalin.version>
 		<!--  Kafka Clients must match cloud target -->
 		<kafka-clients.version>2.2.2</kafka-clients.version>
-		<spring-boot.version>2.5.1</spring-boot.version>
-
-		<!-- Common logons for Management Center, Grafana, Prometheus -->
-		<my.other.admin.user>admin</my.other.admin.user>
-		<my.other.admin.password>password1</my.other.admin.password>
 
 		<!-- From ~/.m2/settings.xml. If token set, use cloud. Name not used unless token set -->
 		<hz.cloud.cluster1.discovery.token>${my.hz.cloud.cluster1.discovery.token}</hz.cloud.cluster1.discovery.token>
 		<hz.cloud.cluster1.name>${my.hz.cloud.cluster1.name}</hz.cloud.cluster1.name>
+		<hz.cloud.cluster1.password>${my.hz.cloud.cluster1.password}</hz.cloud.cluster1.password>
 
 		<!-- So Grafana can find Prometheus service, must match K8S YAML -->
-		<my.prometheus.name>${docker.image.prefix}-prometheus</my.prometheus.name>
+		<my.prometheus.name>${my.docker.image.prefix}-prometheus</my.prometheus.name>
 		<my.prometheus.port>9090</my.prometheus.port>
-		<my.management.center.name>${docker.image.prefix}-management-center</my.management.center.name>
+		<my.management.center.name>${my.docker.image.prefix}-management-center</my.management.center.name>
 	</properties>
 
 	<modules>
+		<module>abstract-hazelcast-node</module>
 		<module>custom-classes</module>
 		<module>common</module>
 		<module>hazelcast-node</module>
+		<module>hazelcast-node-enterprise-1</module>
+		<module>hazelcast-node-enterprise-2</module>
 		<module>trade-producer</module>
 		<module>webapp</module>
 		<module>remote-job-sub-1</module>
@@ -60,8 +58,13 @@
 		<module>kafka-broker</module>
 		<module>kafdrop</module>
 		<module>topic-create</module>
+		<!--
+		<module>finos-nodejs</module>
+		<module>finos-python</module>
+		-->
 		<module>management-center</module>
 		<module>prometheus</module>
+		<module>postgres</module>
 		<module>grafana</module>
 		<module>pulsar</module>
 	</modules>

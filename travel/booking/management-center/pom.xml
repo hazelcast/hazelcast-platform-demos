@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.travel.booking</groupId>
 		<artifactId>booking-root</artifactId>
-		<version>5.1</version>
+		<version>5.2</version>
 	</parent>
 
 	<artifactId>booking-management-center</artifactId>
@@ -15,15 +15,15 @@
 	<description>Travel Booking - Re-package Management Center</description>
 
 	<properties>
-		<docker.image.name>management-center</docker.image.name>
+		<my.docker.image.name>management-center</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

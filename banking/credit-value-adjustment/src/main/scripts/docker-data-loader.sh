@@ -25,7 +25,7 @@ docker container prune --force > /dev/null 2>&1
 
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
-CMD="docker run -e MY_KUBERNETES_ENABLED=false -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP} --rm ${DOCKER_IMAGE} $@"
+CMD="docker run -e MY_KUBERNETES_ENABLED=false -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP} --rm --network=${PROJECT} ${DOCKER_IMAGE} $@"
 #echo $CMD
 
 $CMD

@@ -25,7 +25,21 @@ import java.util.List;
 public class MyConstants {
 
     public static final String KAFKA_TOPIC_MAPPING_PREFIX = "";
+    public static final String KAFKA_TOPIC_NAME_ALERTS = "kf_alerts";
     public static final String KAFKA_TOPIC_NAME_TRADES = "kf_trades";
+    public static final String POSTGRES_CONFIG_KEY = "my.postgres.address";
+    public static final String POSTGRES_ADDRESS = "my.postgres.address";
+    public static final String POSTGRES_DATABASE = "my.postgres.db";
+    public static final String POSTGRES_SCHEMA = "my.postgres.schema";
+    public static final String POSTGRES_USER = "my.postgres.user";
+    public static final String POSTGRES_PASSWORD = "my.postgres.password";
+    // Table name should match "init.sql" in Postgres module.
+    public static final String POSTGRES_TABLE_NAME = "alerts_max_volume";
+    public static final String POSTGRES_TABLE_KEY_NAME = "now";
+    public static final String PROJECT_MODULE = "my.project.module";
+    public static final String PROJECT_NAME = "my.project.name";
+    // Label used on MapStore saved, so can later identify change soure
+    public static final String PROJECT_PROVENANCE = PROJECT_NAME;
     public static final String PULSAR_CONFIG_KEY = "my.pulsar.list";
     public static final String PULSAR_TOPIC_NAME_TRADES = "pulsar_trades";
     public static final String PULSAR_OR_KAFKA_KEY = "my.pulsar.or.kafka";
@@ -33,8 +47,10 @@ public class MyConstants {
 
     public static final String IMAP_NAME_AGGREGATE_QUERY_RESULTS = "AggregateQuery" + "_results";
     public static final String IMAP_NAME_ALERTS_MAX_VOLUME = "alertsMaxVolume";
+    public static final String IMAP_NAME_AUDIT_LOG = "audit_log";
     public static final String IMAP_NAME_JOB_CONTROL = "job_control";
     public static final String IMAP_NAME_JOB_CONFIG = "job_config";
+    public static final String IMAP_NAME_PORTFOLIOS = "portfolios";
     public static final String IMAP_NAME_PYTHON_SENTIMENT = "python_sentiment";
     public static final String IMAP_NAME_SYMBOLS = "symbols";
     public static final String IMAP_NAME_TRADES = "trades";
@@ -42,13 +58,29 @@ public class MyConstants {
     public static final List<String> IMAP_NAMES =
             List.of(IMAP_NAME_AGGREGATE_QUERY_RESULTS, IMAP_NAME_ALERTS_MAX_VOLUME,
                     IMAP_NAME_JOB_CONTROL, IMAP_NAME_JOB_CONFIG,
-                    IMAP_NAME_PYTHON_SENTIMENT,
+                    IMAP_NAME_PORTFOLIOS, IMAP_NAME_PYTHON_SENTIMENT,
                     IMAP_NAME_SYMBOLS, IMAP_NAME_TRADES);
+
+    // Maps that are replicated over WAN in enterprise only. Avoid clashing with
+    // CommonIdempotentInitialization.java configures some maps with map stores and journals
+    public static final List<String> WAN_IMAP_NAMES =
+            List.of(IMAP_NAME_AUDIT_LOG, IMAP_NAME_JOB_CONFIG, IMAP_NAME_SYMBOLS);
 
     public static final String WEBSOCKET_PATH_TRADES = "/trades";
 
     // For demonstration of queries
+    public static final String SQL_JOB_NAME_KAFKA_TO_IMAP = "kafka2IMap";
     public static final int SQL_RESULT_THRESHOLD = 10;
     // For SQL VIEW naming
     public static final String VIEW_SUFFIX = "_VIEW";
+
+    // For exponential loggers
+    public static final int MAX_LOGGING_INTERVAL = 3_000;
+
+    //FIXME Update list of sample stocks
+    public static final List<String> SAMPLE_STOCKS =
+            List.of("AAPL", "MSFT", "GOOG", "JPM", "IBM", "TPL",
+                    "NDP", "PBA", "ESTE", "DWAC", "IBA", "MTRN",
+                    "LPI", "CVX", "EOG", "GHC", "FRPT", "EXPD"
+                    );
 }

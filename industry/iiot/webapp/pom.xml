@@ -6,7 +6,7 @@
         <parent>
                 <groupId>com.hazelcast.platform.demos.industry.iiot</groupId>
                 <artifactId>iiot-root</artifactId>
-                <version>5.1</version>
+                <version>5.2</version>
         </parent>
 
         <artifactId>iiot-webapp</artifactId>
@@ -15,8 +15,8 @@
 	<description>Web client of Hazelcast cloud cluster</description>
 
 	<properties>
-		<docker.image.name>webapp</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<my.docker.image.name>webapp</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 
 		<!-- For src/main/resources/templates/fragments.html -->
@@ -24,8 +24,6 @@
 
 		<!-- React.js app in src/main/app -->
 		<frontend.app.dir>${project.basedir}/src/main/app</frontend.app.dir>
-		<node.version>v16.13.0</node.version>
-		<npm.version>8.1.0</npm.version>
 	</properties>
 
 	<dependencies>
@@ -119,8 +117,8 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

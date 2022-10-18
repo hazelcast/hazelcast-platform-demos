@@ -34,7 +34,7 @@ hazelcast:
         enabled: false
       kubernetes:
         enabled: true
-        service-dns: '@docker.image.prefix@-@my.cluster.name@-hazelcast.default.svc.cluster.local'
+        service-dns: '@my.docker.image.prefix@-@my.cluster.name@-hazelcast.default.svc.cluster.local'
     rest-api:
       enabled: true
       endpoint-groups:
@@ -53,6 +53,5 @@ hazelcast:
   jet:
     enabled: true
     resource-upload-enabled: true
-    instance:
-      # 'true' requires Enterprise (which this demo has) and persistence enabled (which isn't used in this demo)
-      lossless-restart-enabled: false
+    # 'true' requires Enterprise (which this demo has) and persistence enabled (which isn't used in this demo)
+    lossless-restart-enabled: false

@@ -1,4 +1,4 @@
-FROM grafana/grafana:8.2.2
+FROM --platform=linux/amd64 grafana/grafana:9.1.8
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MY_ADMINUSER
@@ -15,6 +15,6 @@ ENV GF_SECURITY_ADMIN_USER=$MY_ADMINUSER
 ENV GF_SECURITY_ADMIN_PASSWORD=$MY_ADMINPASSWORD
 
 # Change homepage in $GF_PATHS_CONFIG, remove leading semicolong
-RUN sed 's#;default_home_dashboard_path =#default_home_dashboard_path = /etc/grafana/provisioning/dashboards/general/hazelcast-default_rev1.json#' \
+RUN sed 's#;default_home_dashboard_path =#default_home_dashboard_path = /etc/grafana/provisioning/dashboards/general/myhome.json#' \
  /etc/grafana/grafana.ini > /tmp/grafana.ini 
 ENV GF_PATHS_CONFIG=/tmp/grafana.ini

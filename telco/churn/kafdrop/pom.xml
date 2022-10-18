@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.telco.churn</groupId>
 		<artifactId>churn-root</artifactId>
-		<version>5.1</version>
+		<version>5.2</version>
 	</parent>
 
 	<artifactId>churn-kafdrop</artifactId>
@@ -15,7 +15,7 @@
 	<description>Telco Churn - Re-package Kafdrop</description>
 
 	<properties>
-		<docker.image.name>kafdrop</docker.image.name>
+		<my.docker.image.name>kafdrop</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 
@@ -29,8 +29,8 @@
 
 		<plugins>
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

@@ -1,0 +1,34 @@
+:root {
+        --hazelcast-blue: #012168;
+        --hazelcast-blue-dark: #0b2a35;
+        --hazelcast-blue-light: #2e7de1;
+        --hazelcast-orange: #ff5f00;
+}
+
+body {
+    background: Black;
+}
+
+h1 {
+    text-align: center;
+}
+h2, h3, h4, h5 {
+    text-align: center;
+}
+
+.headerfooter {
+    color: var(--hazelcast-blue-light);
+    font-family: "Courier New", Courier, monospace;
+    font-size: 80%;
+    text-align: center;
+}
+.headerfooterline {
+    color: var(--hazelcast-orange);
+}
+
+.major_pane {
+    background: white;
+    border-style: solid;
+    border-color: var(--hazelcast-orange);
+    padding: 5px 5px 5px 5px;
+}

@@ -158,21 +158,23 @@ class Jobs extends Component {
     handleData(message) {
     	//console.log(message);
 
-    	let notAvailable = <div><i>"N/a"</i></div>;
-    	var nowStr = myISO8601(message.now);
-    	var jobKey = message.job.name.split('$')[0];
-    	var outputKey = message.job.name.split('$')[1];
-    	var submissionTimeStr = myISO8601(message.job.submission_time);
-    	var csv = notAvailable;
-    	var xls = notAvailable;
-    	if (jobKey == 'CvaStpJob' && message.job.status == 'COMPLETED') {
-    		var csvUrl = "/rest/download/cva_csv?key=" + outputKey;
-    		var xlsUrl = "/rest/download/cva_xlsx?key=" + outputKey;
-    		csv = <a href={csvUrl} download>Download</a>;
-    		xls = <a href={xlsUrl} download>Download</a>;
-    	}
+		if (!message.job.dummy) {
+	    	let notAvailable = <div><i>"N/a"</i></div>;
+    		var nowStr = myISO8601(message.now);
+    		var jobKey = message.job.name.split('$')[0];
+    		var outputKey = message.job.name.split('$')[1];
+    		var submissionTimeStr = myISO8601(message.job.submission_time);
+    		var csv = notAvailable;
+    		var xls = notAvailable;
+    		if (jobKey == 'CvaStpJob' && message.job.status == 'COMPLETED') {
+    			var csvUrl = "/rest/download/cva_csv?key=" + outputKey;
+    			var xlsUrl = "/rest/download/cva_xlsx?key=" + outputKey;
+    			csv = <a href={csvUrl} download>Download</a>;
+    			xls = <a href={xlsUrl} download>Download</a>;
+    		}
 
-        var job = {
+        	var job = {
+				dummy: message.job.dummy,
         		id: message.job.id,
         		name: message.job.name,
         		submission_time: submissionTimeStr,
@@ -182,27 +184,29 @@ class Jobs extends Component {
         		csv: csv,
         		xls: xls,
         		output_key: outputKey,
-        };
+	        };
 
-        // Append or replace
-    	var jobs = this.state.jobs;
-    	var row = -1;
-    	for (var i = 0; i < jobs.length; i++) { 
-    	    if (jobs[i].id == job.id) {
-    	    	row = i;
-    	    }
-    	}
-    	if (row < 0) {
-    		this.setState({
-    			jobs: update(this.state.jobs, {$push: [job]}) 
-    		})
-    	} else {
-    		if (this.state.jobs[row].status != job.status) {
-        		this.setState({
-        			jobs: update(this.state.jobs, {[row] : {$set: job}}) 
-        		})
-    		}
-    	}
+        	// Append or replace
+    		var jobs = this.state.jobs;
+    		var row = -1;
+    		for (var i = 0; i < jobs.length; i++) { 
+    	    	if (jobs[i].id == job.id) {
+    		    	row = i;
+    		    }
+	    	}
+
+			if (row < 0) {
+				this.setState({
+					jobs: update(this.state.jobs, {$push: [job]}) 
+				})
+			} else {
+				if (this.state.jobs[row].status != job.status) {
+					this.setState({
+						jobs: update(this.state.jobs, {[row] : {$set: job}}) 
+					})
+				}
+			}
+		}
     }
     
     render() {
