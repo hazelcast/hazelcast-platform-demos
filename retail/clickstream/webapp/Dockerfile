@@ -24,6 +24,7 @@ ARG JAR_FILE
 COPY target/${JAR_FILE} application.jar
 
 # Default values provided
+ENV HOST_IP ""
 ENV MY_KUBERNETES_ENABLED "true"
 
 # Preconfigure cluster connections
