@@ -104,7 +104,10 @@ public class ApplicationConfig {
         this.addWan(config, publisher, remoteClusterName, remoteClusterMembers);
 
         // Select disk directory for saving data
+        //FIXME https://github.com/hazelcast/hazelcast/issues/22578 https://github.com/hazelcast/hazelcast/issues/22609
+        if ("".equals(System.getProperty("user.name"))) {
         this.addPersistence(config);
+        }
 
         // Non-default configuration for selected maps.
         this.setMapsForJournalWanAndPersistence(config, myMapStoreFactory, publisher, true);

@@ -78,7 +78,7 @@ If you plan to use the Slack integration in some modules, you will also need thr
 
 If building Docker images (activated by `mvn install -Prelease`), not all properties are needed.
 
-For example, `my.hz.cloud.cluster1.discovery.token` can be set, omitted but not null. (docker-maven-plugin)[https://dmp.fabric8.io/]
+For example, `my.hz.cloud.cluster1.discovery.token` can be set, omitted but not null. [docker-maven-plugin](https://dmp.fabric8.io/)
 rejects empty string as a null value.
 
 So do not have this in your `settings.xml`:
