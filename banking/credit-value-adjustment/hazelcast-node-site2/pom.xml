@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.banking.cva</groupId>
 		<artifactId>cva-root</artifactId>
-		<version>5.2</version>
+		<version>5.3</version>
 	</parent>
 
 	<artifactId>cva-hazelcast-node-site2</artifactId>
