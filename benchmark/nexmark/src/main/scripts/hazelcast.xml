@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hazelcast xmlns="http://www.hazelcast.com/schema/config"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.hazelcast.com/schema/config
+           http://www.hazelcast.com/schema/config/hazelcast-config-5.2.xsd">
+
+    <cluster-name>nexmark</cluster-name>
+    
+    <properties>
+        <property name="hazelcast.health.monitoring.level">OFF</property>
+        <property name="hazelcast.partition.count">${my.partitions}</property>
+    </properties>
+
+    <network>
+        <join>
+            <auto-detection enabled="false"/>
+            <multicast enabled="false"/>
+            <tcp-ip enabled="true">
+                <member-list>
+                    <member>${host.ip}</member>
+                </member-list>
+            </tcp-ip>
+        </join>
+    </network>
+
+    <jet enabled="true" resource-upload-enabled="true">
+        <cooperative-thread-count>${my.cooperative.thread.count}</cooperative-thread-count>
+    </jet>
+
+</hazelcast>

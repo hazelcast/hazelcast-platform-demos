@@ -25,12 +25,12 @@ import org.slf4j.LoggerFactory;
 import com.hazelcast.cluster.Address;
 import com.hazelcast.function.FunctionEx;
 import com.hazelcast.jet.pipeline.Pipeline;
-import com.hazelcast.jet.pipeline.Sink;
-import com.hazelcast.jet.pipeline.SinkBuilder;
 import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.pipeline.SourceBuilder;
 import com.hazelcast.jet.pipeline.StreamSource;
 import com.hazelcast.jet.pipeline.StreamStage;
+import com.hazelcast.platform.demos.utils.UtilsConstants;
+import com.hazelcast.platform.demos.utils.UtilsSlackSink;
 import com.hazelcast.topic.ITopic;
 
 /**
@@ -107,10 +107,12 @@ public class TopicToSlack {
             readAndMap
             .writeTo(Sinks.logger());
         } else {
+            String accessToken = properties.getProperty(MyConstants.SLACK_ACCESS_TOKEN);
+            String buildUser = properties.getProperty(UtilsConstants.SLACK_BUILD_USER);
             String channel = properties.getProperty(MyConstants.SLACK_CHANNEL_NAME);
 
             readAndMap
-            .writeTo(TopicToSlack.mySlackChannel(channel, properties, projectName));
+            .writeTo(UtilsSlackSink.slackSink(accessToken, channel, projectName, buildUser));
         }
 
         return pipeline;
@@ -150,31 +152,10 @@ public class TopicToSlack {
             String cleanStr = str.replaceAll("\"", "'");
 
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put(SlackConstants.PARAM_TEXT, cleanStr);
+            jsonObject.put(UtilsConstants.SLACK_PARAM_TEXT, cleanStr);
 
             return jsonObject;
         };
     }
 
-    /**
-     * <p>Create a sink that makes REST calls to write a JSON message to Slack's API.
-     * </p>
-     *
-     * @param channel Used to name the job stage
-     * @param properties To pass to the Sink builder
-     * @param projectName To identify the sender
-     * @return
-     */
-    private static Sink<JSONObject> mySlackChannel(String channel, Properties properties, String projectName) {
-        return SinkBuilder.sinkBuilder(
-                    "slackSink-" + channel,
-                    context -> new MySlackSink(properties, projectName)
-                )
-                .receiveFn(
-                        (MySlackSink mySlackSink, JSONObject item) -> mySlackSink.receiveFn(item)
-                        )
-                .destroyFn(mySlackSink -> mySlackSink.destroyFn())
-                .preferredLocalParallelism(1)
-                .build();
-    }
 }

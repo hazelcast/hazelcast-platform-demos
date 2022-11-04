@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+        <parent>
+                <groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
+                <artifactId>trade-monitor-root</artifactId>
+                <version>5.2</version>
+        </parent>
+
+        <artifactId>trade-monitor-postgres</artifactId>
+
+        <name>Hazelcast Platform - Trade Monitor - Postgres</name>
+        <description>Trade Monitor - Postgres</description>
+
+	<properties>
+		<my.docker.image.name>postgres</my.docker.image.name>
+		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
+	</properties>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

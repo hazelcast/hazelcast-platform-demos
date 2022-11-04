@@ -1,4 +1,4 @@
-FROM library/openjdk:17-slim
+FROM --platform=linux/amd64 library/openjdk:17-slim
 
 # Maven compiled target
 ARG JAR_FILE
@@ -11,4 +11,16 @@ ENV MY_PULSAR_LIST "0.0.0.0"
 ENV JAVA_ARGS ""
 ENV JAVA_OPTS "--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
 
-ENTRYPOINT exec java $JAVA_ARGS $JAVA_OPTS -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS -Dmy.pulsar.list=$MY_PULSAR_LIST -jar application.jar
+CMD ["bash", "-c", "set -euo pipefail \
+      && echo @@@@@@@@@@ \
+      && echo arch \
+      && arch \
+      && echo @@@@@@@@@@ \
+      && echo java --version \
+      && java --version \
+      && echo @@@@@@@@@@ \
+      && echo @@@@@@@@@@ \
+      && echo java $JAVA_ARGS $JAVA_OPTS -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS -Dmy.pulsar.list=$MY_PULSAR_LIST -jar application.jar \
+      && java $JAVA_ARGS $JAVA_OPTS -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS -Dmy.pulsar.list=$MY_PULSAR_LIST -jar application.jar \
+     "]
+

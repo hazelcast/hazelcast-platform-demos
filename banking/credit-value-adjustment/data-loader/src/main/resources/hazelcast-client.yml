@@ -1,9 +1,8 @@
 hazelcast-client:
   # Replaced by Maven
   instance-name: '@project.artifactId@'
-  properties:
-    hazelcast.client.statistics.enabled: true
   network:
     # Default, but make it obvious loader can multiplex
     smart-routing: true
- 
+  metrics:
+    enabled: true

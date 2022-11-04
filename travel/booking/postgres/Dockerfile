@@ -1,4 +1,4 @@
-FROM postgres:13.2
+FROM postgres:14.3
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MY_OTHERUSER

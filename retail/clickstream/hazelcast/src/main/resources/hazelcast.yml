@@ -7,6 +7,8 @@ hazelcast:
   properties:
     # Graceful shutdown is helpful for Kubernetes scale-down.
     hazelcast.member.naming.moby.enabled: true
+    # For Kubernetes, see https://github.com/hazelcast/hazelcast/issues/22577
+    hazelcast.persistence.auto.cluster.state: false
     hazelcast.shutdownhook.policy: GRACEFUL
 
   # Assuming Kubernetes, but override from Java code if we detect otherwise

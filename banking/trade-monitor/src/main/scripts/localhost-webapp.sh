@@ -18,11 +18,13 @@ then
  exit 1
 fi
 
-JAR_FILE=${PROJECT}-${MODULE}-5.1-jar-with-dependencies.jar
+JAR_FILE=${PROJECT}-${MODULE}-5.2-jar-with-dependencies.jar
 
 JAVA_ARGS="-Dmy.kubernetes.enabled=false"
 JAVA_ARGS="${JAVA_ARGS} -Dhazelcast.local.publicAddress=${HOST_IP}"
 JAVA_ARGS="${JAVA_ARGS} -Dmy.bootstrap.servers=${HOST_IP}:9092,${HOST_IP}:9093,${HOST_IP}:9094"
+JAVA_ARGS="${JAVA_ARGS} -Dmy.docker.enabled=false"
+JAVA_ARGS="${JAVA_ARGS} -Dmy.postgres.address=${HOST_IP}:5432"
 JAVA_ARGS="${JAVA_ARGS} -Dmy.pulsar.list=${HOST_IP}:6650"
 
 JAVA_OPTS="--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"

@@ -64,9 +64,16 @@ public class Application {
      * @param hazelcastInstance
      * @return
      */
-    private static Properties buildKafkaProperties(HazelcastInstance hazelcastInstance) {
+    private static Properties buildKafkaProperties(HazelcastInstance hazelcastInstance) throws Exception {
         IMap<String, String> kafkaConfigMap =
                 hazelcastInstance.getMap(MyConstants.IMAP_NAME_JOB_CONFIG);
+
+        if (kafkaConfigMap.isEmpty()) {
+            String message = String.format("Map '%s' is empty, run WEBAPP to load",
+                    kafkaConfigMap.getName());
+            System.err.println(message);
+            throw new RuntimeException(message);
+        }
 
         Properties properties = new Properties();
 

@@ -8,54 +8,83 @@
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
         "type": "dashboard"
       }
     ]
   },
   "description": "Map statistics for CVA clusters",
   "editable": true,
+  "fiscalYearStartMonth": 0,
   "gnetId": null,
   "graphTooltip": 0,
-  "hideControls": false,
-  "id": null,
+  "id": 1,
   "links": [],
-  "refresh": "5s",
-  "rows": [
+  "liveNow": false,
+  "panels": [
     {
-      "collapse": false,
-      "height": 350,
-      "panels": [
-        {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": "Prometheus",
-          "description": "IMap \"cva_trades\" in both clusters",
-          "fill": 1,
-          "id": 1,
-          "legend": {
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 1,
-          "links": [],
-          "nullPointMode": "null",
-          "percentage": false,
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "span": 4,
-          "stack": false,
-          "steppedLine": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 7,
+      "options": {
+        "content": "<center><img src=\"https://hazelcast.com/brand-assets/files/hazelcast-horz-flat-rev-sm.png\" width=\"200\" height=\"42\"></img></center>\n",
+        "mode": "html"
+      },
+      "pluginVersion": "8.2.2",
+      "type": "text"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
+      "description": "IMap \"cva_trades\" in both clusters",
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 8,
+        "x": 0,
+        "y": 3
+      },
+      "hiddenSeries": false,
+      "id": 1,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.2.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
       "targets": [
         {
           "exemplar": true,
@@ -74,73 +103,89 @@
           "target": "alias(max(hz_map_ownedEntryCount{mc_cluster='site2',name='cva_trades'}), 'site2.size')"
         }
       ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "\"cva_trades\" map size",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": "0",
-              "show": true
-            },
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": "0",
-              "show": true
-            }
-          ]
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "\"cva_trades\" map size",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": "0",
+          "show": true
         },
         {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": "Prometheus",
-          "description": "IMap \"cva_trades\" in both clusters",
-          "fill": 1,
-          "id": 2,
-          "legend": {
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 1,
-          "links": [],
-          "nullPointMode": "null",
-          "percentage": false,
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "span": 4,
-          "stack": false,
-          "steppedLine": false,
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": "0",
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
+      "description": "IMap \"cva_trades\" in both clusters",
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 8,
+        "x": 8,
+        "y": 3
+      },
+      "hiddenSeries": false,
+      "id": 2,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.2.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
       "targets": [
         {
           "exemplar": true,
@@ -168,96 +213,128 @@
         },
         {
           "exemplar": true,
+          "expr": "max(hz_map_setCount{mc_cluster='site1',name='cva_trades'})",
+          "interval": "",
+          "legendFormat": "site1.sets",
+          "refId": "D",
+          "target": "alias(max(hz_map_setCount{mc_cluster='site1',name='cva_trades'}), 'site1.sets')"
+        },
+        {
+          "exemplar": true,
           "expr": "max(hz_map_getCount{mc_cluster='site2',name='cva_trades'})",
           "interval": "",
           "legendFormat": "site2.reads",
-          "refId": "D",
+          "refId": "E",
           "target": "alias(max(hz_map_getCount{mc_cluster='site2',name='cva_trades'}), 'site2.reads')"
         },
         {
           "exemplar": true,
           "expr": "max(hz_map_putCount{mc_cluster='site2',name='cva_trades'})",
           "interval": "",
-          "legendFormat": "site2.writes",
-          "refId": "E",
-          "target": "alias(max(hz_map_putCount{mc_cluster='site2',name='cva_trades'}), 'site2.writes')"
+          "legendFormat": "site2.puts",
+          "refId": "F",
+          "target": "alias(max(hz_map_putCount{mc_cluster='site2',name='cva_trades'}), 'site2.puts')"
         },
         {
           "exemplar": true,
           "expr": "max(hz_map_removeCount{mc_cluster='site2',name='cva_trades'})",
           "interval": "",
           "legendFormat": "site2.deletes",
-          "refId": "F",
+          "refId": "G",
           "target": "alias(max(hz_map_removeCount{mc_cluster='site2',name='cva_trades'}), 'site2.deletes')"
-        }	
-      ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "\"cva_trades\" map usage",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": "0",
-              "show": true
-            },
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": "0",
-              "show": true
-            }
-          ]
         },
         {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": "Prometheus",
-          "description": "IMap \"cva_cp_cds\" in both clusters",
-          "fill": 1,
-          "id": 3,
-          "legend": {
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 1,
-          "links": [],
-          "nullPointMode": "null",
-          "percentage": true,
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "span": 4,
-          "stack": false,
-          "steppedLine": false,
+          "exemplar": true,
+          "expr": "max(hz_map_setCount{mc_cluster='site2',name='cva_trades'})",
+          "interval": "",
+          "legendFormat": "site2.sets",
+          "refId": "G",
+          "target": "alias(max(hz_map_setCount{mc_cluster='site2',name='cva_trades'}), 'site2.sets')"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "\"cva_trades\" map usage",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": "0",
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": "0",
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
+      "description": "IMap \"cva_cp_cds\" in both clusters",
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 8,
+        "x": 16,
+        "y": 3
+      },
+      "hiddenSeries": false,
+      "id": 3,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": true,
+      "pluginVersion": "8.2.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
       "targets": [
         {
           "exemplar": true,
@@ -276,85 +353,89 @@
           "target": "alias(site2.GrafanaGlobalMetricsJob.map.cva_cp_cds.near_cache_percent, 'site2.near_cache_percent')"
         }
       ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "\"cva_cp_cds\" map near-cache %age",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": "100",
-              "min": "0",
-              "show": true
-            },
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": "100",
-              "min": "0",
-              "show": true
-            }
-          ]
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "\"cva_cp_cds\" map near-cache %age",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": "100",
+          "min": "0",
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": "100",
+          "min": "0",
+          "show": true
         }
       ],
-      "repeat": null,
-      "repeatIteration": null,
-      "repeatRowId": null,
-      "showTitle": false,
-      "title": "IMap \"cva_cp_cds\" & \"cva_trades\"",
-      "titleSize": "h6"
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     },
     {
-      "collapse": false,
-      "height": 350,
-      "panels": [
-        {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": "Prometheus",
-          "description": "IMap \"cva_ircurves\" in both clusters",
-          "fill": 1,
-          "id": 4,
-          "legend": {
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 1,
-          "links": [],
-          "nullPointMode": "null",
-          "percentage": false,
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "span": 4,
-          "stack": false,
-          "steppedLine": false,
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
+      "description": "IMap \"cva_ircurves\" in both clusters",
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 8,
+        "x": 0,
+        "y": 13
+      },
+      "hiddenSeries": false,
+      "id": 4,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.2.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
       "targets": [
         {
           "exemplar": true,
@@ -373,89 +454,105 @@
           "target": "alias(max(hz_map_ownedEntryCount{mc_cluster='site2',name='cva_ircurves'}), 'site2.size')"
         }
       ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "\"cva_ircurves\" map size",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": "0",
-              "show": true
-            },
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": "0",
-              "show": true
-            }
-          ]
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "\"cva_ircurves\" map size",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": "0",
+          "show": true
         },
         {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": "Prometheus",
-          "description": "IMap \"cva_ircurves\" in both clusters",
-          "fill": 1,
-          "id": 5,
-          "legend": {
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 1,
-          "links": [],
-          "nullPointMode": "null",
-          "percentage": false,
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "span": 4,
-          "stack": false,
-          "steppedLine": false,
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": "0",
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
+      "description": "IMap \"cva_ircurves\" in both clusters",
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 8,
+        "x": 8,
+        "y": 13
+      },
+      "hiddenSeries": false,
+      "id": 5,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.2.2",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
       "targets": [
         {
           "exemplar": true,
           "expr": "max(hz_map_getCount{mc_cluster='site1',name='cva_ircurves'})",
           "interval": "",
-          "legendFormat": "site1.reads",
+          "legendFormat": "site1.gets",
           "refId": "A",
-          "target": "alias(max(hz_map_getCount{mc_cluster='site1',name='cva_ircurves'}), 'site1.reads')"
+          "target": "alias(max(hz_map_getCount{mc_cluster='site1',name='cva_ircurves'}), 'site1.gets')"
         },
         {
           "exemplar": true,
           "expr": "max(hz_map_putCount{mc_cluster='site1',name='cva_ircurves'})",
           "interval": "",
-          "legendFormat": "site1.writes",
+          "legendFormat": "site1.puts",
           "refId": "B",
-          "target": "alias(max(hz_map_putCount{mc_cluster='site1',name='cva_ircurves'}), 'site1.writes')"
+          "target": "alias(max(hz_map_putCount{mc_cluster='site1',name='cva_ircurves'}), 'site1.puts')"
         },
         {
           "exemplar": true,
@@ -467,75 +564,89 @@
         },
         {
           "exemplar": true,
+          "expr": "max(hz_map_setCount{mc_cluster='site1',name='cva_ircurves'})",
+          "interval": "",
+          "legendFormat": "site1.sets",
+          "refId": "D",
+          "target": "alias(max(hz_map_setCount{mc_cluster='site1',name='cva_ircurves'}), 'site1.sets')"
+        },
+        {
+          "exemplar": true,
           "expr": "max(hz_map_getCount{mc_cluster='site2',name='cva_ircurves'})",
           "interval": "",
-          "legendFormat": "site2.reads",
-          "refId": "D",
-          "target": "alias(max(hz_map_getCount{mc_cluster='site2',name='cva_ircurves'}), 'site2.reads')"
+          "legendFormat": "site2.gets",
+          "refId": "E",
+          "target": "alias(max(hz_map_getCount{mc_cluster='site2',name='cva_ircurves'}), 'site2.gets')"
         },
         {
           "exemplar": true,
           "expr": "max(hz_map_putCount{mc_cluster='site2',name='cva_ircurves'})",
           "interval": "",
-          "legendFormat": "site2.writes",
-          "refId": "E",
-          "target": "alias(max(hz_map_putCount{mc_cluster='site2',name='cva_ircurves'}), 'site2.writes')"
+          "legendFormat": "site2.puts",
+          "refId": "F",
+          "target": "alias(max(hz_map_putCount{mc_cluster='site2',name='cva_ircurves'}), 'site2.puts')"
         },
         {
           "exemplar": true,
           "expr": "max(hz_map_removeCount{mc_cluster='site2',name='cva_ircurves'})",
           "interval": "",
           "legendFormat": "site2.deletes",
-          "refId": "F",
+          "refId": "G",
           "target": "alias(max(hz_map_removeCount{mc_cluster='site2',name='cva_ircurves'}), 'site2.deletes')"
-        }	
-      ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "\"cva_ircurves\" map usage",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": "0",
-              "show": true
-            },
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": "0",
-              "show": true
-            }
-          ]
+        },
+        {
+          "exemplar": true,
+          "expr": "max(hz_map_setCount{mc_cluster='site2',name='cva_ircurves'})",
+          "interval": "",
+          "legendFormat": "site2.sets",
+          "refId": "H",
+          "target": "alias(max(hz_map_setCount{mc_cluster='site2',name='cva_ircurves'}), 'site2.sets')"
         }
       ],
-      "repeat": null,
-      "repeatIteration": null,
-      "repeatRowId": null,
-      "showTitle": false,
-      "title": "IMap \"cva_ircurves\"",
-      "titleSize": "h6"
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "\"cva_ircurves\" map usage",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": "0",
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": "0",
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     }
   ],
-  "schemaVersion": 14,
+  "refresh": "5s",
+  "schemaVersion": 31,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -572,5 +683,6 @@
   },
   "timezone": "",
   "title": "CVA Map stats",
-  "version": 1
+  "uid": "OBJvVSPnz",
+  "version": 2
 }

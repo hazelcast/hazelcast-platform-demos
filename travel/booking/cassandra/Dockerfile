@@ -1,4 +1,4 @@
-FROM cassandra:4.0
+FROM cassandra:4.0.4
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MY_OTHERUSER
