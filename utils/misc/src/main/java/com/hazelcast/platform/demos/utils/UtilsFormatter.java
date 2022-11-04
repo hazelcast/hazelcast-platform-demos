@@ -70,7 +70,12 @@ public class UtilsFormatter {
      * @return
      */
     public static String safeForJsonStr(String input) {
-        return input.replaceAll("\"", "'");
+        String[] tokens = input.replaceAll("\"", "'").split(System.getProperty("line.separator"));
+        String result = tokens[0];
+        for (int i = 1; i < tokens.length; i++) {
+            result += "+" + tokens[i];
+        }
+        return result;
     }
 
     /**

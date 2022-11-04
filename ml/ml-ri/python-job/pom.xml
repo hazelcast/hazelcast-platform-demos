@@ -6,7 +6,7 @@
         <parent>
                 <groupId>com.hazelcast.platform.demos.ml.ri</groupId>
                 <artifactId>ml-ri-root</artifactId>
-                <version>5.1</version>
+                <version>5.2</version>
         </parent>
 
         <artifactId>ml-ri-python-job</artifactId>
@@ -15,8 +15,8 @@
         <description>ML Reference Implementation - Python Job</description>
 
         <properties>
-                <docker.image.name>python-job</docker.image.name>
-                <docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</docker.jar.file>
+                <my.docker.image.name>python-job</my.docker.image.name>
+                <my.docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</my.docker.jar.file>
                 <main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
                 <main.class>com.hazelcast.platform.demos.ml.ri.Application</main.class>
         </properties>
@@ -45,8 +45,8 @@
                                 <artifactId>maven-assembly-plugin</artifactId>
                         </plugin>
                         <plugin>
-                                <groupId>com.spotify</groupId>
-                                <artifactId>dockerfile-maven-plugin</artifactId>
+                                <groupId>io.fabric8</groupId>
+                                <artifactId>docker-maven-plugin</artifactId>
                         </plugin>
                 </plugins>
         </build>

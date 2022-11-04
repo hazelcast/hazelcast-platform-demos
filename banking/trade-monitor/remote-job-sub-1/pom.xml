@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
 		<artifactId>trade-monitor-root</artifactId>
-		<version>5.1</version>
+		<version>5.2</version>
 	</parent>
 
 	<artifactId>trade-monitor-remote-job-sub-1</artifactId>

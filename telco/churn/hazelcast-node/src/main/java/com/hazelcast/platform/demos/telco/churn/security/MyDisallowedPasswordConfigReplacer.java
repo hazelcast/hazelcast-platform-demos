@@ -52,7 +52,7 @@ public class MyDisallowedPasswordConfigReplacer implements ConfigReplacer {
     @Override
     public String getReplacement(String arg0) {
         String replacement = MyUtils.rot13(arg0);
-        LOGGER.debug("getRaplacament(): '{}' -> '{}'", arg0, replacement);
+        LOGGER.debug("getReplacament(): '{}' -> '{}'", arg0, replacement);
         return replacement;
     }
 

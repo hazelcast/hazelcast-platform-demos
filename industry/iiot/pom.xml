@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.industry</groupId>
 		<artifactId>industry-root</artifactId>
-		<version>5.1</version>
+		<version>5.2</version>
 	</parent>
 
 	<groupId>com.hazelcast.platform.demos.industry.iiot</groupId>
@@ -30,9 +30,7 @@
 	</modules>
 
 	<properties>
-		<java.version>11</java.version>
-
-		<docker.image.prefix>iiot</docker.image.prefix>
+		<my.docker.image.prefix>iiot</my.docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
 
 		<!-- Mapstores and databases -->

@@ -145,6 +145,7 @@ public class UtilsSlackSQLJob {
         }
         Properties slackProperties = UtilsSlack.loadSlackAccessProperties();
         String accessToken = safeGet(slackProperties, UtilsConstants.SLACK_ACCESS_TOKEN);
+        String buildUser = safeGet(slackProperties, UtilsConstants.SLACK_BUILD_USER);
         String channelId = safeGet(slackProperties, UtilsConstants.SLACK_CHANNEL_ID);
         String channelName = safeGet(slackProperties, UtilsConstants.SLACK_CHANNEL_NAME);
         if (accessToken.length() == 0 || channelId.length() == 0 || channelName.length() == 0) {
@@ -160,7 +161,7 @@ public class UtilsSlackSQLJob {
         String jobName = UtilsSlackSQLJob.class.getSimpleName().replace("Utils", "");
 
         Pipeline pipelineUtilsSlackSQLJob = UtilsSlackSQLJob.buildPipeline(
-                accessToken, channelId, channelName, projectName);
+                accessToken, channelId, channelName, projectName, buildUser);
 
         JobConfig jobConfigUtilsSlackSQLJob = new JobConfig();
         jobConfigUtilsSlackSQLJob.setName(jobName);
@@ -244,7 +245,7 @@ public class UtilsSlackSQLJob {
      * @return
      */
     private static Pipeline buildPipeline(String accessToken, String channelId,
-            String channelName, String projectName) {
+            String channelName, String projectName, String buildUser) {
         ServiceFactory<?, HazelcastInstance> hazelcastInstanceService =
                 ServiceFactories.sharedService(context -> context.hazelcastInstance());
 
@@ -293,7 +294,7 @@ public class UtilsSlackSQLJob {
 
         // Step (6) from diagram
         jsonOutput
-        .writeTo(UtilsSlackSink.slackSink(accessToken, channelName, projectName));
+        .writeTo(UtilsSlackSink.slackSink(accessToken, channelName, projectName, buildUser));
 
         return pipeline;
     }

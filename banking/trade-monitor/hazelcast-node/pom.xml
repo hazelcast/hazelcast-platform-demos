@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
 		<artifactId>trade-monitor-root</artifactId>
-		<version>5.1</version>
+		<version>5.2</version>
 	</parent>
 
 	<artifactId>trade-monitor-hazelcast-node</artifactId>
@@ -15,8 +15,8 @@
 	<description>Trade Monitor - Hazelcast Node</description>
 
 	<properties>
-		<docker.image.name>hazelcast-node</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</docker.jar.file>
+		<my.docker.image.name>hazelcast-node</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 		<main.class>hazelcast.platform.demos.banking.trademonitor.Application</main.class>
 	</properties>
@@ -24,7 +24,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>trade-monitor-common</artifactId>
+			<artifactId>trade-monitor-abstract-hazelcast-node</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
@@ -39,11 +39,29 @@
 
 		<plugins>
 			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<configuration>
+					<target name="Copy requirements.txt">
+						<copy
+							file="${project.build.directory}/../../abstract-hazelcast-node/target/classes/requirements.txt"
+							todir="${project.build.directory}/classes" />
+					</target>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

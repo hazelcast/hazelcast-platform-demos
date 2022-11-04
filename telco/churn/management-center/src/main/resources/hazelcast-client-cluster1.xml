@@ -2,13 +2,9 @@
 <hazelcast-client xmlns="http://www.hazelcast.com/schema/client-config"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://www.hazelcast.com/schema/client-config
-                  http://www.hazelcast.com/schema/client-config/hazelcast-client-config-5.0.xsd">
+                  http://www.hazelcast.com/schema/client-config/hazelcast-client-config-5.2.xsd">
                   
     <cluster-name>@my.cluster1.name@</cluster-name>
-
-    <properties>
-        <property name="hazelcast.client.statistics.enabled">true</property>
-    </properties>
 
    	<network>
    		<!-- Use "cluster-members" and the right address for Docker instead of K8S   -->
@@ -19,9 +15,11 @@
         -->
         
         <kubernetes enabled="true">
-            <service-dns>@docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local</service-dns>
+            <service-dns>@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local</service-dns>
         </kubernetes>        
     </network>
+
+    <metrics enabled="true"/>
 
     <security>
     	<!-- Connect with username/password or use a factory to generate credentials -->

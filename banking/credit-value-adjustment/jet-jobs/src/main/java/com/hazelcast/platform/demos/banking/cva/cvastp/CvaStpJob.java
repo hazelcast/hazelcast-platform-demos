@@ -323,14 +323,13 @@ public class CvaStpJob {
      * @param timestamp    Job submit time
      * @param calcDate     For C++
      * @param loadBalancer Front for C++ servers
-     * @param port         For C++ servers
      * @param batchSize    For C++, how many requests to send
      * @param parallelism  Ratio of C++ workers to Jet node
      * @param debug        For development, save intermediate results
      * @return
      */
     public static Pipeline buildPipeline(String jobName, long timestamp, LocalDate calcDate,
-            String loadBalancer, int port, int batchSize, int parallelism, boolean debug) {
+            String loadBalancer, int batchSize, int parallelism, boolean debug) {
         String timestampStr = MyUtils.timestampToISO8601(timestamp);
         String calcDateStr = CvaStpUtils.escapeQuotes("{\"calc_date\":\"" + calcDate + "\"}");
 
@@ -375,7 +374,7 @@ public class CvaStpJob {
 
         // Step 9 above, provides trio of trade, curve and MTM
         BatchStage<Tuple3<String, String, String>> mtm =
-                callCppForMtm(loadBalancer, port, batchSize, parallelism,
+                callCppForMtm(loadBalancer, batchSize, parallelism,
                         tradesXircurves, fixings, calcDateStr);
 
         // Step 10 above, provides trio of trade, curve, exposure
@@ -438,7 +437,6 @@ public class CvaStpJob {
      * </p>
      *
      * @param host A load balancer fronting the C++ calculation processes
-     * @param port Expect all C++ calculation processes to use the same port
      * @param batchSize How many requests to send in a batch
      * @param parallelism How many C++ workers per Jet node
      * @param tradesXircurves A pair of trade and interest rate curve
@@ -450,7 +448,7 @@ public class CvaStpJob {
      * so should be used as initialisation. Batching would be more efficient.
      * </p>
      */
-    private static BatchStage<Tuple3<String, String, String>> callCppForMtm(String host, int port,
+    private static BatchStage<Tuple3<String, String, String>> callCppForMtm(String host,
             int batchSize, int parallelism,
             BatchStage<Tuple2<String, String>> tradesXircurves, BatchStage<String> fixings, String calcDateStr) {
 
@@ -462,12 +460,13 @@ public class CvaStpJob {
         /* A service factory to provide a BiDirectional connection to a C++ server,
          * using the provided channel builder and invoking function.
          */
+        LOGGER.info("Channel to target host: {}", host);
         FunctionEx<? super ManagedChannel,
                 ? extends FunctionEx<StreamObserver<OutputMessage>, StreamObserver<InputMessage>>>
              callStubFn = channel -> JetToCppGrpc.newStub(channel)::streamingCall;
         ServiceFactory<?, ? extends GrpcService<InputMessage, OutputMessage>> cppService =
                 GrpcServices.bidirectionalStreamingService(
-                        () -> CvaStpUtils.getManagedChannelBuilder(host, port), callStubFn);
+                        () -> MyUtils.getManagedChannelBuilder(host), callStubFn);
 
         /* Make the input to C++ for the service call, and extract the output
          * from the result.

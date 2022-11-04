@@ -48,17 +48,24 @@ Docker exists and build container images for deployment.
 
 ## Modules
 
-There are 13 modules in this example, alphabetically:
+There are 20 modules in this example, alphabetically:
 
 ```
+abstract-hazelcast-node/
 common/
 custom-classes/
+finos-nodejs/
+finos-python/
 grafana/
 hazelcast-node/
+hazelcast-node-enterprise-1/
+hazelcast-node-enterprise-2/
 kafdrop/
 kafka-broker/
 management-center/
+postgres/
 prometheus/
+pulsar/
 remote-job-sub-1/
 topic-create/
 trade-producer/
@@ -163,10 +170,28 @@ Most of the trade fields should be intuitive. The "`symbol`" field is the lookup
 on [NASDAQ](https://www.nasdaq.com/).
 For example, the symbol "_FB_" is [Facebook](https://www.nasdaq.com/market-activity/stocks/fb).
 
-### 8. `hazelcast-node`
+### 8. `pulsar`
 
-The `hazelcast-node` is the module where actual work of the Trade Monitor is done, even though
-this needs the separate `webapp` module below to visualize.
+Not everywhere uses Kafka. If you'd prefer, you can use Pulsar instead.
+
+All you need change is the `my.pulsar.or.kafka` flag in
+[pom.xml](https://github.com/hazelcast/hazelcast-platform-demos/blob/master/banking/trade-monitor/pom.xml)
+and the build will configure for Pulsar instead of Kafka. 
+
+All modules are built, but the `trade-producer` writes to Pulsar and Hazelcast reads from Pulsar.
+So `kafdrop` etc won't show anything useful.
+
+### 9. `postgres`
+
+To show interaction with external stores, a Postgres database is used. Max volume alerts are
+saved here, as an example of data we might wish to keep a history of.
+
+### 10. `abstract-hazelcast-node`
+
+The `abstract-hazelcast-node` is the module where actual work of the Trade Monitor is done, even though
+this needs the separate `webapp` module below to visualize. It is bundled in to `hazelcast-node`
+for open-source, and into `hazelcast-node-enterprise-1` & `hazelcast-node-enterprise-2` for
+demonstrating commercial features.
 
 This module creates a single Hazelcast node with both in-memory data grid (IMDG) and Jet functionality.
 
@@ -191,7 +216,7 @@ Hazelcast clusters would be the solution.
 The Hazelcast node is mainly configured from the
 [hazelcast.yml](./hazelcast-node/src/main/resources/hazelcast.yml) file.
 
-Following the _cloud-first_ approach, the networking section of this file configures for Kubernetes.
+Following the cloud-first approach, the networking section of this file configures for Kubernetes.
 This assumes DNS based discovery, for a service named "`trade-monitor-service.default.svc.cluster.local`"
 and with some REST endpoints enabled to that Kubernetes probes can determine if the node is healthy.
 This network is overridden by the scripts described below to run in Docker or localhost.
@@ -238,9 +263,19 @@ For each trade that comes in, the running total for that trade is updated in the
 Jet job `AggregatedQuery` processes the same input as Jet job `IngestTrades`, and at the same
 time. So they could be merged for efficiency, but here they are kept apart for clarity of understanding.
 
-### 8. `webapp`
+### 10.A `hazelcast-node`
 
-The last module in the demo is a web-based UI to display the trade data and trade aggregation
+Builds the open-source version, named `grid1`.
+
+### 10.b `hazelcast-node-enterprise-1` & `hazelcast-node-enterprise-2`
+
+Builds the enterprise version, two clusters `grid1` and `grid2` connected for data replication.
+
+In this version, data replication is one-way, for selected maps.
+
+### 11. `webapp`
+
+The last main module in the demo is a web-based UI to display the trade data and trade aggregation
 stored in the Hazelcast grid.
 
 `webapp` is a Hazelcast client that connects to the Hazelcast grid nodes, and presents this
@@ -260,7 +295,7 @@ the demonstration. The trades for that symbol are listed most recent first, but 
 millions of trades then that means thousands of trades for each stock symbol, so potentially
 a very long list.
 
-### 9. `management-center` (optional)
+### 12. `management-center` (optional)
 
 This is Hazelcast's Management Center, for collating, viewing and controlling a cluster.
 
@@ -271,25 +306,30 @@ Register [here](https://hazelcast.com/download/) to request the evaluation licen
 need, and put them in your `settings.xml` file as described in [Repository top-level README.md](../../README.md).
 Be sure to mention this is for Trade Monitor so you get a license with the correct capabilities.
 
-### 10. `prometheus` (optional)
+### 13. `prometheus` (optional)
 
 Prometheus is an open-source time-series database. It connects to `management-center` for its
 data, so if you choose not to run `management-center` there's no need to bother with
 `prometheus`.
 
-### 11. `grafana` (optional)
+### 14. `grafana` (optional)
 
 Grafana is open-source dashboarding software. If connects to `prometheus` for its data, so
 if you don't run `management-center` and so don't run `prometheus`, don't bother with
 `grafana` either.
 
-### 12. `remote-job-sub-1` (optional)
+### 15. `remote-job-sub-1` (optional)
 
 The main jobs in this example are started with the cluster automatically.
 
 This module is an optional extra to show how to package and submit from the command line.
 The job involvd is an extra, it does not produce data for the web application. You can
 browse it's output with the Management Center.
+
+### 16. `finos-nodejs` (optional) & `finos-python` (optional)
+
+Two options clients using the [Perspective](https://perspective.finos.org/) plugin from
+[FinOS](https://www.finos.org/).
 
 ## Running -- sequence
 
@@ -305,11 +345,20 @@ or Kubernetes. For all, there is a partial ordering on the modules.
 3.== `kafdrop` The Kafka browser has to start after Kafka. It doesn't have to start after the topic is
 created, but it shows the most if the topic exists and is being written to.
 
+3.== `pulsar` Creates Pulsar, which might be used instead of Kafka depending on
+[pom.xml](https://github.com/hazelcast/hazelcast-platform-demos/blob/master/banking/trade-monitor/pom.xml)
+configuration
+
+3.== `postgres` Creates Postgres, for storage of max volume alerts.
+
 4.== `trade-producer` This writes the trade data to the Kafka topic created.
 
 4.== `hazelcast-node` The Hazelcast node has Jet jobs that read from the Kafka topic created. There doesn't
 need to be anything being written to the Kafka topic, but if there is no input there is no output from
 a streaming job.
+
+If you want to run the enterprise version, start both `hazelcast-node-enterprise-1` and `hazelcast-node-enterprise-2`
+instead of `hazelcast-node`.
 
 5.== `webapp` The web UI is a client of the Hazelcast cluster, so needs Hazelcast node(s) to be runnning.
 
@@ -322,14 +371,14 @@ a streaming job.
 8. `remote-job-sub-1` Launches an additional Jet job from the command line.
 
 Ignoring the partial ordering, the recommended start sequence would be `zookeeper`, `kafka-broker`,
-`topic-create`, `kafdrop`, `trade-producer`, `hazelcast-node` and finally `webapp`.
+`topic-create`, `kafdrop`, `postgres`, `pulsar`, `trade-producer`, `hazelcast-node` and finally `webapp`.
 
 If you add the optional monitoring, then `management-center`, `prometheus` and `grafana`.
 
 ## Running -- Localhost
 
-For running directly on your local machine, the assumption is made that you already have Kafka
-and Zookeeper running and with an appropriate configuration as described in the following
+For running directly on your local machine, the assumption is made that you already have Kafka,
+Pulsar, Postgres and Zookeeper running and with an appropriate configuration as described in the following
 subsection.
 
 Assuming so, run the [localhost-trade-producer.sh](./localhost-trade-producer.sh) script
@@ -368,7 +417,7 @@ command scripts in the obvious places.
 
 ## Running -- Docker
 
-9 scripts are provided to run the various modules as Docker containers.
+14 scripts are provided to run the various modules as Docker containers.
 In sequence:
 
 1. [docker-zookeeper.sh](./src/main/scripts/docker-zookeeper.sh)
@@ -377,22 +426,28 @@ In sequence:
 4. [docker-kafka2.sh](./src/main/scripts/docker-kafka2.sh)
 5. [docker-topic-create.sh](./src/main/scripts/docker-topic-create.sh)
 6. [docker-kafdrop.sh](./src/main/scripts/docker-kafdrop.sh)
-7. [docker-trade-producer.sh](./src/main/scripts/docker-trade-producer.sh)
-8. [docker-hazelcast-node.sh](./src/main/scripts/docker-hazelcast-node.sh)
-9. [docker-webapp.sh](./src/main/scripts/docker-webapp.sh)
-10. [docker-management-center.sh](./src/main/scripts/docker-management-center.sh)
+7. [docker-postgres.sh](./src/main/scripts/docker-postgres.sh)
+8. [docker-pulsar.sh](./src/main/scripts/docker-pulsar.sh)
+9. [docker-trade-producer.sh](./src/main/scripts/docker-trade-producer.sh)
+10. [docker-hazelcast-node0.sh](./src/main/scripts/docker-hazelcast-node0.sh)
+11. [docker-hazelcast-node1.sh](./src/main/scripts/docker-hazelcast-node1.sh)
+12. [docker-hazelcast-node2.sh](./src/main/scripts/docker-hazelcast-node2.sh)
+13. [docker-webapp.sh](./src/main/scripts/docker-webapp.sh)
+14. [docker-management-center.sh](./src/main/scripts/docker-management-center.sh)
 
 You should wait for Zookeeper (1) to have started before starting the three Kafka brokers (2,3,4).
 
 You should wait for Kafka brokers (2,3,4) before starting the container that creates the topic (5).
 
-Kafdrop (6), the Trade Producer (7) and a Hazelcast node (8) can all be started in parallel once the topic exists.
+Kafdrop (6), Postgres (7) and Pulsar (8) can then be started.
 
-The Web UI (9) is started last, once everything else is ready.
+The Trade Producer (9) and a Hazelcast nodes (10, 11, 12) can all be started in parallel once the topic exists.
+
+The Web UI (13) is started last, once everything else is ready.
 
 Once started, the `webapp` UI is available as http://localhost:8081/ and `kafdrop` as http://localhost:8083/.
 
-If you chose to start the `management-center` it is on http://localhost:8080.
+If you chose to start the `management-center` (14) it is on http://localhost:8080.
 
 ### Host network
 
@@ -410,45 +465,58 @@ If you have multiple network cards on your host machine the scripts won't be abl
 
 ## Running -- Kubernetes
 
-4 deployment files are provided to run the Trade Monitor in Kubernetes.
+7 deployment files are provided to run the Trade Monitor in Kubernetes.
 
-1. [kubernetes-zookeeper-kafka.yaml](./src/main/scripts/kubernetes-zookeeper-kafka.yaml)
-2. [kubernetes-trade-producer.yaml](./src/main/scripts/kubernetes-trade-producer.yaml)
-3. [kubernetes-hazelcast-node.yaml](./src/main/scripts/kubernetes-hazelcast-node.yaml)
-4. [kubernetes-webapp-and-monitoring.yaml](./src/main/scripts/kubernetes-webapp-and-monitoring.yaml)
+1. [kubernetes-1-zookeeper-kafka-firsthalf.yaml](./src/main/scripts/kubernetes-1-zookeeper-kafka-firsthalf.yaml)
+2. [kubernetes-2-create-configmap.sh](./src/main/scripts/kubernetes-2-create-configmap.sh)
+3. [kubernetes-3-kafka-secondhalf.yaml](./src/main/scripts/kubernetes-3-kafka-secondhalf.yaml)
+4. [kubernetes-4-kafdrop-topic-postgres.yaml](./src/main/scripts/kubernetes-4-kafdrop-topic-postgres.yaml)
+5. [kubernetes-5-optional-hazelcast.yaml](./src/main/scripts/kubernetes-5-optional-hazelcast.yaml)
+6. [kubernetes-6-webapp-and-monitoring.yaml](./src/main/scripts/kubernetes-6-webapp-and-monitoring.yaml)
+7. [kubernetes-7-trade-producer.yaml](./src/main/scripts/kubernetes-7-trade-producer.yaml)
 
-These are deliberately simple Kubernetes deployment file. Resource limits, auto-scaling,
+
+These are deliberately simple Kubernetes deployment files. Resource limits, auto-scaling,
 namespaces, etc could all be added to move towards production quality.
 For each file, ensure all the created pods report as being healthy ("_1/1_" in the "_READY_" column)
 before progressing to the next deployment.
 
-The first will create a pod for Zookeeper, three pods for Kafka brokers, run a job to create the needed topic, and start a pod for Kafdrop.
+The first creates Zookeeper and a service for Kafka.
 
-The second creates a job pod to run the Trade Producer.
+The second is a shell script to extract the Kafka connection for a config map.
 
-The third creates two pods for the Hazelcast cluster to process the trades. This is a stateful set,
-you can vary the number of replicas after from 2 down to 1 or up to a larger number.
+The third creates the rest of Kafka, the actual brokers attached to the service, reading the config map.
 
-The last creates a pod for the web UI.
+The fourth creates other bits once Kakfa is ready, a topic, Kafdrop and other things (Postgres) that
+can be done now.
+
+The fifth creates Hazelcast servers and Management Center. This is optional, as you could use Hazelcast
+Cloud instead.
+
+The sixth creates the web app and launches job processing.
+
+The seventh starts the production of data to monitor.
 
 If all looks well, you should something like this listed for the default namespace:
 
 ```
 $ kubectl get pods
-NAME                                       READY   STATUS      RESTARTS   AGE
-job-trade-monitor-topic-create-2v2q6               0/1     Completed   0          17m
-job-trade-monitor-trade-producer-t2r2r             1/1     Running     0          9s
-trade-monitor-grafana-b5bd4545b-7tc2b              1/1     Running     0          8m11s
-trade-monitor-hazelcast-node-0                     1/1     Running     0          11m
-trade-monitor-hazelcast-node-1                     1/1     Running     0          10m
-trade-monitor-kafdrop-6c454cf9c4-pbqc4             1/1     Running     0          17m
-trade-monitor-kafka-broker-0                       1/1     Running     0          17m
-trade-monitor-kafka-broker-1                       1/1     Running     0          17m
-trade-monitor-kafka-broker-2                       1/1     Running     0          16m
-trade-monitor-management-center-66b8744ccd-4qlvv   1/1     Running     0          8m11s
-trade-monitor-prometheus-74cc965f6d-4kwhh          1/1     Running     0          8m11s
-trade-monitor-webapp-86c965c5b4-qvjkd              1/1     Running     0          8m11s
-trade-monitor-zookeeper-596bcf6b7c-hhl4z           1/1     Running     0          17m
+NAME                                               READY   STATUS      RESTARTS   AGE
+trade-monitor-grafana-7b56d947b4-phsnj             1/1     Running     0          61s
+trade-monitor-grid1-hazelcast-0                    1/1     Running     0          3m2s
+trade-monitor-grid1-hazelcast-1                    1/1     Running     0          2m2s
+trade-monitor-job-topic-create-pxnjq               0/1     Completed   0          57m
+trade-monitor-job-trade-producer-xkgwn             1/1     Running     0          61s
+trade-monitor-kafdrop-679dcd8568-72f87             1/1     Running     0          57m
+trade-monitor-kafka-broker-0                       1/1     Running     0          59m
+trade-monitor-kafka-broker-1                       1/1     Running     0          58m
+trade-monitor-kafka-broker-2                       1/1     Running     0          58m
+trade-monitor-management-center-68777cf86d-5g7sd   1/1     Running     0          3m2s
+trade-monitor-postgres-d66bdf8-pqprr               1/1     Running     0          57m
+trade-monitor-prometheus-6f89d6f78-wqht4           1/1     Running     0          61s
+trade-monitor-pulsar-665b8d5b5f-tcg2s              1/1     Running     0          67m
+trade-monitor-webapp-56df458979-4mmjj              1/1     Running     0          61s
+trade-monitor-zookeeper-799ff845d5-fjfq6           1/1     Running     0          67m
 ```
 
 All nodes are at "_READY_" status "_1/1_" (exception the topic creation job which has completed).
@@ -461,16 +529,25 @@ For example, for this output from Google Kubernetes Engine:
 
 ```
 $ kubectl get services | egrep 'trade-monitor|EXTERNAL'
-NAME                                 TYPE           CLUSTER-IP      EXTERNAL-IP      PORT(S)          AGE
-trade-monitor-kafdrop-service        LoadBalancer   10.104.4.224    35.205.164.151   8080:31257/TCP   8m45s
-trade-monitor-kafka-broker-service   ClusterIP      None            <none>           9092/TCP         8m45s
-trade-monitor-service                ClusterIP      None            <none>           5701/TCP         3m49s
-trade-monitor-webapp                 LoadBalancer   10.104.1.250    35.205.91.17     8080:32760/TCP   111s
-trade-monitor-zookeeper-service      ClusterIP      10.104.11.197   <none>           2181/TCP         8m45s
+NAME                                 TYPE           CLUSTER-IP      EXTERNAL-IP      PORT(S)                         AGE
+trade-monitor-grafana                LoadBalancer   10.176.14.167   34.76.251.40     80:30801/TCP                    2m22s
+trade-monitor-grid1-hazelcast        ClusterIP      None            <none>           5701/TCP                        4m24s
+trade-monitor-grid1-hazelcast-extra  LoadBalancer   10.176.10.53    35.205.8.203     5701:32162/TCP                  4m23s
+trade-monitor-kafdrop                LoadBalancer   10.176.10.128   34.79.56.218     8080:30157/TCP                  58m
+trade-monitor-kafka-broker           ClusterIP      None            <none>           19092/TCP                       68m
+trade-monitor-kafka-broker-0         LoadBalancer   10.176.11.46    35.240.1.234     9092:30066/TCP                  68m
+trade-monitor-kafka-broker-1         LoadBalancer   10.176.7.192    34.140.248.232   9092:31305/TCP                  68m
+trade-monitor-kafka-broker-2         LoadBalancer   10.176.5.35     35.233.58.222    9092:30659/TCP                  68m
+trade-monitor-management-center      LoadBalancer   10.176.8.10     34.78.186.82     8080:30341/TCP                  4m23s
+trade-monitor-postgres               LoadBalancer   10.176.14.194   35.233.20.170    5432:31956/TCP                  58m
+trade-monitor-prometheus             LoadBalancer   10.176.6.85     34.140.214.31    9090:31218/TCP                  2m22s
+trade-monitor-pulsar                 LoadBalancer   10.176.3.113    34.77.130.135    6650:32044/TCP,8080:32718/TCP   68m
+trade-monitor-webapp                 LoadBalancer   10.176.1.61     34.78.196.28     8080:30635/TCP                  2m23s
+trade-monitor-zookeeper              ClusterIP      10.176.14.244   <none>           2181/TCP                        68m
 ```
 
-So here Kafdrop would be available as [http://75.205.164.151:8080/](https://www.youtube.com/watch?v=dQw4w9WgXcQ) and the WebApp as
-[http://75.205.91.17:8080/](https://www.youtube.com/watch?v=dQw4w9WgXcQ).
+So here Kafdrop would be available as [http://34.79.56.218:8080/](https://www.youtube.com/watch?v=dQw4w9WgXcQ) and the WebApp as
+[http://34.78.196.28:8080/](https://www.youtube.com/watch?v=dQw4w9WgXcQ).
 
 ### Tagging for Kubernetes
 
@@ -492,23 +569,23 @@ producer can produce.
 
 ## Running `remote-job-sub-1` from the command line
 
-If you download Jet from [here](https://jet-start.sh/download), there is a utility
-in the `bin` folder called `jet`.
+If you download Hazelcast from [here](https://hazelcast.com/open-source-projects/downloads/), there is a utility
+in the `bin` folder called `hz-cli`.
 
 Try this to begin with:
 
 ```
-hazelcast-jet-4.5/bin/jet -t grid@123.456.789.0 list-jobs
+hazelcast/bin/hz-cli -t grid1@123.456.789.0 list-jobs
 ```
 
-The cluster name here is `grid` but you will need to substitue the IP address of one of
+The cluster name here is `grid1` but you will need to substitute the IP address of one of
 the member. Once successful, this should list the running jobs in the cluster,
 `AggregateQuery` and `IngestTrades`.
 
 Then do this to launch the additional job
 
 ```
-hazelcast-jet-4.5/bin/jet -t grid@123.456.789.0 submit target/trade-monitor-remote-job-sub-1-5.0.jar
+hazelcast/bin/hz-cli -t grid1@123.456.789.0 submit target/trade-monitor-remote-job-sub-1-5.0.jar
 ```
 
 This will send the job from your machine to wherever in the world the cluster
@@ -590,6 +667,13 @@ aggregate, so the format is the same as for `trade-producer` log and the `Ingest
 ```
 14:43:11.181 INFO  trade-monitor-webapp.event-2 c.h.p.d.b.trademonitor.TradesMapListener - Received 1 => "{"id": "5af8cf39-4db7-4663-8b31-1169dd9398ca","timestamp": 1583934191165,"symbol": "MTGE","price": 2501,"quantity": 5729}" 
 ```
+
+## Running -- Hazelcast Cloud
+
+Create a Hazelcast Cloud cluster if you don't have one.
+
+Follow the instructions in [here](../../README.md) to obtain cloud credentials, save them to your `settings.xml`
+and compile.
 
 ## Summary
 

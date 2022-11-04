@@ -1,0 +1,55 @@
+---
+# Service DNS for Webapp will be "nexmark-webapp.default.svc.cluster.local".
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$ SERVICE DEFINITIONS $$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Service for webapp
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexmark-webapp
+spec:
+  selector:
+    app: nexmark-webapp
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: LoadBalancer
+---
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$ POD DEFINITIONS $$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---
+# Pod for webapp
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nexmark-webapp
+spec:
+  selector:
+    matchLabels:
+      app: nexmark-webapp
+  template:
+    metadata:
+      labels:
+        app: nexmark-webapp
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/nexmark-webapp"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+          name: nexmark-webapp-container
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 30
+---

@@ -31,6 +31,7 @@ public class UtilsConstants {
 
     // Our constants, we could change them
     public static final String SLACK_ACCESS_TOKEN = "slack.bot.user.oath.access.token";
+    public static final String SLACK_BUILD_USER = "slack.build.user";
     public static final String SLACK_CHANNEL_ID = "slack.bot.channel.id";
     public static final String SLACK_CHANNEL_NAME = "slack.bot.channel.name";
     public static final String SLACK_PROJECT_NAME = "my.project.name";

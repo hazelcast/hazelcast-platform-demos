@@ -56,6 +56,20 @@ spec:
   - port: 9092
   type: LoadBalancer
 ---
+# Postgres : DNS will be "trade-monitor-postgres.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trade-monitor-postgres
+spec:
+  selector:
+    app: trade-monitor-postgres
+  ports:
+  - port: 5432
+    targetPort: 5432
+  type: LoadBalancer
+---
 # Service for Pulsar
 ---
 apiVersion: v1

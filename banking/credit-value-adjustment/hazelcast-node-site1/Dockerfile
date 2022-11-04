@@ -1,4 +1,4 @@
-FROM amd64/ubuntu:20.04
+FROM amd64/ubuntu:22.04
 
 # Add and confirm Java installed
 RUN apt upgrade
@@ -8,7 +8,6 @@ RUN cd /tmp ; \
     wget -q https://download.java.net/java/GA/jdk17/0d483333a00540d886896bac774ff48b/35/GPL/openjdk-17_linux-x64_bin.tar.gz ; \
     tar xf openjdk-17_linux-x64_bin.tar.gz ; 
 RUN update-alternatives --install /usr/bin/java java /tmp/jdk-17/bin/java 1
-RUN java --version
 
 # Maven compiled target
 ARG JAR_FILE

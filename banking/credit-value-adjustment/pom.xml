@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.banking</groupId>
 		<artifactId>banking-root</artifactId>
-		<version>5.1</version>
+		<version>5.2</version>
 	</parent>
 
 	<groupId>com.hazelcast.platform.demos.banking.cva</groupId>
@@ -18,7 +18,7 @@
 	<description>Example implementation for monitoring a series of trades</description>
 
 	<properties>
-		<docker.image.prefix>cva</docker.image.prefix>
+		<my.docker.image.prefix>cva</my.docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
 		<!-- Live, probably -->
 		<my.cluster1.init.size>20</my.cluster1.init.size>
@@ -35,9 +35,9 @@
 		<my.other.admin.password>password1</my.other.admin.password>
 
 		<!-- So Grafana can find Prometheus service, must match K8S YAML -->
-		<my.prometheus.name>${docker.image.prefix}-prometheus</my.prometheus.name>
+		<my.prometheus.name>${my.docker.image.prefix}-prometheus</my.prometheus.name>
 		<my.prometheus.port>9090</my.prometheus.port>
-		<my.management.center.name>${docker.image.prefix}-management-center</my.management.center.name>
+		<my.management.center.name>${my.docker.image.prefix}-management-center</my.management.center.name>
 	</properties>
 
 	<modules>
@@ -50,10 +50,15 @@
 		<module>hazelcast-node-site2</module>
 		<module>abstract-hazelcast-client</module>
 		<module>cpp</module>
+		<module>cpp-tester</module>
+		<module>cpp-tester2</module>
+		<module>cpp-tester3</module>
 		<module>data-loader</module>
 		<module>jet-jobs</module>
 		<module>webapp</module>
+		<!-- Not used, only for diagnostics
 		<module>hazelcast-node-site1-cpp</module>
+		-->
 	</modules>
 
 	<dependencies>

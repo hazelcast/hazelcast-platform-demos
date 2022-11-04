@@ -251,7 +251,7 @@ public class MyRestController {
     }
 
     /**
-     * <p>List available files for download, as help for Swagger and direct REST debugging.
+     * <p>List available files for download, as help for REST debugging.
      * Bakes in the URL expected by {@link fileDownload} below.
      * </p>
      *

@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.telco.churn</groupId>
 		<artifactId>churn-root</artifactId>
-		<version>5.1</version>
+		<version>5.2</version>
 	</parent>
 
 	<artifactId>churn-data-feed</artifactId>
@@ -15,8 +15,8 @@
 	<description>Telco Churn - feed test data into Kafka</description>
 
 	<properties>
-		<docker.image.name>data-feed</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<my.docker.image.name>data-feed</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 
@@ -42,8 +42,8 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

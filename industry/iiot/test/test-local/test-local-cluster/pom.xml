@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.industry.iiot</groupId>
 		<artifactId>iiot-test-local-root</artifactId>
-		<version>5.1</version>
+		<version>5.2</version>
 	</parent>
 
 	<artifactId>iiot-test-local-cluster</artifactId>
@@ -15,9 +15,9 @@
 	<description>For offline testing, a cluster simulating Hazelcast Cloud</description>
 
 	<properties>
-		<docker.image.name>test-local-hazelcast</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</docker.jar.file>
-		<docker.jar.file2>iiot-custom-classes-${project.version}-jar-with-dependencies.jar</docker.jar.file2>
+		<my.docker.image.name>test-local-hazelcast</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</my.docker.jar.file>
+		<my.docker.jar.file2>iiot-custom-classes-${project.version}-jar-with-dependencies.jar</my.docker.jar.file2>
 		<main.basedir>${project.parent.parent.parent.parent.parent.basedir}</main.basedir>
 		<main.class>hazelcast.platform.demos.industry.iiot.Application</main.class>
 	</properties>
@@ -76,8 +76,8 @@
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<configuration>
-					<target name="Copy ${docker.jar.file2}">
-						<copy file="../../../custom-classes/target/${docker.jar.file2}" todir="${project.build.directory}"/>
+					<target name="Copy ${my.docker.jar.file2}">
+						<copy file="../../../custom-classes/target/${my.docker.jar.file2}" todir="${project.build.directory}"/>
 					</target>
 				</configuration>
 				<executions>
@@ -90,8 +90,8 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>
