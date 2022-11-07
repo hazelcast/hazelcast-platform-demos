@@ -1,0 +1,123 @@
+---
+# OPTIONAL
+# OPTIONAL
+# OPTIONAL - If not running on HZ Cloud
+# OPTIONAL
+# OPTIONAL
+---
+# Service DNS will be "transaction-monitor-grid1-hazelcast.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-grid1-hazelcast
+spec:
+  clusterIP: None
+  selector:
+    app: transaction-monitor-grid1-hazelcast
+  ports:
+  - port: 5701
+---
+# Open Kubernetes to allow remote client to connect from outside, eg. Desktop to run "hz-cli" to submit ML
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-grid1-hazelcast-extra
+spec:
+  selector:
+    app: transaction-monitor-grid1-hazelcast
+  ports:
+  - port: 5701
+  type: LoadBalancer
+---
+# Service DNS will be "transaction-monitor-mancenter.default.svc.cluster.local".
+---
+# Management Center
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-management-center
+spec:
+  selector:
+    app: transaction-monitor-management-center
+  ports:
+    - name: transaction-monitor-management-center
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer
+---
+---
+# Creates 2 pods, hazelcast-node-0 and hazelcast-node-1 in a stateful set.
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: transaction-monitor-grid1-hazelcast
+spec:
+  replicas: 2
+  serviceName: transaction-monitor-grid1-hazelcast
+  selector:
+    matchLabels:
+      app: transaction-monitor-grid1-hazelcast
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-grid1-hazelcast
+    spec:
+      containers:
+        - env:
+          - name: "MY_BOOTSTRAP_SERVERS"
+            value: "transaction-monitor-kafka-broker-0.transaction-monitor-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-kafka-broker-1.transaction-monitor-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-kafka-broker-2.transaction-monitor-kafka-broker.default.svc.cluster.local:9092"
+          - name: "MY_POSTGRES_ADDRESS"
+            value: "transaction-monitor-postgres.default.svc.cluster.local:5432"
+          - name: "MY_PULSAR_LIST"
+            value: "transaction-monitor-pulsar.default.svc.cluster.local:6650"
+          image: "hazelcast-platform-demos/transaction-monitor-hazelcast-node"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /hazelcast/health/node-state
+              port: 5701
+          name: transaction-monitor-grid1-hazelcast-container
+          readinessProbe:
+            httpGet:
+              path: /hazelcast/health/ready
+              port: 5701
+            initialDelaySeconds: 30
+          resources:
+            limits:
+              cpu: "2.0"
+            requests:
+              cpu: "2.0"
+---
+# Only need 1 management-center
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transaction-monitor-management-center
+spec:
+  selector:
+    matchLabels:
+      app: transaction-monitor-management-center
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-management-center
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-management-center"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+          name: transaction-monitor-management-center-container
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 30
+---

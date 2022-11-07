@@ -1,0 +1,82 @@
+---
+# Creates 3 Kafka Brokers, uses existing services
+---
+############################################################################
+# Stateful Sets
+############################################################################
+---
+# Kafka Broker, 3 pods
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app.kubernetes.io/component: kafka
+    app.kubernetes.io/name: kafka
+  name: transaction-monitor-kafka-broker
+spec:
+  replicas: 3
+  serviceName: transaction-monitor-kafka-broker
+  selector:
+    matchLabels:
+      app: transaction-monitor-kafka-broker
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-kafka-broker
+        app.kubernetes.io/component: kafka
+        app.kubernetes.io/name: kafka
+    spec:
+      containers:
+        - env:
+          # setup.sh augments the environment variables
+          - name: "ALLOW_PLAINTEXT_LISTENER"
+            value: "true"
+          - name: "KAFKA_CFG_ZOOKEEPER_CONNECT"
+            value: "transaction-monitor-zookeeper.default.svc.cluster.local"
+          - name: "KAFKA_CFG_INTER_BROKER_LISTENER_NAME"
+            value: "INTERNAL_PLAINTEXT"
+          - name: "KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP"
+            value: "EXTERNAL_PLAINTEXT:PLAINTEXT,INTERNAL_PLAINTEXT:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+          - name: KAFKA_CFG_LISTENERS
+            value: "EXTERNAL_PLAINTEXT://:9092,INTERNAL_PLAINTEXT://:19092"
+          - name: "MY_POD_IP"
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: "MY_POD_NAME"
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: "POD_NAME"
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          image: "hazelcast-platform-demos/transaction-monitor-kafka-broker"
+          imagePullPolicy: Never
+          livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            tcpSocket:
+              port: 19092
+          name: transaction-monitor-kafka-broker-container
+          ports:
+            - name: external
+              containerPort: 9092
+            - name: internal
+              containerPort: 19092
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            tcpSocket:
+              port: 19092
+          volumeMounts:
+            - name: configmap
+              mountPath: /customize/my-env.sh
+              subPath: my-env.sh
+      volumes:
+        - name: configmap
+          configMap:
+            name: transaction-monitor-configmap
+            defaultMode: 0755
+---

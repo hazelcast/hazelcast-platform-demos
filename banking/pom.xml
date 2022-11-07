@@ -23,7 +23,7 @@
 
         <modules>
         	<module>credit-value-adjustment</module>
-        	<module>trade-monitor</module>
+        	<module>transaction-monitor</module>
         </modules>
 
 </project>

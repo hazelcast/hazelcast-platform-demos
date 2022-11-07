@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="NORMAL" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %thread %logger{40} - %msg %n</pattern>
+        </encoder>
+    </appender>
+    <appender name="HIGHLIGHT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level %thread %logger{40} - %msg) %n</pattern>
+        </encoder>
+    </appender>
+    <appender name="BLUE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldBlue(%logger{40} - %msg) %n</pattern>
+        </encoder>
+    </appender>
+    <appender name="CYAN" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldCyan(%logger{40} - %msg) %n</pattern>
+        </encoder>
+    </appender>
+    <appender name="MAGENTA" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldMagenta(%logger{40} - %msg) %n</pattern>
+        </encoder>
+    </appender>
+    <appender name="WHITE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldWhite(%logger{40} - %msg) %n</pattern>
+        </encoder>
+    </appender>
+    <appender name="YELLOW" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldYellow(%logger{40} - %msg) %n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Tune out some of Hazelcast's normal messages so more of Transaction Monitor in logs -->
+    <logger name="com.hazelcast.jet.impl.JobExecutionService" level="warn" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
+    <logger name="com.hazelcast.jet.cdc" level="warn" additivity="false">
+        <appender-ref ref="YELLOW"/>
+    </logger>
+    <logger name="com.hazelcast.jet.kafka.impl" level="warn" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
+    <logger name="com.hazelcast.internal.cluster.impl.TcpIpJoiner" level="warn" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
+    <logger name="com.hazelcast.internal.server.tcp.TcpServerConnection" level="warn" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
+    <logger name="com.hazelcast.system.logo" level="trace" additivity="false">
+        <appender-ref ref="MAGENTA"/>
+    </logger>
+    <logger name="io.debezium" level="error" additivity="false">
+        <appender-ref ref="BLUE"/>
+    </logger>
+    <!-- Code for the sample -->
+    <logger name="hazelcast.platform.demos.banking.transactionmonitor.AlertingToPostgresMapStore" level="debug" additivity="false">
+        <appender-ref ref="CYAN"/>
+    </logger>
+    <logger name="hazelcast.platform.demos.banking.transactionmonitor.MyMembershipListener" level="trace" additivity="false">
+        <appender-ref ref="CYAN"/>
+    </logger>
+    <logger name="hazelcast.platform.demos" level="trace" additivity="false">
+        <appender-ref ref="HIGHLIGHT"/>
+    </logger>
+    <!-- Webapp -->
+    <logger name="io.javalin" level="debug" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
+    <!-- Kafka connector -->
+    <logger name="org.apache.kafka" level="error" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
+    
+    <root level="info">
+        <appender-ref ref="NORMAL"/>
+    </root>
+</configuration>

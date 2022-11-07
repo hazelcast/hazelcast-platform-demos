@@ -6,7 +6,7 @@ of streaming analytics and in-memory data.
 ## Demos
 
 1. Banking
-  * [Trade Monitor](./banking/trade-monitor) Monitoring and aggregation of stock market trading volumes.
+  * [Transaction Monitor](./banking/transaction-monitor) Monitoring and aggregation of stock market trading volumes.
     * [Watch The Video](https://hazelcast.com/resources/continuous-query-with-drill-down-demo/)
   * [Credit Value Adjustment](./banking/credit-value-adjustment) Risk exposure calculation for Interest Rate Swaps.
 2. Benchmark

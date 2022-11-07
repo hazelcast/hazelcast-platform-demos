@@ -1,0 +1,32 @@
+<project name="transaction-monitor">
+	<target name="myecho">
+		<echo message="====================================" />
+		<echo message="$my.hz.cloud.cluster1.name=${my.hz.cloud.cluster1.name}" />
+		<echo message="$my.hz.cloud.cluster1.discovery.token=${my.hz.cloud.cluster1.discovery.token}" />
+		<echo message="$my.hz.cloud.cluster1.password=${my.hz.cloud.cluster1.password}" />
+		<echo message="$my.hz.cloud.cluster1.keys.location=${my.hz.cloud.cluster1.keys.location}" />
+		<echo message="====================================" />
+	</target>
+
+	<target name="mytestdir" depends="myecho">
+						<available file="${my.hz.cloud.cluster1.keys.location}" type="dir"
+							property="keys.directory.exists"/>
+	</target>
+
+	<target name="mycopy" depends="mytestdir" if="keys.directory.exists">
+		<echo message="====================================" />
+		<echo message="Copy from ${my.hz.cloud.cluster1.keys.location}" />
+		<echo message="====================================" />
+       		<copy todir="${project.build.directory}">
+       			<fileset dir="${my.hz.cloud.cluster1.keys.location}" includes="client.*store"/>
+        	</copy>
+	</target>
+	<target name="mydontcopy" depends="mytestdir" unless="keys.directory.exists">
+		<echo message="====================================" />
+		<echo message="${my.hz.cloud.cluster1.keys.location} not a directory. No copy" />
+		<echo message="====================================" />
+	</target>
+
+	<target name="conditionalcopy" depends="mycopy,mydontcopy">
+	</target>
+</project>

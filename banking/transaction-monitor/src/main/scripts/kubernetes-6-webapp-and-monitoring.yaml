@@ -1,0 +1,234 @@
+---
+# Service DNS for Webapp will be "transaction-monitor-webapp.default.svc.cluster.local".
+# Service DNS for FINOS Node.js will be "transaction-monitor-finos-nodejs.default.svc.cluster.local".
+# Service DNS for FINOS Python will be "transaction-monitor-finos-python.default.svc.cluster.local".
+# Service DNS for Prometheus will be "transaction-monitor-prometheus.default.svc.cluster.local".
+# Service DNS for Grafana will be "transaction-monitor-grafana.default.svc.cluster.local".
+---
+# Webapp
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-webapp
+spec:
+  selector:
+    app: transaction-monitor-webapp
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: LoadBalancer
+---
+# Only need 1 webapp
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transaction-monitor-webapp
+spec:
+  selector:
+    matchLabels:
+      app: transaction-monitor-webapp
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-webapp
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-webapp"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+          name: transaction-monitor-webapp-container
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 60
+          volumeMounts:
+            - name: configmap
+              mountPath: /customize/my-env.sh
+              subPath: my-env.sh
+      volumes:
+        - name: configmap
+          configMap:
+            name: transaction-monitor-configmap
+            defaultMode: 0755
+---
+# FinOS Node.js
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-finos-nodejs
+spec:
+  selector:
+    app: transaction-monitor-finos-nodejs
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: LoadBalancer
+---
+# Only need 1
+---
+#apiVersion: apps/v1
+#kind: Deployment
+#metadata:
+#  name: transaction-monitor-finos-nodejs
+#spec:
+#  selector:
+#    matchLabels:
+#      app: transaction-monitor-finos-nodejs
+#  template:
+#    metadata:
+#      labels:
+#        app: transaction-monitor-finos-nodejs
+#    spec:
+#      containers:
+#        - image: "hazelcast-platform-demos/transaction-monitor-finos-nodejs"
+#          imagePullPolicy: Never
+##          livenessProbe:
+##            httpGet:
+##              path: /
+##              port: 8080
+#          name: transaction-monitor-finos-nodejs-container
+##          readinessProbe:
+##            httpGet:
+##              path: /
+##              port: 8080
+#          volumeMounts:
+#            - name: configmap
+#              mountPath: /customize/my-env.sh
+#              subPath: my-env.sh
+#      volumes:
+#        - name: configmap
+#          configMap:
+#            name: transaction-monitor-configmap
+#            defaultMode: 0755
+---
+# FinOS Python
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-finos-python
+spec:
+  selector:
+    app: transaction-monitor-finos-python
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: LoadBalancer
+---
+# Only need 1
+---
+#apiVersion: apps/v1
+#kind: Deployment
+#metadata:
+#  name: transaction-monitor-finos-python
+#spec:
+#  selector:
+#    matchLabels:
+#      app: transaction-monitor-finos-python
+#  template:
+#    metadata:
+#      labels:
+#        app: transaction-monitor-finos-python
+#    spec:
+#      containers:
+#        - image: "hazelcast-platform-demos/transaction-monitor-finos-python"
+#          imagePullPolicy: Never
+##          livenessProbe:
+##            httpGet:
+##              path: /
+##              port: 8080
+#          name: transaction-monitor-finos-python-container
+##          readinessProbe:
+##            httpGet:
+##              path: /
+##              port: 8080
+#          volumeMounts:
+#            - name: configmap
+#              mountPath: /customize/my-env.sh
+#              subPath: my-env.sh
+#      volumes:
+#        - name: configmap
+#          configMap:
+#            name: transaction-monitor-configmap
+#            defaultMode: 0755
+---
+# Service for Prometheus
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-prometheus
+spec:
+  selector:
+    app: transaction-monitor-prometheus
+  ports:
+    - name: prometheus
+      port: 9090
+      targetPort: 9090
+  type: LoadBalancer
+---
+# Pods for Prometheus, only need one
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transaction-monitor-prometheus
+spec:
+  selector:
+    matchLabels:
+      app: transaction-monitor-prometheus
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-prometheus
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-prometheus"
+          imagePullPolicy: Never
+          name: transaction-monitor-prometheus-container
+---
+# Service for Grafana
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-grafana
+spec:
+  selector:
+    app: transaction-monitor-grafana
+  ports:
+    - name: grafana
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer
+---
+# Pods for Grafana, only need one
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transaction-monitor-grafana
+spec:
+  selector:
+    matchLabels:
+      app: transaction-monitor-grafana
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-grafana
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-grafana"
+          imagePullPolicy: Never
+          name: transaction-monitor-grafana-container
+---

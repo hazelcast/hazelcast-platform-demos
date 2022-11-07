@@ -1,0 +1,30 @@
+############################################################################
+# Jobs
+############################################################################
+---
+# Transaction Producer
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: transaction-monitor-job-transaction-producer
+  name: transaction-monitor-job-transaction-producer
+spec:
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-job-transaction-producer
+    spec:
+      containers:
+        - env:
+          # Internal port 19092
+          - name: "MY_BOOTSTRAP_SERVERS"
+            value: "transaction-monitor-kafka-broker-0.transaction-monitor-kafka-broker.default.svc.cluster.local:19092,transaction-monitor-kafka-broker-1.transaction-monitor-kafka-broker.default.svc.cluster.local:19092,transaction-monitor-kafka-broker-2.transaction-monitor-kafka-broker.default.svc.cluster.local:19092"
+          # Default port
+          - name: "MY_PULSAR_LIST"
+            value: "transaction-monitor-pulsar.default.svc.cluster.local"
+          image: "hazelcast-platform-demos/transaction-monitor-transaction-producer"
+          imagePullPolicy: Never
+          name: transaction-monitor-job-transaction-producer-container
+      restartPolicy: Never

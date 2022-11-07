@@ -1,0 +1,120 @@
+---
+# Creates a Kafka topic, and Kafdrop UI
+---
+############################################################################
+# Services
+############################################################################
+---
+# Kafdrop : DNS will be "transaction-monitor-kafdrop.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-kafdrop
+spec:
+  selector:
+    app: transaction-monitor-kafdrop
+  ports:
+  - port: 8080
+    targetPort: 9000
+  type: LoadBalancer
+---
+############################################################################
+# Jobs - runs immediately
+############################################################################
+---
+# Topic Create
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: transaction-monitor-job-topic-create
+  name: transaction-monitor-job-topic-create
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-job-topic-create
+    spec:
+      containers:
+        - env:
+          - name: "MY_BOOTSTRAP_SERVERS"
+            value: "transaction-monitor-kafka-broker-0.transaction-monitor-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-kafka-broker-1.transaction-monitor-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-kafka-broker-2.transaction-monitor-kafka-broker.default.svc.cluster.local:9092"
+          image: "hazelcast-platform-demos/transaction-monitor-topic-create"
+          imagePullPolicy: Never
+          name: transaction-monitor-job-topic-create-container
+      restartPolicy: Never
+---
+############################################################################
+# Deployments - wait to allow jobs to run, then create
+############################################################################
+---
+# Kafdrop
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: kafdrop
+  name: transaction-monitor-kafdrop
+spec:
+  selector:
+    matchLabels:
+      app: transaction-monitor-kafdrop
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-kafdrop
+        app.kubernetes.io/component: kafdrop
+    spec:
+      initContainers:
+        - name: wait-for-topic-create
+          image: busybox
+          command: ['sh', '-c', 'sleep 60']
+      containers:
+        - env:
+          # Internal port 19092
+          - name: "KAFKA_BROKERCONNECT"
+            value: "transaction-monitor-kafka-broker-0.transaction-monitor-kafka-broker.default.svc.cluster.local:19092,transaction-monitor-kafka-broker-1.transaction-monitor-kafka-broker.default.svc.cluster.local:19092,transaction-monitor-kafka-broker-2.transaction-monitor-kafka-broker.default.svc.cluster.local:19092"
+          image: "hazelcast-platform-demos/transaction-monitor-kafdrop"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 9000
+          name: transaction-monitor-kafdrop-container
+          ports:
+            - containerPort: 9000
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9000
+            initialDelaySeconds: 30
+---
+# Postgres
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: postgres
+  name: transaction-monitor-postgres
+spec:
+  selector:
+    matchLabels:
+      app: transaction-monitor-postgres
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-postgres
+        app.kubernetes.io/component: postgres
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-postgres"
+          imagePullPolicy: Never
+          name: transaction-monitor-postgres-container
+          ports:
+            - containerPort: 5432
+---
