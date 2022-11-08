@@ -52,6 +52,7 @@ public class MyUtils {
     private static final int CSV_FIRST = 0;
     private static final int CSV_SECOND = 1;
     private static final int CSV_THIRD = 2;
+    private static final int CSV_FOURTH = 3;
     private static final int CSV_FIFTH = 4;
 
     /**
@@ -74,7 +75,7 @@ public class MyUtils {
         ) {
             result =
                     bufferedReader.lines()
-                    .filter(line -> !line.startsWith("#"))
+                    .filter(line -> line.length() > 0 && !line.startsWith("#"))
                     .map(line -> {
                         String[] split = line.split("\\|");
                         Tuple3<String, NasdaqMarketCategory, NasdaqFinancialStatus> tuple3
@@ -83,6 +84,42 @@ public class MyUtils {
                                     NasdaqFinancialStatus.valueOfFinancialtatus(split[CSV_FIFTH]));
                         return new SimpleImmutableEntry
                                 <String, Tuple3<String, NasdaqMarketCategory, NasdaqFinancialStatus>>(split[CSV_FIRST], tuple3);
+                    })
+                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+        }
+
+        return result;
+    }
+
+    /**
+     * <p>Read E-commerce stock symbols and details about it from
+     * a CSV file on the classpath.
+     * </p>
+     *
+     * @return A map with symbol key and security item as value
+     * @throws Exception
+     */
+    public static Map<String, Tuple3<String, String, Double>>
+        productCatalog() throws Exception {
+        Map<String, Tuple3<String, String, Double>> result = null;
+
+        try (
+             BufferedReader bufferedReader =
+                 new BufferedReader(
+                     new InputStreamReader(
+                             MyUtils.class.getResourceAsStream("/productcatalog.txt"), StandardCharsets.UTF_8));
+        ) {
+            result =
+                    bufferedReader.lines()
+                    .filter(line -> line.length() > 0 && !line.startsWith("#"))
+                    .map(line -> {
+                        String[] split = line.split("\\|");
+                        Tuple3<String, String, Double> tuple3
+                            = Tuple3.tuple3(split[CSV_SECOND],
+                                    split[CSV_THIRD],
+                                    Double.parseDouble(split[CSV_FOURTH]));
+                        return new SimpleImmutableEntry
+                                <String, Tuple3<String, String, Double>>(split[CSV_FIRST], tuple3);
                     })
                     .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
         }
@@ -319,4 +356,29 @@ public class MyUtils {
         return result;
     }
 
+    /**
+     * <p>Look-up from properties
+     * </p>
+     *
+     * @param properties
+     * @return
+     */
+    public static TransactionMonitorSkin getTransactionMonitorSkin(Properties properties) {
+        String key = MyConstants.TRANSACTION_MONITOR_SKIN;
+        try {
+            String value = (properties == null ? "" : properties.getProperty(key, ""));
+            for (TransactionMonitorSkin possible : TransactionMonitorSkin.values()) {
+                if (possible.toString().equalsIgnoreCase(value)) {
+                    return possible;
+                }
+            }
+            LOGGER.error("No match for skin '{}' in {}", value, TransactionMonitorSkin.values());
+        } catch (Exception e) {
+            String message = String.format("Parse error '%s' in '%s'", key, properties);
+            LOGGER.error(message, e);
+        }
+        TransactionMonitorSkin defaultValue = TransactionMonitorSkin.TRADE;
+        LOGGER.info("Defaulting to '{}' for key '{}'", defaultValue, key);
+        return defaultValue;
+    }
 }

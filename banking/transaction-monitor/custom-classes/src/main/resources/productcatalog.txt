@@ -1,0 +1,5 @@
+# Item Code|Item Name|Category|Price
+XBOXS|XBox Series S|Console|249.00
+XBOXX|XBox Series X|Console|449.00
+PS5DE|Playstation 5 Digital Edition|Console|549.00
+PS5BLU|Playstation 5 Blu-ray|Console|599.00

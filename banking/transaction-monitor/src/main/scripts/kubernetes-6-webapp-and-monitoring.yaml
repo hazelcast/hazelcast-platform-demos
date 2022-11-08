@@ -47,7 +47,7 @@ spec:
             httpGet:
               path: /
               port: 8080
-            initialDelaySeconds: 60
+            initialDelaySeconds: 120
           volumeMounts:
             - name: configmap
               mountPath: /customize/my-env.sh

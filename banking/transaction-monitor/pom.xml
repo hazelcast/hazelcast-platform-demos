@@ -111,7 +111,7 @@
                         <target>
                         <echo message="@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" />
                         <echo message="Set in top level pom.xml" />
-                        <echo message="$my.transaction-monitor.skin=${my.transaction-monitor.skin}" />
+                        <echo message="$my.pulsar.or.kafka=${my.pulsar.or.kafka}" />
                         <echo message="$my.transaction-monitor.skin=${my.transaction-monitor.skin}" />
                         <echo message="@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" />
                     </target>

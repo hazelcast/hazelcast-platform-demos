@@ -309,26 +309,29 @@ public class ApplicationRunner {
     private boolean demoSql() {
         boolean didFail = false;
         String[][] queries = new String[][] {
-            /* Turn off if you wish Javalin available sooner
+            /* Turn off if you wish Javalin available sooner, and so Kubernetes readiness probe is happy.
              */
             { "System",  "SELECT * FROM information_schema.mappings" },
             { "System",  "SELECT table_name AS name FROM information_schema.mappings" },
-            { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS },
+            { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS + " LIMIT 5" },
             { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_SYMBOLS + " LIMIT 5" },
-            { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_TRANSACTIONS },
+            { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_TRANSACTIONS + " LIMIT 5"},
             { "IMap",    "SELECT id, symbol, price FROM " + MyConstants.IMAP_NAME_TRANSACTIONS
-                    + " WHERE symbol LIKE 'AA%' AND price > 2510" },
-            { "Kafka",   "SELECT * FROM " + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS },
+                    + " WHERE symbol LIKE 'AA%' AND price > 2510 LIMIT 5" },
+            /* Streaming query, if not enough data to exceed LIMIT it waits, forcing pod timeout
+            { "Kafka",   "SELECT * FROM " + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS
+                   + " LIMIT 5"},
             // The next 2 have the same execution plan but are declared differently
             { "Join",    "SELECT * FROM (SELECT id, symbol, \"timestamp\" FROM "
                 + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS + ") AS k"
-                    + " LEFT JOIN symbols AS s ON k.symbol = s.__key" },
+                    + " LEFT JOIN symbols AS s ON k.symbol = s.__key LIMIT 5" },
             { "Join",    "SELECT k.id, k.symbol, k.\"timestamp\", s.* FROM "
                     + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS + " AS k"
-                    + " LEFT JOIN symbols AS s ON k.symbol = s.__key" },
+                    + " LEFT JOIN symbols AS s ON k.symbol = s.__key LIMIT 5" },
             { "Join",    "SELECT * FROM (SELECT id, symbol, \"timestamp\" FROM "
                     + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS + ") AS k"
-                + " LEFT JOIN (SELECT * FROM " + MyConstants.IMAP_NAME_SYMBOLS + ") AS s ON k.symbol = s.__key" },
+                + " LEFT JOIN (SELECT * FROM " + MyConstants.IMAP_NAME_SYMBOLS + ") AS s ON k.symbol = s.__key LIMIT 5" },
+                */
             { "IMap",    "SELECT stock FROM " + MyConstants.IMAP_NAME_PORTFOLIOS + " ORDER BY 1 DESC LIMIT 3"},
             { "IMap",    "SHOW MAPPINGS" },
             { "IMap",    "SHOW VIEWS" },

@@ -36,7 +36,7 @@
                 <!-- Configure the build for HZ Cloud or all Kubernetes -->
                 <use.hz-cloud>false</use.hz-cloud>
 
-		<!-- Variations for the Transaction Monitor -->
+		<!-- Variations for the Transaction Monitor, TransactionSkin.java ENUM -->
 		<my.transaction-monitor.skin>trade</my.transaction-monitor.skin>
 		<my.transaction-monitor.skin>ecommerce</my.transaction-monitor.skin>
 

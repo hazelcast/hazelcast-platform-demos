@@ -39,6 +39,8 @@ import org.slf4j.LoggerFactory;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.platform.demos.utils.UtilsUrls;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * <p>The main "{@code run()}" method of the application, called
  * once configuration created.
@@ -49,18 +51,22 @@ public class ApplicationRunner {
 
     private static final long LOG_THRESHOLD = 20_000L;
     private static final int MAX_BATCH_SIZE = 16 * 1024;
-    private static final int OPENING_PRICE = 2_500;
-    private static final int LOWEST_QUANTITY = 10;
-    private static final int HIGHEST_QUANTITY = 10_000;
+    private static final int OPENING_TRADE_PRICE = 2_500;
+    private static final int LOWEST_ECOMMERCE_QUANTITY = 10;
+    private static final int LOWEST_TRADE_QUANTITY = 10;
+    private static final int HIGHEST_TRADE_QUANTITY = 10_000;
 
     private final int rate;
     private final int max;
     private final boolean usePulsar;
+    private final TransactionMonitorSkin transactionMonitorSkin;
     private int count;
     private final KafkaProducer<String, String> kafkaProducer;
     private final Producer<String> pulsarProducer;
-    private final List<String> symbols;
-    private final Map<String, Integer> symbolToPrice;
+    private List<String> ecommerceSymbols;
+    private List<String> tradeSymbols;
+    private Map<String, Double> ecommerceSymbolToPrice;
+    private Map<String, Integer> tradeSymbolToPrice;
 
     /**
      * <p>Initialise a connection to Kafka for writing.
@@ -73,13 +79,18 @@ public class ApplicationRunner {
      * @param arg2 Kafka broker list
      * @param arg3 Pulsar connection list
      * @param arg4 Which of arg2 or arg3 to use
+     * @param arg5 What type of transactions - banking, e-commerce, etc
      */
-    public ApplicationRunner(int arg0, int arg1, String arg2, String arg3, boolean arg4) throws Exception {
+    @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
+            justification = "https://github.com/spotbugs/spotbugs/issues/1812")
+    public ApplicationRunner(int arg0, int arg1, String arg2, String arg3,
+            boolean arg4, TransactionMonitorSkin arg5) throws Exception {
         this.rate = arg0;
         this.max = arg1;
         String bootstrapServers = arg2;
         String pulsarList = arg3;
         this.usePulsar = arg4;
+        this.transactionMonitorSkin = arg5;
 
         if (this.usePulsar) {
             String serviceUrl = UtilsUrls.getPulsarServiceUrl(pulsarList);
@@ -107,17 +118,34 @@ public class ApplicationRunner {
             this.pulsarProducer = null;
         }
 
+        this.initMaps();
+    }
+
+    /**
+     * <p>Set up data.
+     * </p>
+     */
+    private void initMaps() throws Exception {
         Map<String, Tuple3<String, NasdaqMarketCategory, NasdaqFinancialStatus>>
             nasdaqListed = MyUtils.nasdaqListed();
+        Map<String, Tuple3<String, String, Double>>
+            productCatalog = MyUtils.productCatalog();
 
-        this.symbols = new ArrayList<>(nasdaqListed.keySet());
+        this.ecommerceSymbols = new ArrayList<>(productCatalog.keySet());
+        this.tradeSymbols = new ArrayList<>(nasdaqListed.keySet());
 
-        this.symbolToPrice = nasdaqListed.entrySet().stream()
+        this.ecommerceSymbolToPrice = productCatalog.entrySet().stream()
+                .collect(Collectors.<Entry<String,
+                        Tuple3<String, String, Double>>,
+                            String, Double>toMap(
+                        entry -> entry.getKey(),
+                        entry -> entry.getValue().f2()));
+        this.tradeSymbolToPrice = nasdaqListed.entrySet().stream()
                 .collect(Collectors.<Entry<String,
                         Tuple3<String, NasdaqMarketCategory, NasdaqFinancialStatus>>,
                             String, Integer>toMap(
                         entry -> entry.getKey(),
-                        entry -> OPENING_PRICE));
+                        entry -> OPENING_TRADE_PRICE));
     }
 
     /**
@@ -147,7 +175,16 @@ public class ApplicationRunner {
                     }
 
                     String id = UUID.randomUUID().toString();
-                    String transaction = this.createTransaction(id, random);
+                    String transaction;
+                    switch (this.transactionMonitorSkin) {
+                    case ECOMMERCE:
+                        transaction = this.createEcommerceTransaction(id, random);
+                        break;
+                    case TRADE:
+                    default:
+                        transaction = this.createTradeTransaction(id, random);
+                        break;
+                    }
 
                     if (this.usePulsar) {
                         this.pulsarProducer.newMessage(Schema.STRING)
@@ -176,6 +213,44 @@ public class ApplicationRunner {
     }
 
     /**
+     * <p>Create a random e-commerce transaction with the supplied (random!) Id.
+     * The price is fixed. The quantity is usually 1 but sometimes higher.
+     * <p>
+     *
+     * @param id Identifies the transaction uniquely
+     * @return A transaction with that transaction Id
+     */
+    private String createEcommerceTransaction(String id, ThreadLocalRandom random) {
+        String symbol = this.ecommerceSymbols.get(random.nextInt(this.ecommerceSymbols.size()));
+
+        double price = this.ecommerceSymbolToPrice.get(symbol);
+        // Buy 1, sometimes 2, even 3.
+        int quantity = 1;
+        if (random.nextInt(LOWEST_ECOMMERCE_QUANTITY) == 0) {
+            quantity++;
+            if (random.nextInt(LOWEST_ECOMMERCE_QUANTITY) == 0) {
+                quantity++;
+            }
+        }
+
+        String transaction = String.format("{"
+                        + "\"id\": \"%s\","
+                        + "\"timestamp\": %d,"
+                        + "\"symbol\": \"%s\","
+                        + "\"price\": %f,"
+                        + "\"quantity\": %d"
+                        + "}",
+                id,
+                System.currentTimeMillis(),
+                symbol,
+                price,
+                quantity
+        );
+
+        return transaction;
+    }
+
+    /**
      * <p>Create a random transaction with the supplied (random!) Id.
      * The price is a random fluctuation of the price of the
      * symbol. The quantity is random but within bounds.
@@ -184,11 +259,11 @@ public class ApplicationRunner {
      * @param id Identifies the transaction uniquely
      * @return A transaction with that transaction Id
      */
-    private String createTransaction(String id, ThreadLocalRandom random) {
-        String symbol = symbols.get(random.nextInt(symbols.size()));
+    private String createTradeTransaction(String id, ThreadLocalRandom random) {
+        String symbol = this.tradeSymbols.get(random.nextInt(this.tradeSymbols.size()));
 
         // Vary price between -1 to +2... randomly
-        int price = this.symbolToPrice.compute(symbol,
+        int price = this.tradeSymbolToPrice.compute(symbol,
                 (k, v) -> v + random.nextInt(-1, 2));
 
         String transaction = String.format("{"
@@ -202,7 +277,7 @@ public class ApplicationRunner {
                 System.currentTimeMillis(),
                 symbol,
                 price,
-                random.nextInt(LOWEST_QUANTITY, HIGHEST_QUANTITY)
+                random.nextInt(LOWEST_TRADE_QUANTITY, HIGHEST_TRADE_QUANTITY)
         );
 
         return transaction;
