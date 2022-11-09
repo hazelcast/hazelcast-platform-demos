@@ -23,6 +23,7 @@ import java.util.List;
  * </p>
  */
 public class MyConstants {
+    public static final String APPLICATION_PROPERTIES_FILE = "application.properties";
 
     public static final String KAFKA_TOPIC_MAPPING_PREFIX = "";
     public static final String KAFKA_TOPIC_NAME_ALERTS = "kf_alerts";
@@ -34,30 +35,38 @@ public class MyConstants {
     public static final String POSTGRES_USER = "my.postgres.user";
     public static final String POSTGRES_PASSWORD = "my.postgres.password";
     // Table name should match "init.sql" in Postgres module.
-    public static final String POSTGRES_TABLE_NAME = "alerts_max_volume";
+    public static final String POSTGRES_TABLE_NAME = "alerts_log";
     public static final String POSTGRES_TABLE_KEY_NAME = "now";
     public static final String PROJECT_MODULE = "my.project.module";
     public static final String PROJECT_NAME = "my.project.name";
-    // Label used on MapStore saved, so can later identify change soure
+    // Label used on MapStore saved, so can later identify change source
     public static final String PROJECT_PROVENANCE = PROJECT_NAME;
     public static final String PULSAR_CONFIG_KEY = "my.pulsar.list";
     public static final String PULSAR_TOPIC_NAME_TRANSACTIONS = "pulsar_transactions";
     public static final String PULSAR_OR_KAFKA_KEY = "my.pulsar.or.kafka";
-    public static final String TRANSACTION_MONITOR_SKIN = "my.transaction-monitor.skin";
+    public static final String TRANSACTION_MONITOR_FLAVOR = "my.transaction-monitor.flavor";
     public static final String USE_HZ_CLOUD = "use.hz-cloud";
 
     public static final String IMAP_NAME_AGGREGATE_QUERY_RESULTS = "AggregateQuery" + "_results";
-    public static final String IMAP_NAME_ALERTS_MAX_VOLUME = "alertsMaxVolume";
+    public static final String IMAP_NAME_ALERTS_LOG = "alertsLog";
     public static final String IMAP_NAME_AUDIT_LOG = "audit_log";
     public static final String IMAP_NAME_JOB_CONTROL = "job_control";
     public static final String IMAP_NAME_JOB_CONFIG = "job_config";
     public static final String IMAP_NAME_PORTFOLIOS = "portfolios";
+    public static final String IMAP_NAME_PRODUCTS = "products";
     public static final String IMAP_NAME_PYTHON_SENTIMENT = "python_sentiment";
     public static final String IMAP_NAME_SYMBOLS = "symbols";
     public static final String IMAP_NAME_TRANSACTIONS = "transactions";
 
-    public static final List<String> IMAP_NAMES =
-            List.of(IMAP_NAME_AGGREGATE_QUERY_RESULTS, IMAP_NAME_ALERTS_MAX_VOLUME,
+    public static final List<String> IMAP_NAMES_ECOMMERCE =
+            List.of(IMAP_NAME_AGGREGATE_QUERY_RESULTS, IMAP_NAME_ALERTS_LOG,
+                    IMAP_NAME_JOB_CONTROL, IMAP_NAME_JOB_CONFIG,
+                    IMAP_NAME_PRODUCTS,
+                    //TODO IMAP_NAME_PORTFOLIOS, IMAP_NAME_PYTHON_SENTIMENT,
+                    IMAP_NAME_TRANSACTIONS);
+
+    public static final List<String> IMAP_NAMES_TRADES =
+            List.of(IMAP_NAME_AGGREGATE_QUERY_RESULTS, IMAP_NAME_ALERTS_LOG,
                     IMAP_NAME_JOB_CONTROL, IMAP_NAME_JOB_CONFIG,
                     IMAP_NAME_PORTFOLIOS, IMAP_NAME_PYTHON_SENTIMENT,
                     IMAP_NAME_SYMBOLS, IMAP_NAME_TRANSACTIONS);

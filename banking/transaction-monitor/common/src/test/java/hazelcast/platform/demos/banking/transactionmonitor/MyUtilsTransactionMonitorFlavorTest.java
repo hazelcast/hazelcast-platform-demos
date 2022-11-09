@@ -17,6 +17,7 @@
 package hazelcast.platform.demos.banking.transactionmonitor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Properties;
 import java.util.UUID;
@@ -30,34 +31,32 @@ import org.junit.jupiter.api.TestInfo;
  */
 public class MyUtilsTransactionMonitorSkinTest {
 
-    private static final TransactionMonitorSkin DEFAULT_SKIN = TransactionMonitorSkin.TRADE;
-
     @Test
     public void testNullProperty(TestInfo testInfo) {
         Properties properties = null;
-        TransactionMonitorSkin output = MyUtils.getTransactionMonitorSkin(properties);
-        TransactionMonitorSkin expected = DEFAULT_SKIN;
 
-        assertEquals(expected, output);
+        assertThrows(RuntimeException.class, () -> {
+                MyUtils.getTransactionMonitorSkin(properties);
+                });
     }
 
     @Test
     public void testNoProperty(TestInfo testInfo) {
         Properties properties = new Properties();
-        TransactionMonitorSkin output = MyUtils.getTransactionMonitorSkin(properties);
-        TransactionMonitorSkin expected = DEFAULT_SKIN;
 
-        assertEquals(expected, output);
+        assertThrows(RuntimeException.class, () -> {
+            MyUtils.getTransactionMonitorSkin(properties);
+            });
     }
 
     @Test
     public void testBlankProperty(TestInfo testInfo) {
         Properties properties = new Properties();
         properties.put(MyConstants.TRANSACTION_MONITOR_SKIN, "");
-        TransactionMonitorSkin output = MyUtils.getTransactionMonitorSkin(properties);
-        TransactionMonitorSkin expected = DEFAULT_SKIN;
 
-        assertEquals(expected, output);
+        assertThrows(RuntimeException.class, () -> {
+            MyUtils.getTransactionMonitorSkin(properties);
+            });
     }
 
     // Defend against someone adding "unknown" as a skin type.
@@ -65,14 +64,14 @@ public class MyUtilsTransactionMonitorSkinTest {
     public void testUnknownProperty(TestInfo testInfo) {
         Properties properties = new Properties();
         properties.put(MyConstants.TRANSACTION_MONITOR_SKIN, "unknown-" + UUID.randomUUID().toString());
-        TransactionMonitorSkin output = MyUtils.getTransactionMonitorSkin(properties);
-        TransactionMonitorSkin expected = DEFAULT_SKIN;
 
-        assertEquals(expected, output);
+        assertThrows(RuntimeException.class, () -> {
+            MyUtils.getTransactionMonitorSkin(properties);
+            });
     }
 
     @Test
-    public void testCorrectProperty(TestInfo testInfo) {
+    public void testCorrectProperty(TestInfo testInfo) throws Exception {
         Properties properties = new Properties();
         properties.put(MyConstants.TRANSACTION_MONITOR_SKIN, "ecommerce");
         TransactionMonitorSkin output = MyUtils.getTransactionMonitorSkin(properties);

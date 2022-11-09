@@ -71,11 +71,11 @@ public class UtilsFormatter {
      */
     public static String safeForJsonStr(String input) {
         String[] tokens = input.replaceAll("\"", "'").split(System.getProperty("line.separator"));
-        String result = tokens[0];
+        StringBuffer result = new StringBuffer(tokens[0]);
         for (int i = 1; i < tokens.length; i++) {
-            result += "+" + tokens[i];
+            result.append("+").append(tokens[i]);
         }
-        return result;
+        return result.toString();
     }
 
     /**

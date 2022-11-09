@@ -27,6 +27,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -363,22 +364,18 @@ public class MyUtils {
      * @param properties
      * @return
      */
-    public static TransactionMonitorSkin getTransactionMonitorSkin(Properties properties) {
+    public static TransactionMonitorSkin getTransactionMonitorSkin(Properties properties) throws Exception {
         String key = MyConstants.TRANSACTION_MONITOR_SKIN;
-        try {
-            String value = (properties == null ? "" : properties.getProperty(key, ""));
-            for (TransactionMonitorSkin possible : TransactionMonitorSkin.values()) {
-                if (possible.toString().equalsIgnoreCase(value)) {
-                    return possible;
-                }
+        String value = (properties == null ? "" : properties.getProperty(key, ""));
+
+        for (TransactionMonitorSkin possible : TransactionMonitorSkin.values()) {
+            if (possible.toString().equalsIgnoreCase(value)) {
+                return possible;
             }
-            LOGGER.error("No match for skin '{}' in {}", value, TransactionMonitorSkin.values());
-        } catch (Exception e) {
-            String message = String.format("Parse error '%s' in '%s'", key, properties);
-            LOGGER.error(message, e);
         }
-        TransactionMonitorSkin defaultValue = TransactionMonitorSkin.TRADE;
-        LOGGER.info("Defaulting to '{}' for key '{}'", defaultValue, key);
-        return defaultValue;
+
+        String message = String.format("No match for skin '%s' in %s",
+                value, Arrays.toString(TransactionMonitorSkin.values()));
+        throw new RuntimeException(message);
     }
 }

@@ -36,9 +36,9 @@
                 <!-- Configure the build for HZ Cloud or all Kubernetes -->
                 <use.hz-cloud>false</use.hz-cloud>
 
-		<!-- Variations for the Transaction Monitor, TransactionSkin.java ENUM -->
-		<my.transaction-monitor.skin>trade</my.transaction-monitor.skin>
-		<my.transaction-monitor.skin>ecommerce</my.transaction-monitor.skin>
+		<!-- Variations for the Transaction Monitor, TransactionMonitorFlavor.java ENUM -->
+		<my.transaction-monitor.flavor>trade</my.transaction-monitor.flavor>
+		<my.transaction-monitor.flavor>ecommerce</my.transaction-monitor.flavor>
 
 		<!-- For Management Center, Cassandra/Mongo/MySQL etc logons -->
 		<my.mc.admin.user>admin</my.mc.admin.user>
@@ -83,7 +83,7 @@
 			banking/credit-value-adjustment/common/src/main/proto/JetToCpp.proto -->
 		<protobuf.version>3.21.6</protobuf.version>
 		<pulsar.version>2.8.0</pulsar.version>
-		<spotbugs-annotations.version>4.7.1</spotbugs-annotations.version>
+		<spotbugs-annotations.version>4.7.3</spotbugs-annotations.version>
 		<springdoc.version>1.6.7</springdoc.version>
 		<spring-boot.version>2.7.5</spring-boot.version>
 		<spring-cloud.version>2021.0.0</spring-cloud.version>
@@ -109,7 +109,7 @@
 		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
 		<os-maven-plugin.version>1.6.2</os-maven-plugin.version>
 		<protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
-		<spotbugs-maven-plugin.version>4.7.1.1</spotbugs-maven-plugin.version>
+		<spotbugs-maven-plugin.version>4.7.2.2</spotbugs-maven-plugin.version>
 
 		<!-- Javascript -->
 		<node.version>v18.5.0</node.version>
@@ -508,6 +508,9 @@
 										<platform>linux/x86_64</platform>
 									</createImageOptions>
 									<dockerFile>${project.basedir}/Dockerfile</dockerFile>
+									<!--
+									<squash>true</squash>
+									-->
 								</build>
                                 <name>hazelcast-platform-demos/${my.docker.image.prefix}-${my.docker.image.name}</name>								
                             </image>
