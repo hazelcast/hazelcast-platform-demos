@@ -43,7 +43,7 @@ public class Application {
     public static void main(String[] args) throws Exception {
         Properties properties = UtilsProperties.loadClasspathProperties("application.properties");
         String pulsarOrKafka = properties.getProperty(MyConstants.PULSAR_OR_KAFKA_KEY);
-        TransactionMonitorSkin transactionMonitorSkin = MyUtils.getTransactionMonitorSkin(properties);
+        TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(properties);
 
         boolean usePulsar = MyUtils.usePulsar(pulsarOrKafka);
         if (usePulsar) {
@@ -53,7 +53,7 @@ public class Application {
             LOGGER.info("Using Kafka = '{}'=='{}'",
                     MyConstants.PULSAR_OR_KAFKA_KEY, pulsarOrKafka);
         }
-        LOGGER.info("Producing '{}'", transactionMonitorSkin);
+        LOGGER.info("TransactionMonitorFlavor=='{}'", transactionMonitorFlavor);
 
         String bootstrapServers = null;
         String pulsarList = null;
@@ -83,7 +83,7 @@ public class Application {
             max = Integer.parseInt(args[2]);
         }
 
-        new ApplicationRunner(rate, max, bootstrapServers, pulsarList, usePulsar, transactionMonitorSkin).run();
+        new ApplicationRunner(rate, max, bootstrapServers, pulsarList, usePulsar, transactionMonitorFlavor).run();
     }
 
 }

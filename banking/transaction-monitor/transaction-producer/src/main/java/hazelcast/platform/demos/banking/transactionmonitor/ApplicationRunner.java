@@ -55,17 +55,22 @@ public class ApplicationRunner {
     private static final int LOWEST_ECOMMERCE_QUANTITY = 10;
     private static final int LOWEST_TRADE_QUANTITY = 10;
     private static final int HIGHEST_TRADE_QUANTITY = 10_000;
+    private static final int DISCOUNT_ECOMMERCE_PERCENT = 100;
+    private static final int DISCOUNT_ECOMMERCE_1 = 75;
+    private static final int DISCOUNT_ECOMMERCE_2 = 85;
+    private static final int DISCOUNT_ECOMMERCE_3 = 90;
+    private static final int ONE_HUNDRED = 100;
 
     private final int rate;
     private final int max;
     private final boolean usePulsar;
-    private final TransactionMonitorSkin transactionMonitorSkin;
+    private final TransactionMonitorFlavor transactionMonitorFlavor;
     private int count;
     private final KafkaProducer<String, String> kafkaProducer;
     private final Producer<String> pulsarProducer;
-    private List<String> ecommerceSymbols;
+    private List<String> ecommerceItems;
     private List<String> tradeSymbols;
-    private Map<String, Double> ecommerceSymbolToPrice;
+    private Map<String, Double> ecommerceItemsToPrice;
     private Map<String, Integer> tradeSymbolToPrice;
 
     /**
@@ -84,13 +89,13 @@ public class ApplicationRunner {
     @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
             justification = "https://github.com/spotbugs/spotbugs/issues/1812")
     public ApplicationRunner(int arg0, int arg1, String arg2, String arg3,
-            boolean arg4, TransactionMonitorSkin arg5) throws Exception {
+            boolean arg4, TransactionMonitorFlavor arg5) throws Exception {
         this.rate = arg0;
         this.max = arg1;
         String bootstrapServers = arg2;
         String pulsarList = arg3;
         this.usePulsar = arg4;
-        this.transactionMonitorSkin = arg5;
+        this.transactionMonitorFlavor = arg5;
 
         if (this.usePulsar) {
             String serviceUrl = UtilsUrls.getPulsarServiceUrl(pulsarList);
@@ -131,10 +136,10 @@ public class ApplicationRunner {
         Map<String, Tuple3<String, String, Double>>
             productCatalog = MyUtils.productCatalog();
 
-        this.ecommerceSymbols = new ArrayList<>(productCatalog.keySet());
+        this.ecommerceItems = new ArrayList<>(productCatalog.keySet());
         this.tradeSymbols = new ArrayList<>(nasdaqListed.keySet());
 
-        this.ecommerceSymbolToPrice = productCatalog.entrySet().stream()
+        this.ecommerceItemsToPrice = productCatalog.entrySet().stream()
                 .collect(Collectors.<Entry<String,
                         Tuple3<String, String, Double>>,
                             String, Double>toMap(
@@ -176,7 +181,7 @@ public class ApplicationRunner {
 
                     String id = UUID.randomUUID().toString();
                     String transaction;
-                    switch (this.transactionMonitorSkin) {
+                    switch (this.transactionMonitorFlavor) {
                     case ECOMMERCE:
                         transaction = this.createEcommerceTransaction(id, random);
                         break;
@@ -214,16 +219,16 @@ public class ApplicationRunner {
 
     /**
      * <p>Create a random e-commerce transaction with the supplied (random!) Id.
-     * The price is fixed. The quantity is usually 1 but sometimes higher.
+     * The price may be discounted. The quantity is usually 1 but sometimes higher.
      * <p>
      *
      * @param id Identifies the transaction uniquely
      * @return A transaction with that transaction Id
      */
     private String createEcommerceTransaction(String id, ThreadLocalRandom random) {
-        String symbol = this.ecommerceSymbols.get(random.nextInt(this.ecommerceSymbols.size()));
+        String itemCode = this.ecommerceItems.get(random.nextInt(this.ecommerceItems.size()));
 
-        double price = this.ecommerceSymbolToPrice.get(symbol);
+        double price = this.ecommerceItemsToPrice.get(itemCode);
         // Buy 1, sometimes 2, even 3.
         int quantity = 1;
         if (random.nextInt(LOWEST_ECOMMERCE_QUANTITY) == 0) {
@@ -233,16 +238,27 @@ public class ApplicationRunner {
             }
         }
 
+        int discountBand = random.nextInt(DISCOUNT_ECOMMERCE_PERCENT);
+        if (discountBand > DISCOUNT_ECOMMERCE_1 && price <= DISCOUNT_ECOMMERCE_2) {
+            price = price * DISCOUNT_ECOMMERCE_1 / DISCOUNT_ECOMMERCE_PERCENT;
+        }
+        if (discountBand > DISCOUNT_ECOMMERCE_2 && price <= DISCOUNT_ECOMMERCE_3) {
+            price = price * DISCOUNT_ECOMMERCE_2 / DISCOUNT_ECOMMERCE_PERCENT;
+        }
+        if (discountBand > DISCOUNT_ECOMMERCE_3) {
+            price = price * DISCOUNT_ECOMMERCE_3 / DISCOUNT_ECOMMERCE_PERCENT;
+        }
+
         String transaction = String.format("{"
                         + "\"id\": \"%s\","
                         + "\"timestamp\": %d,"
-                        + "\"symbol\": \"%s\","
-                        + "\"price\": %f,"
+                        + "\"item_code\": \"%s\","
+                        + "\"price\": %.2f,"
                         + "\"quantity\": %d"
                         + "}",
                 id,
                 System.currentTimeMillis(),
-                symbol,
+                itemCode,
                 price,
                 quantity
         );
@@ -263,14 +279,14 @@ public class ApplicationRunner {
         String symbol = this.tradeSymbols.get(random.nextInt(this.tradeSymbols.size()));
 
         // Vary price between -1 to +2... randomly
-        int price = this.tradeSymbolToPrice.compute(symbol,
-                (k, v) -> v + random.nextInt(-1, 2));
+        double price = 1D * this.tradeSymbolToPrice.compute(symbol,
+                (k, v) -> v + random.nextInt(-1, 2)) / ONE_HUNDRED;
 
         String transaction = String.format("{"
                         + "\"id\": \"%s\","
                         + "\"timestamp\": %d,"
                         + "\"symbol\": \"%s\","
-                        + "\"price\": %d,"
+                        + "\"price\": %.2f,"
                         + "\"quantity\": %d"
                         + "}",
                 id,

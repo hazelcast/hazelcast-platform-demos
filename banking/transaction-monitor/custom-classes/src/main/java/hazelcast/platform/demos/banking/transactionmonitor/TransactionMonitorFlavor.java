@@ -20,7 +20,7 @@ package hazelcast.platform.demos.banking.transactionmonitor;
  * <p>The flavor of transactions produced.
  * </p>
  */
-public enum TransactionMonitorSkin {
+public enum TransactionMonitorFlavor {
 
     ECOMMERCE,
     TRADE;

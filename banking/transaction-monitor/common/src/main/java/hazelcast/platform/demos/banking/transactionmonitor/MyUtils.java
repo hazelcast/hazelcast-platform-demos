@@ -364,18 +364,18 @@ public class MyUtils {
      * @param properties
      * @return
      */
-    public static TransactionMonitorSkin getTransactionMonitorSkin(Properties properties) throws Exception {
-        String key = MyConstants.TRANSACTION_MONITOR_SKIN;
+    public static TransactionMonitorFlavor getTransactionMonitorFlavor(Properties properties) throws Exception {
+        String key = MyConstants.TRANSACTION_MONITOR_FLAVOR;
         String value = (properties == null ? "" : properties.getProperty(key, ""));
 
-        for (TransactionMonitorSkin possible : TransactionMonitorSkin.values()) {
+        for (TransactionMonitorFlavor possible : TransactionMonitorFlavor.values()) {
             if (possible.toString().equalsIgnoreCase(value)) {
                 return possible;
             }
         }
 
-        String message = String.format("No match for skin '%s' in %s",
-                value, Arrays.toString(TransactionMonitorSkin.values()));
+        String message = String.format("No match for flavor '%s' in %s",
+                value, Arrays.toString(TransactionMonitorFlavor.values()));
         throw new RuntimeException(message);
     }
 }

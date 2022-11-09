@@ -29,15 +29,15 @@ import org.junit.jupiter.api.TestInfo;
  * <p>Test the enumeration lookup.
  * </p>
  */
-public class MyUtilsTransactionMonitorSkinTest {
+public class MyUtilsTransactionMonitorFlavorTest {
 
     @Test
     public void testNullProperty(TestInfo testInfo) {
         Properties properties = null;
 
         assertThrows(RuntimeException.class, () -> {
-                MyUtils.getTransactionMonitorSkin(properties);
-                });
+            MyUtils.getTransactionMonitorFlavor(properties);
+            });
     }
 
     @Test
@@ -45,37 +45,37 @@ public class MyUtilsTransactionMonitorSkinTest {
         Properties properties = new Properties();
 
         assertThrows(RuntimeException.class, () -> {
-            MyUtils.getTransactionMonitorSkin(properties);
+            MyUtils.getTransactionMonitorFlavor(properties);
             });
     }
 
     @Test
     public void testBlankProperty(TestInfo testInfo) {
         Properties properties = new Properties();
-        properties.put(MyConstants.TRANSACTION_MONITOR_SKIN, "");
+        properties.put(MyConstants.TRANSACTION_MONITOR_FLAVOR, "");
 
         assertThrows(RuntimeException.class, () -> {
-            MyUtils.getTransactionMonitorSkin(properties);
+            MyUtils.getTransactionMonitorFlavor(properties);
             });
     }
 
-    // Defend against someone adding "unknown" as a skin type.
+    // Defend against someone adding "unknown" as a type.
     @Test
     public void testUnknownProperty(TestInfo testInfo) {
         Properties properties = new Properties();
-        properties.put(MyConstants.TRANSACTION_MONITOR_SKIN, "unknown-" + UUID.randomUUID().toString());
+        properties.put(MyConstants.TRANSACTION_MONITOR_FLAVOR, "unknown-" + UUID.randomUUID().toString());
 
         assertThrows(RuntimeException.class, () -> {
-            MyUtils.getTransactionMonitorSkin(properties);
+            MyUtils.getTransactionMonitorFlavor(properties);
             });
     }
 
     @Test
     public void testCorrectProperty(TestInfo testInfo) throws Exception {
         Properties properties = new Properties();
-        properties.put(MyConstants.TRANSACTION_MONITOR_SKIN, "ecommerce");
-        TransactionMonitorSkin output = MyUtils.getTransactionMonitorSkin(properties);
-        TransactionMonitorSkin expected = TransactionMonitorSkin.ECOMMERCE;
+        properties.put(MyConstants.TRANSACTION_MONITOR_FLAVOR, "ecommerce");
+        TransactionMonitorFlavor output = MyUtils.getTransactionMonitorFlavor(properties);
+        TransactionMonitorFlavor expected = TransactionMonitorFlavor.ECOMMERCE;
 
         assertEquals(expected, output);
     }

@@ -24,13 +24,13 @@ import org.apache.kafka.common.serialization.Deserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * <p>De-serialize binary data into a {@link TransactionTrade} object.
+ * <p>De-serialize binary data into a {@link TransactionEcommerce} object.
  * </p>
  * <p>Use <a href="https://github.com/FasterXML/jackson-databind/wiki">Jackson</a>
  * libraries to do the JSON parsing.
  * </p>
  */
-public class TransactionTradeJsonDeserializer implements Deserializer<TransactionTrade> {
+public class TransactionEcommerceJsonDeserializer implements Deserializer<TransactionEcommerce> {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     /**
@@ -39,9 +39,9 @@ public class TransactionTradeJsonDeserializer implements Deserializer<Transactio
      * </p>
      */
     @Override
-    public TransactionTrade deserialize(String topic, byte[] data) {
+    public TransactionEcommerce deserialize(String topic, byte[] data) {
         try {
-            return objectMapper.readValue(data, TransactionTrade.class);
+            return objectMapper.readValue(data, TransactionEcommerce.class);
         } catch (Exception exception) {
             throw new SerializationException(exception);
         }

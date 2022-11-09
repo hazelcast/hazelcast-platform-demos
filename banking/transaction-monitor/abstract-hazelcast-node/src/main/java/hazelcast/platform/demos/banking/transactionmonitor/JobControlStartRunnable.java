@@ -44,9 +44,10 @@ public class JobControlStartRunnable implements Runnable {
     private final boolean usePulsar;
     private final String projectName;
     private final String clusterName;
+    private final TransactionMonitorFlavor transactionMonitorFlavor;
 
     public JobControlStartRunnable(String arg0, String arg1, String arg2, boolean arg3,
-            String arg4, String arg5) {
+            String arg4, String arg5, TransactionMonitorFlavor arg6) {
         this.hazelcastInstance = Hazelcast.getAllHazelcastInstances().iterator().next();
         this.targetJobNamePrefix = arg0;
         this.bootstrapServers = arg1;
@@ -54,6 +55,7 @@ public class JobControlStartRunnable implements Runnable {
         this.usePulsar = arg3;
         this.projectName = arg4;
         this.clusterName = arg5;
+        this.transactionMonitorFlavor = arg6;
     }
 
     @Override
@@ -98,11 +100,11 @@ public class JobControlStartRunnable implements Runnable {
                 JobConfig jobConfigAggregateQuery = new JobConfig();
                 jobConfigAggregateQuery.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
                 jobConfigAggregateQuery.setName(AggregateQuery.class.getSimpleName() + "@" + now);
-                jobConfigAggregateQuery.addClass(MaxVolumeAggregator.class);
+                jobConfigAggregateQuery.addClass(MaxAggregator.class);
 
                 Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(this.bootstrapServers,
                         this.pulsarList, this.usePulsar, projectName, jobConfigAggregateQuery.getName(),
-                        clusterName);
+                        this.clusterName, this.transactionMonitorFlavor);
 
                 try {
                     hazelcastInstance.getJet().newJob(pipelineAggregateQuery, jobConfigAggregateQuery);

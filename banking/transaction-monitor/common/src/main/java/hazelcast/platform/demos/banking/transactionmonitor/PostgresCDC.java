@@ -116,7 +116,7 @@ public class PostgresCDC {
     }
 
     /**
-     * <p>Create data object. Format should match {@link MaxVolumeAggregator}
+     * <p>Create data object. Format should match {@link MaxAggregator}
      * and mapping defined in {@link CommonIdempotentInitialization}.
      * </p>
      * <p>For any records on the Postgres change stream that were due to
