@@ -9,8 +9,8 @@ E0001|Kindle 8GB 6.8"|eReader|129.00
 E0002|Kindle 32GB 6.8"|eReader|179.00
 E0003|Kobo Elipsa 32GB 10.3"|eReader|349.99
 E0004|Kobo Clara 8GB 6"|eReader|119.99
-G0001|George Foreman (Medium)|Grill|45.00
-G0002|George Foreman (Small)|Grill|27.00
+G0001|George Foreman Grill (Medium)|Grill|45.00
+G0002|George Foreman Grill (Small)|Grill|27.00
 H0001|Remington S6300 Straightener|Hair|32.00
 H0002|Remington S8500 Straightener|Hair|59.00
 H0003|Babyliss 2516U Straightener|Hair|60.00

@@ -7,17 +7,36 @@ import detectBrowserLanguage from 'detect-browser-language';
 import Page from "../Page";
 import Pagination from "../Pagination";
 import Querying from '../querying'
-import SymbolDetails from "../symbol-details";
+import ItemDetails from "../item-details";
 import "../../Table.css";
 
 class Home extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            symbols: [],
+            items: [],
             expanded: {},
-            browserLanguage: "en"
+            browserLanguage: "en",
+            keyHeader: "?",
+            f1Header: "?",
+            f2Header: "?"
         };
+
+        let transactionMonitorFlavor = "@my.transaction-monitor.flavor@".toUpperCase();
+        switch (transactionMonitorFlavor) {
+			case "ECOMMERCE":
+				this.state.keyHeader = "Item Code";
+				this.state.f1Header = "Total Sales";
+				this.state.f2Header = "Average Price";
+			    break;
+			case "TRADE":
+				this.state.keyHeader = "Symbol";
+				this.state.f1Header = "Volume";
+				this.state.f2Header = "Price";
+			    break;
+			default:
+		 	console.log("home.js", "Unexpected value transactionMonitorFlavor", transactionMonitorFlavor);
+		}
 
         this.sendMessage = this.sendMessage.bind(this);
         this.handleData = this.handleData.bind(this);
@@ -33,30 +52,30 @@ class Home extends Component {
     }
 
     onOpen() {
-        setInterval(() => this.sendMessage("LOAD_SYMBOLS"), 1000);
+        setInterval(() => this.sendMessage("LOAD_ITEMS"), 1000);
     }
 
     handleData(data) {
         let result = JSON.parse(data);
-        for (let i = 0; i < result.symbols.length; i++) {
-            let oldPrice;
-            if (typeof this.state.symbols[i] === "undefined") {
-                oldPrice = 0;
+        for (let i = 0; i < result.items.length; i++) {
+            let oldUpDownField;
+            if (typeof this.state.items[i] === "undefined") {
+                oldUpDownField = 0;
             } else {
-                oldPrice = this.state.symbols[i].price;
+                oldUpDownField = this.state.items[i].upDownField;
             }
-            result.symbols[i]["oldPrice"] = oldPrice;
+            result.items[i]["oldUpDownField"] = oldUpDownField;
         }
-        this.setState({ symbols: result.symbols });
+        this.setState({ items: result.items });
     }
 
     render() {
-        const { symbols } = this.state;
+        const { items } = this.state;
 
         const columns = [
             {
-                Header: "Symbol",
-                accessor: "symbol",
+                Header: this.state.keyHeader,
+                accessor: "key",
                 width: 300,
                 Cell: ({ value }) => (
                     <span className="Table-highlightValue">{value}</span>
@@ -67,12 +86,12 @@ class Home extends Component {
                     accessor: "name"
                 },
                 {
-                    Header: "Price",
-                    accessor: "price",
+                    Header: this.state.f2Header,
+                    accessor: "f2",
                     width: 300,
                     Cell: ({ value, columnProps: { className } }) => (
                         <span className={`Table-highlightValue Table-price ${className}`}>
-                        {(value / 100).toLocaleString(this.state.browserLanguage, {
+                        {(value / 1).toLocaleString(this.state.browserLanguage, {
                             style: "currency",
                             currency: "USD"
                         })}
@@ -83,8 +102,8 @@ class Home extends Component {
                                 return {};
                             }
                             // console.log(ri.row);
-                            const changeUp = ri.row.price > ri.row._original.oldPrice;
-                            const changeDown = ri.row.price < ri.row._original.oldPrice;
+                            const changeUp = ri.row._original.upDownField > ri.row._original.oldUpDownField;
+                            const changeDown = ri.row._original.upDownField < ri.row._original.oldUpDownField;
                             const className = changeUp
                             ? "Table-changeUp"
                             : changeDown
@@ -97,12 +116,18 @@ class Home extends Component {
                         }
                     },
                     {
-                        Header: "Volume",
-                        accessor: "volume"
+                        Header: this.state.f1Header,
+                        accessor: "f1",
+		                Cell: ({ value }) => (
+        		            <span className="Table-highlightValue Table-price">{(value / 1).toLocaleString(this.state.browserLanguage, {
+                		        style: "currency",
+                        		currency: "USD"
+                    	})}</span>
+		                )
                     }
                 ];
 
-        // Same code duplicated in: src/main/app/src/components/symbol-details/symbol-details.js
+        // Same code duplicated in: src/main/app/src/components/item-details/item-details.js
         const WS_HOST = "ws:/" + window.location.host + "/transactions";
 
         return (
@@ -110,7 +135,7 @@ class Home extends Component {
                         <Querying/>
                         <ReactTable
                         className="Table-main"
-                        data={symbols}
+                        data={items}
                         columns={columns}
                         defaultPageSize={25}
                         expanded={this.state.expanded}
@@ -134,7 +159,7 @@ class Home extends Component {
                             };
                         }}
                         SubComponent={original => (
-                            <SymbolDetails symbol={original.row.symbol} />
+                            <ItemDetails item={original.row.key} />
                             )}
                             />
 

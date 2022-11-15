@@ -59,7 +59,7 @@ import com.hazelcast.platform.demos.utils.UtilsSlackSink;
  * <p>
  * Map journal source
  * </p>
- * <p>Stream changes from the "{@code alertMaxVolume}" map.
+ * <p>Stream changes from the "{@code alertMax}" map.
  * </p>
  * </li>
  * <li>
@@ -100,7 +100,7 @@ public class AlertingToSlack {
 
         StreamStage<JSONObject> input = pipeline
         .readFrom(Sources.<Long, HazelcastJsonValue>mapJournal(
-                MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME,
+                MyConstants.IMAP_NAME_ALERTS_LOG,
                 JournalInitialPosition.START_FROM_OLDEST)).withoutTimestamps()
         .map(AlertingToSlack.myMapStage()).setName("reformat-to-JSON");
 

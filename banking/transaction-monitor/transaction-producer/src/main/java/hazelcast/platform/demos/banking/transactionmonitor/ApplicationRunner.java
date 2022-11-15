@@ -252,7 +252,7 @@ public class ApplicationRunner {
         String transaction = String.format("{"
                         + "\"id\": \"%s\","
                         + "\"timestamp\": %d,"
-                        + "\"item_code\": \"%s\","
+                        + "\"itemCode\": \"%s\","
                         + "\"price\": %.2f,"
                         + "\"quantity\": %d"
                         + "}",

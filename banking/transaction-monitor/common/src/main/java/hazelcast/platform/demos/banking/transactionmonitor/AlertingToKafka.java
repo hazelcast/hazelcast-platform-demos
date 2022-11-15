@@ -51,7 +51,7 @@ public class AlertingToKafka {
         properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, HazelcastJsonValueSerializer.class.getName());
 
         return Pipeline.create()
-        .readFrom(Sources.<Long, HazelcastJsonValue>mapJournal(MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME,
+        .readFrom(Sources.<Long, HazelcastJsonValue>mapJournal(MyConstants.IMAP_NAME_ALERTS_LOG,
                 JournalInitialPosition.START_FROM_OLDEST))
                 .withoutTimestamps()
         .writeTo(KafkaSinks.kafka(properties, MyConstants.KAFKA_TOPIC_NAME_ALERTS))

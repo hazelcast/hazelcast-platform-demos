@@ -27,7 +27,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.map.IMap;
 
 /**TODO Move to {@code transaction-producer} module?
- *FIXME Add SKIN based change
+ *FIXME Add flavor based change
  */
 public class PortfolioUpdater implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(PortfolioUpdater.class);

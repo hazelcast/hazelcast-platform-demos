@@ -30,30 +30,30 @@ import com.hazelcast.platform.demos.utils.UtilsFormatter;
  * <p>Accumulate and output a maximum value.
  * </p>
  */
-public class MaxVolumeAggregator implements Serializable {
+public class MaxAggregator implements Serializable {
     private static final long serialVersionUID = 1L;
     // Don't log as may run in the cloud
-    // private static final Logger LOGGER = LoggerFactory.getLogger(MaxVolumeAggregator.class);
+    // private static final Logger LOGGER = LoggerFactory.getLogger(MaxAggregator.class);
 
     private final String provenance;
     private String maxSymbol;
-    private long maxVolume;
+    private double maxVolume;
 
-    public MaxVolumeAggregator(String arg0, String arg1, String arg2) {
+    public MaxAggregator(String arg0, String arg1, String arg2) {
         this.provenance = arg0 + ":" + arg1 + ":" + arg2;
     }
 
-    public static AggregateOperation1<Entry<Integer, Tuple4<String, Long, Long, Long>>,
-        MaxVolumeAggregator, Entry<Long, HazelcastJsonValue>> buildMaxVolumeAggregation(
+    public static AggregateOperation1<Entry<Integer, Tuple4<String, Long, Double, Double>>,
+        MaxAggregator, Entry<Long, HazelcastJsonValue>> buildMaxAggregation(
                 String projectName, String clusterName, String jobName
                 ) {
         return AggregateOperation
-                .withCreate(() -> new MaxVolumeAggregator(projectName, clusterName, jobName))
-                .andAccumulate((MaxVolumeAggregator maxVolumeAggregator,
-                        Entry<Integer, Tuple4<String, Long, Long, Long>> entry)
+                .withCreate(() -> new MaxAggregator(projectName, clusterName, jobName))
+                .andAccumulate((MaxAggregator maxVolumeAggregator,
+                        Entry<Integer, Tuple4<String, Long, Double, Double>> entry)
                         -> maxVolumeAggregator.accumulate(entry.getValue()))
-                .andCombine(MaxVolumeAggregator::combine)
-                .andExportFinish(MaxVolumeAggregator::exportFinish);
+                .andCombine(MaxAggregator::combine)
+                .andExportFinish(MaxAggregator::exportFinish);
     }
 
     /**
@@ -63,7 +63,7 @@ public class MaxVolumeAggregator implements Serializable {
      * @param entry
      * @return The current accumulator
      */
-    public MaxVolumeAggregator accumulate(Tuple4<String, Long, Long, Long> tuple4) {
+    public MaxAggregator accumulate(Tuple4<String, Long, Double, Double> tuple4) {
         if (this.maxSymbol == null) {
             this.maxSymbol = tuple4.f0();
             this.maxVolume = tuple4.f2();
@@ -80,9 +80,9 @@ public class MaxVolumeAggregator implements Serializable {
      * <p>Update the max if necessary.
      * </p>
      */
-    public MaxVolumeAggregator combine(MaxVolumeAggregator that) {
+    public MaxAggregator combine(MaxAggregator that) {
         String thatMaxSymbol = that.getMaxSymbol();
-        Long thatMaxVolume = that.getMaxVolume();
+        Double thatMaxVolume = that.getMaxVolume();
         if (this.maxSymbol == null) {
             // May be null on merging value also
             this.maxSymbol = thatMaxSymbol;
@@ -105,7 +105,7 @@ public class MaxVolumeAggregator implements Serializable {
     private String getMaxSymbol() {
         return this.maxSymbol;
     }
-    private Long getMaxVolume() {
+    private Double getMaxVolume() {
         return this.maxVolume;
     }
 
@@ -121,7 +121,7 @@ public class MaxVolumeAggregator implements Serializable {
         if (this.maxSymbol == null) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("{");
-            stringBuilder.append("  \"symbol\" : \"<none>\"");
+            stringBuilder.append("  \"code\" : \"<none>\"");
             stringBuilder.append(", \"provenance\" : \"" + this.provenance + "\"");
             stringBuilder.append(", \"whence\" : \"" + nowStr + "\"");
             stringBuilder.append(", \"volume\" : 0");
@@ -132,7 +132,7 @@ public class MaxVolumeAggregator implements Serializable {
         } else {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("{");
-            stringBuilder.append("  \"symbol\" : \"" + this.maxSymbol + "\"");
+            stringBuilder.append("  \"code\" : \"" + this.maxSymbol + "\"");
             stringBuilder.append(", \"provenance\" : \"" + this.provenance + "\"");
             stringBuilder.append(", \"whence\" : \"" + nowStr + "\"");
             stringBuilder.append(", \"volume\" : " + this.maxVolume);

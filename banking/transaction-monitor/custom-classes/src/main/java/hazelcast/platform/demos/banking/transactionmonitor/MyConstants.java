@@ -73,7 +73,9 @@ public class MyConstants {
 
     // Maps that are replicated over WAN in enterprise only. Avoid clashing with
     // CommonIdempotentInitialization.java configures some maps with map stores and journals
-    public static final List<String> WAN_IMAP_NAMES =
+    public static final List<String> WAN_IMAP_NAMES_ECOMMERCE =
+            List.of(IMAP_NAME_AUDIT_LOG, IMAP_NAME_JOB_CONFIG, IMAP_NAME_PRODUCTS);
+    public static final List<String> WAN_IMAP_NAMES_TRADE =
             List.of(IMAP_NAME_AUDIT_LOG, IMAP_NAME_JOB_CONFIG, IMAP_NAME_SYMBOLS);
 
     public static final String WEBSOCKET_PATH_TRANSACTIONS = "/transactions";

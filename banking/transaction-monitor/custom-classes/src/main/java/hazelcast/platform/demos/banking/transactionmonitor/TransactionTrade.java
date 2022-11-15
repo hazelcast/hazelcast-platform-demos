@@ -20,13 +20,13 @@ import java.io.Serializable;
 
 /**
  * <p>A Java object representing some (in fact, all) of the
- * JSON fields in the transaction object read for Kafka.
+ * JSON fields in the Trade style transaction object read for Kafka.
  * </p>
  * <p>Required until <a href="https://github.com/hazelcast/hazelcast/issues/15140">Issue-15150</a>
  * is addressed.
  * </p>
  */
-public class Transaction implements Serializable {
+public class TransactionTrade implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,7 +34,7 @@ public class Transaction implements Serializable {
     private long timestamp;
     private String symbol;
     private long quantity;
-    private long price;
+    private double price;
 
     // Generated getters/setters and toString()
 
@@ -70,17 +70,17 @@ public class Transaction implements Serializable {
         this.quantity = quantity;
     }
 
-    public long getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(long price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 
     @Override
     public String toString() {
-        return "Transaction [id=" + id + ", timestamp=" + timestamp + ", symbol=" + symbol + ", quantity=" + quantity
+        return "TransactionTrade [id=" + id + ", timestamp=" + timestamp + ", symbol=" + symbol + ", quantity=" + quantity
                 + ", price=" + price + "]";
     }
 

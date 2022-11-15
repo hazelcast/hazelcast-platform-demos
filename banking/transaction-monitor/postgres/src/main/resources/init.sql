@@ -6,16 +6,16 @@ SHOW search_path;
 -- and to CommonIdempotentInitialization.java that reads from IMap.
 CREATE TABLE alerts_log (
  now	                      BIGSERIAL NOT NULL PRIMARY KEY,
- id                           VARCHAR(8) NOT NULL,
+ code                         VARCHAR(24) NOT NULL,
  provenance                   VARCHAR(80) NOT NULL,
  whence                       VARCHAR(80) NOT NULL,
  volume                       NUMERIC(17,2) NOT NULL
 );
 
 -- Dummy data, to demonstrate loading action of MapStore
-INSERT INTO alerts_log (now, id, provenance, whence, volume)
+INSERT INTO alerts_log (now, code, provenance, whence, volume)
 VALUES
- (0, 'DUMMY', '@my.docker.image.prefix@:@project.artifactId@:init.sql', '@maven.build.timestamp@', 0.0)
+ (0, 'DUMMY', 'init.sql', '@maven.build.timestamp@', 0.0)
 ;
 
 SELECT * FROM alerts_log;

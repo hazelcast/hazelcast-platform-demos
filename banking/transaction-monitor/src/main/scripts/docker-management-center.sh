@@ -38,7 +38,7 @@ docker container prune --force > /dev/null 2>&1
 
 CMD="docker run \
  -e MC_CLUSTER1_ADDRESSLIST_OVERRIDE=$MC_CLUSTER1_ADDRESSLIST_OVERRIDE \
- -p 8080:8080 --rm ${DOCKER_IMAGE}"
+ -p 8081:8080 --rm ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD

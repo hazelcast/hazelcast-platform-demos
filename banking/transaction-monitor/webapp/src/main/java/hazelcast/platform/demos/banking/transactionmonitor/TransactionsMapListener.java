@@ -42,6 +42,20 @@ public class TransactionsMapListener implements EntryAddedListener<String, Hazel
 
     private static AtomicInteger count = new AtomicInteger(0);
 
+    private final String itemFieldName;
+
+    TransactionsMapListener(TransactionMonitorFlavor transactionMonitorFlavor) {
+        switch (transactionMonitorFlavor) {
+        case ECOMMERCE:
+            itemFieldName = "itemCode";
+            break;
+        case TRADE:
+        default:
+            itemFieldName = "symbol";
+            break;
+        }
+    }
+
     /**
      * <p>For any transaction created, broadcast to all listening web socket
      * contexts interested in the transaction's symbol. As the key is the
@@ -55,30 +69,27 @@ public class TransactionsMapListener implements EntryAddedListener<String, Hazel
     public void entryAdded(EntryEvent<String, HazelcastJsonValue> event) {
 
         HazelcastJsonValue transaction = event.getValue();
-
-        JSONObject jsonObject = new JSONObject(transaction.toString());
-
-        String symbol = jsonObject.getString("symbol");
+        JSONObject jsonObjectInput = new JSONObject(transaction.toString());
+        String item = jsonObjectInput.getString(this.itemFieldName);
 
         if (count.getAndIncrement() % LOG_THRESHOLD == 0) {
             LOGGER.info("Received {} => \"{}\"", count.get() - 1, transaction);
         }
 
+        JSONObject jsonObjectOutput = new JSONObject();
+        jsonObjectOutput.put(this.itemFieldName, item);
+
+        String transactionJson = transaction.toString();
+        jsonObjectOutput.append("data", new JSONObject(transactionJson));
+        String message = jsonObjectOutput.toString();
+
         /* Contexts that have the drill-down view open need this updated
          * if there is a new transaction for the relevant symbol.
          */
-        List<WsContext> contexts = ApplicationRunner.getContexts(symbol);
+        List<WsContext> contexts = ApplicationRunner.getContexts(item);
         if (contexts != null && !contexts.isEmpty()) {
-            LOGGER.trace("Broadcasting update on '{}' to {} context{}", symbol,
+            LOGGER.trace("Broadcasting update on '{}' to {} context{}", item,
                     contexts.size(), (contexts.size() == 1 ? "" : "s"));
-
-            String message = String.format("{"
-                    + "\"symbol\": \"%s\","
-                    + "\"data\": \"%s\""
-                    + "}",
-                    symbol,
-                    transaction
-            );
 
             for (WsContext context : contexts) {
                 context.send(message);

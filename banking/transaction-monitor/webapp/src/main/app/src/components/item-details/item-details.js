@@ -6,15 +6,25 @@ import 'react-table/react-table.css';
 import Pagination from '../Pagination';
 import detectBrowserLanguage from 'detect-browser-language';
 
-class SymbolDetails extends Component {
+class ItemDetails extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            symbol: [],
+            item: [],
             loading: true,
             browserLanguage: "en"
         };
+
+        //let transactionMonitorFlavor = "@my.transaction-monitor.flavor@".toUpperCase();
+        //switch (transactionMonitorFlavor) {
+		//	case "ECOMMERCE":
+		//	    break;
+		//	case "TRADE":
+		//	    break;
+		//	default:
+		// 	console.log("item-details.js", "Unexpected value transactionMonitorFlavor", transactionMonitorFlavor);
+		//}
 
         this.sendMessage = this.sendMessage.bind(this);
         this.handleData = this.handleData.bind(this);
@@ -31,23 +41,23 @@ class SymbolDetails extends Component {
     }
 
     onOpen() {
-        this.sendMessage('DRILL_SYMBOL ' + this.props.symbol);
+        this.sendMessage('DRILL_ITEM ' + this.props.item);
     }
 
     handleData(data) {
         let result = JSON.parse(data);
         this.setState(prevState => ({
-            symbol: prevState.symbol.concat(result.data),
+            item: prevState.item.concat(result.data),
             loading: false,
         }));
     }
 
     renderPagination(paginationProps) {
-        return <Pagination {...paginationProps} extraData={<span>{this.props.symbol} has {this.state.symbol.length} records</span>}/>
+        return <Pagination {...paginationProps} extraData={<span>{this.props.item} has {this.state.item.length} records</span>}/>
     }
 
     render() {
-        const {symbol} = this.state;
+        const {item} = this.state;
 
         // Same code duplicated in: src/main/app/src/components/home/home.js
         const WS_HOST = "ws:/" + window.location.host + "/transactions";
@@ -65,14 +75,6 @@ class SymbolDetails extends Component {
                 )
             },
             {
-                Header: 'Symbol',
-                accessor: 'symbol',
-                Cell: ({ value }) => (
-                    <span className="Table-highlightValue">{value}</span>
-                )
-
-            },
-            {
                 Header: 'Quantity',
                 accessor: 'quantity',
                 Cell: ({ value }) => (
@@ -84,7 +86,7 @@ class SymbolDetails extends Component {
                 Header: 'Price',
                 accessor: 'price',
                 Cell: ({ value }) => (
-                    <span className="Table-highlightValue Table-price">{(value / 100).toLocaleString("en-US", {
+                    <span className="Table-highlightValue Table-price">{(value / 1).toLocaleString(this.state.browserLanguage, {
                         style: "currency",
                         currency: "USD"
                     })}</span>
@@ -100,7 +102,7 @@ class SymbolDetails extends Component {
             this.refWebSocket = Websocket;
         }}/>
         <ReactTable
-        data={symbol}
+        data={item}
         columns={columns}
         defaultSorted={[
             {
@@ -119,4 +121,4 @@ class SymbolDetails extends Component {
     }
 }
 
-export default SymbolDetails;
+export default ItemDetails;

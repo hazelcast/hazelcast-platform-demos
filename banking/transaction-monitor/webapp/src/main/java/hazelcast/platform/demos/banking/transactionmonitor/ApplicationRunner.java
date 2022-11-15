@@ -61,19 +61,20 @@ import io.javalin.websocket.WsMessageHandler;
  */
 public class ApplicationRunner {
 
-    private static Map<String, List<WsContext>> symbolsToBeUpdated = new ConcurrentHashMap<>();
+    private static Map<String, List<WsContext>> aggregationsToBeUpdated = new ConcurrentHashMap<>();
     private static Map<String, WsContext> sessions = new ConcurrentHashMap<>();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationRunner.class);
 
-    private static final String APPLICATION_PROPERTIES_FILE = "application.properties";
-    private static final String DRILL_SYMBOL = "DRILL_SYMBOL";
-    private static final String LOAD_SYMBOLS = "LOAD_SYMBOLS";
+    private static final String DRILL_ITEM = "DRILL_ITEM";
+    private static final String LOAD_ITEMS = "LOAD_ITEMS";
 
     private final Executor executor = Executors.newSingleThreadExecutor();
     private final HazelcastInstance  hazelcastInstance;
+    private final TransactionMonitorFlavor transactionMonitorFlavor;
     private final boolean localhost;
     private IMap<String, Tuple3<Long, Long, Integer>> aggregateQueryResultsMap;
+    private IMap<String, ProductInfo> productsMap;
     private IMap<String, SymbolInfo> symbolsMap;
     private IMap<String, HazelcastJsonValue> transactionsMap;
 
@@ -83,8 +84,9 @@ public class ApplicationRunner {
      * </p>
      */
     @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Hazelcast instance must be shared, not cloned")
-    public ApplicationRunner(HazelcastInstance arg0) throws Exception {
+    public ApplicationRunner(HazelcastInstance arg0, TransactionMonitorFlavor arg1) throws Exception {
         this.hazelcastInstance = arg0;
+        this.transactionMonitorFlavor = arg1;
         // If specifically indicated as localhost, don't do some steps
         this.localhost =
            System.getProperty("my.docker.enabled", "").equalsIgnoreCase("false");
@@ -104,13 +106,21 @@ public class ApplicationRunner {
 
         this.aggregateQueryResultsMap =
                 this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS);
-        this.symbolsMap =
-                this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_SYMBOLS);
+        switch (this.transactionMonitorFlavor) {
+        case ECOMMERCE:
+            this.productsMap = this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_PRODUCTS);
+            break;
+        case TRADE:
+        default:
+            this.symbolsMap = this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_SYMBOLS);
+            break;
+        }
+
         this.transactionsMap =
                 this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_TRANSACTIONS);
 
         // Be aware of new transactions
-        this.transactionsMap.addEntryListener(new TransactionsMapListener(), true);
+        this.transactionsMap.addEntryListener(new TransactionsMapListener(transactionMonitorFlavor), true);
 
         System.out.println("");
         System.out.println("");
@@ -118,7 +128,6 @@ public class ApplicationRunner {
         if (ok) {
             PortfolioUpdater portfolioUpdater
                 = new PortfolioUpdater(this.hazelcastInstance);
-            LOGGER.info("process(): execute {}", System.identityHashCode(portfolioUpdater));
             this.executor.execute(portfolioUpdater);
 
             ok = demoSql();
@@ -167,7 +176,7 @@ public class ApplicationRunner {
     private WsConnectHandler onConnect() {
         return wsConnectContext -> {
             String sessionId = wsConnectContext.getSessionId();
-            LOGGER.debug("Session -> '{}', connect", sessionId);
+            LOGGER.trace("Session -> '{}', connect", sessionId);
             sessions.put(sessionId, wsConnectContext);
         };
     }
@@ -184,10 +193,10 @@ public class ApplicationRunner {
     private WsCloseHandler onClose() {
         return wsCloseContext -> {
             String sessionId = wsCloseContext.getSessionId();
-            LOGGER.debug("Session -> '{}', close", sessionId);
+            LOGGER.trace("Session -> '{}', close", sessionId);
             sessions.remove(sessionId, wsCloseContext);
 
-            for (Entry<String, List<WsContext>> entry : symbolsToBeUpdated.entrySet()) {
+            for (Entry<String, List<WsContext>> entry : aggregationsToBeUpdated.entrySet()) {
                 List<WsContext> contexts = entry.getValue();
                 contexts.removeIf(context -> context.getSessionId().equals(sessionId));
             }
@@ -199,23 +208,23 @@ public class ApplicationRunner {
      * browser session. Only two types currently handled:
      * </p>
      * <ul>
-     * <li><p>"<i>LOAD_SYMBOLS</i>"</p>
+     * <li><p>"<i>LOAD_ITEMS</i>"</p>
      * <p>This is for the aggregated view produced by {@link AggregateQuery}.</p>
      * <p>A JSON object is creating holding the current results of the aggregation,
-     * with one element for each transaction symbol.
+     * with one element for each transaction key.
      * </p>
      * </li>
-     * <li><p>"<i>DRILL_SYMBOL</i>"</p>
-     * <p>This is for the detail view on any symbol. If the browser user
-     * clicks to expand the aggregration for a particular symbom, this creates
-     * a query to the "{@code transactions}" map for all transactions for that symbol.</p>
-     * <p>The transactions map is indexed on the "{@code symbol}" column.</p>
+     * <li><p>"<i>DRILL_ITEM</i>"</p>
+     * <p>This is for the detail view on any item. If the browser user
+     * clicks to expand the aggregation for a particular item, this creates
+     * a query to the "{@code transactions}" map for all transactions for that item's
+     * routing key (eg. stock code for trades).</p>
+     * <p>The transactions map is indexed on the column matching the routing key.</p>
      * </li>
      * </ul>
      *
      * @return Callback handler
      */
-    @SuppressWarnings("unchecked")
     private WsMessageHandler onMessage() {
         return wsMessageContext -> {
             String sessionId = wsMessageContext.getSessionId();
@@ -223,36 +232,31 @@ public class ApplicationRunner {
             WsContext session = sessions.get(sessionId);
 
             // Caller wishes an update on the AggregateQuery
-            if (LOAD_SYMBOLS.equals(message)) {
+            if (LOAD_ITEMS.equals(message)) {
                 JSONObject jsonObject = new JSONObject();
+                LOGGER.trace("Session -> '{}', load", sessionId);
 
-                Map<String, String> allSymbols =
-                        this.symbolsMap.entrySet().stream().collect(
-                                Collectors.toMap(Entry::getKey, entry -> entry.getValue().getSecurityName()));
-
-                // The screen turns cents to dollars for price but not for volume
-                aggregateQueryResultsMap.forEach((key, value) -> {
-                    jsonObject.append("symbols", new JSONObject()
-                            .put("name", allSymbols.get(key))
-                            .put("symbol", key)
-                            .put("count", value.f0())
-                            .put("volume", volumeToString(value.f1()))
-                            .put("price", value.f2())
-                    );
-                });
+                switch (this.transactionMonitorFlavor) {
+                case ECOMMERCE:
+                    loadItemsEcommerce(jsonObject);
+                    break;
+                case TRADE:
+                default:
+                    loadItemsTrade(jsonObject);
+                    break;
+                }
 
                 session.send(jsonObject.toString());
             }
 
             // Caller wishes the list of transactions for a particular symbol, eg. "DRILL_SYMBOL AAPL" for Apple
-            if (message.startsWith(DRILL_SYMBOL)) {
+            if (message.startsWith(DRILL_ITEM)) {
                 JSONObject jsonObject = new JSONObject();
 
-                String symbol = message.split(" ")[1];
-                LOGGER.debug("Session -> '{}', requested symbol '{}'", sessionId, symbol);
+                String code = message.split(" ")[1];
+                LOGGER.trace("Session -> '{}', requested '{}'", sessionId, code);
 
-                // Note that this session now wishes updated if the drill-down list changes (by TransactionsMapListener)
-                symbolsToBeUpdated.compute(symbol, (k, v) -> {
+                aggregationsToBeUpdated.compute(code, (k, v) -> {
                     if (v == null) {
                         v = new ArrayList<>();
                     }
@@ -260,43 +264,117 @@ public class ApplicationRunner {
                     return v;
                 });
 
-                // Query IMDG for all transactions for the current symbol
-                Collection<HazelcastJsonValue> records = this.transactionsMap.values(new EqualPredicate("symbol", symbol));
-                records.forEach(transaction -> {
-                    String transactionJson = transaction.toString();
-                    jsonObject.put("symbol", symbol);
-                    jsonObject.append("data", new JSONObject(transactionJson));
-                });
+                switch (this.transactionMonitorFlavor) {
+                case ECOMMERCE:
+                    drillItemsEcommerce(jsonObject, code);
+                    break;
+                case TRADE:
+                default:
+                    drillItemsTrade(jsonObject, code);
+                    break;
+                }
 
                 session.send(jsonObject.toString());
             }
-
         };
     }
 
-
     /**
-     * <p>Convert transaction volume (quantity * price in cents) to dollars.
+     * <p>Load all eCommerce items.
      * </p>
      *
-     * @param Volume from Tuple3 produced by {@link AggregateQuery}
-     * @return Input divided by 100 to 2DP.
+     * @param jsonObject
      */
-    private static String volumeToString(long price) {
-        final double oneHundred = 100.00d;
-        return String.format("$%,.2f", price / oneHundred);
+    private void loadItemsEcommerce(JSONObject jsonObject) {
+        Map<String, String> allProducts =
+                this.productsMap.entrySet().stream().collect(
+                        Collectors.toMap(Entry::getKey, entry -> entry.getValue().getItemName()));
+
+        // The screen turns cents to dollars for price but not for volume
+        aggregateQueryResultsMap.forEach((key, value) -> {
+            jsonObject.append("items", new JSONObject()
+                    .put("name", allProducts.get(key))
+                    // Item Code
+                    .put("key", key)
+                    .put("f0", value.f0())
+                    .put("f1", String.format("%.2f", value.f1()))
+                    .put("f2", String.format("%.2f", value.f2()))
+                    // Screen flashes the row if average goes up or down
+                    .put("upDownField", String.format("%.2f", value.f2()))
+            );
+        });
     }
 
-
     /**
-     * <p>Find which sessions have a stock symbol drilldown open.
+     * <p>Load all trade items.
      * </p>
      *
-     * @param symbol A stock symbol, "{@code AAPL}" for Apple, etc.
+     * @param jsonObject
+     */
+    private void loadItemsTrade(JSONObject jsonObject) {
+        Map<String, String> allSymbols =
+                this.symbolsMap.entrySet().stream().collect(
+                        Collectors.toMap(Entry::getKey, entry -> entry.getValue().getSecurityName()));
+
+        aggregateQueryResultsMap.forEach((key, value) -> {
+            jsonObject.append("items", new JSONObject()
+                    .put("name", allSymbols.get(key))
+                    // Symbol
+                    .put("key", key)
+                    .put("f0", value.f0())
+                    .put("f1", String.format("%.2f", value.f1()))
+                    .put("f2", String.format("%.2f", value.f2()))
+                    // Screen flashes the row if price goes up or down
+                    .put("upDownField", String.format("%.2f", value.f2()))
+            );
+        });
+    }
+
+    /**
+     * <p>Drilldown into all E-commerce objects
+     * </p>
+     *
+     * @param jsonObject
+     */
+    @SuppressWarnings("unchecked")
+    private void drillItemsEcommerce(JSONObject jsonObject, String itemCode) {
+        jsonObject.put("itemCode", itemCode);
+
+        Collection<HazelcastJsonValue> records = this.transactionsMap.values(new EqualPredicate("itemCode", itemCode));
+
+        records.forEach(transaction -> {
+            String transactionJson = transaction.toString();
+            jsonObject.append("data", new JSONObject(transactionJson));
+        });
+    }
+
+    /**
+     * <p>Drilldown into all Trade objects
+     * </p>
+     *
+     * @param jsonObject
+     */
+    @SuppressWarnings("unchecked")
+    private void drillItemsTrade(JSONObject jsonObject, String symbol) {
+        jsonObject.put("symbol", symbol);
+
+        Collection<HazelcastJsonValue> records = this.transactionsMap.values(new EqualPredicate("symbol", symbol));
+
+        records.forEach(transaction -> {
+            String transactionJson = transaction.toString();
+            jsonObject.append("data", new JSONObject(transactionJson));
+        });
+    }
+
+    /**
+     * <p>Find which sessions have an item drilldown open.
+     * </p>
+     *
+     * @param item An e-commerce item code or for trading the stock symbol, "{@code AAPL}" for Apple, etc.
      * @return A list, possibly empty, of sessions
      */
-    public static List<WsContext> getContexts(String symbol) {
-        return symbolsToBeUpdated.get(symbol);
+    public static List<WsContext> getContexts(String code) {
+        return aggregationsToBeUpdated.get(code);
     }
 
     /**
@@ -308,34 +386,7 @@ public class ApplicationRunner {
      */
     private boolean demoSql() {
         boolean didFail = false;
-        String[][] queries = new String[][] {
-            /* Turn off if you wish Javalin available sooner, and so Kubernetes readiness probe is happy.
-             */
-            { "System",  "SELECT * FROM information_schema.mappings" },
-            { "System",  "SELECT table_name AS name FROM information_schema.mappings" },
-            { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS + " LIMIT 5" },
-            { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_SYMBOLS + " LIMIT 5" },
-            { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_TRANSACTIONS + " LIMIT 5"},
-            { "IMap",    "SELECT id, symbol, price FROM " + MyConstants.IMAP_NAME_TRANSACTIONS
-                    + " WHERE symbol LIKE 'AA%' AND price > 2510 LIMIT 5" },
-            /* Streaming query, if not enough data to exceed LIMIT it waits, forcing pod timeout
-            { "Kafka",   "SELECT * FROM " + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS
-                   + " LIMIT 5"},
-            // The next 2 have the same execution plan but are declared differently
-            { "Join",    "SELECT * FROM (SELECT id, symbol, \"timestamp\" FROM "
-                + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS + ") AS k"
-                    + " LEFT JOIN symbols AS s ON k.symbol = s.__key LIMIT 5" },
-            { "Join",    "SELECT k.id, k.symbol, k.\"timestamp\", s.* FROM "
-                    + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS + " AS k"
-                    + " LEFT JOIN symbols AS s ON k.symbol = s.__key LIMIT 5" },
-            { "Join",    "SELECT * FROM (SELECT id, symbol, \"timestamp\" FROM "
-                    + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS + ") AS k"
-                + " LEFT JOIN (SELECT * FROM " + MyConstants.IMAP_NAME_SYMBOLS + ") AS s ON k.symbol = s.__key LIMIT 5" },
-                */
-            { "IMap",    "SELECT stock FROM " + MyConstants.IMAP_NAME_PORTFOLIOS + " ORDER BY 1 DESC LIMIT 3"},
-            { "IMap",    "SHOW MAPPINGS" },
-            { "IMap",    "SHOW VIEWS" },
-        };
+        String[][] queries = getQueries();
 
         int count = 0;
         // Don't break loop on failure, try each to find if more than one fails
@@ -371,6 +422,69 @@ public class ApplicationRunner {
         return didFail;
     }
 
+    /**
+     * <p>Queries to test SQL
+     * </p>
+     *
+     * @return
+     */
+    private String[][] getQueries() {
+        String[][] queries = new String[][] {
+            /* Turn some off if you wish Javalin available sooner, and so Kubernetes readiness probe is happy.
+             */
+            //{ "System",  "SELECT * FROM information_schema.mappings" },
+            //{ "System",  "SELECT table_name AS name FROM information_schema.mappings" },
+            //{ "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS + " LIMIT 5" },
+            //{ "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_TRANSACTIONS + " LIMIT 5"},
+            //{ "IMap",    "SELECT stock FROM " + MyConstants.IMAP_NAME_PORTFOLIOS + " ORDER BY 1 DESC LIMIT 3"},
+            { "IMap",    "SHOW MAPPINGS" },
+            { "IMap",    "SHOW VIEWS" },
+        };
+
+        int originalLen = queries.length;
+        String[][] additionalQueries;
+
+        switch (this.transactionMonitorFlavor) {
+        case ECOMMERCE:
+            additionalQueries = new String[][] {
+                { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_PRODUCTS + " LIMIT 3" },
+                /*{ "IMap",    "SELECT id, itemcode, price FROM " + MyConstants.IMAP_NAME_TRANSACTIONS
+                    + " WHERE itemcode LIKE 'H%' LIMIT 3" },
+                 */
+            };
+            break;
+        case TRADE:
+        default:
+            additionalQueries = new String[][] {
+                { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_SYMBOLS + " LIMIT 5" },
+                /*{ "IMap",    "SELECT id, symbol, price FROM " + MyConstants.IMAP_NAME_TRANSACTIONS
+                    + " WHERE symbol LIKE 'AA%' AND price > 2510 LIMIT 5" },
+                 */
+                /* Streaming query, if not enough data to exceed LIMIT it waits, forcing pod timeout
+                { "Kafka",   "SELECT * FROM " + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS
+                   + " LIMIT 5"},
+                // The next 2 have the same execution plan but are declared differently
+                { "Join",    "SELECT * FROM (SELECT id, symbol, \"timestamp\" FROM "
+                    + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS + ") AS k"
+                    + " LEFT JOIN symbols AS s ON k.symbol = s.__key LIMIT 5" },
+                { "Join",    "SELECT k.id, k.symbol, k.\"timestamp\", s.* FROM "
+                    + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS + " AS k"
+                    + " LEFT JOIN symbols AS s ON k.symbol = s.__key LIMIT 5" },
+                { "Join",    "SELECT * FROM (SELECT id, symbol, \"timestamp\" FROM "
+                    + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS + ") AS k"
+                    + " LEFT JOIN (SELECT * FROM " + MyConstants.IMAP_NAME_SYMBOLS + ") AS s ON k.symbol = s.__key LIMIT 5" },
+                 */
+            };
+            break;
+        }
+
+        queries = Arrays.copyOf(queries, originalLen + additionalQueries.length);
+        for (int i = 0; i < additionalQueries.length; i++) {
+            queries[originalLen + i] = additionalQueries[i];
+        }
+
+        return queries;
+    }
 
     /**
      * <p>Test serverside. Only really needed if using Hazelcast Cloud
@@ -417,7 +531,7 @@ public class ApplicationRunner {
      * </p>
      * @return
      */
-    private boolean initialize(String clusterName) {
+    private boolean initialize(String clusterName) throws Exception {
         LOGGER.info("initialize(): -=-=-=-=- START -=-=-=-=-=-");
 
         String propertyName1 = "my.bootstrap.servers";
@@ -441,9 +555,8 @@ public class ApplicationRunner {
         if (ok) {
             Properties properties;
             try {
-                properties = UtilsProperties.loadClasspathProperties(APPLICATION_PROPERTIES_FILE);
-                Properties properties2 = UtilsSlack.loadSlackAccessProperties();
-                properties.putAll(properties2);
+                properties = UtilsProperties.loadClasspathProperties(MyConstants.APPLICATION_PROPERTIES_FILE);
+                properties.putAll(UtilsSlack.loadSlackAccessProperties());
             } catch (Exception e) {
                 LOGGER.error("No properties:", e);
                 properties = new Properties();
@@ -455,6 +568,8 @@ public class ApplicationRunner {
             String cloudOrHzCloud = properties.getProperty(MyConstants.USE_HZ_CLOUD);
             boolean useHzCloud = MyUtils.useHzCloud(cloudOrHzCloud);
             LOGGER.debug("useHzCloud='{}'", useHzCloud);
+            TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(properties);
+            LOGGER.info("TransactionMonitorFlavor=='{}'", transactionMonitorFlavor);
 
             // Address from environment/command line, others from application.properties file.
             properties.put(MyConstants.POSTGRES_ADDRESS, postgresAddress);
@@ -469,14 +584,16 @@ public class ApplicationRunner {
             }
 
             ok &= CommonIdempotentInitialization.createNeededObjects(hazelcastInstance,
-                    postgresProperties, ourProjectProvenance);
+                    postgresProperties, ourProjectProvenance, transactionMonitorFlavor);
             ok &= CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList,
-                    usePulsar, useHzCloud);
-            ok &= CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers);
-            if (ok && !this.localhost) {
+                    usePulsar, useHzCloud, transactionMonitorFlavor);
+            ok &= CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance,
+                    bootstrapServers, transactionMonitorFlavor);
+            //FIXME if (ok && !this.localhost) {
+            if (ok) {
                 // Don't even try if broken by this point
                 ok = CommonIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
-                        pulsarList, postgresProperties, properties, clusterName);
+                        pulsarList, postgresProperties, properties, clusterName, transactionMonitorFlavor);
             } else {
                 LOGGER.info("ok=={}, localhost=={} - no job submission", ok, this.localhost);
             }

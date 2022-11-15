@@ -63,7 +63,13 @@
     <logger name="hazelcast.platform.demos.banking.transactionmonitor.AlertingToPostgresMapStore" level="debug" additivity="false">
         <appender-ref ref="CYAN"/>
     </logger>
+    <logger name="hazelcast.platform.demos.banking.transactionmonitor.ApplicationRunner" level="debug" additivity="false">
+        <appender-ref ref="CYAN"/>
+    </logger>
     <logger name="hazelcast.platform.demos.banking.transactionmonitor.MyMembershipListener" level="trace" additivity="false">
+        <appender-ref ref="CYAN"/>
+    </logger>
+    <logger name="hazelcast.platform.demos.banking.transactionmonitor.TransactionsMapListener" level="debug" additivity="false">
         <appender-ref ref="CYAN"/>
     </logger>
     <logger name="hazelcast.platform.demos" level="trace" additivity="false">

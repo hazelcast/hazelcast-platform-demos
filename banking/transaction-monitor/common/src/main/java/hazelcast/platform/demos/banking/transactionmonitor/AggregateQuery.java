@@ -32,6 +32,7 @@ import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.function.FunctionEx;
 import com.hazelcast.function.Functions;
 import com.hazelcast.function.SupplierEx;
+import com.hazelcast.function.ToDoubleFunctionEx;
 import com.hazelcast.function.ToLongFunctionEx;
 import com.hazelcast.jet.accumulator.LongAccumulator;
 import com.hazelcast.jet.accumulator.MutableReference;
@@ -39,6 +40,7 @@ import com.hazelcast.jet.aggregate.AggregateOperation;
 import com.hazelcast.jet.aggregate.AggregateOperation1;
 import com.hazelcast.jet.aggregate.AggregateOperations;
 import com.hazelcast.jet.contrib.pulsar.PulsarSources;
+import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.jet.datamodel.Tuple4;
 import com.hazelcast.jet.kafka.KafkaSources;
@@ -95,42 +97,23 @@ public class AggregateQuery {
      * @return A pipeline job to run in Jet.
      */
     public static Pipeline buildPipeline(String bootstrapServers, String pulsarList,
-            boolean usePulsar, String projectName, String jobName, String clusterName) {
+            boolean usePulsar, String projectName, String jobName, String clusterName,
+            TransactionMonitorFlavor transactionMonitorFlavor) {
 
-        // Override the value de-serializer to produce a different type
         Properties properties = InitializerConfig.kafkaSourceProperties(bootstrapServers);
-        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, TransactionJsonDeserializer.class.getName());
 
         Pipeline pipeline = Pipeline.create();
 
-        StreamStage<Transaction> inputSource;
-        if (usePulsar) {
-            inputSource =
-                    pipeline.readFrom(AggregateQuery.pulsarSource(pulsarList))
-                    .withoutTimestamps();
-        } else {
-            inputSource =
-                pipeline.readFrom(KafkaSources.<String, Transaction, Transaction>
-                    kafka(properties,
-                    ConsumerRecord::value,
-                    MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS)
-                    )
-            .withoutTimestamps();
+        StreamStage<Entry<String, Tuple3<Long, Double, Double>>> aggregated;
+        switch (transactionMonitorFlavor) {
+        case ECOMMERCE:
+            aggregated = aggregatedEcommerce(pipeline, properties, usePulsar, pulsarList);
+            break;
+        case TRADE:
+        default:
+            aggregated = aggregatedTrade(pipeline, properties, usePulsar, pulsarList);
+            break;
         }
-
-        StreamStage<Entry<String, Tuple3<Long, Long, Long>>> aggregated =
-            inputSource
-            .mapUsingIMap(MyConstants.IMAP_NAME_SYMBOLS,
-                    Transaction::getSymbol,
-                    (Transaction transaction, SymbolInfo symbolInfo)
-                    -> (symbolInfo.getFinancialStatus() == NasdaqFinancialStatus.NORMAL ? transaction : null))
-            .groupingKey(Transaction::getSymbol)
-            .rollingAggregate(AggregateOperations.allOf(
-                AggregateOperations.counting(),
-                AggregateOperations.summingLong(transaction -> transaction.getPrice() * transaction.getQuantity()),
-                latestValue(transaction -> Long.valueOf(transaction.getPrice()))
-               ))
-               .setName("aggregate by symbol");
 
         aggregated
         .writeTo(Sinks.map(MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS));
@@ -151,11 +134,100 @@ public class AggregateQuery {
         .writeTo(Sinks.logger());
 
         // Extra stages for alert generation
-        AggregateQuery.addMaxVolumeAlert(aggregated, projectName, clusterName, jobName);
+        AggregateQuery.addMaxAlert(aggregated, projectName, clusterName, jobName);
 
         return pipeline;
     }
 
+    /**
+     * <p>E-commerce items are aggregated by item code, "{@code A0001}", etc.
+     * Unlike trades, there is no filtering. Instead we compute the average
+     * sale price.
+     * </p>
+     *
+     * @return A trio for the product - count, sum and latest
+     */
+    private static StreamStage<Entry<String, Tuple3<Long, Double, Double>>> aggregatedEcommerce(
+            Pipeline pipeline, Properties properties, boolean usePulsar, String pulsarList) {
+
+        StreamStage<TransactionEcommerce> inputSource;
+        if (usePulsar) {
+            inputSource =
+                    pipeline.readFrom(AggregateQuery.pulsarSourceEcommerce(pulsarList))
+                    .withoutTimestamps();
+        } else {
+            // Override the value de-serializer to produce a different type
+            properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                    TransactionEcommerceJsonDeserializer.class.getName());
+
+            inputSource =
+                pipeline.readFrom(KafkaSources.<String, TransactionEcommerce, TransactionEcommerce>
+                    kafka(properties,
+                    ConsumerRecord::value,
+                    MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS)
+                    )
+            .withoutTimestamps();
+        }
+
+        return inputSource
+                .groupingKey(TransactionEcommerce::getItemCode)
+                .rollingAggregate(AggregateOperations.allOf(
+                    AggregateOperations.counting(),
+                    AggregateOperations.summingDouble(transaction -> transaction.getPrice() * transaction.getQuantity())
+                   ))
+                .map((Entry<String, Tuple2<Long, Double>> entry) -> {
+                    return (Entry<String, Tuple3<Long, Double, Double>>)
+                            new SimpleImmutableEntry<>(entry.getKey(),
+                            Tuple3.tuple3(entry.getValue().f0(),
+                                    entry.getValue().f1(),
+                                    Double.parseDouble(String.format("%.2f", entry.getValue().f1() / entry.getValue().f0()))));
+                })
+                .setName("aggregate by item code");
+    }
+
+    /**
+     * <p>Trades are aggregated by stock symbol, "{@code AAL}", etc.
+     * Stocks with specific status other than normal are filtered out,
+     * we do not see "{@code DELINQUENT}" or "{@code DEFICIENT}".
+     * </p>
+     *
+     * @return A trio for the stock - count, sum and latest
+     */
+    private static StreamStage<Entry<String, Tuple3<Long, Double, Double>>> aggregatedTrade(
+            Pipeline pipeline, Properties properties, boolean usePulsar, String pulsarList) {
+
+        StreamStage<TransactionTrade> inputSource;
+        if (usePulsar) {
+            inputSource =
+                    pipeline.readFrom(AggregateQuery.pulsarSourceTrade(pulsarList))
+                    .withoutTimestamps();
+        } else {
+            // Override the value de-serializer to produce a different type
+            properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                    TransactionTradeJsonDeserializer.class.getName());
+
+            inputSource =
+                pipeline.readFrom(KafkaSources.<String, TransactionTrade, TransactionTrade>
+                    kafka(properties,
+                    ConsumerRecord::value,
+                    MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS)
+                    )
+            .withoutTimestamps();
+        }
+
+        return inputSource
+                .mapUsingIMap(MyConstants.IMAP_NAME_SYMBOLS,
+                        TransactionTrade::getSymbol,
+                        (TransactionTrade transaction, SymbolInfo symbolInfo)
+                        -> (symbolInfo.getFinancialStatus() == NasdaqFinancialStatus.NORMAL ? transaction : null))
+                .groupingKey(TransactionTrade::getSymbol)
+                .rollingAggregate(AggregateOperations.allOf(
+                    AggregateOperations.counting(),
+                    AggregateOperations.summingDouble(transaction -> transaction.getPrice() * transaction.getQuantity()),
+                    latestTradeValue(transaction -> Double.valueOf(transaction.getPrice()))
+                   ))
+                   .setName("aggregate by symbol");
+    }
 
     /**
      * <p>A custom aggregator to track the last value, stashing it in
@@ -164,15 +236,16 @@ public class AggregateQuery {
      * giving a minor race condition that does not matter here.
      * </p>
      *
-     * @param getLongValueFn How to get an "{@code long}" from the transaction
-     * @return A long
+     * @param getDoubleValueFn How to get a "{@code double}" from the transaction
+     * @return A double
      */
-    private static AggregateOperation1<Transaction, MutableReference<Long>, Long> latestValue(
-            ToLongFunctionEx<Transaction> getLongValueFn) {
+    private static AggregateOperation1<TransactionTrade, MutableReference<Double>, Double>
+        latestTradeValue(
+            ToDoubleFunctionEx<TransactionTrade> getDoubleValueFn) {
         return AggregateOperation
-            .withCreate(() -> new MutableReference<Long>())
-            .andAccumulate((MutableReference<Long> reference, Transaction transaction) -> {
-                reference.set(getLongValueFn.applyAsLong(transaction));
+            .withCreate(() -> new MutableReference<Double>())
+            .andAccumulate((MutableReference<Double> reference, TransactionTrade transaction) -> {
+                reference.set(getDoubleValueFn.applyAsDouble(transaction));
             })
             .andExportFinish(MutableReference::get);
     }
@@ -187,19 +260,19 @@ public class AggregateQuery {
      *
      * @param aggregated
      */
-    private static void addMaxVolumeAlert(
-            StreamStage<Entry<String, Tuple3<Long, Long, Long>>> aggregated,
+    private static void addMaxAlert(
+            StreamStage<Entry<String, Tuple3<Long, Double, Double>>> aggregated,
             String projectName, String jobName, String clusterName) {
         AggregateOperation1<
-            Entry<Integer, Tuple4<String, Long, Long, Long>>,
-            MaxVolumeAggregator,
+            Entry<Integer, Tuple4<String, Long, Double, Double>>,
+            MaxAggregator,
             Entry<Long, HazelcastJsonValue>>
-                maxVolumeAggregator =
-                    MaxVolumeAggregator.buildMaxVolumeAggregation(projectName, clusterName, jobName);
+                maxAggregator =
+                    MaxAggregator.buildMaxAggregation(projectName, clusterName, jobName);
 
         aggregated
         .map(entry -> {
-            Tuple4<String, Long, Long, Long> tuple4 =
+            Tuple4<String, Long, Double, Double> tuple4 =
                     Tuple4.tuple4(entry.getKey(), entry.getValue().f0(),
                             entry.getValue().f1(), entry.getValue().f2());
             return new SimpleImmutableEntry<>(CONSTANT_KEY, tuple4);
@@ -207,9 +280,9 @@ public class AggregateQuery {
         .addTimestamps(nowTimestampFn, 0)
         .groupingKey(Functions.entryKey())
         .window(WindowDefinition.tumbling(FIVE_MINUTES_IN_MS))
-        .aggregate(maxVolumeAggregator)
+        .aggregate(maxAggregator)
         .map(result -> result.getValue())
-        .writeTo(Sinks.map(MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME));
+        .writeTo(Sinks.map(MyConstants.IMAP_NAME_ALERTS_LOG));
     }
 
     /**
@@ -220,7 +293,53 @@ public class AggregateQuery {
      * @param pulsarList
      * @return
      */
-    private static StreamSource<Transaction> pulsarSource(String pulsarList) {
+    @SuppressWarnings("unchecked")
+    private static StreamSource<TransactionEcommerce> pulsarSourceEcommerce(String pulsarList) {
+        FunctionEx<Message<String>, TransactionEcommerce> pulsarProjectionFunction =
+                message -> {
+                    //TODO: A new deserializer for each message, could optimize with shared if thread-safe
+                    try (TransactionEcommerceJsonDeserializer transactionJsonDeserializer =
+                            new TransactionEcommerceJsonDeserializer()) {
+                        byte[] bytes = message.getValue().getBytes(StandardCharsets.UTF_8);
+                        return transactionJsonDeserializer.deserialize("", bytes);
+                    }
+                };
+
+        return (StreamSource<TransactionEcommerce>) pulsarSource(pulsarList, pulsarProjectionFunction);
+    }
+
+    /**
+     * <p>This is similar to {@link IngestTransactions#IngestTransactions()} but
+     * returns a different type.
+     * </p>
+     *
+     * @param pulsarList
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private static StreamSource<TransactionTrade> pulsarSourceTrade(String pulsarList) {
+        FunctionEx<Message<String>, TransactionTrade> pulsarProjectionFunction =
+                message -> {
+                    //TODO: A new deserializer for each message, could optimize with shared if thread-safe
+                    try (TransactionTradeJsonDeserializer transactionJsonDeserializer = new TransactionTradeJsonDeserializer()) {
+                        byte[] bytes = message.getValue().getBytes(StandardCharsets.UTF_8);
+                        return transactionJsonDeserializer.deserialize("", bytes);
+                    }
+                };
+
+        return (StreamSource<TransactionTrade>) pulsarSource(pulsarList, pulsarProjectionFunction);
+    }
+
+    /**
+     * <p>Builds a source for Pulsar
+     * </p>
+     *
+     * @param pulsarList
+     * @param pulsarProjectionFunction - Extracts the data
+     * @return
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private static StreamSource pulsarSource(String pulsarList, FunctionEx pulsarProjectionFunction) {
         String serviceUrl = UtilsUrls.getPulsarServiceUrl(pulsarList);
 
         SupplierEx<PulsarClient> pulsarConnectionSupplier =
@@ -232,19 +351,10 @@ public class AggregateQuery {
         SupplierEx<Schema<String>> pulsarSchemaSupplier =
                 () -> Schema.STRING;
 
-        FunctionEx<Message<String>, Transaction> pulsarProjectionFunction =
-                message -> {
-                    //TODO: A new deserializer for each message, could optimize with shared if thread-safe
-                    try (TransactionJsonDeserializer transactionJsonDeserializer = new TransactionJsonDeserializer()) {
-                        byte[] bytes = message.getValue().getBytes(StandardCharsets.UTF_8);
-                        return transactionJsonDeserializer.deserialize("", bytes);
-                    }
-                };
-
         return PulsarSources.pulsarReaderBuilder(
-                    MyConstants.PULSAR_TOPIC_NAME_TRANSACTIONS,
-                    pulsarConnectionSupplier,
-                    pulsarSchemaSupplier,
-                    pulsarProjectionFunction).build();
+                        MyConstants.PULSAR_TOPIC_NAME_TRANSACTIONS,
+                        pulsarConnectionSupplier,
+                        pulsarSchemaSupplier,
+                        pulsarProjectionFunction).build();
     }
 }

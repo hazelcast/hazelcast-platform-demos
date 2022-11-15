@@ -16,7 +16,9 @@
 
 package hazelcast.platform.demos.banking.transactionmonitor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 import java.util.Map.Entry;
 
@@ -54,7 +56,7 @@ public class ApplicationConfig {
      * for more details.
      * </p>
      */
-    public static Config buildConfig(Properties properties) {
+    public static Config buildConfig(Properties properties) throws Exception {
         Config config = new ClasspathYamlConfig("hazelcast.yml");
 
         JoinConfig joinConfig = config.getNetworkConfig().getJoin();
@@ -98,12 +100,14 @@ public class ApplicationConfig {
      * @param config To amend in-situ
      * @param properties From "application.properties"
      */
-    public static void addWan(Config config, Properties properties) {
+    public static void addWan(Config config, Properties properties) throws Exception {
         if (!System.getProperty("my.kubernetes.enabled", "").equals("true")) {
             LOGGER.info("WAN deactivated as not Kubernetes");
             config.getWanReplicationConfigs().clear();
             return;
         }
+        TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(properties);
+        LOGGER.info("TransactionMonitorFlavor=='{}'", transactionMonitorFlavor);
 
         // Assume only one
         Entry<String, WanReplicationConfig> entry =
@@ -126,7 +130,17 @@ public class ApplicationConfig {
             }
         });
 
-        for (String mapName : MyConstants.WAN_IMAP_NAMES) {
+        List<String> wanMapNames = new ArrayList<>();
+        switch (transactionMonitorFlavor) {
+        case ECOMMERCE:
+            wanMapNames.addAll(MyConstants.WAN_IMAP_NAMES_ECOMMERCE);
+            break;
+        case TRADE:
+        default:
+            wanMapNames.addAll(MyConstants.WAN_IMAP_NAMES_TRADE);
+            break;
+        }
+        for (String mapName : wanMapNames) {
             WanReplicationRef wanReplicationRef = new WanReplicationRef();
             wanReplicationRef.setName(publisherName);
 

@@ -64,7 +64,7 @@ public class AlertingToPostgresMapStore implements MapStore<Long, HazelcastJsonV
     private static final String SQL_LOADALLKEYS = "SELECT now FROM " + MyConstants.POSTGRES_TABLE_NAME;
     private static final String SQL_LOAD = "SELECT * FROM " + MyConstants.POSTGRES_TABLE_NAME
                                         + " WHERE " + MyConstants.POSTGRES_TABLE_KEY_NAME + " = ?";
-    private static final String[] TABLE_NONKEY_NAMES = new String[] { "symbol", "provenance", "whence", "volume"};
+    private static final String[] TABLE_NONKEY_NAMES = new String[] { "code", "provenance", "whence", "volume"};
     private static final String SQL_STORE = "INSERT INTO " + MyConstants.POSTGRES_TABLE_NAME
             + " (" + MyConstants.POSTGRES_TABLE_KEY_NAME
             + " ," + TABLE_NONKEY_NAMES[0]
@@ -294,8 +294,8 @@ public class AlertingToPostgresMapStore implements MapStore<Long, HazelcastJsonV
             }
 
             if (!provenance.startsWith(this.ourProjectProvenance)) {
-                LOGGER.error(this.prefix + "store(): for key '{}' value '{}': unexpected provenance v '{}': END",
-                        key, value, this.ourProjectProvenance);
+                LOGGER.error(this.prefix + "store(): for key '{}' value '{}': don't save provenance '{}': END",
+                        key, value, provenance);
             } else {
                 try (PreparedStatement preparedStatement = this.connection.prepareStatement(SQL_STORE);) {
                     preparedStatement.setLong(1, key);

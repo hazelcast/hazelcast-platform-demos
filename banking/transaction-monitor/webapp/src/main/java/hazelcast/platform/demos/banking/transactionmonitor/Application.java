@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.platform.demos.utils.UtilsProperties;
 
 /**
  * <p>Entry point, "{@code main()}" method.
@@ -67,6 +68,8 @@ public class Application {
         String bootstrapServers = System.getProperty(propertyName1, "");
         String pulsarList = System.getProperty(propertyName2, "");
         String postgresAddress = System.getProperty(propertyName3, "");
+        TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(
+                UtilsProperties.loadClasspathProperties(MyConstants.APPLICATION_PROPERTIES_FILE));
         if (bootstrapServers.isBlank()) {
             LOGGER.error("No value for " + propertyName1);
             System.exit(1);
@@ -82,12 +85,13 @@ public class Application {
         LOGGER.info("'bootstrapServers'=='{}'", bootstrapServers);
         LOGGER.info("'pulsarList'=='{}'", pulsarList);
         LOGGER.info("'postgresAddress'=='{}'", postgresAddress);
+        LOGGER.info("TransactionMonitorFlavor=='{}'", transactionMonitorFlavor);
 
         ClientConfig clientConfig = ApplicationConfig.buildJetClientConfig();
 
         HazelcastInstance hazelcastInstance = HazelcastClient.newHazelcastClient(clientConfig);
 
-        new ApplicationRunner(hazelcastInstance).run();
+        new ApplicationRunner(hazelcastInstance, transactionMonitorFlavor).run();
 
         hazelcastInstance.shutdown();
     }

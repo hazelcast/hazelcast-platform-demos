@@ -95,28 +95,28 @@ public class ApplicationInitializer {
 
         HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance(config);
 
-        TransactionMonitorSkin transactionMonitorSkin = MyUtils.getTransactionMonitorSkin(properties);
-        LOGGER.info("TransactionMonitorSkin '{}'", transactionMonitorSkin);
+        TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(properties);
+        LOGGER.info("TransactionMonitorFlavor=='{}'", transactionMonitorFlavor);
 
         String initializerProperty = "my.initialize";
         if (System.getProperty(initializerProperty, "").equalsIgnoreCase(Boolean.TRUE.toString())) {
             ApplicationInitializer.initialise(hazelcastInstance, bootstrapServers, pulsarList,
                     postgresAddress, properties, config.getClusterName());
         } else {
-            LOGGER.info("Skip initialize except mappings as '{}'=='{}', assume client will do so",
+            LOGGER.info("Skip initialize except WAN maps as '{}'=='{}', assume client will do the rest",
                     initializerProperty, System.getProperty(initializerProperty));
-            ApplicationInitializer.miniInitialize(hazelcastInstance, transactionMonitorSkin);
+            ApplicationInitializer.miniInitialize(hazelcastInstance, transactionMonitorFlavor);
         }
     }
 
     /**
-     * <p>Minimal version of initialize, only mappings needed by WAN.
+     * <p>Minimal version of initialize, only maps and mappings needed by WAN.
      * (Instead of WAN replicating "{@code __sql.catalog}" which would do too many.
      * </p>
      */
     public static void miniInitialize(HazelcastInstance hazelcastInstance,
-            TransactionMonitorSkin transactionMonitorSkin) throws Exception {
-        CommonIdempotentInitialization.createMinimalMappings(hazelcastInstance, transactionMonitorSkin);
+            TransactionMonitorFlavor transactionMonitorFlavor) throws Exception {
+        CommonIdempotentInitialization.createMinimal(hazelcastInstance, transactionMonitorFlavor);
     }
 
     /**
@@ -139,8 +139,8 @@ public class ApplicationInitializer {
                     useHzCloud, MyConstants.USE_HZ_CLOUD, cloudOrHzCloud);
             throw new RuntimeException(message);
         }
-        TransactionMonitorSkin transactionMonitorSkin = MyUtils.getTransactionMonitorSkin(properties);
-        LOGGER.info("TransactionMonitorSkin '{}'", transactionMonitorSkin);
+        TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(properties);
+        LOGGER.info("TransactionMonitorFlavor=='{}'", transactionMonitorFlavor);
 
         // Address from environment/command line, others from application.properties file.
         properties.put(MyConstants.POSTGRES_ADDRESS, postgresAddress);
@@ -150,15 +150,15 @@ public class ApplicationInitializer {
 
         Properties postgresProperties = MyUtils.getPostgresProperties(properties);
         CommonIdempotentInitialization.createNeededObjects(hazelcastInstance,
-                postgresProperties, ourProjectProvenance, transactionMonitorSkin);
+                postgresProperties, ourProjectProvenance, transactionMonitorFlavor);
         addListeners(hazelcastInstance, bootstrapServers, pulsarList, usePulsar, projectName, clusterName,
-                transactionMonitorSkin);
+                transactionMonitorFlavor);
         CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList, usePulsar,
-                useHzCloud, transactionMonitorSkin);
-        CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers, transactionMonitorSkin);
+                useHzCloud, transactionMonitorFlavor);
+        CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers, transactionMonitorFlavor);
 
         CommonIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
-                pulsarList, postgresProperties, properties, clusterName, transactionMonitorSkin);
+                pulsarList, postgresProperties, properties, clusterName, transactionMonitorFlavor);
     }
 
 
@@ -170,13 +170,13 @@ public class ApplicationInitializer {
      */
     static void addListeners(HazelcastInstance hazelcastInstance, String bootstrapServers,
             String pulsarList, boolean usePulsar, String projectName, String clusterName,
-            TransactionMonitorSkin transactionMonitorSkin) {
+            TransactionMonitorFlavor transactionMonitorFlavor) {
         MyMembershipListener myMembershipListener = new MyMembershipListener(hazelcastInstance);
         hazelcastInstance.getCluster().addMembershipListener(myMembershipListener);
 
         JobControlListener jobControlListener =
                 new JobControlListener(bootstrapServers, pulsarList, usePulsar,
-                        projectName, clusterName, transactionMonitorSkin);
+                        projectName, clusterName, transactionMonitorFlavor);
         hazelcastInstance.getMap(MyConstants.IMAP_NAME_JOB_CONTROL)
             .addLocalEntryListener(jobControlListener);
     }

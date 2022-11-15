@@ -153,24 +153,25 @@ public class PostgresCDC {
                     }
                 }
 
-                Object symbol = valueFields.get("symbol");
+                Object code = valueFields.get("code");
                 Object provenance = valueFields.get("provenance");
                 Object whence = valueFields.get("whence");
                 Object volume = valueFields.get("volume");
-                if (symbol == null || provenance == null || whence == null || volume == null) {
+                if (code == null || provenance == null || whence == null || volume == null) {
                     LOGGER.error("Value fields incomplete, {}", valueFields.keySet());
                     return null;
                 }
 
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append("{");
-                stringBuilder.append("  \"symbol\" : \"" + symbol + "\"");
+                stringBuilder.append("  \"code\" : \"" + code + "\"");
                 stringBuilder.append(", \"provenance\" : \"" + provenance + "\"");
                 stringBuilder.append(", \"whence\" : \"" + whence + "\"");
                 stringBuilder.append(", \"volume\" : " + volume);
                 stringBuilder.append("}");
                 HazelcastJsonValue value = new HazelcastJsonValue(stringBuilder.toString());
 
+                // Allow SQL scripts
                 Tuple2<Long, HazelcastJsonValue> tuple2 = Tuple2.tuple2(key, value);
                 if (provenance.toString().startsWith(ourProvenanceProject)) {
                     /* Anything starting "transaction-monitor" is either initial
