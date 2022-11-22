@@ -98,14 +98,21 @@ public class ApplicationInitializer {
         TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(properties);
         LOGGER.info("TransactionMonitorFlavor=='{}'", transactionMonitorFlavor);
 
+        // First node runs initialization
+        int size = hazelcastInstance.getCluster().getMembers().size();
+
         String initializerProperty = "my.initialize";
         if (System.getProperty(initializerProperty, "").equalsIgnoreCase(Boolean.TRUE.toString())) {
             ApplicationInitializer.initialise(hazelcastInstance, bootstrapServers, pulsarList,
                     postgresAddress, properties, config.getClusterName());
         } else {
-            LOGGER.info("Skip initialize except WAN maps as '{}'=='{}', assume client will do the rest",
-                    initializerProperty, System.getProperty(initializerProperty));
-            ApplicationInitializer.miniInitialize(hazelcastInstance, transactionMonitorFlavor);
+            if (size == 1) {
+                LOGGER.info("Mini initialize, only WAN maps as '{}'=='{}', assume client will do the rest",
+                        initializerProperty, System.getProperty(initializerProperty));
+                ApplicationInitializer.miniInitialize(hazelcastInstance, transactionMonitorFlavor);
+            } else {
+                LOGGER.info("Skip initialize, assume done by first node, current cluster size is {}", size);
+            }
         }
     }
 

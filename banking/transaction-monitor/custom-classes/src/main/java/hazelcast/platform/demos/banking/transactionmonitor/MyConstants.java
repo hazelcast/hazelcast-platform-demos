@@ -52,7 +52,7 @@ public class MyConstants {
     public static final String IMAP_NAME_AUDIT_LOG = "audit_log";
     public static final String IMAP_NAME_JOB_CONTROL = "job_control";
     public static final String IMAP_NAME_JOB_CONFIG = "job_config";
-    public static final String IMAP_NAME_PORTFOLIOS = "portfolios";
+    public static final String IMAP_NAME_PERSPECTIVE = "perspective";
     public static final String IMAP_NAME_PRODUCTS = "products";
     public static final String IMAP_NAME_PYTHON_SENTIMENT = "python_sentiment";
     public static final String IMAP_NAME_SYMBOLS = "symbols";
@@ -62,13 +62,13 @@ public class MyConstants {
             List.of(IMAP_NAME_AGGREGATE_QUERY_RESULTS, IMAP_NAME_ALERTS_LOG,
                     IMAP_NAME_JOB_CONTROL, IMAP_NAME_JOB_CONFIG,
                     IMAP_NAME_PRODUCTS,
-                    //TODO IMAP_NAME_PORTFOLIOS, IMAP_NAME_PYTHON_SENTIMENT,
+                    IMAP_NAME_PERSPECTIVE, IMAP_NAME_PYTHON_SENTIMENT,
                     IMAP_NAME_TRANSACTIONS);
 
     public static final List<String> IMAP_NAMES_TRADES =
             List.of(IMAP_NAME_AGGREGATE_QUERY_RESULTS, IMAP_NAME_ALERTS_LOG,
                     IMAP_NAME_JOB_CONTROL, IMAP_NAME_JOB_CONFIG,
-                    IMAP_NAME_PORTFOLIOS, IMAP_NAME_PYTHON_SENTIMENT,
+                    IMAP_NAME_PERSPECTIVE, IMAP_NAME_PYTHON_SENTIMENT,
                     IMAP_NAME_SYMBOLS, IMAP_NAME_TRANSACTIONS);
 
     // Maps that are replicated over WAN in enterprise only. Avoid clashing with
@@ -77,6 +77,8 @@ public class MyConstants {
             List.of(IMAP_NAME_AUDIT_LOG, IMAP_NAME_JOB_CONFIG, IMAP_NAME_PRODUCTS);
     public static final List<String> WAN_IMAP_NAMES_TRADE =
             List.of(IMAP_NAME_AUDIT_LOG, IMAP_NAME_JOB_CONFIG, IMAP_NAME_SYMBOLS);
+
+    public static final String PN_UPDATER = "updater-" + PerspectiveTrade.class.getSimpleName();
 
     public static final String WEBSOCKET_PATH_TRANSACTIONS = "/transactions";
 
@@ -88,11 +90,4 @@ public class MyConstants {
 
     // For exponential loggers
     public static final int MAX_LOGGING_INTERVAL = 3_000;
-
-    //FIXME Update list of sample stocks
-    public static final List<String> SAMPLE_STOCKS =
-            List.of("AAPL", "MSFT", "GOOG", "JPM", "IBM", "TPL",
-                    "NDP", "PBA", "ESTE", "DWAC", "IBA", "MTRN",
-                    "LPI", "CVX", "EOG", "GHC", "FRPT", "EXPD"
-                    );
 }

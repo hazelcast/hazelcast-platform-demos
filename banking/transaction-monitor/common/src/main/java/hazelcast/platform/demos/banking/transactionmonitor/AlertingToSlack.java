@@ -90,7 +90,8 @@ public class AlertingToSlack {
      * @param buildUsser String from properties
      */
     public static Pipeline buildPipeline(Object accessTokenObject,
-            Object channelNameObject, Object projectNameObject, Object buildUserObject) throws Exception {
+            Object channelNameObject, Object projectNameObject, Object buildUserObject,
+            TransactionMonitorFlavor transactionMonitorFlavor) throws Exception {
         String accessToken = validate("accessToken", accessTokenObject);
         String channelName = validate("channelName", channelNameObject);
         String projectName = validate("projectName", projectNameObject);
@@ -102,7 +103,7 @@ public class AlertingToSlack {
         .readFrom(Sources.<Long, HazelcastJsonValue>mapJournal(
                 MyConstants.IMAP_NAME_ALERTS_LOG,
                 JournalInitialPosition.START_FROM_OLDEST)).withoutTimestamps()
-        .map(AlertingToSlack.myMapStage()).setName("reformat-to-JSON");
+        .map(AlertingToSlack.myMapStage(transactionMonitorFlavor)).setName("reformat-to-JSON");
 
         input
         .writeTo(UtilsSlackSink.slackSink(accessToken, channelName, projectName, buildUser));
@@ -134,17 +135,39 @@ public class AlertingToSlack {
      * <p>Extract the JSON from the map entry.
      * </p>
      */
-    private static FunctionEx<Map.Entry<Long, HazelcastJsonValue>, JSONObject> myMapStage() {
+    private static FunctionEx<Map.Entry<Long, HazelcastJsonValue>, JSONObject> myMapStage(
+            TransactionMonitorFlavor transactionMonitorFlavor) {
         return entry -> {
             JSONObject output = new JSONObject();
+
             try {
                 JSONObject input = new JSONObject(entry.getValue().toString());
+
+                String fieldName1;
+                String fieldValue1;
+                String fieldName2;
+                String fieldValue2;
+                switch (transactionMonitorFlavor) {
+                case ECOMMERCE:
+                    fieldName1 = "code";
+                    fieldValue1 = safeGetString(input, "code");
+                    fieldName2 = "sales";
+                    fieldValue2 = safeGetDouble(input, "volume");
+                    break;
+                case TRADE:
+                default:
+                    fieldName1 = "stock";
+                    fieldValue1 = safeGetString(input, "symbol");
+                    fieldName2 = "volume";
+                    fieldValue2 = safeGetDouble(input, "volume");
+                    break;
+                }
 
                 String cleanStr =
                         "*ALERT* `"
                         + safeGetString(input, "whence")
-                        + ", stock '" + safeGetString(input, "symbol") + "'"
-                        + ", volume: " + safeGetLong(input, "volume") + ""
+                        + ", " + fieldName1 + ": '" + fieldValue1 + "'"
+                        + ", " + fieldName2 + ": " + fieldValue2 + ""
                         + ", provenance: '" + safeGetString(input, "provenance") + "'`";
 
                 output.put(UtilsConstants.SLACK_PARAM_TEXT, cleanStr);
@@ -169,7 +192,7 @@ public class AlertingToSlack {
         try {
             return Objects.toString(input.getString(field));
         } catch (Exception e) {
-            return String.format("Exception for %s:%s", field, e.getMessage());
+            return String.format("Exception for %s:%s in '%s'", field, e.getMessage(), input);
         }
     }
 
@@ -181,9 +204,10 @@ public class AlertingToSlack {
      * @param field
      * @return
      */
-    private static String safeGetLong(JSONObject input, String field) {
+    private static String safeGetDouble(JSONObject input, String field) {
         try {
-            return Objects.toString(input.getLong(field));
+            Double d = input.getDouble(field);
+            return String.format("%-2f", d);
         } catch (Exception e) {
             return String.format("Exception for %s:%s", field, e.getMessage());
         }

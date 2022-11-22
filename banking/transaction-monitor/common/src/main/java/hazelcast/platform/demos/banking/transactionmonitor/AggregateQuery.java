@@ -144,6 +144,8 @@ public class AggregateQuery {
      * Unlike trades, there is no filtering. Instead we compute the average
      * sale price.
      * </p>
+     * <p>See also {@link PerspectiveEcommerce}.
+     * </p>
      *
      * @return A trio for the product - count, sum and latest
      */
@@ -189,6 +191,8 @@ public class AggregateQuery {
      * <p>Trades are aggregated by stock symbol, "{@code AAL}", etc.
      * Stocks with specific status other than normal are filtered out,
      * we do not see "{@code DELINQUENT}" or "{@code DEFICIENT}".
+     * </p>
+     * <p>See also {@link PerspectiveTrade}.
      * </p>
      *
      * @return A trio for the stock - count, sum and latest

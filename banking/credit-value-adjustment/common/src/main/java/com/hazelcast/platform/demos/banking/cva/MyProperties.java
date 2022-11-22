@@ -18,7 +18,7 @@ package com.hazelcast.platform.demos.banking.cva;
 
 import com.hazelcast.platform.demos.banking.cva.MyConstants.Site;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

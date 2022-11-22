@@ -39,4 +39,5 @@ hazelcast:
   serialization:
     compact-serialization:
       serializers:
-        - serializer: hazelcast.platform.demos.banking.transactionmonitor.PortfolioSerializer
+        - serializer: hazelcast.platform.demos.banking.transactionmonitor.PerspectiveEcommerceSerializer
+        - serializer: hazelcast.platform.demos.banking.transactionmonitor.PerspectiveTradeSerializer

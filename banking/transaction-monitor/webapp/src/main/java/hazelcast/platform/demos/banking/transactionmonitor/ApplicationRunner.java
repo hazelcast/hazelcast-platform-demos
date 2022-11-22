@@ -25,8 +25,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -38,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import com.hazelcast.cluster.Member;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
+import com.hazelcast.crdt.pncounter.PNCounter;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.map.IMap;
 import com.hazelcast.platform.demos.utils.UtilsProperties;
@@ -69,7 +68,6 @@ public class ApplicationRunner {
     private static final String DRILL_ITEM = "DRILL_ITEM";
     private static final String LOAD_ITEMS = "LOAD_ITEMS";
 
-    private final Executor executor = Executors.newSingleThreadExecutor();
     private final HazelcastInstance  hazelcastInstance;
     private final TransactionMonitorFlavor transactionMonitorFlavor;
     private final boolean localhost;
@@ -126,9 +124,17 @@ public class ApplicationRunner {
         System.out.println("");
 
         if (ok) {
-            PortfolioUpdater portfolioUpdater
-                = new PortfolioUpdater(this.hazelcastInstance);
-            this.executor.execute(portfolioUpdater);
+            PNCounter updateCounter = this.hazelcastInstance.getPNCounter(MyConstants.PN_UPDATER);
+            if (updateCounter.get() == 0L) {
+                PerspectiveUpdater perspectiveUpdater
+                    = new PerspectiveUpdater(transactionMonitorFlavor);
+                this.hazelcastInstance.getExecutorService("default").execute(perspectiveUpdater);
+                updateCounter.incrementAndGet();
+                LOGGER.info("Launch '{}'", perspectiveUpdater.getClass());
+            } else {
+                LOGGER.info("Skip launch '{}', PNCounter '{}'=={}", PerspectiveUpdater.class.getSimpleName(),
+                        updateCounter.getName(), updateCounter.get());
+            }
 
             ok = demoSql();
         }
@@ -138,6 +144,7 @@ public class ApplicationRunner {
 
         // If SQL is broken, abort
         if (!ok) {
+            CommonIdempotentInitialization.logStuff(this.hazelcastInstance);
             Javalin javalin = Javalin.create();
 
             // ReactJS, see src/main/app
@@ -589,8 +596,7 @@ public class ApplicationRunner {
                     usePulsar, useHzCloud, transactionMonitorFlavor);
             ok &= CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance,
                     bootstrapServers, transactionMonitorFlavor);
-            //FIXME if (ok && !this.localhost) {
-            if (ok) {
+            if (ok && !this.localhost) {
                 // Don't even try if broken by this point
                 ok = CommonIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
                         pulsarList, postgresProperties, properties, clusterName, transactionMonitorFlavor);
