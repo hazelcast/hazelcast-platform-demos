@@ -27,7 +27,7 @@
 # GEVO,WHALE
 # ----------------------------------------------------------------------
 # Note:
-# (1) The same stock may feature more than once in the input item list,
+# (1) The same item may feature more than once in the input item list,
 # but this isn't considered. Each item is assessed in isolation,
 # missing the chance for added value.
 # (2) The code has a "sleep()" to simulate complex processing that
@@ -37,19 +37,39 @@
 import json
 import time 
 
+flavor = "@my.transaction-monitor.flavor@"
+
 def processFn(items):
     results = []
 
+    keyField = ""
+    threshold = 0
+    thresholdAbove = ""
+    thresholdBelow = ""
+    # Not Python 3.10 necessarily 
+    if flavor == "ecommerce":
+      keyField = "itemCode"
+      threshold = 1
+      thresholdAbove = "Hot"
+      thresholdBelow = "Cold"
+    if flavor == "trade":
+      keyField = "symbol"
+      threshold = 5000
+      thresholdAbove = "Whale"
+      thresholdBelow = "Minnow"
+    if keyField == "":
+      return results
+
     for item in items:
       transaction = json.loads(item)
-      symbol = transaction["symbol"]
+      key = transaction[keyField]
 
-      if transaction["quantity"] > 5000:
-        assessment = "WHALE"
+      if transaction["quantity"] > threshold:
+        assessment = thresholdAbove
       else:
-        assessment = "MINNOW"
+        assessment = thresholdBelow
       
       time.sleep(0.05)
 
-      results.append("".join((symbol, ",", assessment)))
+      results.append("".join((key, ",", assessment, ",", flavor)))
     return results    

@@ -20,9 +20,9 @@
 import slow
 import time
 
-transaction1 = '{"id": "c6dcc88c-5f1c-4c0d-ae7f-6518e5bb187a","timestamp": 1617797114225,"symbol": "GEVO","price": 2499,"quantity": 5913}'
-transaction2 = '{"id": "6edfd130-d088-491b-a36a-934c029729a7","timestamp": 1617874250739,"symbol": "PLAB","price": 2501,"quantity": 4408}'
-transaction3 = '{"id": "0f1a39a7-40c3-4f5a-bf05-c57229e9aebe","timestamp": 1617878692183,"symbol": "VIRC","price": 2499,"quantity": 5379}'
+transaction1 = '{"id": "c6dcc88c-5f1c-4c0d-ae7f-6518e5bb187a","timestamp": 1617797114225,"itemCode": "A001","price": 3,"quantity": 5913}'
+transaction2 = '{"id": "6edfd130-d088-491b-a36a-934c029729a7","timestamp": 1617874250739,"itemCode": "B002","price": 2,"quantity": 4408}'
+transaction3 = '{"id": "0f1a39a7-40c3-4f5a-bf05-c57229e9aebe","timestamp": 1617878692183,"itemCode": "C003","price": 1,"quantity": 5379}'
 
 print("----------------------------------")
 print("Run from target/classes/python to use slow.py with Maven substitutions.")

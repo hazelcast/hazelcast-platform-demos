@@ -83,6 +83,7 @@ public class MyConstants {
     public static final String WEBSOCKET_PATH_TRANSACTIONS = "/transactions";
 
     // For demonstration of queries
+    public static final String SQL_JOB_NAME_IMAP_TO_KAFKA = "imap2Kafka";
     public static final String SQL_JOB_NAME_KAFKA_TO_IMAP = "kafka2IMap";
     public static final int SQL_RESULT_THRESHOLD = 10;
     // For SQL VIEW naming

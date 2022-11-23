@@ -822,7 +822,7 @@ public class CommonIdempotentInitialization {
             } else {
                 UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAggregateQuery, jobConfigAggregateQuery);
                 // Aggregate query creates alerts to an IMap. Use a separate rather than same job to copy to Kafka.
-                launchAlertsToKafkaAndToLog(hazelcastInstance, bootstrapServers);
+                launchAlertsToKafkaAndToLog(hazelcastInstance, bootstrapServers, transactionMonitorFlavor);
             }
 
         }
@@ -878,23 +878,37 @@ public class CommonIdempotentInitialization {
      * @param hazelcastInstance
      * @param bootstrapServers
      */
-    private static void launchAlertsToKafkaAndToLog(HazelcastInstance hazelcastInstance, String bootstrapServers) {
+    private static void launchAlertsToKafkaAndToLog(HazelcastInstance hazelcastInstance, String bootstrapServers,
+            TransactionMonitorFlavor transactionMonitorFlavor) {
         String topic = MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_ALERTS;
 
-        /*FIXME 5.3. Make both jobs streaming SQL
-        String sqlJobMapToKafka = "SINK INTO "
-                + MyConstants.KAFKA_TOPIC_NAME_ALERTS
-                + " SELECT __key, symbol || ',' || provenance || ',' || whence || ',' || volume FROM "
-                + MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME;
-                */
-
         String sqlJobKafkaToMap =
-                "CREATE JOB IF NOT EXISTS " + MyConstants.SQL_JOB_NAME_KAFKA_TO_IMAP
+                "CREATE JOB IF NOT EXISTS \"" + MyConstants.SQL_JOB_NAME_KAFKA_TO_IMAP + "\""
                 + " AS "
-                + " SINK INTO " + MyConstants.IMAP_NAME_AUDIT_LOG
-                + " SELECT * FROM " + topic;
+                + " SINK INTO \"" + MyConstants.IMAP_NAME_AUDIT_LOG + "\""
+                + " SELECT * FROM \"" + topic + "\"";
 
-        // 5.2 Style, to be removed in favor of SQL for both.
+        String concatenation;
+        String xxx = "UNMERGED_INTO_5.3_";
+        LOGGER.error("Reminder to remove job prefix {}", xxx);
+        switch (transactionMonitorFlavor) {
+        case ECOMMERCE:
+            concatenation = "code";
+            break;
+        case TRADE:
+        default:
+            concatenation = "symbol";
+            break;
+        }
+        String sqlJobMapToKafka =
+                "CREATE JOB IF NOT EXISTS \"" + xxx + MyConstants.SQL_JOB_NAME_IMAP_TO_KAFKA + "\""
+                + " AS "
+                + " SINK INTO \"" + MyConstants.KAFKA_TOPIC_NAME_ALERTS + "\""
+                + " SELECT __key, " + concatenation + " || ',' || provenance || ',' || whence || ',' || volume"
+                + " FROM \"" + MyConstants.IMAP_NAME_ALERTS_LOG + "\"";
+
+        //FIXME 5.2 Style, to be removed once "sqlJobMapToKafka" runs as streaming in 5.3
+        //FIXME https://docs.hazelcast.com/hazelcast/5.3-snapshot/sql/querying-maps-sql#streaming-map-changes
         try {
             Pipeline pipelineAlertingToKafka = AlertingToKafka.buildPipeline(bootstrapServers);
 
@@ -907,7 +921,8 @@ public class CommonIdempotentInitialization {
             LOGGER.error("launchAlertsSqlToKafka:", e);
         }
 
-        for (String sql : List.of(sqlJobKafkaToMap)) {
+        //FIXME Submit "sqlJobMapToKafka", will complete until ready for streaming as reminder
+        for (String sql : List.of(sqlJobKafkaToMap, sqlJobMapToKafka)) {
             try {
                 hazelcastInstance.getSql().execute(sql);
                 LOGGER.info("SQL running: '{}'", sql);
