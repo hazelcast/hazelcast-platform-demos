@@ -19,4 +19,5 @@ exec java $JAVA_ARGS $JAVA_OPTS \
  -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
  -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
  -Dmy.pulsar.list=$MY_PULSAR_LIST \
+ -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
  -jar application.jar

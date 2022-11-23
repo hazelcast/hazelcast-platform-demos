@@ -44,6 +44,7 @@ CMD ["bash", "-c", "set -euo pipefail \
  -Dmy.pulsar.list=$MY_PULSAR_LIST \
  -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
  -Dhazelcast.enterprise.license.key=${MC_LICENSE} \
+ -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
  -jar application.jar \
       && java $JAVA_ARGS $JAVA_OPTS \
  -Dmy.autostart.enabled=$MY_AUTOSTART_ENABLED \
@@ -52,5 +53,6 @@ CMD ["bash", "-c", "set -euo pipefail \
  -Dmy.pulsar.list=$MY_PULSAR_LIST \
  -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
  -Dhazelcast.enterprise.license.key=${MC_LICENSE} \
+ -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
  -jar application.jar \
      "]

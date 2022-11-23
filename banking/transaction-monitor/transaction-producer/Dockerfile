@@ -20,7 +20,7 @@ CMD ["bash", "-c", "set -euo pipefail \
       && java --version \
       && echo @@@@@@@@@@ \
       && echo @@@@@@@@@@ \
-      && echo java $JAVA_ARGS $JAVA_OPTS -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS -Dmy.pulsar.list=$MY_PULSAR_LIST -jar application.jar \
-      && java $JAVA_ARGS $JAVA_OPTS -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS -Dmy.pulsar.list=$MY_PULSAR_LIST -jar application.jar \
+      && echo java $JAVA_ARGS $JAVA_OPTS -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS -Dmy.pulsar.list=$MY_PULSAR_LIST -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener -jar application.jar \
+      && java $JAVA_ARGS $JAVA_OPTS -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS -Dmy.pulsar.list=$MY_PULSAR_LIST -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener -jar application.jar \
      "]
 
