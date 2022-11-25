@@ -62,13 +62,14 @@
 		<cassandra-driver.version>3.5.0</cassandra-driver.version>
 		<debezium-connector-cassandra.version>1.4.0.Alpha1</debezium-connector-cassandra.version>
 		<debezium-connector-mongodb.version>1.3.1.Final</debezium-connector-mongodb.version>
-		<java-annotation.version>1.3.2</java-annotation.version>
+		<javax-annotation.version>1.3.2</javax-annotation.version>
+		<javax-validation.version>2.0.1.Final</javax-validation.version>
 		<guava.version>29.0-jre</guava.version>
 		<!-- Matches banking/credit-value-adjustment/cpp/Dockerfile2 -->
 		<grpc.version>1.49.1</grpc.version>
 		<hazelcast.version>5.3.0-SNAPSHOT</hazelcast.version>
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
-		<hibernate-validator.version>6.1.5.Final</hibernate-validator.version>
+		<hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
 		<jackson.version>2.12.4</jackson.version>
 		<json.version>20220320</json.version>
 		<json-smart.version>2.4.8</json-smart.version>
@@ -86,6 +87,7 @@
 		<spotbugs-annotations.version>4.7.3</spotbugs-annotations.version>
 		<springdoc.version>1.6.7</springdoc.version>
 		<spring-boot.version>2.7.5</spring-boot.version>
+		<spring-boot.version>3.0.0</spring-boot.version>
 		<spring-cloud.version>2021.0.0</spring-cloud.version>
 		<spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
 		<zipkin.version>2.23.3-SNAPSHOT</zipkin.version>
@@ -239,7 +241,12 @@
 			<dependency>
 				<groupId>javax.annotation</groupId>
 				<artifactId>javax.annotation-api</artifactId>
-				<version>${java-annotation.version}</version>
+				<version>${javax-annotation.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.validation</groupId>
+				<artifactId>validation-api</artifactId>
+				<version>${javax-validation.version}</version>
 			</dependency>
 
 			<dependency>
@@ -508,9 +515,7 @@
 										<platform>linux/x86_64</platform>
 									</createImageOptions>
 									<dockerFile>${project.basedir}/Dockerfile</dockerFile>
-									<!--
 									<squash>true</squash>
-									-->
 								</build>
                                 <name>hazelcast-platform-demos/${my.docker.image.prefix}-${my.docker.image.name}</name>								
                             </image>

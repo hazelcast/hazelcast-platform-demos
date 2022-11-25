@@ -5,7 +5,7 @@ MODULE=hazelcast-node
 HOST_IP=$1
 PUBLIC_IP=$2
 
-JAR_FILE=${PROJECT}-${MODULE}-5.2-jar-with-dependencies.jar
+JAR_FILE=${PROJECT}-${MODULE}-5.3-jar-with-dependencies.jar
 
 JAVA_ARGS="-Dhazelcast.config="$HOME/hazelcast.xml
 JAVA_ARGS="${JAVA_ARGS} -Dmy.cooperative.thread.count=14"
