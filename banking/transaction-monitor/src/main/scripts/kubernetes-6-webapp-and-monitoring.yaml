@@ -42,6 +42,7 @@ spec:
             httpGet:
               path: /
               port: 8080
+            initialDelaySeconds: 120
           name: transaction-monitor-webapp-container
           readinessProbe:
             httpGet:

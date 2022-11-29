@@ -15,7 +15,6 @@ COPY target/classes/requirements.txt /finos/
 
 RUN pip install --upgrade pip
 RUN pip install -r /finos/requirements.txt
-RUN pip install hazelcast-python-client
 
 COPY target/classes/custom-entrypoint.sh  /
 ENTRYPOINT ["/bin/bash", "/custom-entrypoint.sh"]
