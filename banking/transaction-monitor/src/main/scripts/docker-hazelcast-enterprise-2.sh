@@ -39,6 +39,13 @@ docker network create $PROJECT --driver bridge > /dev/null 2>&1
 # For easier restarts
 docker container prune --force > /dev/null 2>&1
 
+# Tiered Store
+MEMORY="--memory=2g"
+VOLUME_BASE=~/Downloads/volumes-${PROJECT}/${MODULE}
+VOLUME_TIERED_STORAGE=${VOLUME_BASE}/ts
+mkdir -p $VOLUME_TIERED_STORAGE
+VOLUMES="-v ${VOLUME_BASE}:/${PROJECT}-base-dir"
+
 PORT=$(($CLONE + 5701))
 
 CMD="docker run -e MY_BOOTSTRAP_SERVERS=$MY_BOOTSTRAP_SERVERS \
@@ -46,7 +53,7 @@ CMD="docker run -e MY_BOOTSTRAP_SERVERS=$MY_BOOTSTRAP_SERVERS \
  -e MY_POSTGRES_ADDRESS=$MY_POSTGRES_ADDRESS \
  -e MY_PULSAR_LIST=$MY_PULSAR_LIST \
  -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP}:${PORT} \
- -p ${PORT}:${PORT} --name=${MODULE}${CLONE} --rm --network=${PROJECT} ${DOCKER_IMAGE}"
+ -p ${PORT}:${PORT} ${MEMORY} ${VOLUMES} --name=${MODULE}${CLONE} --rm --network=${PROJECT} ${DOCKER_IMAGE}"
 echo $CMD
 
 $CMD

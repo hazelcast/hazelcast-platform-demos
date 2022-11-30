@@ -89,6 +89,13 @@ public class MyConstants {
     // For SQL VIEW naming
     public static final String VIEW_SUFFIX = "_VIEW";
 
+    // Tiered Store, only used by Enterprise grids
+    public static final String TIERED_STORE_BASE_DIR_PREFIX = "/transaction-monitor-base-dir";
+    public static final String TIERED_STORE_DEVICE_NAME = "transaction-monitor-local";
+    public static final List<String> TIERED_STORE_IMAP_NAMES =
+            List.of(IMAP_NAME_TRANSACTIONS);
+    public static final long TIERED_STORE_MEMORY_CAPACITY_MB = 256;
+
     // For exponential loggers
     public static final int MAX_LOGGING_INTERVAL = 3_000;
 }

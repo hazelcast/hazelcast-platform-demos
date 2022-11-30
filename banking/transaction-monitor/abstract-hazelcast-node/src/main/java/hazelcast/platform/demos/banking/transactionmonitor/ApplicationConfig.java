@@ -16,6 +16,8 @@
 
 package hazelcast.platform.demos.banking.transactionmonitor;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,11 +31,18 @@ import com.hazelcast.config.ClasspathYamlConfig;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.DiscoveryConfig;
 import com.hazelcast.config.DiscoveryStrategyConfig;
+import com.hazelcast.config.DiskTierConfig;
+import com.hazelcast.config.InMemoryFormat;
 import com.hazelcast.config.JoinConfig;
+import com.hazelcast.config.LocalDeviceConfig;
 import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.MemoryTierConfig;
 import com.hazelcast.config.TcpIpConfig;
+import com.hazelcast.config.TieredStoreConfig;
 import com.hazelcast.config.WanReplicationConfig;
 import com.hazelcast.config.WanReplicationRef;
+import com.hazelcast.memory.Capacity;
+import com.hazelcast.memory.MemoryUnit;
 
 /**
  * <p>Non-default configuration for Jet, to allow this example to run in Kubernetes (by default),
@@ -88,6 +97,11 @@ public class ApplicationConfig {
         // If using Enterprise
         if (!config.getWanReplicationConfigs().isEmpty()) {
             addWan(config, properties);
+        }
+
+        // If using Enterprise
+        if (config.getNativeMemoryConfig().isEnabled()) {
+            addTieredStore(config);
         }
 
         return config;
@@ -150,5 +164,72 @@ public class ApplicationConfig {
 
             config.addMapConfig(mapConfig);
         }
+    }
+
+    /**
+     * <p>Add tiered store configuration.
+     * </p>
+     * <p>Watch for no clash with {@link CommonIdempotentInitialization}. In this method
+     * we add configuration for the "{@code transactions}" map, where in the other class
+     * we amend the map itself.
+     * </p>
+     *
+     * @param config
+     */
+    private static void addTieredStore(Config config) {
+        LOGGER.info("Adding Tiered Storage");
+        //FIXME Remove warning once 5.3.0 released
+        LOGGER.warn("--------------------------------");
+        LOGGER.warn("Tiered Storage is BETA in 5.2, not GA til 5.3");
+        LOGGER.warn("--------------------------------");
+
+        LocalDeviceConfig localDeviceConfig = new LocalDeviceConfig();
+        localDeviceConfig.setName(MyConstants.TIERED_STORE_DEVICE_NAME);
+        Path path = Paths.get(MyConstants.TIERED_STORE_BASE_DIR_PREFIX + "/" + config.getClusterName());
+        localDeviceConfig.setBaseDir(path.toFile());
+        LOGGER.debug("{}", localDeviceConfig);
+        config.getDeviceConfigs().put(localDeviceConfig.getName(), localDeviceConfig);
+
+        // Same config for all selected maps
+        TieredStoreConfig tieredStoreConfig = getTieredStoreConfig(localDeviceConfig);
+
+        // Augment map config
+        for (String tieredStoreMapName : MyConstants.TIERED_STORE_IMAP_NAMES) {
+            MapConfig mapConfig = config.getMapConfigs().get(tieredStoreMapName);
+            if (mapConfig == null) {
+                mapConfig = new MapConfig();
+                mapConfig.setName(tieredStoreMapName);
+            }
+            mapConfig.setInMemoryFormat(InMemoryFormat.NATIVE);
+            mapConfig.setTieredStoreConfig(tieredStoreConfig);
+            config.getMapConfigs().put(mapConfig.getName(), mapConfig);
+        }
+    }
+
+    /**
+     * <p>Configuration for tiered storage.
+     * Memory has a size, disk has too but we can't measure it from Java.
+     * </p>
+     *
+     * @param localDeviceConfig
+     * @return
+     */
+    private static TieredStoreConfig getTieredStoreConfig(LocalDeviceConfig localDeviceConfig) {
+        Capacity memoryCapacity = new Capacity(MyConstants.TIERED_STORE_MEMORY_CAPACITY_MB, MemoryUnit.MEGABYTES);
+
+        MemoryTierConfig memoryTierConfig = new MemoryTierConfig();
+        memoryTierConfig.setCapacity(memoryCapacity);
+
+        DiskTierConfig diskTierConfig = new DiskTierConfig();
+        diskTierConfig.setEnabled(true);
+        diskTierConfig.setDeviceName(localDeviceConfig.getName());
+
+        TieredStoreConfig tieredStoreConfig = new TieredStoreConfig();
+        tieredStoreConfig.setEnabled(true);
+        tieredStoreConfig.setMemoryTierConfig(memoryTierConfig);
+        tieredStoreConfig.setDiskTierConfig(diskTierConfig);
+
+        LOGGER.info("{}", tieredStoreConfig);
+        return tieredStoreConfig;
     }
 }

@@ -13,3 +13,7 @@ hazelcast:
         service-dns: '@my.docker.image.prefix@-@my.cluster2.name@-hazelcast.default.svc.cluster.local'
   #
   # No WAN from DR to Live, purely one-way failover
+  #
+  # For Tiered-Storage
+  native-memory:
+    enabled: true 
