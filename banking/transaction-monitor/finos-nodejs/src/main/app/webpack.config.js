@@ -4,8 +4,18 @@ const path = require('path');
 module.exports = {
     entry: './src/index.tsx',
     mode: 'production',
+    externals: [
+        "dns",
+    ],
     resolve: {
         extensions: [".ts", ".tsx", ".js"],
+        fallback: {
+            //"https": require.resolve("https-browserify"),
+            //"https": false,
+            //"os": require.resolve("os-browserify/browser")
+            "os": false
+            //"zlib": require.resolve("browserify-zlib")
+        }
     },
     plugins: [
         new PerspectivePlugin()
@@ -25,9 +35,13 @@ module.exports = {
                 }
         ]
     },
+    ignoreWarnings: [/Failed to parse source map/],
     devServer: {
         contentBase: [
             path.join(__dirname, "dist"),
         ],
-    },        
+    },
+    target: 'node',
+node: {
+},
 };

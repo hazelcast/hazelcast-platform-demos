@@ -6,11 +6,12 @@
         "moduleResolution": "node",
         "removeComments": true,
         "target": "es2022",
+        "types": ["node"]
       },
     "include": [
-        "src/**/*",
+        "src/**/*"
     ],
     "exclude": [
-        "node_modules",
+        "node_modules"
     ]
 }
