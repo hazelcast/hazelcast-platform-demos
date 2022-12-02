@@ -23,6 +23,7 @@ COPY target/${JAR_FILE} application.jar
 ENV MY_AUTOSTART_ENABLED "true"
 ENV MY_BOOTSTRAP_SERVERS "0.0.0.0:9092,0.0.0.0:9093,0.0.0.0:9094"
 ENV MY_KUBERNETES_ENABLED "true"
+ENV MY_NATIVE_MEGABYTES ""
 ENV MC_LICENSE=${MC_LICENSE}
 
 ENV JAVA_ARGS "-Dhazelcast.health.monitoring.level=OFF \
@@ -41,6 +42,7 @@ CMD ["bash", "-c", "set -euo pipefail \
  -Dmy.autostart.enabled=$MY_AUTOSTART_ENABLED \
  -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS \
  -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+ -Dmy.native.megabytes=$MY_NATIVE_MEGABYTES \
  -Dmy.pulsar.list=$MY_PULSAR_LIST \
  -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
  -Dhazelcast.enterprise.license.key=${MC_LICENSE} \
@@ -50,6 +52,7 @@ CMD ["bash", "-c", "set -euo pipefail \
  -Dmy.autostart.enabled=$MY_AUTOSTART_ENABLED \
  -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS \
  -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+ -Dmy.native.megabytes=$MY_NATIVE_MEGABYTES \
  -Dmy.pulsar.list=$MY_PULSAR_LIST \
  -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
  -Dhazelcast.enterprise.license.key=${MC_LICENSE} \

@@ -89,8 +89,14 @@ public class MyConstants {
     // For SQL VIEW naming
     public static final String VIEW_SUFFIX = "_VIEW";
 
-    // Tiered Store, only used by Enterprise grids
-    public static final String TIERED_STORE_BASE_DIR_PREFIX = "/transaction-monitor-base-dir";
+    // Tiered and Persistent Store, only used by Enterprise grids
+    public static final String PERSISTENT_STORE_SUFFIX = "ps";
+    public static final List<String> PERSISTENT_STORE_IMAP_NAMES_ECOMMERCE =
+            List.of(IMAP_NAME_PRODUCTS);
+    public static final List<String> PERSISTENT_STORE_IMAP_NAMES_TRADE =
+            List.of(IMAP_NAME_SYMBOLS);
+    public static final String STORE_BASE_DIR_PREFIX = "data/transaction-monitor";
+    public static final String TIERED_STORE_SUFFIX = "ts";
     public static final String TIERED_STORE_DEVICE_NAME = "transaction-monitor-local";
     public static final List<String> TIERED_STORE_IMAP_NAMES =
             List.of(IMAP_NAME_TRANSACTIONS);

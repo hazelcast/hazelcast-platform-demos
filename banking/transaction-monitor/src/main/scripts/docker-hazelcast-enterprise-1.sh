@@ -2,6 +2,7 @@
 
 PROJECT=transaction-monitor
 MODULE=hazelcast-node-enterprise-1
+CLUSTER_NAME=grid1
 CLONE=0
 
 BASEDIR=`dirname $0`
@@ -30,6 +31,8 @@ fi
 
 MY_BOOTSTRAP_SERVERS=kafka-broker0:9092,kafka-broker1:9093,kafka-broker2:9094
 MY_POSTGRES_ADDRESS=postgres:5432
+# See also $MEMORY. Need to allow at least 500MB for heap
+MY_NATIVE_MEGABYTES=4400
 MY_PULSAR_LIST=pulsar:6650
 
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
@@ -40,16 +43,17 @@ docker network create $PROJECT --driver bridge > /dev/null 2>&1
 docker container prune --force > /dev/null 2>&1
 
 # Tiered Store
-MEMORY="--memory=2g"
+MEMORY="--memory=5g"
 VOLUME_BASE=~/Downloads/volumes-${PROJECT}/${MODULE}
-VOLUME_TIERED_STORAGE=${VOLUME_BASE}/ts
+VOLUME_TIERED_STORAGE=${VOLUME_BASE}/${CLUSTER_NAME}
 mkdir -p $VOLUME_TIERED_STORAGE
-VOLUMES="-v ${VOLUME_BASE}:/${PROJECT}-base-dir"
+VOLUMES="-v ${VOLUME_BASE}:/data/${PROJECT}"
 
 PORT=$(($CLONE + 5701))
 
 CMD="docker run -e MY_BOOTSTRAP_SERVERS=$MY_BOOTSTRAP_SERVERS \
  -e MY_KUBERNETES_ENABLED=false \
+ -e MY_NATIVE_MEGABYTES=$MY_NATIVE_MEGABYTES \
  -e MY_POSTGRES_ADDRESS=$MY_POSTGRES_ADDRESS \
  -e MY_PULSAR_LIST=$MY_PULSAR_LIST \
  -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP}:${PORT} \

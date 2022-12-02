@@ -39,17 +39,26 @@ CMD ["bash", "-c", "set -euo pipefail \
       && echo java --version \
       && java --version \
       && echo @@@@@@@@@@ \
+      && echo date \
+      && date \
+      && echo @@@@@@@@@@ \
       && MC_CLUSTER1_LIST=`echo ${MC_CLUSTER1_ADDRESSLIST_OVERRIDE:-${MC_EMPTY}} $MC_CLUSTER1_ADDRESSLIST |awk '{print $1}'` \
       && echo MC_CLUSTER1_NAME: ${MC_CLUSTER1_NAME} \
       && echo MC_CLUSTER1_LIST: ${MC_CLUSTER1_LIST} \
       && echo bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_LIST} \
       && bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_LIST} \
       && echo @@@@@@@@@@ \
+      && echo date \
+      && date \
+      && echo @@@@@@@@@@ \
       && MC_CLUSTER2_LIST=`echo ${MC_CLUSTER2_ADDRESSLIST_OVERRIDE:-${MC_EMPTY}} $MC_CLUSTER2_ADDRESSLIST |awk '{print $1}'` \
       && echo MC_CLUSTER2_NAME: ${MC_CLUSTER2_NAME} \
       && echo MC_CLUSTER2_LIST: ${MC_CLUSTER2_LIST} \
       && echo bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER2_NAME} --member-addresses=${MC_CLUSTER2_LIST} \
       && bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER2_NAME} --member-addresses=${MC_CLUSTER2_LIST} \
+      && echo @@@@@@@@@@ \
+      && echo date \
+      && date \
       && echo @@@@@@@@@@ \
       && echo bin/hz-mc start \
       && bin/hz-mc start \

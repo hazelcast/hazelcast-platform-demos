@@ -62,6 +62,68 @@ spec:
   type: LoadBalancer
 ---
 ---
+# Persistent volumes, for tiered store
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: transaction-monitor-grid1-hazelcast-pv
+  labels:
+    type: local
+spec:
+  capacity:
+    storage: 48Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/var/lib/data/grid1"
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: manual
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: transaction-monitor-grid2-hazelcast-pv
+  labels:
+    type: local
+spec:
+  capacity:
+    storage: 48Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/var/lib/data/grid1"
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: manual
+---
+---
+# Persisted Volume claims
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: transaction-monitor-grid1-hazelcast-pv-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 8Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: transaction-monitor-grid2-hazelcast-pv-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 8Gi
+---
+---
 # Creates 3 pods, bigger than DR
 ---
 apiVersion: apps/v1
@@ -83,6 +145,8 @@ spec:
         - env:
           - name: "MY_BOOTSTRAP_SERVERS"
             value: "transaction-monitor-kafka-broker-0.transaction-monitor-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-kafka-broker-1.transaction-monitor-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-kafka-broker-2.transaction-monitor-kafka-broker.default.svc.cluster.local:9092"
+          - name: "MY_NATIVE_MEGABYTES"
+            value: "4400"
           - name: "MY_POSTGRES_ADDRESS"
             value: "transaction-monitor-postgres.default.svc.cluster.local:5432"
           - name: "MY_PULSAR_LIST"
@@ -104,6 +168,14 @@ spec:
               cpu: "2.0"
             requests:
               cpu: "2.0"
+          volumeMounts:
+            - name: grid1-store
+              mountPath: /data/transaction-monitor/grid1
+      volumes:
+        - name: grid1-store
+          persistentVolumeClaim:
+            claimName: transaction-monitor-grid1-hazelcast-pv-claim
+---
 ---
 # Creates 2 pods, DR is smaller
 ---
@@ -126,6 +198,8 @@ spec:
         - env:
           - name: "MY_BOOTSTRAP_SERVERS"
             value: "transaction-monitor-kafka-broker-0.transaction-monitor-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-kafka-broker-1.transaction-monitor-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-kafka-broker-2.transaction-monitor-kafka-broker.default.svc.cluster.local:9092"
+          - name: "MY_NATIVE_MEGABYTES"
+            value: "4400"
           - name: "MY_POSTGRES_ADDRESS"
             value: "transaction-monitor-postgres.default.svc.cluster.local:5432"
           - name: "MY_PULSAR_LIST"
@@ -147,6 +221,13 @@ spec:
               cpu: "2.0"
             requests:
               cpu: "2.0"
+          volumeMounts:
+            - name: grid1-store
+              mountPath: /data/transaction-monitor/grid2
+      volumes:
+        - name: grid2-store
+          persistentVolumeClaim:
+            claimName: transaction-monitor-grid2-hazelcast-pv-claim
 ---
 ---
 # Only need 1 management-center

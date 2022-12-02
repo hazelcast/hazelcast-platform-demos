@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+
 import java.util.Map.Entry;
 
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import com.hazelcast.config.ClasspathYamlConfig;
 import com.hazelcast.config.Config;
+import com.hazelcast.config.DataPersistenceConfig;
 import com.hazelcast.config.DiscoveryConfig;
 import com.hazelcast.config.DiscoveryStrategyConfig;
 import com.hazelcast.config.DiskTierConfig;
@@ -37,6 +39,7 @@ import com.hazelcast.config.JoinConfig;
 import com.hazelcast.config.LocalDeviceConfig;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MemoryTierConfig;
+import com.hazelcast.config.PersistenceConfig;
 import com.hazelcast.config.TcpIpConfig;
 import com.hazelcast.config.TieredStoreConfig;
 import com.hazelcast.config.WanReplicationConfig;
@@ -101,6 +104,9 @@ public class ApplicationConfig {
 
         // If using Enterprise
         if (config.getNativeMemoryConfig().isEnabled()) {
+            TransactionMonitorFlavor transactionMonitorFlavor =
+                    MyUtils.getTransactionMonitorFlavor(properties);
+            addPersistentStore(config, transactionMonitorFlavor);
             addTieredStore(config);
         }
 
@@ -175,34 +181,47 @@ public class ApplicationConfig {
      * </p>
      *
      * @param config
+     * @throws Exception if native memory specification not a number
      */
-    private static void addTieredStore(Config config) {
-        LOGGER.info("Adding Tiered Storage");
+    private static void addTieredStore(Config config) throws Exception {
         //FIXME Remove warning once 5.3.0 released
         LOGGER.warn("--------------------------------");
         LOGGER.warn("Tiered Storage is BETA in 5.2, not GA til 5.3");
         LOGGER.warn("--------------------------------");
 
+        Path path = Paths.get("/" + MyConstants.STORE_BASE_DIR_PREFIX + "/" + config.getClusterName()
+            + "/" + MyConstants.TIERED_STORE_SUFFIX);
+        LOGGER.info("Adding Tiered Storage, {}", path.toString());
+
+        String nativeMemoryProperty = "my.native.megabytes";
+        String nativeMegabytesSpec = System.getProperty(nativeMemoryProperty, "");
+        try {
+            long nativeMegabytes = Long.parseLong(nativeMegabytesSpec);
+            Capacity nativeCapacity = new Capacity(nativeMegabytes, MemoryUnit.MEGABYTES);
+            config.getNativeMemoryConfig().setCapacity(nativeCapacity);
+        } catch (NumberFormatException nfe) {
+            String message = String.format("Property '%s', parse '%s'", nativeMemoryProperty, nativeMegabytesSpec);
+            throw new RuntimeException(message, nfe);
+        }
+        LOGGER.info("'{}'=='{}', native memory to: {}",
+                    nativeMemoryProperty, nativeMegabytesSpec, config.getNativeMemoryConfig().getCapacity());
+
         LocalDeviceConfig localDeviceConfig = new LocalDeviceConfig();
         localDeviceConfig.setName(MyConstants.TIERED_STORE_DEVICE_NAME);
-        Path path = Paths.get(MyConstants.TIERED_STORE_BASE_DIR_PREFIX + "/" + config.getClusterName());
         localDeviceConfig.setBaseDir(path.toFile());
-        LOGGER.debug("{}", localDeviceConfig);
+        LOGGER.trace("{}", localDeviceConfig);
         config.getDeviceConfigs().put(localDeviceConfig.getName(), localDeviceConfig);
 
         // Same config for all selected maps
         TieredStoreConfig tieredStoreConfig = getTieredStoreConfig(localDeviceConfig);
 
         // Augment map config
-        for (String tieredStoreMapName : MyConstants.TIERED_STORE_IMAP_NAMES) {
-            MapConfig mapConfig = config.getMapConfigs().get(tieredStoreMapName);
-            if (mapConfig == null) {
-                mapConfig = new MapConfig();
-                mapConfig.setName(tieredStoreMapName);
-            }
+        for (String mapName : MyConstants.TIERED_STORE_IMAP_NAMES) {
+            // "getMapConfig()" creates if not present
+            MapConfig mapConfig = config.getMapConfig(mapName);
+            LOGGER.debug("Setting map '{}' for TieredStore", mapConfig.getName());
             mapConfig.setInMemoryFormat(InMemoryFormat.NATIVE);
             mapConfig.setTieredStoreConfig(tieredStoreConfig);
-            config.getMapConfigs().put(mapConfig.getName(), mapConfig);
         }
     }
 
@@ -229,7 +248,42 @@ public class ApplicationConfig {
         tieredStoreConfig.setMemoryTierConfig(memoryTierConfig);
         tieredStoreConfig.setDiskTierConfig(diskTierConfig);
 
-        LOGGER.info("{}", tieredStoreConfig);
+        LOGGER.trace("{}", tieredStoreConfig);
         return tieredStoreConfig;
+    }
+
+    /**
+     * <p>Add persistent store configuration.
+     * </p>
+     */
+    private static void addPersistentStore(Config config, TransactionMonitorFlavor transactionMonitorFlavor) {
+        Path path = Paths.get("/" + MyConstants.STORE_BASE_DIR_PREFIX + "/" + config.getClusterName()
+            + "/" + MyConstants.PERSISTENT_STORE_SUFFIX);
+        LOGGER.info("Adding Persistent Storage, {}", path.toString());
+
+        PersistenceConfig persistenceConfig = config.getPersistenceConfig();
+        persistenceConfig.setEnabled(true);
+        persistenceConfig.setBaseDir(path.toFile());
+
+        DataPersistenceConfig dataPersistenceConfig = new DataPersistenceConfig();
+        dataPersistenceConfig.setEnabled(true);
+
+        List<String> mapNames;
+        switch (transactionMonitorFlavor) {
+            case ECOMMERCE:
+                mapNames = MyConstants.PERSISTENT_STORE_IMAP_NAMES_ECOMMERCE;
+                break;
+            case TRADE:
+            default:
+                mapNames = MyConstants.PERSISTENT_STORE_IMAP_NAMES_TRADE;
+                break;
+        }
+
+        for (String mapName : mapNames) {
+            // "getMapConfig()" creates if not present
+            MapConfig mapConfig = config.getMapConfig(mapName);
+            LOGGER.debug("Setting map '{}' for PersistentStore", mapConfig.getName());
+            mapConfig.setDataPersistenceConfig(dataPersistenceConfig);
+        }
     }
 }

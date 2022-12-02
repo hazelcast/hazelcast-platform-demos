@@ -17,4 +17,12 @@ RUN pip install --upgrade pip
 RUN pip install -r /finos/requirements.txt
 
 COPY target/classes/custom-entrypoint.sh  /
-ENTRYPOINT ["/bin/bash", "/custom-entrypoint.sh"]
+CMD ["bash", "-c", "set -euo pipefail \
+      && echo @@@@@@@@@@ \
+      && echo arch \
+      && arch \
+      && echo @@@@@@@@@@ \
+      && chmod 755 /custom-entrypoint.sh \
+      && echo /custom-entrypoint.sh \
+      && /custom-entrypoint.sh \
+     "]
