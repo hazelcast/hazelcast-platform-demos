@@ -184,11 +184,6 @@ public class ApplicationConfig {
      * @throws Exception if native memory specification not a number
      */
     private static void addTieredStore(Config config) throws Exception {
-        //FIXME Remove warning once 5.3.0 released
-        LOGGER.warn("--------------------------------");
-        LOGGER.warn("Tiered Storage is BETA in 5.2, not GA til 5.3");
-        LOGGER.warn("--------------------------------");
-
         Path path = Paths.get("/" + MyConstants.STORE_BASE_DIR_PREFIX + "/" + config.getClusterName()
             + "/" + MyConstants.TIERED_STORE_SUFFIX);
         LOGGER.info("Adding Tiered Storage, {}", path.toString());
@@ -209,6 +204,8 @@ public class ApplicationConfig {
         LocalDeviceConfig localDeviceConfig = new LocalDeviceConfig();
         localDeviceConfig.setName(MyConstants.TIERED_STORE_DEVICE_NAME);
         localDeviceConfig.setBaseDir(path.toFile());
+        Capacity diskCapacity = new Capacity(MyConstants.TIERED_STORE_DISK_CAPACITY_GB, MemoryUnit.GIGABYTES);
+        localDeviceConfig.setCapacity(diskCapacity);
         LOGGER.trace("{}", localDeviceConfig);
         config.getDeviceConfigs().put(localDeviceConfig.getName(), localDeviceConfig);
 

@@ -1042,10 +1042,10 @@ public class CommonIdempotentInitialization {
         LOGGER.info("logJobs()");
         LOGGER.info("---------");
         hazelcastInstance.getJet().getJobs().forEach(job -> {
-            LOGGER.info("Job name '{}', id {}, status {}, submission {} ({})",
+            try {
+                LOGGER.info("Job name '{}', id {}, status {}, submission {} ({})",
                     Objects.toString(job.getName()), job.getId(), job.getStatus(),
                     job.getSubmissionTime(), new Date(job.getSubmissionTime()));
-            try {
                 JobConfig jobConfig = job.getConfig();
                 Object originalSql =
                         jobConfig.getArgument(JobConfigArguments.KEY_SQL_QUERY_TEXT);
@@ -1053,7 +1053,8 @@ public class CommonIdempotentInitialization {
                     LOGGER.info(" Original SQL: {}", originalSql);
                 }
             } catch (Exception e) {
-                LOGGER.info("JobConfig", e);
+                String message = String.format("logJobs(): %s", Objects.toString(job));
+                LOGGER.info(message, e);
             }
         });
         LOGGER.info("---------");

@@ -100,6 +100,7 @@ public class MyConstants {
     public static final String TIERED_STORE_DEVICE_NAME = "transaction-monitor-local";
     public static final List<String> TIERED_STORE_IMAP_NAMES =
             List.of(IMAP_NAME_TRANSACTIONS);
+    public static final long TIERED_STORE_DISK_CAPACITY_GB = 6;
     public static final long TIERED_STORE_MEMORY_CAPACITY_MB = 256;
 
     // For exponential loggers
