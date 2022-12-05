@@ -61,18 +61,18 @@ spec:
 ---
 # FinOS Node.js
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: transaction-monitor-finos-nodejs
-spec:
-  selector:
-    app: transaction-monitor-finos-nodejs
-  ports:
-  - port: 8080
-    protocol: TCP
-    targetPort: 8080
-  type: LoadBalancer
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: transaction-monitor-finos-nodejs
+#spec:
+#  selector:
+#    app: transaction-monitor-finos-nodejs
+#  ports:
+#  - port: 8080
+#    protocol: TCP
+#    targetPort: 8080
+#  type: LoadBalancer
 ---
 # Only need 1
 ---
@@ -113,18 +113,18 @@ spec:
 ---
 # FinOS Python
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: transaction-monitor-finos-python
-spec:
-  selector:
-    app: transaction-monitor-finos-python
-  ports:
-  - port: 8080
-    protocol: TCP
-    targetPort: 8080
-  type: LoadBalancer
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: transaction-monitor-finos-python
+#spec:
+#  selector:
+#    app: transaction-monitor-finos-python
+#  ports:
+#  - port: 8080
+#    protocol: TCP
+#    targetPort: 8080
+#  type: LoadBalancer
 ---
 # Only need 1
 ---

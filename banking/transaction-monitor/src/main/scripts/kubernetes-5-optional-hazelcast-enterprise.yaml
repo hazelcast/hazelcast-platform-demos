@@ -92,7 +92,7 @@ spec:
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: "/var/lib/data/grid1"
+    path: "/var/lib/data/grid2"
   persistentVolumeReclaimPolicy: Delete
   storageClassName: manual
 ---
@@ -154,15 +154,29 @@ spec:
           image: "hazelcast-platform-demos/transaction-monitor-hazelcast-node-enterprise-1"
           imagePullPolicy: Never
           livenessProbe:
+            # From https://github.com/hazelcast/charts/blob/master/stable/hazelcast-enterprise/values.yaml
+            # Not perfect, but unlikely to do a full cluster restart
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 10
             httpGet:
               path: /hazelcast/health/node-state
               port: 5701
           name: transaction-monitor-grid1-hazelcast-container
           readinessProbe:
-            httpGet:
-              path: /hazelcast/health/ready
-              port: 5701
+            # Same as for livenessProbe
             initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 10
+            httpGet:
+              # Use node-state when persistent with DNS
+              #path: /hazelcast/health/ready
+              path: /hazelcast/health/node-state
+              port: 5701
           resources:
             limits:
               cpu: "2.0"
@@ -212,17 +226,24 @@ spec:
               port: 5701
           name: transaction-monitor-grid2-hazelcast-container
           readinessProbe:
-            httpGet:
-              path: /hazelcast/health/ready
-              port: 5701
+            # Same as for livenessProbe
             initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 10
+            httpGet:
+              # Use node-state when persistent with DNS
+              #path: /hazelcast/health/ready
+              path: /hazelcast/health/node-state
+              port: 5701
           resources:
             limits:
               cpu: "2.0"
             requests:
               cpu: "2.0"
           volumeMounts:
-            - name: grid1-store
+            - name: grid2-store
               mountPath: /data/transaction-monitor/grid2
       volumes:
         - name: grid2-store
