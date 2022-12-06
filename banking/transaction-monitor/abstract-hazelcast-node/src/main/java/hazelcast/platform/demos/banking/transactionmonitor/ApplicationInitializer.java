@@ -97,6 +97,7 @@ public class ApplicationInitializer {
 
         TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(properties);
         LOGGER.info("TransactionMonitorFlavor=='{}'", transactionMonitorFlavor);
+        boolean localhost = System.getProperty("my.docker.enabled", "").equalsIgnoreCase("false");
 
         // First node runs initialization
         int size = hazelcastInstance.getCluster().getMembers().size();
@@ -104,7 +105,7 @@ public class ApplicationInitializer {
         String initializerProperty = "my.initialize";
         if (System.getProperty(initializerProperty, "").equalsIgnoreCase(Boolean.TRUE.toString())) {
             ApplicationInitializer.initialise(hazelcastInstance, bootstrapServers, pulsarList,
-                    postgresAddress, properties, config.getClusterName());
+                    postgresAddress, properties, config.getClusterName(), localhost);
         } else {
             if (size == 1) {
                 LOGGER.info("Mini initialize, only WAN maps as '{}'=='{}', assume client will do the rest",
@@ -132,7 +133,8 @@ public class ApplicationInitializer {
      * </p>
      */
     public static void initialise(HazelcastInstance hazelcastInstance, String bootstrapServers,
-            String pulsarList, String postgresAddress, Properties properties, String clusterName)
+            String pulsarList, String postgresAddress, Properties properties, String clusterName,
+            boolean localhost)
                     throws Exception {
 
         String pulsarOrKafka = properties.getProperty(MyConstants.PULSAR_OR_KAFKA_KEY);
@@ -157,7 +159,7 @@ public class ApplicationInitializer {
 
         Properties postgresProperties = MyUtils.getPostgresProperties(properties);
         CommonIdempotentInitialization.createNeededObjects(hazelcastInstance,
-                postgresProperties, ourProjectProvenance, transactionMonitorFlavor);
+                postgresProperties, ourProjectProvenance, transactionMonitorFlavor, localhost);
         addListeners(hazelcastInstance, bootstrapServers, pulsarList, usePulsar, projectName, clusterName,
                 transactionMonitorFlavor);
         CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList, usePulsar,

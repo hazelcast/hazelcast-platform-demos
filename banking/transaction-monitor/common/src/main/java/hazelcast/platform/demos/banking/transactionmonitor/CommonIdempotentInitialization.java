@@ -82,7 +82,7 @@ public class CommonIdempotentInitialization {
      */
     public static boolean createNeededObjects(HazelcastInstance hazelcastInstance,
             Properties postgresProperties, String ourProjectProvenance,
-            TransactionMonitorFlavor transactionMonitorFlavor) {
+            TransactionMonitorFlavor transactionMonitorFlavor, boolean localhost) {
         // Capture what was present before
         Set<String> existingIMapNames = hazelcastInstance.getDistributedObjects()
                 .stream()
@@ -93,7 +93,7 @@ public class CommonIdempotentInitialization {
 
         // Add journals and map stores to maps before they are created
         boolean ok = dynamicMapConfig(hazelcastInstance, existingIMapNames,
-                postgresProperties, ourProjectProvenance);
+                postgresProperties, ourProjectProvenance, localhost);
 
         // Accessing non-existing maps does not return any failures
         List<String> iMapNames;
@@ -141,7 +141,8 @@ public class CommonIdempotentInitialization {
      * @return true, always, either added or not needed
      */
     private static boolean dynamicMapConfig(HazelcastInstance hazelcastInstance,
-            Set<String> existingIMapNames, Properties postgresProperties, String ourProjectProvenance) {
+            Set<String> existingIMapNames, Properties postgresProperties, String ourProjectProvenance,
+            boolean localhost) {
         final String alertsWildcard = "alerts*";
 
         EventJournalConfig eventJournalConfig = new EventJournalConfig();
@@ -163,7 +164,11 @@ public class CommonIdempotentInitialization {
             properties.put(MyConstants.PROJECT_PROVENANCE, ourProjectProvenance);
             mapStoreConfig.setProperties(properties);
 
-            alertsMapConfig.setMapStoreConfig(mapStoreConfig);
+            if (localhost) {
+                LOGGER.info("localhost=={}, no map store for Postgres", localhost);
+            } else {
+                alertsMapConfig.setMapStoreConfig(mapStoreConfig);
+            }
 
             hazelcastInstance.getConfig().addMapConfig(alertsMapConfig);
         } else {
@@ -1003,6 +1008,7 @@ public class CommonIdempotentInitialization {
      */
     private static void launchPostgresCDC(HazelcastInstance hazelcastInstance,
             Properties properties, String ourProjectProvenance) {
+
         try {
             Pipeline pipelinePostgresCDC = PostgresCDC.buildPipeline(
                     Objects.toString(properties.get(MyConstants.POSTGRES_ADDRESS)),

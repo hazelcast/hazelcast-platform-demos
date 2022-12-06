@@ -591,7 +591,7 @@ public class ApplicationRunner {
             }
 
             ok &= CommonIdempotentInitialization.createNeededObjects(hazelcastInstance,
-                    postgresProperties, ourProjectProvenance, transactionMonitorFlavor);
+                    postgresProperties, ourProjectProvenance, transactionMonitorFlavor, this.localhost);
             ok &= CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList,
                     usePulsar, useHzCloud, transactionMonitorFlavor);
             ok &= CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance,
