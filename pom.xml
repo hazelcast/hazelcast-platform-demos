@@ -28,7 +28,8 @@
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
 		<dockerfile.skip>true</dockerfile.skip>
 		<failsafe.skip>true</failsafe.skip>
-		<java.version>17</java.version>
+		<!-- Needs to be 11 currently for Viridian upload -->
+		<java.version>11</java.version>
 		<main.basedir>${project.basedir}</main.basedir>
 		<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

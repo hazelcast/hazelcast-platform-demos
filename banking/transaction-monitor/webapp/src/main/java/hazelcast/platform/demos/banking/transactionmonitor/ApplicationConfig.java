@@ -91,14 +91,8 @@ public class ApplicationConfig {
             Properties sslProps = getSSLProperties(password);
             clientConfig.getNetworkConfig().setSSLConfig(new SSLConfig().setEnabled(true).setProperties(sslProps));
 
-            if (clientConfig.getClusterName().startsWith("de-")) {
-                LOGGER.info("DEV cloud");
-                clientConfig.setProperty("hazelcast.client.cloud.url", "https://dev.test.hazelcast.cloud");
-            }
-            if (clientConfig.getClusterName().startsWith("ua-")) {
-                LOGGER.info("UAT cloud");
-                clientConfig.setProperty("hazelcast.client.cloud.url", "https://uat.hazelcast.cloud");
-            }
+            // Viridian
+            clientConfig.setProperty("hazelcast.client.cloud.url", "https://api.viridian.hazelcast.com");
 
             logCloudConfig(clientConfig);
 
