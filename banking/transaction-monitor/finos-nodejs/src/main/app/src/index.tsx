@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2023, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,6 @@ const clusterAddress = process.env.REACT_APP_MC_CLUSTER1_LIST
 const kubernetes = "@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local"
 const kubernetesEnabled = process.env.REACT_APP_MY_KUBERNETES_ENABLED
 
-/*
 function createClientConfig() : ClientConfig {
 	let clusterMember = kubernetes
 	if (kubernetesEnabled.toLowerCase() === 'false') {
@@ -56,6 +55,7 @@ function createClientConfig() : ClientConfig {
 	// Webapp console, on Browser
 	console.log("index.tsx", "createClientConfig()", "clusterName", clusterName)
 	console.log("index.tsx", "createClientConfig()", "clusterMember", clusterMember)
+    console.log("index.tsx", "createClientConfig()", "Will use '" + clusterMember + "' for connection.")
 
     return {
     	clusterName: clusterName,
@@ -77,9 +77,64 @@ function createClientConfig() : ClientConfig {
     	}    
 	}
 }
+
+/*
+const worker = perspective.default.shared_worker();
+
+const getTable = async (): Promise<perspective.Table> => {
+    const req = fetch("./superstore.arrow");
+    const resp = await req;
+    const buffer = await resp.arrayBuffer();
+    return await worker.table(buffer as any);
+};*/
+
+/*
+const getTable = async () => {
+  let d: any[] = []
+  d.push({ stock: 'AAAA', sold: 123, bought: 456 })
+  d.push({ stock: 'BBBB', sold: 456, bought: 789 })
+  d.push({ stock: 'CCCC', sold: 788, bought: 123 })
+  return worker.table(d as any);
+};
+
+//const config: PerspectiveViewerConfig = {
+ //XXX   group_by: ["State"],
+//};
+
+const start = async (): Promise<any> => {
+    try {
+        let clientConfig = createClientConfig();
+        return await Client.newHazelcastClient(clientConfig);
+    } catch (err) {
+        console.error('Error:', err);
+    }
+}
+//XXX start()
 */
 
 const App = (): React.ReactElement => {
+	//const viewer = React.useRef<HTMLPerspectiveViewerElement>(null);
+	
+	/*
+  React.useEffect(() => {
+    getTable().then(table => {
+      if (viewer.current) {
+        viewer.current.load(table);
+        //viewer.current.restore(config);
+      }
+    });
+  }, []);
+  */
+  
+  /*
+    React.useEffect(() => {
+        getTable().then((table) => {
+            if (viewer.current) {
+                viewer.current.load(Promise.resolve(table));
+                viewer.current.restore(config);
+            }
+        });
+    }, []);*/
     	
     return <p>FIXME</p>;
     //<perspective-viewer ref={viewer}></perspective-viewer>;

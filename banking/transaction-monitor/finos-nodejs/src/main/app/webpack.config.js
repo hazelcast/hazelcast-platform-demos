@@ -10,15 +10,15 @@ module.exports = {
     resolve: {
         extensions: [".ts", ".tsx", ".js"],
         fallback: {
-            //"https": require.resolve("https-browserify"),
-            //"https": false,
-            //"os": require.resolve("os-browserify/browser")
-            "os": false
-            //"zlib": require.resolve("browserify-zlib")
+            "dns": false,
+            "fs": false,
+            https: require.resolve('https-browserify'),
+            os: require.resolve('os-browserify/browser'),
+            zlib: require.resolve('browserify-zlib')
         }
     },
     plugins: [
-        new PerspectivePlugin()
+        new PerspectivePlugin(),
     ],        
     output: {
         path: __dirname,
