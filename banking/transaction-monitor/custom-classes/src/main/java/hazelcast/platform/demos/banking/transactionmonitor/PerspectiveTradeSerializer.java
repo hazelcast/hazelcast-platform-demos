@@ -34,7 +34,7 @@ public class PerspectiveTradeSerializer implements CompactSerializer<Perspective
         perspectiveTrade.setSum(in.readFloat64("sum"));
         perspectiveTrade.setLatest(in.readFloat64("latest"));
         perspectiveTrade.setSeconds(in.readInt32("seconds"));
-        perspectiveTrade.setSeconds(in.readInt32("random"));
+        perspectiveTrade.setRandom(in.readInt32("random"));
         return perspectiveTrade;
     }
 

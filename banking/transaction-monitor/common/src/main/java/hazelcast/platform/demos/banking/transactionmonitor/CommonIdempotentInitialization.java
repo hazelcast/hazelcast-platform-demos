@@ -652,21 +652,37 @@ public class CommonIdempotentInitialization {
     static boolean defineIMaps3(HazelcastInstance hazelcastInstance, TransactionMonitorFlavor transactionMonitorFlavor) {
         String definition9a = "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_TRANSACTIONS
+                + " ("
+                + "    __key VARCHAR,"
+                + "    id VARCHAR,"
+                + "    \"timestamp\" BIGINT,"
+                + "    code VARCHAR,"
+                + "    price DECIMAL,"
+                + "    quantity BIGINT"
+                + ")"
                 + " TYPE IMap "
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
                 + " 'keyJavaClass' = 'java.lang.String',"
-                + " 'valueFormat' = 'java',"
-                + " 'valueJavaClass' = '" + TransactionEcommerce.class.getName() + "'"
+                + " 'valueFormat' = 'json-flat',"
+                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getName() + "'"
                 + " )";
        String definition9b = "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_TRANSACTIONS
+                + " ("
+                + "    __key VARCHAR,"
+                + "    id VARCHAR,"
+                + "    \"timestamp\" BIGINT,"
+                + "    symbol VARCHAR,"
+                + "    price DECIMAL,"
+                + "    quantity BIGINT"
+                + ")"
                 + " TYPE IMap "
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
                 + " 'keyJavaClass' = 'java.lang.String',"
-                + " 'valueFormat' = 'java',"
-                + " 'valueJavaClass' = '" + TransactionTrade.class.getName() + "'"
+                + " 'valueFormat' = 'json-flat',"
+                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getName() + "'"
                 + " )";
 
        String definition10 = "CREATE MAPPING IF NOT EXISTS "
@@ -902,7 +918,7 @@ public class CommonIdempotentInitialization {
             break;
         case TRADE:
         default:
-            concatenation = "symbol";
+            concatenation = "code";
             break;
         }
         String sqlJobMapToKafka =

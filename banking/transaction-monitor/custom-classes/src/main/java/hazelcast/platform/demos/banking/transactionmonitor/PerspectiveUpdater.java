@@ -108,6 +108,9 @@ public class PerspectiveUpdater implements Runnable, Serializable, HazelcastInst
         case ECOMMERCE:
             keySet = this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_PRODUCTS).keySet();
             break;
+        case PAYMENTS_ISO20022:
+            keySet = this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_BICS).keySet();
+            break;
         case TRADE:
         default:
             keySet = this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_SYMBOLS).keySet();
@@ -166,6 +169,18 @@ public class PerspectiveUpdater implements Runnable, Serializable, HazelcastInst
                 perspectiveEcommerce.setAverage(tuple3.f2());
             }
             value = perspectiveEcommerce;
+            break;
+        case PAYMENTS_ISO20022:
+            PerspectivePayments perspectivePayments = new PerspectivePayments();
+            perspectivePayments.setBic(key);
+            perspectivePayments.setSeconds(seconds);
+            perspectivePayments.setRandom(random);
+            if (tuple3 != null) {
+                perspectivePayments.setCount(tuple3.f0());
+                perspectivePayments.setSum(tuple3.f1());
+                perspectivePayments.setAverage(tuple3.f2());
+            }
+            value = perspectivePayments;
             break;
         case TRADE:
         default:

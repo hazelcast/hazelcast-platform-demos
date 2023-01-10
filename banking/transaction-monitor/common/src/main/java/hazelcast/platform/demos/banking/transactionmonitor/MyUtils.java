@@ -32,13 +32,18 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Properties;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.datamodel.Tuple3;
+import com.hazelcast.jet.datamodel.Tuple4;
 import com.hazelcast.jet.python.PythonServiceConfig;
 import com.hazelcast.sql.SqlResult;
 import com.hazelcast.sql.SqlRow;
@@ -55,6 +60,8 @@ public class MyUtils {
     private static final int CSV_THIRD = 2;
     private static final int CSV_FOURTH = 3;
     private static final int CSV_FIFTH = 4;
+    private static final int POS4 = 4;
+    private static final int POS6 = 6;
 
     /**
      * <p>Read NASDAQ stock symbols and details about it from
@@ -93,11 +100,66 @@ public class MyUtils {
     }
 
     /**
-     * <p>Read E-commerce stock symbols and details about it from
+     * <p>Read Bank Identifier Code (BIC) and details about it from
+     * a CSV file on the classpath.
+     * </p>
+     * <p>A BIC code "{@code AAAAGBXX}" would be bank "AAAA", in country "GB"
+     * with location "XX". Use the country to derive the currency.
+     * </p>
+     *
+     * @return A map with BIC key and details as value
+     * @throws Exception
+     */
+    public static Map<String, Tuple4<String, Double, String, String>>
+        bicList() throws Exception {
+        Map<String, Tuple4<String, Double, String, String>> result = null;
+        final SortedSet<String> failures = new TreeSet<>();
+
+        try (
+             BufferedReader bufferedReader =
+                 new BufferedReader(
+                     new InputStreamReader(
+                             MyUtils.class.getResourceAsStream("/biclist.txt"), StandardCharsets.UTF_8));
+        ) {
+            result =
+                    bufferedReader.lines()
+                    .filter(line -> line.length() > 0 && !line.startsWith("#"))
+                    .map(line -> {
+                        String[] lineSplit = line.split("\\|");
+                        String key = lineSplit[CSV_FIRST];
+                        String country = key.substring(POS4, POS6);
+                        Tuple2<String, Double> currencyPair = Tuple2.tuple2(null, 0d);
+                        try {
+                            currencyPair = MyUtils.getCurrency(country);
+                        } catch (Exception e) {
+                            failures.add(country);
+                        }
+                        Tuple4<String, Double, String, String> tuple4
+                            = Tuple4.tuple4(
+                                    currencyPair.f0(),
+                                    currencyPair.f1(),
+                                    lineSplit[CSV_SECOND],
+                                    lineSplit[CSV_THIRD]
+                                    );
+                        return new SimpleImmutableEntry
+                                <String, Tuple4<String, Double, String, String>>(key, tuple4);
+                    })
+                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+        }
+
+        if (failures.size() != 0) {
+            String message = String.format("No currencies derived for %s", failures.toString());
+            throw new RuntimeException(message);
+        }
+        return result;
+    }
+
+    /**
+     * <p>Read E-commerce stock codes and details about them from
      * a CSV file on the classpath.
      * </p>
      *
-     * @return A map with symbol key and security item as value
+     * @return A map with stock code and details as value
      * @throws Exception
      */
     public static Map<String, Tuple3<String, String, Double>>
@@ -377,5 +439,69 @@ public class MyUtils {
         String message = String.format("No match for flavor '%s' in %s",
                 value, Arrays.toString(TransactionMonitorFlavor.values()));
         throw new RuntimeException(message);
+    }
+
+    /**
+     * <p>For a country, find the currency and an relative
+     * amount compared to USD. Ie. fix exchange rate.
+     * </p>
+     *
+     * @param country
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:MagicNumber"})
+    public static Tuple2<String, Double> getCurrency(String country) throws Exception {
+        String currency = null;
+        double rate = 0d;
+        switch (country) {
+        case "BS":
+            currency = "BSD";
+            rate = 1d;
+            break;
+        case "CH":
+            currency = "CHF";
+            rate = 1.08d;
+            break;
+        case "CZ":
+            currency = "CZK";
+            rate = 0.044d;
+            break;
+        case "AT":
+        case "BE":
+        case "DE":
+        case "ES":
+        case "FR":
+        case "IE":
+        case "IT":
+        case "LU":
+        case "PT":
+            currency = "EUR";
+            rate = 1.06d;
+            break;
+        case "GB":
+            currency = "GBP";
+            rate = 1.20d;
+            break;
+        case "HK":
+            currency = "HKD";
+            rate = 0.13d;
+            break;
+        case "PL":
+            currency = "PLN";
+            rate = 0.23d;
+            break;
+        default:
+            // None
+            break;
+        }
+        if (country.equals("FR")) {
+            currency = "EUR";
+        }
+        if (currency == null) {
+            String message = String.format("No currency for '%s'", Objects.toString(country));
+            throw new RuntimeException(message);
+        }
+        return Tuple2.tuple2(currency, rate);
     }
 }

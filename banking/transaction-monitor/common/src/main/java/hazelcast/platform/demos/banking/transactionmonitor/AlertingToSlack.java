@@ -157,7 +157,7 @@ public class AlertingToSlack {
                 case TRADE:
                 default:
                     fieldName1 = "stock";
-                    fieldValue1 = safeGetString(input, "symbol");
+                    fieldValue1 = safeGetString(input, "code");
                     fieldName2 = "volume";
                     fieldValue2 = safeGetDouble(input, "volume");
                     break;

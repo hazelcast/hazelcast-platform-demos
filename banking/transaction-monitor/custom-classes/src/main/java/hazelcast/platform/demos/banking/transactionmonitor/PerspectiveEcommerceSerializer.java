@@ -34,7 +34,7 @@ public class PerspectiveEcommerceSerializer implements CompactSerializer<Perspec
         perspectiveEcommerce.setSum(in.readFloat64("sum"));
         perspectiveEcommerce.setAverage(in.readFloat64("average"));
         perspectiveEcommerce.setSeconds(in.readInt32("seconds"));
-        perspectiveEcommerce.setSeconds(in.readInt32("random"));
+        perspectiveEcommerce.setRandom(in.readInt32("random"));
         return perspectiveEcommerce;
     }
 

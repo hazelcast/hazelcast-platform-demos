@@ -20,6 +20,8 @@ class ItemDetails extends Component {
         //switch (transactionMonitorFlavor) {
 		//	case "ECOMMERCE":
 		//	    break;
+		//  case "PAYMENTS_ISO20022":
+		//		break;
 		//	case "TRADE":
 		//	    break;
 		//	default:

@@ -50,6 +50,7 @@ public class MyConstants {
     public static final String IMAP_NAME_AGGREGATE_QUERY_RESULTS = "AggregateQuery" + "_results";
     public static final String IMAP_NAME_ALERTS_LOG = "alertsLog";
     public static final String IMAP_NAME_AUDIT_LOG = "audit_log";
+    public static final String IMAP_NAME_BICS = "bics";
     public static final String IMAP_NAME_JOB_CONTROL = "job_control";
     public static final String IMAP_NAME_JOB_CONFIG = "job_config";
     public static final String IMAP_NAME_PERSPECTIVE = "perspective";
@@ -65,6 +66,13 @@ public class MyConstants {
                     IMAP_NAME_PERSPECTIVE, IMAP_NAME_PYTHON_SENTIMENT,
                     IMAP_NAME_TRANSACTIONS);
 
+    public static final List<String> IMAP_NAMES_PAYMENTS_ISO20022 =
+            List.of(IMAP_NAME_AGGREGATE_QUERY_RESULTS, IMAP_NAME_ALERTS_LOG,
+                    IMAP_NAME_BICS,
+                    IMAP_NAME_JOB_CONTROL, IMAP_NAME_JOB_CONFIG,
+                    IMAP_NAME_PERSPECTIVE, IMAP_NAME_PYTHON_SENTIMENT,
+                    IMAP_NAME_TRANSACTIONS);
+
     public static final List<String> IMAP_NAMES_TRADES =
             List.of(IMAP_NAME_AGGREGATE_QUERY_RESULTS, IMAP_NAME_ALERTS_LOG,
                     IMAP_NAME_JOB_CONTROL, IMAP_NAME_JOB_CONFIG,
@@ -75,6 +83,8 @@ public class MyConstants {
     // CommonIdempotentInitialization.java configures some maps with map stores and journals
     public static final List<String> WAN_IMAP_NAMES_ECOMMERCE =
             List.of(IMAP_NAME_AUDIT_LOG, IMAP_NAME_JOB_CONFIG, IMAP_NAME_PRODUCTS);
+    public static final List<String> WAN_IMAP_NAMES_PAYMENTS_ISO20022 =
+            List.of(IMAP_NAME_AUDIT_LOG, IMAP_NAME_JOB_CONFIG, IMAP_NAME_BICS);
     public static final List<String> WAN_IMAP_NAMES_TRADE =
             List.of(IMAP_NAME_AUDIT_LOG, IMAP_NAME_JOB_CONFIG, IMAP_NAME_SYMBOLS);
 

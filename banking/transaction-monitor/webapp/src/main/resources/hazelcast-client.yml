@@ -16,6 +16,7 @@ hazelcast-client:
     compact-serialization:
       serializers:
         - serializer: hazelcast.platform.demos.banking.transactionmonitor.PerspectiveEcommerceSerializer
+        - serializer: hazelcast.platform.demos.banking.transactionmonitor.PerspectivePaymentsSerializer
         - serializer: hazelcast.platform.demos.banking.transactionmonitor.PerspectiveTradeSerializer
 
   metrics:
