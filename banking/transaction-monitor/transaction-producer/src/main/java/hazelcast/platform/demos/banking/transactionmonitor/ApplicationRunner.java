@@ -16,6 +16,8 @@
 
 package hazelcast.platform.demos.banking.transactionmonitor;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +38,9 @@ import org.apache.pulsar.client.api.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.datamodel.Tuple3;
+import com.hazelcast.jet.datamodel.Tuple4;
 import com.hazelcast.platform.demos.utils.UtilsUrls;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -53,6 +57,8 @@ public class ApplicationRunner {
     private static final int MAX_BATCH_SIZE = 16 * 1024;
     private static final int OPENING_TRADE_PRICE = 2_500;
     private static final int LOWEST_ECOMMERCE_QUANTITY = 10;
+    private static final int LOWEST_PAYMENT_QUANTITY = 10_000;
+    private static final int HIGHEST_PAYMENT_QUANTITY = 1_000_000;
     private static final int LOWEST_TRADE_QUANTITY = 10;
     private static final int HIGHEST_TRADE_QUANTITY = 10_000;
     private static final int DISCOUNT_ECOMMERCE_PERCENT = 100;
@@ -60,6 +66,9 @@ public class ApplicationRunner {
     private static final int DISCOUNT_ECOMMERCE_2 = 85;
     private static final int DISCOUNT_ECOMMERCE_3 = 90;
     private static final int ONE_HUNDRED = 100;
+    private static final List<String> PAYMENT_CHARGE_BEARER_TYPES
+        = List.of("DEBT", "CRED", "SHAR");
+    private static final String NEWLINE = System.lineSeparator();
 
     private final int rate;
     private final int max;
@@ -68,10 +77,14 @@ public class ApplicationRunner {
     private int count;
     private final KafkaProducer<String, String> kafkaProducer;
     private final Producer<String> pulsarProducer;
+    private List<String> bics;
+    private int bicsSize;
     private List<String> ecommerceItems;
     private List<String> tradeSymbols;
+    private Map<String, Tuple2<String, Double>> bicsToCurrency;
     private Map<String, Double> ecommerceItemsToPrice;
     private Map<String, Integer> tradeSymbolToPrice;
+    private String todayCCYYMMDD;
 
     /**
      * <p>Initialise a connection to Kafka for writing.
@@ -123,22 +136,34 @@ public class ApplicationRunner {
             this.pulsarProducer = null;
         }
 
-        this.initMaps();
+        this.initData();
     }
 
     /**
      * <p>Set up data.
      * </p>
      */
-    private void initMaps() throws Exception {
+    private void initData() throws Exception {
         Map<String, Tuple3<String, NasdaqMarketCategory, NasdaqFinancialStatus>>
             nasdaqListed = MyUtils.nasdaqListed();
+        Map<String, Tuple4<String, Double, String, String>>
+            bicList = MyUtils.bicList();
         Map<String, Tuple3<String, String, Double>>
             productCatalog = MyUtils.productCatalog();
 
+        this.bics = new ArrayList<>(bicList.keySet());
+        this.bicsSize = this.bics.size();
         this.ecommerceItems = new ArrayList<>(productCatalog.keySet());
         this.tradeSymbols = new ArrayList<>(nasdaqListed.keySet());
+        this.todayCCYYMMDD = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
 
+        this.bicsToCurrency = bicList.entrySet().stream()
+                .collect(Collectors.<Entry<String,
+                         Tuple4<String, Double, String, String>>,
+                             String, Tuple2<String, Double>>toMap(
+                         entry -> entry.getKey(),
+                         entry -> Tuple2.tuple2(entry.getValue().f0(), entry.getValue().f1())
+                        ));
         this.ecommerceItemsToPrice = productCatalog.entrySet().stream()
                 .collect(Collectors.<Entry<String,
                         Tuple3<String, String, Double>>,
@@ -184,6 +209,9 @@ public class ApplicationRunner {
                     switch (this.transactionMonitorFlavor) {
                     case ECOMMERCE:
                         transaction = this.createEcommerceTransaction(id, random);
+                        break;
+                    case PAYMENTS_ISO20022:
+                        transaction = this.createPaymentsTransaction(id, random);
                         break;
                     case TRADE:
                     default:
@@ -264,6 +292,101 @@ public class ApplicationRunner {
         );
 
         return transaction;
+    }
+
+    /**
+     * <p>Create a PAIN.001 (Customer Credit Transfer Initiation) message
+     * in XML held in a String.
+     * </p>
+     *
+     * @param id
+     * @param random
+     * @return
+     */
+    @SuppressFBWarnings(value = "RV_ABSOLUTE_VALUE_OF_HASHCODE",
+            justification = "Using HashCode to generate random number")
+    private String createPaymentsTransaction(String id, ThreadLocalRandom random) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        String bicCreditor = this.bics.get(random.nextInt(this.bicsSize));
+        String ccy = this.bicsToCurrency.get(bicCreditor).f0();
+        Double rate = this.bicsToCurrency.get(bicCreditor).f1();
+        int usd = random.nextInt(LOWEST_PAYMENT_QUANTITY, HIGHEST_PAYMENT_QUANTITY);
+        Double amt = (1 / rate) * usd;
+        String chargeBearerType = createChargeBearerType(random);
+
+        // Source and target are different banks, more interesting for monitoring
+        // interbank payments than between accounts at same bank, possible AML.
+        String bicDebitor = this.bics.get(random.nextInt(this.bicsSize));
+        while (bicDebitor.equals(bicCreditor)) {
+            bicDebitor = this.bics.get(random.nextInt(this.bicsSize));
+        }
+        String instrId = bicDebitor + "/" + this.todayCCYYMMDD + "/" + Math.abs(id.hashCode());
+
+        stringBuilder.append("<pain.001.001>").append(NEWLINE);
+        stringBuilder.append(" <CdtTrfTxInf>").append(NEWLINE);
+
+        stringBuilder.append("  <Amt>").append(NEWLINE);
+        stringBuilder.append("   <InstdAmt Ccy=\"").append(ccy).append("\">")
+            .append(String.format("%.2f", amt)).append("</InstdAmt>").append(NEWLINE);
+        stringBuilder.append("  </Amt>").append(NEWLINE);
+
+        stringBuilder.append("  <Cdtr>").append(NEWLINE);
+        stringBuilder.append("   <Nm>").append(bicDebitor).append("</Nm>").append(NEWLINE);
+        stringBuilder.append("  </Cdtr>").append(NEWLINE);
+
+        stringBuilder
+            .append("  <CdtrAgt>").append(NEWLINE)
+            .append("   <FinInstnId>").append(NEWLINE)
+            .append("    <BICFI>").append(bicCreditor).append("</BICFI>").append(NEWLINE)
+            .append("   </FinInstnId>").append(NEWLINE)
+            .append("  </CdtrAgt>").append(NEWLINE);
+
+        stringBuilder.append("  <ChrgBr>").append(chargeBearerType)
+            .append("</ChrgBr>").append(NEWLINE);
+
+        stringBuilder
+            .append("  <PmntId>").append(NEWLINE)
+            .append("   <InstrId>").append(instrId).append("</InstrId>").append(NEWLINE)
+            .append("   <EndToEndId>").append(id).append("</EndToEndId>").append(NEWLINE)
+            .append("  </PmntId>").append(NEWLINE);
+
+        stringBuilder.append(" </CdtTrfTxInf>").append(NEWLINE);
+        stringBuilder.append("</pain.001.001>");
+
+        String transaction = String.format("{"
+                + "\"id\": \"%s\","
+                + "\"timestamp\": %d,"
+                + "\"kind\": \"pain.001.001\","
+                + "\"bicCreditor\": \"%s\","
+                + "\"bicDebitor\": \"%s\","
+                + "\"ccy\": \"%s\","
+                // No decimal places, only interested in main currency
+                + "\"amt_floor\": %.0f,"
+                + "\"xml\": %s"
+                + "}",
+                id,
+                System.currentTimeMillis(),
+                bicCreditor,
+                bicDebitor,
+                ccy,
+                amt,
+                MyUtils.xmlSafeForJson(stringBuilder.toString())
+        );
+
+        return transaction;
+    }
+
+    /**
+     * <p>Pick a type, Credit, Debit or Shared
+     * </p>
+     *
+     * @param random
+     * @return
+     */
+    private String createChargeBearerType(ThreadLocalRandom random) {
+        int i = random.nextInt(PAYMENT_CHARGE_BEARER_TYPES.size());
+        return PAYMENT_CHARGE_BEARER_TYPES.get(i);
     }
 
     /**

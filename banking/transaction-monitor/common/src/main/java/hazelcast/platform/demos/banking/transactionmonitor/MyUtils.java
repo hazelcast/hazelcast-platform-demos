@@ -504,4 +504,43 @@ public class MyUtils {
         }
         return Tuple2.tuple2(currency, rate);
     }
+
+    /**
+     * <p>Turn multi-line XML into JSON
+     * </p>
+     *
+     * @param string
+     * @return
+     */
+    public static String xmlSafeForJson(String input) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("[");
+
+        String[] lines = input.split(System.lineSeparator());
+        for (int i = 0; i < lines.length; i++) {
+            if (i > 0) {
+                stringBuilder.append(", \"");
+            } else {
+                stringBuilder.append("\"");
+            }
+
+            stringBuilder.append(xmlLineToJsonString(lines[i]));
+
+            stringBuilder.append("\"");
+        }
+
+        stringBuilder.append("]");
+        return stringBuilder.toString();
+    }
+
+    /**
+     * <p>Make a line of XML into a safe JSON string.
+     * </p>
+     *
+     * @param line
+     * @return
+     */
+    public static String xmlLineToJsonString(String line) {
+        return line.replace("\"", "\\\"");
+    }
 }
