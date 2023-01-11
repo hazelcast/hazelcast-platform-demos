@@ -91,8 +91,14 @@ public class IngestTransactions {
                  .withoutTimestamps();
         }
 
-        inputSource
-        .writeTo(Sinks.map(MyConstants.IMAP_NAME_TRANSACTIONS));
+        if (transactionMonitorFlavor == TransactionMonitorFlavor.PAYMENTS_ISO20022) {
+            inputSource
+            .map(IngestTransactions::depleteEntry).setName("deplete-entry")
+            .writeTo(Sinks.map(MyConstants.IMAP_NAME_TRANSACTIONS));
+        } else {
+            inputSource
+            .writeTo(Sinks.map(MyConstants.IMAP_NAME_TRANSACTIONS));
+        }
 
         /* To help with diagnostics, allow every 100,0000th item through
          * on each node. Nulls are filtered out.
@@ -152,6 +158,35 @@ public class IngestTransactions {
             pulsarConnectionSupplier,
             pulsarSchemaSupplier,
             pulsarProjectionFunction).build();
+    }
+
+    /**
+     * <p>Simplify the JSON, removing nested array, so it can be more easily queried.
+     * See {@link #makeEntryXML(Entry)} that does capture the XML part for storage
+     * elsewhere.
+     * </p>
+     * @param input
+     * @return
+     */
+    @SuppressFBWarnings(value = "", justification = "JSON access can throw exception")
+    private static Entry<String, HazelcastJsonValue> depleteEntry(Entry<String, HazelcastJsonValue> input) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("{");
+        try {
+            JSONObject json = new JSONObject(input.getValue().toString());
+            stringBuilder.append(" \"id\" : \"").append(json.getString("id")).append("\"");
+            stringBuilder.append(", \"timestamp\" : ").append(json.getLong("timestamp"));
+            stringBuilder.append(", \"kind\" : \"").append(json.getString("kind")).append("\"");
+            stringBuilder.append(", \"bicCreditor\" : \"").append(json.getString("bicCreditor")).append("\"");
+            stringBuilder.append(", \"bicDebitor\" : \"").append(json.getString("bicDebitor")).append("\"");
+            stringBuilder.append(", \"ccy\" : \"").append(json.getString("ccy")).append("\"");
+            stringBuilder.append(", \"amtFloor\" : ").append(json.getDouble("amtFloor"));
+        } catch (Exception e) {
+            // Don't log, may be running in the cloud. Null means no entry passed to next stage, filter.
+            return null;
+        }
+        stringBuilder.append("}");
+        return Tuple2.tuple2(input.getKey(), new HazelcastJsonValue(stringBuilder.toString()));
     }
 
     /**

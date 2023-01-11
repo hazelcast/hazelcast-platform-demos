@@ -3,6 +3,7 @@
 echo ============================================================
 echo Attempts to do all steps for Google Cloud
 echo ============================================================
+echo `date +"%H:%M:%S"`
 echo ----
 
 PROJECT=transaction-monitor
@@ -141,5 +142,7 @@ do
  echo ====
  echo END: $INPUT_FILE
 done
+
+echo `date +"%H:%M:%S"` - Done
 
 /bin/rm $TMPFILE.* > /dev/null 2>&1

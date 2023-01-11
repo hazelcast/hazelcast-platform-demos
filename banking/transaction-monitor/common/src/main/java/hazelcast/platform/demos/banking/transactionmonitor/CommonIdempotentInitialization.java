@@ -42,6 +42,7 @@ import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.config.JobConfigArguments;
 import com.hazelcast.jet.config.ProcessingGuarantee;
 import com.hazelcast.jet.datamodel.Tuple3;
+import com.hazelcast.jet.datamodel.Tuple4;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.map.IMap;
 import com.hazelcast.platform.demos.utils.UtilsConstants;
@@ -57,8 +58,11 @@ import com.hazelcast.platform.demos.utils.UtilsSlackSink;
  * having to test if another client has already run it.
  * </p>
  */
+@SuppressWarnings("checkstyle:MethodCount")
 public class CommonIdempotentInitialization {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonIdempotentInitialization.class);
+    private static final int POS4 = 4;
+    private static final int POS6 = 6;
 
     /**
      * <p>Maps and mappings needed for WAN, rather than replicate "{@code __sql.catalog}"
@@ -100,6 +104,9 @@ public class CommonIdempotentInitialization {
         switch (transactionMonitorFlavor) {
             case ECOMMERCE:
                 iMapNames = MyConstants.IMAP_NAMES_ECOMMERCE;
+                break;
+            case PAYMENTS_ISO20022:
+                iMapNames = MyConstants.IMAP_NAMES_PAYMENTS_ISO20022;
                 break;
             case TRADE:
             default:
@@ -210,6 +217,9 @@ public class CommonIdempotentInitialization {
             case ECOMMERCE:
                 indexColumn1 = "itemCode";
                 break;
+            case PAYMENTS_ISO20022:
+                indexColumn1 = "bankCode";
+                break;
             case TRADE:
             default:
                 indexColumn1 = "symbol";
@@ -286,6 +296,7 @@ public class CommonIdempotentInitialization {
      */
     private static void loadNeededDataForFlavor(HazelcastInstance hazelcastInstance,
             TransactionMonitorFlavor transactionMonitorFlavor) throws Exception {
+        IMap<String, BicInfo> bicsMap = null;
         IMap<String, ProductInfo> productsMap = null;
         IMap<String, SymbolInfo> symbolsMap = null;
 
@@ -295,23 +306,21 @@ public class CommonIdempotentInitialization {
             if (!productsMap.isEmpty()) {
                 LOGGER.trace("Skip loading '{}', not empty", productsMap.getName());
             } else {
-                Map<String, ProductInfo> localMap =
-                        MyUtils.productCatalog().entrySet().stream()
-                        .collect(Collectors.<Entry<String, Tuple3<String, String, Double>>,
-                                String, ProductInfo>
-                                toUnmodifiableMap(
-                                entry -> entry.getKey(),
-                                entry -> {
-                                    ProductInfo productInfo = new ProductInfo();
-                                    productInfo.setItemName(entry.getValue().f0());
-                                    productInfo.setCategory(entry.getValue().f1());
-                                    productInfo.setPrice(entry.getValue().f2());
-                                    return productInfo;
-                                }));
-
+                Map<String, ProductInfo> localMap = getProductInfoLocalMap();
                 productsMap.putAll(localMap);
 
                 LOGGER.trace("Loaded {} into '{}'", localMap.size(), productsMap.getName());
+            }
+            break;
+        case PAYMENTS_ISO20022:
+            bicsMap = hazelcastInstance.getMap(MyConstants.IMAP_NAME_BICS);
+            if (!bicsMap.isEmpty()) {
+                LOGGER.trace("Skip loading '{}', not empty", bicsMap.getName());
+            } else {
+                Map<String, BicInfo> localMap = getBicInfoLocalMap();
+                bicsMap.putAll(localMap);
+
+                LOGGER.trace("Loaded {} into '{}'", localMap.size(), bicsMap.getName());
             }
             break;
         case TRADE:
@@ -320,26 +329,81 @@ public class CommonIdempotentInitialization {
             if (!symbolsMap.isEmpty()) {
                 LOGGER.trace("Skip loading '{}', not empty", symbolsMap.getName());
             } else {
-                Map<String, SymbolInfo> localMap =
-                        MyUtils.nasdaqListed().entrySet().stream()
-                        .collect(Collectors.<Entry<String, Tuple3<String, NasdaqMarketCategory, NasdaqFinancialStatus>>,
-                                String, SymbolInfo>
-                                toUnmodifiableMap(
-                                entry -> entry.getKey(),
-                                entry -> {
-                                    SymbolInfo symbolInfo = new SymbolInfo();
-                                    symbolInfo.setSecurityName(entry.getValue().f0());
-                                    symbolInfo.setMarketCategory(entry.getValue().f1());
-                                    symbolInfo.setFinancialStatus(entry.getValue().f2());
-                                    return symbolInfo;
-                                }));
-
+                Map<String, SymbolInfo> localMap = getSymbolInfoLocalMap();
                 symbolsMap.putAll(localMap);
 
                 LOGGER.trace("Loaded {} into '{}'", localMap.size(), symbolsMap.getName());
             }
             break;
         }
+    }
+
+    /**
+     * <p>Format file "{@code productcatalog.txt}" for bulk insert.
+     * </p>
+     * @return
+     * @throws Exception
+     */
+    private static Map<String, ProductInfo> getProductInfoLocalMap() throws Exception {
+        return MyUtils.productCatalog().entrySet().stream()
+                .collect(Collectors.<Entry<String, Tuple3<String, String, Double>>,
+                        String, ProductInfo>
+                        toUnmodifiableMap(
+                        entry -> entry.getKey(),
+                        entry -> {
+                            ProductInfo productInfo = new ProductInfo();
+                            productInfo.setItemName(entry.getValue().f0());
+                            productInfo.setCategory(entry.getValue().f1());
+                            productInfo.setPrice(entry.getValue().f2());
+                            return productInfo;
+                        }));
+    }
+
+    /**
+     * <p>Format file "{@code biclist.txt}" for bulk insert.
+     * </p>
+     * @return
+     * @throws Exception
+     */
+    private static Map<String, BicInfo> getBicInfoLocalMap() throws Exception {
+        return MyUtils.bicList().entrySet().stream()
+                .collect(Collectors.<Entry<String, Tuple4<String, Double, String, String>>,
+                        String, BicInfo>
+                        toUnmodifiableMap(
+                        entry -> entry.getKey(),
+                        entry -> {
+                            String key = entry.getKey();
+                            BicInfo bicInfo = new BicInfo();
+                            bicInfo.setBankCode(key.substring(0, POS4));
+                            bicInfo.setCountry(key.substring(POS4, POS6));
+                            bicInfo.setCurrency(entry.getValue().f0());
+                            bicInfo.setName(entry.getValue().f2());
+                            bicInfo.setLocation(entry.getValue().f3());
+                            bicInfo.setLocationCode(key.substring(POS6));
+                            bicInfo.setExchangeRate(entry.getValue().f1());
+                            return bicInfo;
+                        }));
+    }
+
+    /**
+     * <p>Format file "{@code nasdaqlisted.txt}" for bulk insert.
+     * </p>
+     * @return
+     * @throws Exception
+     */
+    private static Map<String, SymbolInfo> getSymbolInfoLocalMap() throws Exception {
+        return MyUtils.nasdaqListed().entrySet().stream()
+                .collect(Collectors.<Entry<String, Tuple3<String, NasdaqMarketCategory, NasdaqFinancialStatus>>,
+                        String, SymbolInfo>
+                        toUnmodifiableMap(
+                        entry -> entry.getKey(),
+                        entry -> {
+                            SymbolInfo symbolInfo = new SymbolInfo();
+                            symbolInfo.setSecurityName(entry.getValue().f0());
+                            symbolInfo.setMarketCategory(entry.getValue().f1());
+                            symbolInfo.setFinancialStatus(entry.getValue().f2());
+                            return symbolInfo;
+                        }));
     }
 
     /**
@@ -367,6 +431,7 @@ public class CommonIdempotentInitialization {
      *
      * @param bootstrapServers
      */
+    @SuppressWarnings("checkstyle:MethodLength")
     static boolean defineKafka1(HazelcastInstance hazelcastInstance, String bootstrapServers,
             TransactionMonitorFlavor transactionMonitorFlavor) {
         String definition1a = "CREATE EXTERNAL MAPPING IF NOT EXISTS "
@@ -378,7 +443,7 @@ public class CommonIdempotentInitialization {
                 + " id             VARCHAR, "
                 + " price          DECIMAL, "
                 + " quantity       BIGINT, "
-                + " itemCode      VARCHAR, "
+                + " itemCode       VARCHAR, "
                 // Timestamp is a reserved word, need to escape. Adjust the mapping name so avoiding clash with IMap
                 + " \"timestamp\"  BIGINT "
                 + " ) "
@@ -392,6 +457,31 @@ public class CommonIdempotentInitialization {
                 + " )";
 
         String definition1b = "CREATE EXTERNAL MAPPING IF NOT EXISTS "
+                // Name for our SQL
+                + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS
+                // Name of the remote object
+                + " EXTERNAL NAME " + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS
+                + " ( "
+                + " id             VARCHAR, "
+                // Timestamp is a reserved word, need to escape. Adjust the mapping name so avoiding clash with IMap
+                + " \"timestamp\"  BIGINT, "
+                + " kind           VARCHAR, "
+                + " bicCreditor    VARCHAR, "
+                + " bicDebtor      VARCHAR, "
+                + " ccy            VARCHAR, "
+                + " amtFloor       DECIMAL, "
+                + " xml            VARCHAR "
+                + " ) "
+                + " TYPE Kafka "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'json-flat',"
+                + " 'auto.offset.reset' = 'earliest',"
+                + " 'bootstrap.servers' = '" + bootstrapServers + "'"
+                + " )";
+
+        String definition1c = "CREATE EXTERNAL MAPPING IF NOT EXISTS "
                 // Name for our SQL
                 + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS
                 // Name of the remote object
@@ -418,9 +508,12 @@ public class CommonIdempotentInitialization {
         case ECOMMERCE:
             ok = define(definition1a, hazelcastInstance);
             break;
+        case PAYMENTS_ISO20022:
+            ok = define(definition1b, hazelcastInstance);
+            break;
         case TRADE:
         default:
-            ok = define(definition1b, hazelcastInstance);
+            ok = define(definition1c, hazelcastInstance);
             break;
         }
         return ok;
@@ -485,36 +578,25 @@ public class CommonIdempotentInitialization {
                 + " 'valueJavaClass' = '" + String.class.getName() + "'"
                 + " )";
 
-        String definition5a = "CREATE MAPPING IF NOT EXISTS "
-                 + MyConstants.IMAP_NAME_PRODUCTS
-                 + " TYPE IMap "
-                 + " OPTIONS ( "
-                 + " 'keyFormat' = 'java',"
-                 + " 'keyJavaClass' = 'java.lang.String',"
-                 + " 'valueFormat' = 'java',"
-                 + " 'valueJavaClass' = '" + ProductInfo.class.getName() + "'"
-                 + " )";
-
-        String definition5b = "CREATE MAPPING IF NOT EXISTS "
-                 + MyConstants.IMAP_NAME_SYMBOLS
-                 + " TYPE IMap "
-                 + " OPTIONS ( "
-                 + " 'keyFormat' = 'java',"
-                 + " 'keyJavaClass' = 'java.lang.String',"
-                 + " 'valueFormat' = 'java',"
-                 + " 'valueJavaClass' = '" + SymbolInfo.class.getName() + "'"
-                 + " )";
+        String[] definition5Arr = getDefinition5();
 
         List<String> definitions;
         List<String> mapNames;
         switch (transactionMonitorFlavor) {
         case ECOMMERCE:
-            definitions = List.of(definition3, definition4, definition5a);
+            definitions = List.of(definition3, definition4,
+                    definition5Arr[TransactionMonitorFlavor.ECOMMERCE.ordinal()]);
             mapNames = MyConstants.WAN_IMAP_NAMES_ECOMMERCE;
+            break;
+        case PAYMENTS_ISO20022:
+            definitions = List.of(definition3, definition4,
+                    definition5Arr[TransactionMonitorFlavor.PAYMENTS_ISO20022.ordinal()]);
+            mapNames = MyConstants.WAN_IMAP_NAMES_PAYMENTS_ISO20022;
             break;
         case TRADE:
         default:
-            definitions = List.of(definition3, definition4, definition5b);
+            definitions = List.of(definition3, definition4,
+                    definition5Arr[TransactionMonitorFlavor.TRADE.ordinal()]);
             mapNames = MyConstants.WAN_IMAP_NAMES_TRADE;
             break;
         }
@@ -525,6 +607,55 @@ public class CommonIdempotentInitialization {
             return false;
         }
         return ok;
+    }
+
+    /**
+     * <p>The various styles of definition 5, depending on the required flavor.
+     * </p>
+     * @return
+     */
+    private static String[] getDefinition5() {
+        String[] result = new String[TransactionMonitorFlavor.values().length];
+
+        result[TransactionMonitorFlavor.ECOMMERCE.ordinal()] =
+                "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_PRODUCTS
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = '" + ProductInfo.class.getName() + "'"
+                + " )";
+
+        result[TransactionMonitorFlavor.PAYMENTS_ISO20022.ordinal()] =
+                "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_BICS
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = '" + BicInfo.class.getName() + "'"
+                + " )";
+
+        result[TransactionMonitorFlavor.TRADE.ordinal()] =
+                "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_SYMBOLS
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = '" + SymbolInfo.class.getName() + "'"
+                + " )";
+
+        for (int i = 0; i < result.length; i++) {
+            if (result[i] == null) {
+                LOGGER.error("Definition 5 is missing for ordinal {}", i);
+            }
+        }
+        return result;
     }
 
     /**
@@ -590,58 +721,93 @@ public class CommonIdempotentInitialization {
      * @param hazelcastInstance
      */
     static boolean defineIMaps2(HazelcastInstance hazelcastInstance, TransactionMonitorFlavor transactionMonitorFlavor) {
-        String definition8a = "CREATE MAPPING IF NOT EXISTS "
-                + MyConstants.IMAP_NAME_PERSPECTIVE
-                + " ("
-                + "    __key VARCHAR,"
-                + "    code VARCHAR,"
-                + "    \"count\" BIGINT,"
-                + "    \"sum\" DOUBLE,"
-                + "    average DOUBLE,"
-                + "    seconds INTEGER,"
-                + "    random INTEGER"
-                + ")"
-                + " TYPE IMap "
-                + " OPTIONS ( "
-                + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = '" + String.class.getName() + "',"
-                + " 'valueFormat' = 'compact',"
-                + " 'valueCompactTypeName' = '" + PerspectiveTrade.class.getSimpleName() + "'"
-                + " )";
-        String definition8b = "CREATE MAPPING IF NOT EXISTS "
-                + MyConstants.IMAP_NAME_PERSPECTIVE
-                + " ("
-                + "    __key VARCHAR,"
-                + "    symbol VARCHAR,"
-                + "    \"count\" BIGINT,"
-                + "    \"sum\" DOUBLE,"
-                + "    latest DOUBLE,"
-                + "    seconds INTEGER,"
-                + "    random INTEGER"
-                + ")"
-                + " TYPE IMap "
-                + " OPTIONS ( "
-                + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = '" + String.class.getName() + "',"
-                + " 'valueFormat' = 'compact',"
-                + " 'valueCompactTypeName' = '" + PerspectiveTrade.class.getSimpleName() + "'"
-                + " )";
+        String[] definition8Arr = getDefinition8();
 
         boolean ok = true;
-        List<String> definitions;
-        switch (transactionMonitorFlavor) {
-        case ECOMMERCE:
-            definitions = List.of(definition8a);
-            break;
-        case TRADE:
-        default:
-            definitions = List.of(definition8b);
-            break;
-        }
+        List<String> definitions
+        = List.of(definition8Arr[transactionMonitorFlavor.ordinal()]);
+
         for (String definition : definitions) {
             ok &= define(definition, hazelcastInstance);
         }
         return ok;
+    }
+
+    /**
+     * <p>The various styles of definition 8, depending on the required flavor.
+     * </p>
+     * @return
+     */
+    @SuppressWarnings("checkstyle:MethodLength")
+    private static String[] getDefinition8() {
+        String[] result = new String[TransactionMonitorFlavor.values().length];
+
+        result[TransactionMonitorFlavor.ECOMMERCE.ordinal()] =
+                "CREATE MAPPING IF NOT EXISTS "
+                        + MyConstants.IMAP_NAME_PERSPECTIVE
+                        + " ("
+                        + "    __key VARCHAR,"
+                        + "    code VARCHAR,"
+                        + "    \"count\" BIGINT,"
+                        + "    \"sum\" DOUBLE,"
+                        + "    average DOUBLE,"
+                        + "    seconds INTEGER,"
+                        + "    random INTEGER"
+                        + ")"
+                        + " TYPE IMap "
+                        + " OPTIONS ( "
+                        + " 'keyFormat' = 'java',"
+                        + " 'keyJavaClass' = '" + String.class.getName() + "',"
+                        + " 'valueFormat' = 'compact',"
+                        + " 'valueCompactTypeName' = '" + PerspectiveEcommerce.class.getSimpleName() + "'"
+                        + " )";
+
+        result[TransactionMonitorFlavor.PAYMENTS_ISO20022.ordinal()] =
+                "CREATE MAPPING IF NOT EXISTS "
+                        + MyConstants.IMAP_NAME_PERSPECTIVE
+                        + " ("
+                        + "    __key VARCHAR,"
+                        + "    bic VARCHAR,"
+                        + "    \"count\" BIGINT,"
+                        + "    \"sum\" DOUBLE,"
+                        + "    average DOUBLE,"
+                        + "    seconds INTEGER,"
+                        + "    random INTEGER"
+                        + ")"
+                        + " TYPE IMap "
+                        + " OPTIONS ( "
+                        + " 'keyFormat' = 'java',"
+                        + " 'keyJavaClass' = '" + String.class.getName() + "',"
+                        + " 'valueFormat' = 'compact',"
+                        + " 'valueCompactTypeName' = '" + PerspectivePayments.class.getSimpleName() + "'"
+                        + " )";
+
+        result[TransactionMonitorFlavor.TRADE.ordinal()] =
+                "CREATE MAPPING IF NOT EXISTS "
+                        + MyConstants.IMAP_NAME_PERSPECTIVE
+                        + " ("
+                        + "    __key VARCHAR,"
+                        + "    symbol VARCHAR,"
+                        + "    \"count\" BIGINT,"
+                        + "    \"sum\" DOUBLE,"
+                        + "    latest DOUBLE,"
+                        + "    seconds INTEGER,"
+                        + "    random INTEGER"
+                        + ")"
+                        + " TYPE IMap "
+                        + " OPTIONS ( "
+                        + " 'keyFormat' = 'java',"
+                        + " 'keyJavaClass' = '" + String.class.getName() + "',"
+                        + " 'valueFormat' = 'compact',"
+                        + " 'valueCompactTypeName' = '" + PerspectiveTrade.class.getSimpleName() + "'"
+                        + " )";
+
+        for (int i = 0; i < result.length; i++) {
+            if (result[i] == null) {
+                LOGGER.error("Definition 8 is missing for ordinal {}", i);
+            }
+        }
+        return result;
     }
 
     /**
@@ -650,40 +816,11 @@ public class CommonIdempotentInitialization {
      * @param hazelcastInstance
      */
     static boolean defineIMaps3(HazelcastInstance hazelcastInstance, TransactionMonitorFlavor transactionMonitorFlavor) {
-        String definition9a = "CREATE MAPPING IF NOT EXISTS "
-                + MyConstants.IMAP_NAME_TRANSACTIONS
-                + " ("
-                + "    __key VARCHAR,"
-                + "    id VARCHAR,"
-                + "    \"timestamp\" BIGINT,"
-                + "    code VARCHAR,"
-                + "    price DECIMAL,"
-                + "    quantity BIGINT"
-                + ")"
-                + " TYPE IMap "
-                + " OPTIONS ( "
-                + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = 'java.lang.String',"
-                + " 'valueFormat' = 'json-flat',"
-                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getName() + "'"
-                + " )";
-       String definition9b = "CREATE MAPPING IF NOT EXISTS "
-                + MyConstants.IMAP_NAME_TRANSACTIONS
-                + " ("
-                + "    __key VARCHAR,"
-                + "    id VARCHAR,"
-                + "    \"timestamp\" BIGINT,"
-                + "    symbol VARCHAR,"
-                + "    price DECIMAL,"
-                + "    quantity BIGINT"
-                + ")"
-                + " TYPE IMap "
-                + " OPTIONS ( "
-                + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = 'java.lang.String',"
-                + " 'valueFormat' = 'json-flat',"
-                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getName() + "'"
-                + " )";
+       String[] definition9Arr = getDefinition9();
+       String definition9 = definition9Arr[transactionMonitorFlavor.ordinal()];
+
+       String[] definition9ExtraArr = getDefinition9Extra();
+       String definition9Extra = definition9ExtraArr[transactionMonitorFlavor.ordinal()];
 
        String definition10 = "CREATE MAPPING IF NOT EXISTS "
                + MyConstants.IMAP_NAME_PYTHON_SENTIMENT
@@ -697,19 +834,124 @@ public class CommonIdempotentInitialization {
 
        boolean ok = true;
        List<String> definitions;
-       switch (transactionMonitorFlavor) {
-       case ECOMMERCE:
-           definitions = List.of(definition9a, definition10);
-           break;
-       case TRADE:
-       default:
-           definitions = List.of(definition9b, definition10);
-           break;
+       if (definition9Extra == null || definition9Extra.isBlank()) {
+           definitions = List.of(definition9, definition10);
+       } else {
+           definitions = List.of(definition9, definition9Extra, definition10);
        }
+
        for (String definition : definitions) {
            ok &= define(definition, hazelcastInstance);
        }
        return ok;
+    }
+
+    /**
+     * <p>The various styles of definition 9, depending on the required flavor.
+     * </p>
+     * @return
+     */
+    @SuppressWarnings("checkstyle:MethodLength")
+    private static String[] getDefinition9() {
+        String[] result = new String[TransactionMonitorFlavor.values().length];
+
+        result[TransactionMonitorFlavor.ECOMMERCE.ordinal()] =
+                "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_TRANSACTIONS
+                + " ("
+                + "    __key VARCHAR,"
+                + "    id VARCHAR,"
+                + "    \"timestamp\" BIGINT,"
+                + "    code VARCHAR,"
+                + "    price DECIMAL,"
+                + "    quantity BIGINT"
+                + ")"
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'json-flat',"
+                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getName() + "'"
+                + " )";
+
+        result[TransactionMonitorFlavor.PAYMENTS_ISO20022.ordinal()] =
+                "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_TRANSACTIONS
+                + " ("
+                + "    __key VARCHAR,"
+                + "    id VARCHAR,"
+                + "    \"timestamp\" BIGINT,"
+                + "    kind VARCHAR,"
+                + "    bicCreditor VARCHAR,"
+                + "    bicDebitor VARCHAR,"
+                + "    ccy VARCHAR,"
+                + "    amtFloor DECIMAL"
+                + ")"
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'json-flat',"
+                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getName() + "'"
+                + " )";
+
+        result[TransactionMonitorFlavor.TRADE.ordinal()] =
+                "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_TRANSACTIONS
+                + " ("
+                + "    __key VARCHAR,"
+                + "    id VARCHAR,"
+                + "    \"timestamp\" BIGINT,"
+                + "    symbol VARCHAR,"
+                + "    price DECIMAL,"
+                + "    quantity BIGINT"
+                + ")"
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'json-flat',"
+                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getName() + "'"
+                + " )";
+
+        for (int i = 0; i < result.length; i++) {
+            if (result[i] == null) {
+                LOGGER.error("Definition 9 is missing for ordinal {}", i);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * <p>Bonus definitions for transactions, may not be needed depending
+     * on the type of transaction.
+     * </p>
+     * @return
+     */
+    private static String[] getDefinition9Extra() {
+        String[] result = new String[TransactionMonitorFlavor.values().length];
+
+        result[TransactionMonitorFlavor.ECOMMERCE.ordinal()] = "";
+
+        result[TransactionMonitorFlavor.PAYMENTS_ISO20022.ordinal()] =
+                "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_TRANSACTIONS_XML
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = '" + String.class.getName() + "',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = '" + String.class.getName() + "'"
+                + " )";
+
+        result[TransactionMonitorFlavor.TRADE.ordinal()] = "";
+
+        for (int i = 0; i < result.length; i++) {
+            if (result[i] == null) {
+                LOGGER.error("Definition 9 is missing for ordinal {}", i);
+            }
+        }
+        return result;
     }
 
     /**
@@ -764,6 +1006,10 @@ public class CommonIdempotentInitialization {
      */
     static boolean define(String definition, HazelcastInstance hazelcastInstance) {
         LOGGER.debug("Definition '{}'", definition);
+        if (definition == null || definition.isBlank()) {
+            LOGGER.error("Empty definition");
+            return false;
+        }
         try {
             hazelcastInstance.getSql().execute(definition);
             return true;
@@ -811,7 +1057,8 @@ public class CommonIdempotentInitialization {
                     System.getProperty("my.autostart.enabled"));
 
             // Transaction ingest
-            Pipeline pipelineIngestTransactions = IngestTransactions.buildPipeline(bootstrapServers, pulsarList, usePulsar);
+            Pipeline pipelineIngestTransactions = IngestTransactions.buildPipeline(bootstrapServers, pulsarList,
+                    usePulsar, transactionMonitorFlavor);
 
             JobConfig jobConfigIngestTransactions = new JobConfig();
             jobConfigIngestTransactions.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
