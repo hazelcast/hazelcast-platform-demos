@@ -83,7 +83,7 @@ public class JobControlStartRunnable implements Runnable {
         if (targetJobNamePrefix.equals(IngestTransactions.class.getSimpleName())) {
             // Transaction ingest
             Pipeline pipelineIngestTransactions = IngestTransactions.buildPipeline(this.bootstrapServers,
-                this.pulsarList, this.usePulsar);
+                this.pulsarList, this.usePulsar, this.transactionMonitorFlavor);
 
             JobConfig jobConfigIngestTransactions = new JobConfig();
             jobConfigIngestTransactions.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);

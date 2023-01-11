@@ -61,4 +61,8 @@ YAML to create a stream of transactions.
 Can be run before or after `kubernetes-6-webapp-and-monitoring.yaml`. After would be usual, but there is no dependency
 between these two.
 
+## Bonus
+
+If running on Google Cloud, there is a script `gke.sh` that should do all these steps for you.
+
 

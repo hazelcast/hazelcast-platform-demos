@@ -24,6 +24,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.pulsar.client.api.Message;
 import org.apache.pulsar.client.api.PulsarClient;
 import org.apache.pulsar.client.api.Schema;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.function.FunctionEx;
@@ -31,6 +33,7 @@ import com.hazelcast.function.SupplierEx;
 import com.hazelcast.jet.Util;
 import com.hazelcast.jet.accumulator.LongAccumulator;
 import com.hazelcast.jet.contrib.pulsar.PulsarSources;
+import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.kafka.KafkaSources;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.ServiceFactories;
@@ -38,6 +41,8 @@ import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.pipeline.StreamSource;
 import com.hazelcast.jet.pipeline.StreamStage;
 import com.hazelcast.platform.demos.utils.UtilsUrls;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * <p>Creates a Jet pipeline to upload from a Kafka topic into a
@@ -64,7 +69,8 @@ public class IngestTransactions {
      * @param bootstrapServers Kafka brokers list
      * @return A pipeline to run
      */
-    public static Pipeline buildPipeline(String bootstrapServers, String pulsarList, boolean usePulsar) {
+    public static Pipeline buildPipeline(String bootstrapServers, String pulsarList, boolean usePulsar,
+            TransactionMonitorFlavor transactionMonitorFlavor) {
 
         Properties properties = InitializerConfig.kafkaSourceProperties(bootstrapServers);
 
@@ -103,6 +109,14 @@ public class IngestTransactions {
         }).setName("filter_every_" + LOG_THRESHOLD)
         .writeTo(Sinks.logger());
 
+        /* Bonus output fork depending on flavor
+         */
+        if (transactionMonitorFlavor == TransactionMonitorFlavor.PAYMENTS_ISO20022) {
+            inputSource
+            .map(IngestTransactions::makeEntryXML).setName("extract-xml")
+            .writeTo(Sinks.map(MyConstants.IMAP_NAME_TRANSACTIONS_XML));
+        }
+
         return pipeline;
     }
 
@@ -140,4 +154,32 @@ public class IngestTransactions {
             pulsarProjectionFunction).build();
     }
 
+    /**
+     * <p>The payment is passed as JSON, but XML is multi-line. Turn XML back
+     * from an array of strings into a single multi-line string.
+     * </p>
+     *
+     * @param input
+     * @return
+     */
+    @SuppressFBWarnings(value = "", justification = "JSON access can throw exception")
+    private static Entry<String, String> makeEntryXML(Entry<String, HazelcastJsonValue> input) {
+        String xml;
+        try {
+            StringBuilder stringBuilder = new StringBuilder();
+            JSONObject json = new JSONObject(input.getValue().toString());
+            JSONArray array = json.getJSONArray("xml");
+            for (int i = 0; i < array.length(); i++) {
+                if (i > 0) {
+                    stringBuilder.append(System.lineSeparator());
+                }
+                stringBuilder.append(array.getString(i));
+            }
+            xml = stringBuilder.toString();
+        } catch (Exception e) {
+            // Don't log, may be running in the cloud
+            xml = input.getValue().toString();
+        }
+        return Tuple2.tuple2(input.getKey(), xml);
+    }
 }

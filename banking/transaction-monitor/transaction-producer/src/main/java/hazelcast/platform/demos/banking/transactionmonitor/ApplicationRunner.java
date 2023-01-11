@@ -362,7 +362,7 @@ public class ApplicationRunner {
                 + "\"bicDebitor\": \"%s\","
                 + "\"ccy\": \"%s\","
                 // No decimal places, only interested in main currency
-                + "\"amt_floor\": %.0f,"
+                + "\"amt_floor\": %.0f.00,"
                 + "\"xml\": %s"
                 + "}",
                 id,
