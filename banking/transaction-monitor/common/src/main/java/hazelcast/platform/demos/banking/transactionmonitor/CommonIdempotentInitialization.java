@@ -218,7 +218,7 @@ public class CommonIdempotentInitialization {
                 indexColumn1 = "itemCode";
                 break;
             case PAYMENTS_ISO20022:
-                indexColumn1 = "bankCode";
+                indexColumn1 = "bicCreditor";
                 break;
             case TRADE:
             default:
