@@ -58,6 +58,7 @@ public class MyConstants {
     public static final String IMAP_NAME_PYTHON_SENTIMENT = "python_sentiment";
     public static final String IMAP_NAME_SYMBOLS = "symbols";
     public static final String IMAP_NAME_TRANSACTIONS = "transactions";
+    public static final String IMAP_NAME_TRANSACTIONS_XML = "transactions_xml";
 
     public static final List<String> IMAP_NAMES_ECOMMERCE =
             List.of(IMAP_NAME_AGGREGATE_QUERY_RESULTS, IMAP_NAME_ALERTS_LOG,
@@ -71,7 +72,7 @@ public class MyConstants {
                     IMAP_NAME_BICS,
                     IMAP_NAME_JOB_CONTROL, IMAP_NAME_JOB_CONFIG,
                     IMAP_NAME_PERSPECTIVE, IMAP_NAME_PYTHON_SENTIMENT,
-                    IMAP_NAME_TRANSACTIONS);
+                    IMAP_NAME_TRANSACTIONS, IMAP_NAME_TRANSACTIONS_XML);
 
     public static final List<String> IMAP_NAMES_TRADES =
             List.of(IMAP_NAME_AGGREGATE_QUERY_RESULTS, IMAP_NAME_ALERTS_LOG,
@@ -103,12 +104,18 @@ public class MyConstants {
     public static final String PERSISTENT_STORE_SUFFIX = "ps";
     public static final List<String> PERSISTENT_STORE_IMAP_NAMES_ECOMMERCE =
             List.of(IMAP_NAME_PRODUCTS);
+    public static final List<String> PERSISTENT_STORE_IMAP_NAMES_PAYMENTS_ISO20022 =
+            List.of(IMAP_NAME_BICS);
     public static final List<String> PERSISTENT_STORE_IMAP_NAMES_TRADE =
             List.of(IMAP_NAME_SYMBOLS);
     public static final String STORE_BASE_DIR_PREFIX = "data/transaction-monitor";
     public static final String TIERED_STORE_SUFFIX = "ts";
     public static final String TIERED_STORE_DEVICE_NAME = "transaction-monitor-local";
-    public static final List<String> TIERED_STORE_IMAP_NAMES =
+    public static final List<String> TIERED_STORE_IMAP_NAMES_ECOMMERCE =
+            List.of(IMAP_NAME_TRANSACTIONS);
+    public static final List<String> TIERED_STORE_IMAP_NAMES_PAYMENTS_ISO20022 =
+            List.of(IMAP_NAME_TRANSACTIONS, IMAP_NAME_TRANSACTIONS_XML);
+    public static final List<String> TIERED_STORE_IMAP_NAMES_TRADE =
             List.of(IMAP_NAME_TRANSACTIONS);
     public static final long TIERED_STORE_DISK_CAPACITY_GB = 6;
     public static final long TIERED_STORE_MEMORY_CAPACITY_MB = 256;

@@ -49,6 +49,9 @@ public class TransactionsMapListener implements EntryAddedListener<String, Hazel
         case ECOMMERCE:
             itemFieldName = "itemCode";
             break;
+        case PAYMENTS_ISO20022:
+            itemFieldName = "bicCreditor";
+            break;
         case TRADE:
         default:
             itemFieldName = "symbol";

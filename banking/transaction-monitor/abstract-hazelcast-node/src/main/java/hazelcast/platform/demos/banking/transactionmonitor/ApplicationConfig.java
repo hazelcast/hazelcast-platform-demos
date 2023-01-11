@@ -107,7 +107,7 @@ public class ApplicationConfig {
             TransactionMonitorFlavor transactionMonitorFlavor =
                     MyUtils.getTransactionMonitorFlavor(properties);
             addPersistentStore(config, transactionMonitorFlavor);
-            addTieredStore(config);
+            addTieredStore(config, transactionMonitorFlavor);
         }
 
         return config;
@@ -155,6 +155,9 @@ public class ApplicationConfig {
         case ECOMMERCE:
             wanMapNames.addAll(MyConstants.WAN_IMAP_NAMES_ECOMMERCE);
             break;
+        case PAYMENTS_ISO20022:
+            wanMapNames.addAll(MyConstants.WAN_IMAP_NAMES_PAYMENTS_ISO20022);
+            break;
         case TRADE:
         default:
             wanMapNames.addAll(MyConstants.WAN_IMAP_NAMES_TRADE);
@@ -183,7 +186,7 @@ public class ApplicationConfig {
      * @param config
      * @throws Exception if native memory specification not a number
      */
-    private static void addTieredStore(Config config) throws Exception {
+    private static void addTieredStore(Config config, TransactionMonitorFlavor transactionMonitorFlavor) throws Exception {
         Path path = Paths.get("/" + MyConstants.STORE_BASE_DIR_PREFIX + "/" + config.getClusterName()
             + "/" + MyConstants.TIERED_STORE_SUFFIX);
         LOGGER.info("Adding Tiered Storage, {}", path.toString());
@@ -212,8 +215,22 @@ public class ApplicationConfig {
         // Same config for all selected maps
         TieredStoreConfig tieredStoreConfig = getTieredStoreConfig(localDeviceConfig);
 
+        List<String> tieredStoreMapNames;
+        switch (transactionMonitorFlavor) {
+        case ECOMMERCE:
+            tieredStoreMapNames = MyConstants.TIERED_STORE_IMAP_NAMES_ECOMMERCE;
+            break;
+        case PAYMENTS_ISO20022:
+            tieredStoreMapNames = MyConstants.TIERED_STORE_IMAP_NAMES_PAYMENTS_ISO20022;
+            break;
+        case TRADE:
+        default:
+            tieredStoreMapNames = MyConstants.TIERED_STORE_IMAP_NAMES_TRADE;
+            break;
+        }
+
         // Augment map config
-        for (String mapName : MyConstants.TIERED_STORE_IMAP_NAMES) {
+        for (String mapName : tieredStoreMapNames) {
             // "getMapConfig()" creates if not present
             MapConfig mapConfig = config.getMapConfig(mapName);
             LOGGER.debug("Setting map '{}' for TieredStore", mapConfig.getName());
@@ -269,6 +286,9 @@ public class ApplicationConfig {
         switch (transactionMonitorFlavor) {
             case ECOMMERCE:
                 mapNames = MyConstants.PERSISTENT_STORE_IMAP_NAMES_ECOMMERCE;
+                break;
+            case PAYMENTS_ISO20022:
+                mapNames = MyConstants.PERSISTENT_STORE_IMAP_NAMES_PAYMENTS_ISO20022;
                 break;
             case TRADE:
             default:
