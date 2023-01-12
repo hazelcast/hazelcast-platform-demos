@@ -109,6 +109,9 @@ public class AggregateQuery {
         case ECOMMERCE:
             aggregated = aggregatedEcommerce(pipeline, properties, usePulsar, pulsarList);
             break;
+        case PAYMENTS_ISO20022:
+            aggregated = aggregatedPayments(pipeline, properties, usePulsar, pulsarList);
+            break;
         case TRADE:
         default:
             aggregated = aggregatedTrade(pipeline, properties, usePulsar, pulsarList);
@@ -185,6 +188,54 @@ public class AggregateQuery {
                                     Double.parseDouble(String.format("%.2f", entry.getValue().f1() / entry.getValue().f0()))));
                 })
                 .setName("aggregate by item code");
+    }
+
+
+    /**
+     * <p>Payments items are aggregated by crediting bank BIC, "{@code bicCreditor}".
+     * Transactions have the value, no need to derive (unlike Trades which is {@code price * quantity}).
+     * </p>
+     * <p>See also {@link PerspectivePayments}.
+     * </p>
+     *
+     * @return A trio for the product - count, sum and latest
+     */
+    private static StreamStage<Entry<String, Tuple3<Long, Double, Double>>> aggregatedPayments(
+            Pipeline pipeline, Properties properties, boolean usePulsar, String pulsarList) {
+
+        StreamStage<TransactionPayments> inputSource;
+        if (usePulsar) {
+            inputSource =
+                    pipeline.readFrom(AggregateQuery.pulsarSourcePayments(pulsarList))
+                    .withoutTimestamps();
+        } else {
+            // Override the value de-serializer to produce a different type
+            properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                    TransactionPaymentsJsonDeserializer.class.getName());
+
+            inputSource =
+                pipeline.readFrom(KafkaSources.<String, TransactionPayments, TransactionPayments>
+                    kafka(properties,
+                    ConsumerRecord::value,
+                    MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS)
+                    )
+            .withoutTimestamps();
+        }
+
+        return inputSource
+                .groupingKey(TransactionPayments::getBicCreditor)
+                .rollingAggregate(AggregateOperations.allOf(
+                    AggregateOperations.counting(),
+                    AggregateOperations.summingDouble(transaction -> transaction.getAmtFloor())
+                   ))
+                .map((Entry<String, Tuple2<Long, Double>> entry) -> {
+                    return (Entry<String, Tuple3<Long, Double, Double>>)
+                            new SimpleImmutableEntry<>(entry.getKey(),
+                            Tuple3.tuple3(entry.getValue().f0(),
+                                    entry.getValue().f1(),
+                                    Double.parseDouble(String.format("%.2f", entry.getValue().f1() / entry.getValue().f0()))));
+                })
+                .setName("aggregate by BIC creditor");
     }
 
     /**
@@ -310,6 +361,29 @@ public class AggregateQuery {
                 };
 
         return (StreamSource<TransactionEcommerce>) pulsarSource(pulsarList, pulsarProjectionFunction);
+    }
+
+    /**
+     * <p>This is similar to {@link IngestTransactions#IngestTransactions()} but
+     * returns a different type.
+     * </p>
+     *
+     * @param pulsarList
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private static StreamSource<TransactionPayments> pulsarSourcePayments(String pulsarList) {
+        FunctionEx<Message<String>, TransactionPayments> pulsarProjectionFunction =
+                message -> {
+                    //TODO: A new deserializer for each message, could optimize with shared if thread-safe
+                    try (TransactionPaymentsJsonDeserializer transactionJsonDeserializer =
+                            new TransactionPaymentsJsonDeserializer()) {
+                        byte[] bytes = message.getValue().getBytes(StandardCharsets.UTF_8);
+                        return transactionJsonDeserializer.deserialize("", bytes);
+                    }
+                };
+
+        return (StreamSource<TransactionPayments>) pulsarSource(pulsarList, pulsarProjectionFunction);
     }
 
     /**

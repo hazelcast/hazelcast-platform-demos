@@ -981,12 +981,15 @@ public class CommonIdempotentInitialization {
         boolean ok = true;
         List<String> definitions;
 
-        // Currently same definition
+        // Same for all currently
         switch (transactionMonitorFlavor) {
-        case ECOMMERCE:
-            definitions = List.of(definition11, definition12);
-            break;
-        case TRADE:
+        //case ECOMMERCE:
+        //    definitions = List.of(definition11, definition12);
+        //    break;
+        //case PAYMENTS_ISO20022:
+        //    definitions = List.of(definition11, definition12);
+        //    break;
+        //case TRADE:
         default:
             definitions = List.of(definition11, definition12);
             break;
@@ -1159,11 +1162,15 @@ public class CommonIdempotentInitialization {
         String concatenation;
         String xxx = "UNMERGED_INTO_5.3_";
         LOGGER.error("Reminder to remove job prefix {}", xxx);
+        // Same for all currently
         switch (transactionMonitorFlavor) {
-        case ECOMMERCE:
-            concatenation = "code";
-            break;
-        case TRADE:
+        //case ECOMMERCE:
+        //    concatenation = "code";
+        //    break;
+        //case PAYMENTS_ISO20022:
+        //    concatenation = "code";
+        //    break;
+        //case TRADE:
         default:
             concatenation = "code";
             break;
@@ -1322,8 +1329,8 @@ public class CommonIdempotentInitialization {
                     LOGGER.info(" Original SQL: {}", originalSql);
                 }
             } catch (Exception e) {
-                String message = String.format("logJobs(): %s", Objects.toString(job));
-                LOGGER.info(message, e);
+                String message = String.format("logJobs(): %s: %s", job.getId(), e.getMessage());
+                LOGGER.warn(message);
             }
         });
         LOGGER.info("---------");
