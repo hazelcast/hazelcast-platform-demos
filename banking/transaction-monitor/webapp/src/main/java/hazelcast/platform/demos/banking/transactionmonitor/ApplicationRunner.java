@@ -72,6 +72,7 @@ public class ApplicationRunner {
     private final TransactionMonitorFlavor transactionMonitorFlavor;
     private final boolean localhost;
     private IMap<String, Tuple3<Long, Long, Integer>> aggregateQueryResultsMap;
+    private IMap<String, BicInfo> bicsMap;
     private IMap<String, ProductInfo> productsMap;
     private IMap<String, SymbolInfo> symbolsMap;
     private IMap<String, HazelcastJsonValue> transactionsMap;
@@ -107,6 +108,9 @@ public class ApplicationRunner {
         switch (this.transactionMonitorFlavor) {
         case ECOMMERCE:
             this.productsMap = this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_PRODUCTS);
+            break;
+        case PAYMENTS_ISO20022:
+            this.bicsMap = this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_BICS);
             break;
         case TRADE:
         default:
@@ -247,6 +251,9 @@ public class ApplicationRunner {
                 case ECOMMERCE:
                     loadItemsEcommerce(jsonObject);
                     break;
+                case PAYMENTS_ISO20022:
+                    loadItemsPayments(jsonObject);
+                    break;
                 case TRADE:
                 default:
                     loadItemsTrade(jsonObject);
@@ -275,6 +282,9 @@ public class ApplicationRunner {
                 case ECOMMERCE:
                     drillItemsEcommerce(jsonObject, code);
                     break;
+                case PAYMENTS_ISO20022:
+                    drillItemsPayments(jsonObject, code);
+                    break;
                 case TRADE:
                 default:
                     drillItemsTrade(jsonObject, code);
@@ -302,6 +312,32 @@ public class ApplicationRunner {
             jsonObject.append("items", new JSONObject()
                     .put("name", allProducts.get(key))
                     // Item Code
+                    .put("key", key)
+                    .put("f0", value.f0())
+                    .put("f1", String.format("%.2f", value.f1()))
+                    .put("f2", String.format("%.2f", value.f2()))
+                    // Screen flashes the row if average goes up or down
+                    .put("upDownField", String.format("%.2f", value.f2()))
+            );
+        });
+    }
+
+    /**
+     * <p>Load all Payment items.
+     * </p>
+     *
+     * @param jsonObject
+     */
+    private void loadItemsPayments(JSONObject jsonObject) {
+        Map<String, String> allBics =
+                this.bicsMap.entrySet().stream().collect(
+                        Collectors.toMap(Entry::getKey, entry -> entry.getValue().getName()));
+
+        // The screen turns cents to dollars for price but not for volume
+        aggregateQueryResultsMap.forEach((key, value) -> {
+            jsonObject.append("items", new JSONObject()
+                    .put("name", allBics.get(key))
+                    // BIC Code
                     .put("key", key)
                     .put("f0", value.f0())
                     .put("f1", String.format("%.2f", value.f1()))
@@ -348,6 +384,24 @@ public class ApplicationRunner {
         jsonObject.put("itemCode", itemCode);
 
         Collection<HazelcastJsonValue> records = this.transactionsMap.values(new EqualPredicate("itemCode", itemCode));
+
+        records.forEach(transaction -> {
+            String transactionJson = transaction.toString();
+            jsonObject.append("data", new JSONObject(transactionJson));
+        });
+    }
+
+    /**
+     * <p>Drilldown into all Payments objects
+     * </p>
+     *
+     * @param jsonObject
+     */
+    @SuppressWarnings("unchecked")
+    private void drillItemsPayments(JSONObject jsonObject, String bicCreditor) {
+        jsonObject.put("bicCreditor", bicCreditor);
+
+        Collection<HazelcastJsonValue> records = this.transactionsMap.values(new EqualPredicate("bicCreditor", bicCreditor));
 
         records.forEach(transaction -> {
             String transactionJson = transaction.toString();
@@ -458,6 +512,11 @@ public class ApplicationRunner {
                 /*{ "IMap",    "SELECT id, itemcode, price FROM " + MyConstants.IMAP_NAME_TRANSACTIONS
                     + " WHERE itemcode LIKE 'H%' LIMIT 3" },
                  */
+            };
+            break;
+        case PAYMENTS_ISO20022:
+            additionalQueries = new String[][] {
+                { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_BICS + " LIMIT 3" },
             };
             break;
         case TRADE:

@@ -13,20 +13,28 @@ class ItemDetails extends Component {
         this.state = {
             item: [],
             loading: true,
+            column3Accessor: "quantity",
+            column3Header: "Quantity",
+            column4Accessor: "price",
+            column4Header: "Price",
             browserLanguage: "en"
         };
 
-        //let transactionMonitorFlavor = "@my.transaction-monitor.flavor@".toUpperCase();
-        //switch (transactionMonitorFlavor) {
-		//	case "ECOMMERCE":
-		//	    break;
-		//  case "PAYMENTS_ISO20022":
-		//		break;
-		//	case "TRADE":
-		//	    break;
-		//	default:
-		// 	console.log("item-details.js", "Unexpected value transactionMonitorFlavor", transactionMonitorFlavor);
-		//}
+        let transactionMonitorFlavor = "@my.transaction-monitor.flavor@".toUpperCase();
+        switch (transactionMonitorFlavor) {
+		  	case "ECOMMERCE":
+			    break;
+		  	case "PAYMENTS_ISO20022":
+				  this.state.column3Accessor = "bicDebitor"
+				  this.state.column3Header = "Debitor"
+				  this.state.column4Accessor = "amtFloor"
+				  this.state.column4Header = "Amount"
+				break;
+			case "TRADE":
+			    break;
+			default:
+		 	console.log("item-details.js", "Unexpected value transactionMonitorFlavor", transactionMonitorFlavor);
+		}
 
         this.sendMessage = this.sendMessage.bind(this);
         this.handleData = this.handleData.bind(this);
@@ -77,16 +85,15 @@ class ItemDetails extends Component {
                 )
             },
             {
-                Header: 'Quantity',
-                accessor: 'quantity',
+                Header: this.state.column3Header,
+                accessor: this.state.column3Accessor,
                 Cell: ({ value }) => (
                     <span className="Table-highlightValue">{value.toLocaleString()}</span>
                 )
-
             },
             {
-                Header: 'Price',
-                accessor: 'price',
+                Header: this.state.column4Header,
+                accessor: this.state.column4Accessor,
                 Cell: ({ value }) => (
                     <span className="Table-highlightValue Table-price">{(value / 1).toLocaleString(this.state.browserLanguage, {
                         style: "currency",
