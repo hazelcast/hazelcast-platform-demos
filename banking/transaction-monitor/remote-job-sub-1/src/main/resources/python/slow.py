@@ -43,16 +43,25 @@ def processFn(items):
     results = []
 
     keyField = ""
+    thresholdField = ""
     threshold = 0
     thresholdAbove = ""
     thresholdBelow = ""
     # Not Python 3.10 necessarily 
     if flavor == "ecommerce":
       keyField = "itemCode"
+      thresholdField = "quantity"
       threshold = 1
       thresholdAbove = "Hot"
       thresholdBelow = "Cold"
+    if flavor == "payments_iso20022":
+      thresholdField = "amtFloor"
+      keyField = "bicCreditor"
+      threshold = 500000
+      thresholdAbove = "Whale"
+      thresholdBelow = "Minnow"
     if flavor == "trade":
+      thresholdField = "quantity"
       keyField = "symbol"
       threshold = 5000
       thresholdAbove = "Whale"
@@ -64,7 +73,7 @@ def processFn(items):
       transaction = json.loads(item)
       key = transaction[keyField]
 
-      if transaction["quantity"] > threshold:
+      if transaction[thresholdField] > threshold:
         assessment = thresholdAbove
       else:
         assessment = thresholdBelow
