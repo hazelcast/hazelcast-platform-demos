@@ -8,13 +8,13 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   labels:
-    app: transaction-monitor-FLAVOR-job-transaction-producer
-  name: transaction-monitor-FLAVOR-job-transaction-producer
+    app: transaction-monitor-FLAVOR-job-trans-producer
+  name: transaction-monitor-FLAVOR-job-trans-producer
 spec:
   template:
     metadata:
       labels:
-        app: transaction-monitor-FLAVOR-job-transaction-producer
+        app: transaction-monitor-FLAVOR-job-trans-producer
     spec:
       containers:
         - env:
@@ -26,5 +26,5 @@ spec:
             value: "transaction-monitor-FLAVOR-pulsar.default.svc.cluster.local"
           image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-transaction-producer"
           imagePullPolicy: Never
-          name: transaction-monitor-FLAVOR-job-transaction-producer-container
+          name: transaction-monitor-FLAVOR-job-trans-producer-container
       restartPolicy: Never

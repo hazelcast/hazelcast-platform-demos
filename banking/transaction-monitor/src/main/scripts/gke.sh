@@ -60,7 +60,7 @@ wait_for_pod() {
    REQUIRED_STATE=Running
    ;;
   7)
-   WAIT_ON=job-transaction-producer
+   WAIT_ON=job-trans-producer
    REQUIRED_STATE=Running
    ;;
  esac
