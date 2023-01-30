@@ -5,15 +5,15 @@
 # Services
 ############################################################################
 ---
-# Kafdrop : DNS will be "transaction-monitor-kafdrop.default.svc.cluster.local".
+# Kafdrop : DNS will be "transaction-monitor-FLAVOR-kafdrop.default.svc.cluster.local".
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: transaction-monitor-kafdrop
+  name: transaction-monitor-FLAVOR-kafdrop
 spec:
   selector:
-    app: transaction-monitor-kafdrop
+    app: transaction-monitor-FLAVOR-kafdrop
   ports:
   - port: 8080
     targetPort: 9000
@@ -29,22 +29,22 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   labels:
-    app: transaction-monitor-job-topic-create
-  name: transaction-monitor-job-topic-create
+    app: transaction-monitor-FLAVOR-job-topic-create
+  name: transaction-monitor-FLAVOR-job-topic-create
 spec:
   backoffLimit: 0
   template:
     metadata:
       labels:
-        app: transaction-monitor-job-topic-create
+        app: transaction-monitor-FLAVOR-job-topic-create
     spec:
       containers:
         - env:
           - name: "MY_BOOTSTRAP_SERVERS"
-            value: "transaction-monitor-kafka-broker-0.transaction-monitor-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-kafka-broker-1.transaction-monitor-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-kafka-broker-2.transaction-monitor-kafka-broker.default.svc.cluster.local:9092"
-          image: "hazelcast-platform-demos/transaction-monitor-topic-create"
+            value: "transaction-monitor-FLAVOR-kafka-broker-0.transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-FLAVOR-kafka-broker-1.transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-FLAVOR-kafka-broker-2.transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local:9092"
+          image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-topic-create"
           imagePullPolicy: Never
-          name: transaction-monitor-job-topic-create-container
+          name: transaction-monitor-FLAVOR-job-topic-create-container
       restartPolicy: Never
 ---
 ############################################################################
@@ -58,15 +58,15 @@ kind: Deployment
 metadata:
   labels:
     app.kubernetes.io/component: kafdrop
-  name: transaction-monitor-kafdrop
+  name: transaction-monitor-FLAVOR-kafdrop
 spec:
   selector:
     matchLabels:
-      app: transaction-monitor-kafdrop
+      app: transaction-monitor-FLAVOR-kafdrop
   template:
     metadata:
       labels:
-        app: transaction-monitor-kafdrop
+        app: transaction-monitor-FLAVOR-kafdrop
         app.kubernetes.io/component: kafdrop
     spec:
       initContainers:
@@ -77,14 +77,14 @@ spec:
         - env:
           # Internal port 19092
           - name: "KAFKA_BROKERCONNECT"
-            value: "transaction-monitor-kafka-broker-0.transaction-monitor-kafka-broker.default.svc.cluster.local:19092,transaction-monitor-kafka-broker-1.transaction-monitor-kafka-broker.default.svc.cluster.local:19092,transaction-monitor-kafka-broker-2.transaction-monitor-kafka-broker.default.svc.cluster.local:19092"
-          image: "hazelcast-platform-demos/transaction-monitor-kafdrop"
+            value: "transaction-monitor-FLAVOR-kafka-broker-0.transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local:19092,transaction-monitor-FLAVOR-kafka-broker-1.transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local:19092,transaction-monitor-FLAVOR-kafka-broker-2.transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local:19092"
+          image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-kafdrop"
           imagePullPolicy: Never
           livenessProbe:
             httpGet:
               path: /
               port: 9000
-          name: transaction-monitor-kafdrop-container
+          name: transaction-monitor-FLAVOR-kafdrop-container
           ports:
             - containerPort: 9000
           readinessProbe:
@@ -100,21 +100,21 @@ kind: Deployment
 metadata:
   labels:
     app.kubernetes.io/component: postgres
-  name: transaction-monitor-postgres
+  name: transaction-monitor-FLAVOR-postgres
 spec:
   selector:
     matchLabels:
-      app: transaction-monitor-postgres
+      app: transaction-monitor-FLAVOR-postgres
   template:
     metadata:
       labels:
-        app: transaction-monitor-postgres
+        app: transaction-monitor-FLAVOR-postgres
         app.kubernetes.io/component: postgres
     spec:
       containers:
-        - image: "hazelcast-platform-demos/transaction-monitor-postgres"
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-postgres"
           imagePullPolicy: Never
-          name: transaction-monitor-postgres-container
+          name: transaction-monitor-FLAVOR-postgres-container
           ports:
             - containerPort: 5432
 ---

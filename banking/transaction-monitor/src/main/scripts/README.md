@@ -36,7 +36,7 @@ Do one of 5.A, 5.B or 5.3.
 ### 5.A `kubernetes-5-optional-hazelcast-enterprise.yaml`
 
 Create Enterprise Hazelcast clusters for transaction storage.
-Use `kubectl exec --stdin --tty transaction-monitor-grid1-hazelcast-0 -- /bin/bash` to connect to see tiered store
+Use `kubectl exec --stdin --tty transaction-monitor-ecommerce-grid1-hazelcast-0 -- /bin/bash` to connect to see tiered store
 directory "/data/transaction-monitor".
 
 ### 5.B `kubernetes-5-optional-hazelcast.yaml`

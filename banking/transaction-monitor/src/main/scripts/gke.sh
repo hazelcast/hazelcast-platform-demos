@@ -1,9 +1,30 @@
 #!/bin/bash
 
+ARG1=`echo $1 | awk '{print tolower($0)}'`
+if [ "${ARG1}" == "ecommerce" ]
+then
+ FLAVOR=ecommerce
+fi
+if [ "${ARG1}" == "payments" ]
+then
+ FLAVOR=payments
+fi
+if [ "${ARG1}" == "trade" ]
+then
+ FLAVOR=trade
+fi
+
+if [ "${FLAVOR}" == "" ]
+then
+ echo $0: usage: `basename $0` '<flavor>'
+ exit 1
+fi
+
 echo ============================================================
 echo Attempts to do all steps for Google Cloud
 echo ============================================================
 echo `date +"%H:%M:%S"`
+echo Flavor: $FLAVOR
 echo ----
 
 PROJECT=transaction-monitor
@@ -46,7 +67,7 @@ wait_for_pod() {
  echo Waiting for \'$WAIT_ON\' to reach \"$REQUIRED_STATE\" state.
  COUNT=0
  READY="false"
- POD=${PROJECT}-$WAIT_ON
+ POD=${PROJECT}-${FLAVOR}-$WAIT_ON
  while [ $COUNT -lt $MAX_COUNT ] && [ "$READY" == "false" ]
  do
   COUNT=$(($COUNT + 1))
@@ -77,16 +98,17 @@ wait_for_pod() {
 
 # Applies a script that builds a "kubectl" input
 do_cmd() {
- CMD=$1
+ CMD="$1"
+ ARG="$2"
  COUNT=0
  READY="false"
  POD=${PROJECT}-$WAIT_ON
  while [ $COUNT -lt $MAX_COUNT ] && [ "$READY" == "false" ]
  do
   COUNT=$(($COUNT + 1))
-  echo $CMD
+  echo $CMD $ARG
   echo ----
-  ./$CMD > $TMPFILE.$CMD 2>&1
+  ./$CMD $ARG > $TMPFILE.$CMD 2>&1
   KUBECTL_FILE=`grep ^"kubectl delete" $TMPFILE.$CMD | awk '{print $4}'`
   /bin/rm $TMPFILE.$CMD > /dev/null 2>&1
   if [ "$KUBECTL_FILE" == "" ]
@@ -128,6 +150,7 @@ do
  then
   # Assumed naming standard to find image
   sed "s#image: \"hazelcast-platform-demos#image: \"eu.gcr.io/hazelcast-33/${USER}#" < $INPUT_FILE | \
+  sed "s#FLAVOR#${FLAVOR}#g" | \
   sed 's#imagePullPolicy: Never#imagePullPolicy: Always#' > ${OUTPUT_FILE}
   CMD="kubectl create -f $OUTPUT_FILE"
   echo $CMD
@@ -136,7 +159,7 @@ do
   echo ----
   wait_for_pod $INPUT_FILE
  else
-  do_cmd $INPUT_FILE
+  do_cmd $INPUT_FILE $FLAVOR
  fi
  rm $OUTPUT_FILE > /dev/null 2>&1
  echo ====

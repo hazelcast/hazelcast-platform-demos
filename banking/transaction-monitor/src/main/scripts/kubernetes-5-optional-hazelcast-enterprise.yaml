@@ -5,16 +5,16 @@
 # OPTIONAL
 # OPTIONAL
 ---
-# Service DNS will be "transaction-monitor-grid1-hazelcast.default.svc.cluster.local".
+# Service DNS will be "transaction-monitor-FLAVOR-grid1-hazelcast.default.svc.cluster.local".
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: transaction-monitor-grid1-hazelcast
+  name: transaction-monitor-FLAVOR-grid1-hazelcast
 spec:
   clusterIP: None
   selector:
-    app: transaction-monitor-grid1-hazelcast
+    app: transaction-monitor-FLAVOR-grid1-hazelcast
   ports:
   - port: 5701
 ---
@@ -23,40 +23,40 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: transaction-monitor-grid1-hazelcast-extra
+  name: transaction-monitor-FLAVOR-grid1-hazelcast-extra
 spec:
   selector:
-    app: transaction-monitor-grid1-hazelcast
+    app: transaction-monitor-FLAVOR-grid1-hazelcast
   ports:
   - port: 5701
   type: LoadBalancer
 ---
-# Service DNS will be "transaction-monitor-grid2-hazelcast.default.svc.cluster.local".
+# Service DNS will be "transaction-monitor-FLAVOR-grid2-hazelcast.default.svc.cluster.local".
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: transaction-monitor-grid2-hazelcast
+  name: transaction-monitor-FLAVOR-grid2-hazelcast
 spec:
   clusterIP: None
   selector:
-    app: transaction-monitor-grid2-hazelcast
+    app: transaction-monitor-FLAVOR-grid2-hazelcast
   ports:
   - port: 5701
 ---
-# Service DNS will be "transaction-monitor-mancenter.default.svc.cluster.local".
+# Service DNS will be "transaction-monitor-FLAVOR-mancenter.default.svc.cluster.local".
 ---
 # Management Center
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: transaction-monitor-management-center
+  name: transaction-monitor-FLAVOR-management-center
 spec:
   selector:
-    app: transaction-monitor-management-center
+    app: transaction-monitor-FLAVOR-management-center
   ports:
-    - name: transaction-monitor-management-center
+    - name: transaction-monitor-FLAVOR-management-center
       port: 8080
       targetPort: 8080
   type: LoadBalancer
@@ -67,7 +67,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: transaction-monitor-grid1-hazelcast-pv
+  name: transaction-monitor-FLAVOR-grid1-hazelcast-pv
   labels:
     type: local
 spec:
@@ -83,7 +83,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: transaction-monitor-grid2-hazelcast-pv
+  name: transaction-monitor-FLAVOR-grid2-hazelcast-pv
   labels:
     type: local
 spec:
@@ -102,7 +102,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: transaction-monitor-grid1-hazelcast-pv-claim
+  name: transaction-monitor-FLAVOR-grid1-hazelcast-pv-claim
 spec:
   storageClassName: manual
   accessModes:
@@ -114,7 +114,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: transaction-monitor-grid2-hazelcast-pv-claim
+  name: transaction-monitor-FLAVOR-grid2-hazelcast-pv-claim
 spec:
   storageClassName: manual
   accessModes:
@@ -129,29 +129,29 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: transaction-monitor-grid1-hazelcast
+  name: transaction-monitor-FLAVOR-grid1-hazelcast
 spec:
   replicas: 3
-  serviceName: transaction-monitor-grid1-hazelcast
+  serviceName: transaction-monitor-FLAVOR-grid1-hazelcast
   selector:
     matchLabels:
-      app: transaction-monitor-grid1-hazelcast
+      app: transaction-monitor-FLAVOR-grid1-hazelcast
   template:
     metadata:
       labels:
-        app: transaction-monitor-grid1-hazelcast
+        app: transaction-monitor-FLAVOR-grid1-hazelcast
     spec:
       containers:
         - env:
           - name: "MY_BOOTSTRAP_SERVERS"
-            value: "transaction-monitor-kafka-broker-0.transaction-monitor-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-kafka-broker-1.transaction-monitor-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-kafka-broker-2.transaction-monitor-kafka-broker.default.svc.cluster.local:9092"
+            value: "transaction-monitor-FLAVOR-kafka-broker-0.transaction-monitor-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-kafka-broker-1.transaction-monitor-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-kafka-broker-2.transaction-monitor-kafka-broker.default.svc.cluster.local:9092"
           - name: "MY_NATIVE_MEGABYTES"
             value: "4400"
           - name: "MY_POSTGRES_ADDRESS"
-            value: "transaction-monitor-postgres.default.svc.cluster.local:5432"
+            value: "transaction-monitor-FLAVOR-postgres.default.svc.cluster.local:5432"
           - name: "MY_PULSAR_LIST"
-            value: "transaction-monitor-pulsar.default.svc.cluster.local:6650"
-          image: "hazelcast-platform-demos/transaction-monitor-hazelcast-node-enterprise-1"
+            value: "transaction-monitor-FLAVOR-pulsar.default.svc.cluster.local:6650"
+          image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-hazelcast-node-enterprise-1"
           imagePullPolicy: Never
           livenessProbe:
             # From https://github.com/hazelcast/charts/blob/master/stable/hazelcast-enterprise/values.yaml
@@ -164,7 +164,7 @@ spec:
             httpGet:
               path: /hazelcast/health/node-state
               port: 5701
-          name: transaction-monitor-grid1-hazelcast-container
+          name: transaction-monitor-FLAVOR-grid1-hazelcast-container
           readinessProbe:
             # Same as for livenessProbe
             initialDelaySeconds: 30
@@ -184,11 +184,11 @@ spec:
               cpu: "2.0"
           volumeMounts:
             - name: grid1-store
-              mountPath: /data/transaction-monitor/grid1
+              mountPath: /data/transaction-monitor-FLAVOR/grid1
       volumes:
         - name: grid1-store
           persistentVolumeClaim:
-            claimName: transaction-monitor-grid1-hazelcast-pv-claim
+            claimName: transaction-monitor-FLAVOR-grid1-hazelcast-pv-claim
 ---
 ---
 # Creates 2 pods, DR is smaller
@@ -196,35 +196,35 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: transaction-monitor-grid2-hazelcast
+  name: transaction-monitor-FLAVOR-grid2-hazelcast
 spec:
   replicas: 2
-  serviceName: transaction-monitor-grid2-hazelcast
+  serviceName: transaction-monitor-FLAVOR-grid2-hazelcast
   selector:
     matchLabels:
-      app: transaction-monitor-grid2-hazelcast
+      app: transaction-monitor-FLAVOR-grid2-hazelcast
   template:
     metadata:
       labels:
-        app: transaction-monitor-grid2-hazelcast
+        app: transaction-monitor-FLAVOR-grid2-hazelcast
     spec:
       containers:
         - env:
           - name: "MY_BOOTSTRAP_SERVERS"
-            value: "transaction-monitor-kafka-broker-0.transaction-monitor-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-kafka-broker-1.transaction-monitor-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-kafka-broker-2.transaction-monitor-kafka-broker.default.svc.cluster.local:9092"
+            value: "transaction-monitor-FLAVOR-kafka-broker-0.transaction-monitor-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-kafka-broker-1.transaction-monitor-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-kafka-broker-2.transaction-monitor-kafka-broker.default.svc.cluster.local:9092"
           - name: "MY_NATIVE_MEGABYTES"
             value: "4400"
           - name: "MY_POSTGRES_ADDRESS"
-            value: "transaction-monitor-postgres.default.svc.cluster.local:5432"
+            value: "transaction-monitor-FLAVOR-postgres.default.svc.cluster.local:5432"
           - name: "MY_PULSAR_LIST"
-            value: "transaction-monitor-pulsar.default.svc.cluster.local:6650"
-          image: "hazelcast-platform-demos/transaction-monitor-hazelcast-node-enterprise-2"
+            value: "transaction-monitor-FLAVOR-pulsar.default.svc.cluster.local:6650"
+          image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-hazelcast-node-enterprise-2"
           imagePullPolicy: Never
           livenessProbe:
             httpGet:
               path: /hazelcast/health/node-state
               port: 5701
-          name: transaction-monitor-grid2-hazelcast-container
+          name: transaction-monitor-FLAVOR-grid2-hazelcast-container
           readinessProbe:
             # Same as for livenessProbe
             initialDelaySeconds: 30
@@ -244,11 +244,11 @@ spec:
               cpu: "2.0"
           volumeMounts:
             - name: grid2-store
-              mountPath: /data/transaction-monitor/grid2
+              mountPath: /data/transaction-monitor-FLAVOR/grid2
       volumes:
         - name: grid2-store
           persistentVolumeClaim:
-            claimName: transaction-monitor-grid2-hazelcast-pv-claim
+            claimName: transaction-monitor-FLAVOR-grid2-hazelcast-pv-claim
 ---
 ---
 # Only need 1 management-center
@@ -256,24 +256,24 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: transaction-monitor-management-center
+  name: transaction-monitor-FLAVOR-management-center
 spec:
   selector:
     matchLabels:
-      app: transaction-monitor-management-center
+      app: transaction-monitor-FLAVOR-management-center
   template:
     metadata:
       labels:
-        app: transaction-monitor-management-center
+        app: transaction-monitor-FLAVOR-management-center
     spec:
       containers:
-        - image: "hazelcast-platform-demos/transaction-monitor-management-center"
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-management-center"
           imagePullPolicy: Never
           livenessProbe:
             httpGet:
               path: /health
               port: 8081
-          name: transaction-monitor-management-center-container
+          name: transaction-monitor-FLAVOR-management-center-container
           readinessProbe:
             httpGet:
               path: /health

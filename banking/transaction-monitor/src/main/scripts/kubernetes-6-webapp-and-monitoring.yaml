@@ -1,19 +1,19 @@
 ---
-# Service DNS for Webapp will be "transaction-monitor-webapp.default.svc.cluster.local".
-# Service DNS for FINOS Node.js will be "transaction-monitor-finos-nodejs.default.svc.cluster.local".
-# Service DNS for FINOS Python will be "transaction-monitor-finos-python.default.svc.cluster.local".
-# Service DNS for Prometheus will be "transaction-monitor-prometheus.default.svc.cluster.local".
-# Service DNS for Grafana will be "transaction-monitor-grafana.default.svc.cluster.local".
+# Service DNS for Webapp will be "transaction-monitor-FLAVOR-webapp.default.svc.cluster.local".
+# Service DNS for FINOS Node.js will be "transaction-monitor-FLAVOR-finos-nodejs.default.svc.cluster.local".
+# Service DNS for FINOS Python will be "transaction-monitor-FLAVOR-finos-python.default.svc.cluster.local".
+# Service DNS for Prometheus will be "transaction-monitor-FLAVOR-prometheus.default.svc.cluster.local".
+# Service DNS for Grafana will be "transaction-monitor-FLAVOR-grafana.default.svc.cluster.local".
 ---
 # Webapp
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: transaction-monitor-webapp
+  name: transaction-monitor-FLAVOR-webapp
 spec:
   selector:
-    app: transaction-monitor-webapp
+    app: transaction-monitor-FLAVOR-webapp
   ports:
   - port: 8080
     protocol: TCP
@@ -25,25 +25,25 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: transaction-monitor-webapp
+  name: transaction-monitor-FLAVOR-webapp
 spec:
   selector:
     matchLabels:
-      app: transaction-monitor-webapp
+      app: transaction-monitor-FLAVOR-webapp
   template:
     metadata:
       labels:
-        app: transaction-monitor-webapp
+        app: transaction-monitor-FLAVOR-webapp
     spec:
       containers:
-        - image: "hazelcast-platform-demos/transaction-monitor-webapp"
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-webapp"
           imagePullPolicy: Never
           livenessProbe:
             httpGet:
               path: /
               port: 8080
             initialDelaySeconds: 120
-          name: transaction-monitor-webapp-container
+          name: transaction-monitor-FLAVOR-webapp-container
           readinessProbe:
             httpGet:
               path: /
@@ -56,7 +56,7 @@ spec:
       volumes:
         - name: configmap
           configMap:
-            name: transaction-monitor-configmap
+            name: transaction-monitor-FLAVOR-configmap
             defaultMode: 0755
 ---
 # FinOS Node.js
@@ -64,10 +64,10 @@ spec:
 #apiVersion: v1
 #kind: Service
 #metadata:
-#  name: transaction-monitor-finos-nodejs
+#  name: transaction-monitor-FLAVOR-finos-nodejs
 #spec:
 #  selector:
-#    app: transaction-monitor-finos-nodejs
+#    app: transaction-monitor-FLAVOR-finos-nodejs
 #  ports:
 #  - port: 8080
 #    protocol: TCP
@@ -79,24 +79,24 @@ spec:
 #apiVersion: apps/v1
 #kind: Deployment
 #metadata:
-#  name: transaction-monitor-finos-nodejs
+#  name: transaction-monitor-FLAVOR-finos-nodejs
 #spec:
 #  selector:
 #    matchLabels:
-#      app: transaction-monitor-finos-nodejs
+#      app: transaction-monitor-FLAVOR-finos-nodejs
 #  template:
 #    metadata:
 #      labels:
-#        app: transaction-monitor-finos-nodejs
+#        app: transaction-monitor-FLAVOR-finos-nodejs
 #    spec:
 #      containers:
-#        - image: "hazelcast-platform-demos/transaction-monitor-finos-nodejs"
+#        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-finos-nodejs"
 #          imagePullPolicy: Never
 ##          livenessProbe:
 ##            httpGet:
 ##              path: /
 ##              port: 8080
-#          name: transaction-monitor-finos-nodejs-container
+#          name: transaction-monitor-FLAVOR-finos-nodejs-container
 ##          readinessProbe:
 ##            httpGet:
 ##              path: /
@@ -108,7 +108,7 @@ spec:
 #      volumes:
 #        - name: configmap
 #          configMap:
-#            name: transaction-monitor-configmap
+#            name: transaction-monitor-FLAVOR-configmap
 #            defaultMode: 0755
 ---
 # FinOS Python
@@ -116,10 +116,10 @@ spec:
 #apiVersion: v1
 #kind: Service
 #metadata:
-#  name: transaction-monitor-finos-python
+#  name: transaction-monitor-FLAVOR-finos-python
 #spec:
 #  selector:
-#    app: transaction-monitor-finos-python
+#    app: transaction-monitor-FLAVOR-finos-python
 #  ports:
 #  - port: 8080
 #    protocol: TCP
@@ -131,24 +131,24 @@ spec:
 #apiVersion: apps/v1
 #kind: Deployment
 #metadata:
-#  name: transaction-monitor-finos-python
+#  name: transaction-monitor-FLAVOR-finos-python
 #spec:
 #  selector:
 #    matchLabels:
-#      app: transaction-monitor-finos-python
+#      app: transaction-monitor-FLAVOR-finos-python
 #  template:
 #    metadata:
 #      labels:
-#        app: transaction-monitor-finos-python
+#        app: transaction-monitor-FLAVOR-finos-python
 #    spec:
 #      containers:
-#        - image: "hazelcast-platform-demos/transaction-monitor-finos-python"
+#        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-finos-python"
 #          imagePullPolicy: Never
 ##          livenessProbe:
 ##            httpGet:
 ##              path: /
 ##              port: 8080
-#          name: transaction-monitor-finos-python-container
+#          name: transaction-monitor-FLAVOR-finos-python-container
 ##          readinessProbe:
 ##            httpGet:
 ##              path: /
@@ -160,7 +160,7 @@ spec:
 #      volumes:
 #        - name: configmap
 #          configMap:
-#            name: transaction-monitor-configmap
+#            name: transaction-monitor-FLAVOR-configmap
 #            defaultMode: 0755
 ---
 # Service for Prometheus
@@ -168,10 +168,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: transaction-monitor-prometheus
+  name: transaction-monitor-FLAVOR-prometheus
 spec:
   selector:
-    app: transaction-monitor-prometheus
+    app: transaction-monitor-FLAVOR-prometheus
   ports:
     - name: prometheus
       port: 9090
@@ -183,30 +183,30 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: transaction-monitor-prometheus
+  name: transaction-monitor-FLAVOR-prometheus
 spec:
   selector:
     matchLabels:
-      app: transaction-monitor-prometheus
+      app: transaction-monitor-FLAVOR-prometheus
   template:
     metadata:
       labels:
-        app: transaction-monitor-prometheus
+        app: transaction-monitor-FLAVOR-prometheus
     spec:
       containers:
-        - image: "hazelcast-platform-demos/transaction-monitor-prometheus"
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-prometheus"
           imagePullPolicy: Never
-          name: transaction-monitor-prometheus-container
+          name: transaction-monitor-FLAVOR-prometheus-container
 ---
 # Service for Grafana
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: transaction-monitor-grafana
+  name: transaction-monitor-FLAVOR-grafana
 spec:
   selector:
-    app: transaction-monitor-grafana
+    app: transaction-monitor-FLAVOR-grafana
   ports:
     - name: grafana
       port: 80
@@ -218,18 +218,18 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: transaction-monitor-grafana
+  name: transaction-monitor-FLAVOR-grafana
 spec:
   selector:
     matchLabels:
-      app: transaction-monitor-grafana
+      app: transaction-monitor-FLAVOR-grafana
   template:
     metadata:
       labels:
-        app: transaction-monitor-grafana
+        app: transaction-monitor-FLAVOR-grafana
     spec:
       containers:
-        - image: "hazelcast-platform-demos/transaction-monitor-grafana"
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-grafana"
           imagePullPolicy: Never
-          name: transaction-monitor-grafana-container
+          name: transaction-monitor-FLAVOR-grafana-container
 ---
