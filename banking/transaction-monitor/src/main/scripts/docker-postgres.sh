@@ -5,8 +5,9 @@ MODULE=postgres
 
 BASEDIR=`dirname $0`
 cd $BASEDIR/../../../$MODULE
+. ../src/main/scripts/check-flavor.sh
 
-DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
+DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${FLAVOR}-${MODULE}
 
 # Private network so can use container names
 docker network create $PROJECT --driver bridge > /dev/null 2>&1

@@ -5,6 +5,7 @@ MODULE=transaction-producer
 
 BASEDIR=`dirname $0`
 cd $BASEDIR/../../../$MODULE
+. ../src/main/scripts/check-flavor.sh
 
 HOST_IP=`ifconfig | grep -w inet | grep -v 127.0.0.1 | cut -d" " -f2`
 if [ "$HOST_IP" == "" ]
@@ -21,7 +22,7 @@ fi
 MY_BOOTSTRAP_SERVERS=kafka-broker0:9092,kafka-broker1:9093,kafka-broker2:9094
 MY_PULSAR_LIST=pulsar:6650
 
-DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
+DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${FLAVOR}-${MODULE}
 
 # Private network so can use container names
 docker network create $PROJECT --driver bridge > /dev/null 2>&1

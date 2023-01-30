@@ -7,6 +7,7 @@ CLONE=0
 
 BASEDIR=`dirname $0`
 cd $BASEDIR/../../../$MODULE
+. ../src/main/scripts/check-flavor.sh
 
 # Darwin vs Linux
 OS=`uname -s`
@@ -35,7 +36,7 @@ MY_POSTGRES_ADDRESS=postgres:5432
 MY_NATIVE_MEGABYTES=4400
 MY_PULSAR_LIST=pulsar:6650
 
-DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
+DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${FLAVOR}-${MODULE}
 
 # Private network so can use container names
 docker network create $PROJECT --driver bridge > /dev/null 2>&1
