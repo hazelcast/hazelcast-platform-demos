@@ -125,8 +125,8 @@ is a useful simplification for a demonstration, and again not suitable for produ
 
 The `topic-create` module is only for containerized deployments.
 
-It creates a container image, which if run will create the necessary Kafka topic ("`trades`")
-used by the Trade Monitor applicaiton in Hazelcast.
+It creates a container image, which if run will create the necessary Kafka topic ("`kf_transactions`")
+used by the Transactions Monitor applicaiton in Hazelcast.
 
 It is not needed when running on localhost, the Kafka command line is used instead to
 create the topic.
@@ -138,7 +138,7 @@ The `kafdrop` module is optional.
 [Kafdrop](https://github.com/obsidiandynamics/kafdrop) is an open-source tool with an
 appealing web UI for browsing a Kafka deployment.
 
-It is used here as a way to independently browse the input to the Trade Monitor. This
+It is used here as a way to independently browse the input to the Transaction Monitor. This
 could equally be done with the Kafka's command line "`kafka-console-consumer.sh`" tool,
 although items are written to the topic at a high rate, so command line output tends
 to flood the screen.
@@ -156,8 +156,8 @@ What this module does is random select from 3000 companies listed on the New Yor
 Stock Exchange ( [NASDAQ](https://www.nasdaq.com/) ), and generate trades for
 these companies. The trades have random prices and random quantities.
 
-Trades are generated at a default rate of 300 per second to the Kafka topic named
-"`trades`". 
+Tras are generated at a default rate of 300 per second to the Kafka topic named
+"`kf_transactions`". 
 
 You can generated millions of trades this way, depending what rate you set for
 generation, how long you leave the `trade-producer` running for, and how much
@@ -234,14 +234,14 @@ Also defined is an unordered index on the "`symbol`" field in the "`trades`" map
 The index improves the query speed when looking up stock market trades by their
 string symbol.
 
-#### Ingest Trades
+#### Ingest Transactions
 
-[IngestTrades](./hazelcast-node/src/main/java/com/hazelcast/platform/demos/banking/trademonitor/IngestTrades.java#L62)
+[IngestTransactions](./common/src/main/java/com/hazelcast/platform/demos/banking/trademonitor/IngestTransactions.java#L62)
 is a Jet job that is automatically initiated when the Hazelcast node starts.
 
 This job is a simple upload, or _ingest_ of data from Kafka into Hazelcast.
 
-The input stage of the pipeline is a Kafka source, with the topic name "`trades`".
+The input stage of the pipeline is a Kafka source, with the topic name "`kf_transactions`".
 
 The output stage of the pipeline is an [IMap](https://docs.hazelcast.org/docs/5.0/javadoc/com/hazelcast/map/IMap.html), also called "`trades`".
 
@@ -252,10 +252,10 @@ So the effect of this job is to make trades written to Kafka visible in Hazelcas
 
 #### Aggregate Query
 
-[AggregateQuery](./hazelcast-node/src/main/java/com/hazelcast/platform/demos/banking/trademonitor/AggregateQuery.java#L87)
+[AggregateQuery](./common/src/main/java/com/hazelcast/platform/demos/banking/trademonitor/AggregateQuery.java#L87)
 is a separate Jeb job that is also automatically initiated when the Hazelcast node starts.
 
-It has the same input as the `Ingest Trades` job, namely the Kafka "`trades`" topic.
+It has the same input as the `Ingest Transactions` job, namely the Kafka "`kf_transactions`" topic.
 
 What this job does differently is grouping and aggregation. All incoming trades are grouped by their
 stock symbol, and for each of the 3000 or so symbols a rolling aggregation updates a total of
