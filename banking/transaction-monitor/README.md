@@ -1,16 +1,18 @@
-# Hazelcast Platform Demo Applications - Banking - Trade Monitor
+# Hazelcast Platform Demo Applications - Banking - Transaction Monitor
 
 [Screenshot1]: src/site/markdown/images/Screenshot1.png "Image screenshot1.png"
 [Screenshot2]: src/site/markdown/images/Screenshot2.png "Image screenshot2.png"
 [Screenshot3]: src/site/markdown/images/Screenshot3.png "Image screenshot3.png"
 
-An example showing continuous aggregation of stock market trades, providing
+An example showing continuous aggregation of incoming data, providing
 a UI for inspection of the aggregated values with the ability to drill-down
-to see the trades contained in each aggregation.
+to see the items contained in each aggregation.
 
 [Watch The Video](https://hazelcast.com/resources/continuous-query-with-drill-down-demo/)
 
-This example only requires open-source Hazelcast.
+This example only requires open-source Hazelcast, but if the enterprise Hazelcast is
+used then extra features for available. Refer to [../../README.md](../../README.md)
+to use a license for enterprise.
 
 There are modules for monitoring which involve licensing, but these are optional.
 
@@ -18,7 +20,7 @@ Input is simulated and injected into a Kafka topic. Hazelcast reads from
 this topic to present via  a reactive web UI, but is not aware how of
 where the data originated:
 
-![Image of the Trade Monitor expanded view of "ASPS" symbol][Screenshot2]
+![Image of the Transaction Monitor expanded view of "ASPS" symbol][Screenshot2]
 
 ## Description
 
@@ -30,6 +32,9 @@ and
 <a href="https://hazelcast.org/resources/hazelcast-continuous-query-with-drilldown-trade-monitoring-wp/">here</a>.
 
 ## Building
+
+In the root `pom.xml`, the variable `my.transaction-monitor.flavor` dictates the variation.
+Here we shall assume it is set to "_trade_".
 
 For a standard build to run on your host machine, use:
 
@@ -68,7 +73,7 @@ prometheus/
 pulsar/
 remote-job-sub-1/
 topic-create/
-trade-producer/
+transaction-producer/
 webapp/
 zookeeper/
 ```
@@ -140,9 +145,9 @@ to flood the screen.
 
 Kafdrop itself is unchanged in this module. 
 
-### 7. `trade-producer`
+### 7. `transaction-producer`
 
-The `trade-producer` module is the source of the stock market trades that the Trade
+The `transaction-producer` module is the data feed the 
 Monitor application is monitoring.
 
 The companies being traded are real, the trades are not.
