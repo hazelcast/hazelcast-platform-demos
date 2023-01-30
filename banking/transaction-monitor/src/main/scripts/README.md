@@ -1,5 +1,8 @@
 # Kubernetes specific instructions
 
+Use these scripts, edit to replace `FLAVOR` with what you're using, and you may need to adjust the image
+name to match your image repository.
+
 ```
 kubernetes-1-zookeeper-kafka-firsthalf.yaml
 kubernetes-2-create-configmap.sh
