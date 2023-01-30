@@ -29,7 +29,7 @@ class Home extends Component {
 				this.state.f1Header = "Total Sales";
 				this.state.f2Header = "Average Price";
 			    break;
-			case "PAYMENTS_ISO20022":
+			case "PAYMENTS":
 				this.state.keyHeader = "Bank Code";
 				this.state.f1Header = "Total";
 				this.state.f2Header = "Average";

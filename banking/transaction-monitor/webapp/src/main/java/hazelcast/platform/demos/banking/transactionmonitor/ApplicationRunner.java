@@ -109,7 +109,7 @@ public class ApplicationRunner {
         case ECOMMERCE:
             this.productsMap = this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_PRODUCTS);
             break;
-        case PAYMENTS_ISO20022:
+        case PAYMENTS:
             this.bicsMap = this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_BICS);
             break;
         case TRADE:
@@ -251,7 +251,7 @@ public class ApplicationRunner {
                 case ECOMMERCE:
                     loadItemsEcommerce(jsonObject);
                     break;
-                case PAYMENTS_ISO20022:
+                case PAYMENTS:
                     loadItemsPayments(jsonObject);
                     break;
                 case TRADE:
@@ -282,7 +282,7 @@ public class ApplicationRunner {
                 case ECOMMERCE:
                     drillItemsEcommerce(jsonObject, code);
                     break;
-                case PAYMENTS_ISO20022:
+                case PAYMENTS:
                     drillItemsPayments(jsonObject, code);
                     break;
                 case TRADE:
@@ -514,7 +514,7 @@ public class ApplicationRunner {
                  */
             };
             break;
-        case PAYMENTS_ISO20022:
+        case PAYMENTS:
             additionalQueries = new String[][] {
                 { "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_BICS + " LIMIT 3" },
             };

@@ -24,7 +24,7 @@ class ItemDetails extends Component {
         switch (transactionMonitorFlavor) {
 		  	case "ECOMMERCE":
 			    break;
-		  	case "PAYMENTS_ISO20022":
+		  	case "PAYMENTS":
 				  this.state.column3Accessor = "bicDebitor"
 				  this.state.column3Header = "Debitor"
 				  this.state.column4Accessor = "amtFloor"

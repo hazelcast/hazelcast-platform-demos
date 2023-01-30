@@ -154,7 +154,7 @@ public class AlertingToSlack {
                     fieldName2 = "sales";
                     fieldValue2 = safeGetDouble(input, "volume");
                     break;
-                case PAYMENTS_ISO20022:
+                case PAYMENTS:
                     fieldName1 = "bic";
                     fieldValue1 = safeGetString(input, "code");
                     fieldName2 = "volume";

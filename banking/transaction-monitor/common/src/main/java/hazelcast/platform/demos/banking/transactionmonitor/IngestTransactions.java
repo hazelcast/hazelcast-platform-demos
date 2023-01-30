@@ -91,7 +91,7 @@ public class IngestTransactions {
                  .withoutTimestamps();
         }
 
-        if (transactionMonitorFlavor == TransactionMonitorFlavor.PAYMENTS_ISO20022) {
+        if (transactionMonitorFlavor == TransactionMonitorFlavor.PAYMENTS) {
             inputSource
             .map(IngestTransactions::depleteEntry).setName("deplete-entry")
             .writeTo(Sinks.map(MyConstants.IMAP_NAME_TRANSACTIONS));
@@ -117,7 +117,7 @@ public class IngestTransactions {
 
         /* Bonus output fork depending on flavor
          */
-        if (transactionMonitorFlavor == TransactionMonitorFlavor.PAYMENTS_ISO20022) {
+        if (transactionMonitorFlavor == TransactionMonitorFlavor.PAYMENTS) {
             inputSource
             .map(IngestTransactions::makeEntryXML).setName("extract-xml")
             .writeTo(Sinks.map(MyConstants.IMAP_NAME_TRANSACTIONS_XML));

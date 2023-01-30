@@ -210,7 +210,7 @@ public class ApplicationRunner {
                     case ECOMMERCE:
                         transaction = this.createEcommerceTransaction(id, random);
                         break;
-                    case PAYMENTS_ISO20022:
+                    case PAYMENTS:
                         transaction = this.createPaymentsTransaction(id, random);
                         break;
                     case TRADE:

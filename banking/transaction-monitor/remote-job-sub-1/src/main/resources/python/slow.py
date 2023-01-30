@@ -54,7 +54,7 @@ def processFn(items):
       threshold = 1
       thresholdAbove = "Hot"
       thresholdBelow = "Cold"
-    if flavor == "payments_iso20022":
+    if flavor == "payments":
       thresholdField = "amtFloor"
       keyField = "bicCreditor"
       threshold = 500000

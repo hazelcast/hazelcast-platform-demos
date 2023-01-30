@@ -109,7 +109,7 @@ public class AggregateQuery {
         case ECOMMERCE:
             aggregated = aggregatedEcommerce(pipeline, properties, usePulsar, pulsarList);
             break;
-        case PAYMENTS_ISO20022:
+        case PAYMENTS:
             aggregated = aggregatedPayments(pipeline, properties, usePulsar, pulsarList);
             break;
         case TRADE:

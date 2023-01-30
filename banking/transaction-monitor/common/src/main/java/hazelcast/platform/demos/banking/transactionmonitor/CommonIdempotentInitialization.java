@@ -105,8 +105,8 @@ public class CommonIdempotentInitialization {
             case ECOMMERCE:
                 iMapNames = MyConstants.IMAP_NAMES_ECOMMERCE;
                 break;
-            case PAYMENTS_ISO20022:
-                iMapNames = MyConstants.IMAP_NAMES_PAYMENTS_ISO20022;
+            case PAYMENTS:
+                iMapNames = MyConstants.IMAP_NAMES_PAYMENTS;
                 break;
             case TRADE:
             default:
@@ -217,7 +217,7 @@ public class CommonIdempotentInitialization {
             case ECOMMERCE:
                 indexColumn1 = "itemCode";
                 break;
-            case PAYMENTS_ISO20022:
+            case PAYMENTS:
                 indexColumn1 = "bicCreditor";
                 break;
             case TRADE:
@@ -312,7 +312,7 @@ public class CommonIdempotentInitialization {
                 LOGGER.trace("Loaded {} into '{}'", localMap.size(), productsMap.getName());
             }
             break;
-        case PAYMENTS_ISO20022:
+        case PAYMENTS:
             bicsMap = hazelcastInstance.getMap(MyConstants.IMAP_NAME_BICS);
             if (!bicsMap.isEmpty()) {
                 LOGGER.trace("Skip loading '{}', not empty", bicsMap.getName());
@@ -508,7 +508,7 @@ public class CommonIdempotentInitialization {
         case ECOMMERCE:
             ok = define(definition1a, hazelcastInstance);
             break;
-        case PAYMENTS_ISO20022:
+        case PAYMENTS:
             ok = define(definition1b, hazelcastInstance);
             break;
         case TRADE:
@@ -588,10 +588,10 @@ public class CommonIdempotentInitialization {
                     definition5Arr[TransactionMonitorFlavor.ECOMMERCE.ordinal()]);
             mapNames = MyConstants.WAN_IMAP_NAMES_ECOMMERCE;
             break;
-        case PAYMENTS_ISO20022:
+        case PAYMENTS:
             definitions = List.of(definition3, definition4,
-                    definition5Arr[TransactionMonitorFlavor.PAYMENTS_ISO20022.ordinal()]);
-            mapNames = MyConstants.WAN_IMAP_NAMES_PAYMENTS_ISO20022;
+                    definition5Arr[TransactionMonitorFlavor.PAYMENTS.ordinal()]);
+            mapNames = MyConstants.WAN_IMAP_NAMES_PAYMENTS;
             break;
         case TRADE:
         default:
@@ -628,7 +628,7 @@ public class CommonIdempotentInitialization {
                 + " 'valueJavaClass' = '" + ProductInfo.class.getName() + "'"
                 + " )";
 
-        result[TransactionMonitorFlavor.PAYMENTS_ISO20022.ordinal()] =
+        result[TransactionMonitorFlavor.PAYMENTS.ordinal()] =
                 "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_BICS
                 + " TYPE IMap "
@@ -762,7 +762,7 @@ public class CommonIdempotentInitialization {
                         + " 'valueCompactTypeName' = '" + PerspectiveEcommerce.class.getSimpleName() + "'"
                         + " )";
 
-        result[TransactionMonitorFlavor.PAYMENTS_ISO20022.ordinal()] =
+        result[TransactionMonitorFlavor.PAYMENTS.ordinal()] =
                 "CREATE MAPPING IF NOT EXISTS "
                         + MyConstants.IMAP_NAME_PERSPECTIVE
                         + " ("
@@ -874,7 +874,7 @@ public class CommonIdempotentInitialization {
                 + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getName() + "'"
                 + " )";
 
-        result[TransactionMonitorFlavor.PAYMENTS_ISO20022.ordinal()] =
+        result[TransactionMonitorFlavor.PAYMENTS.ordinal()] =
                 "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_TRANSACTIONS
                 + " ("
@@ -933,7 +933,7 @@ public class CommonIdempotentInitialization {
 
         result[TransactionMonitorFlavor.ECOMMERCE.ordinal()] = "";
 
-        result[TransactionMonitorFlavor.PAYMENTS_ISO20022.ordinal()] =
+        result[TransactionMonitorFlavor.PAYMENTS.ordinal()] =
                 "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_TRANSACTIONS_XML
                 + " TYPE IMap "
@@ -986,7 +986,7 @@ public class CommonIdempotentInitialization {
         //case ECOMMERCE:
         //    definitions = List.of(definition11, definition12);
         //    break;
-        //case PAYMENTS_ISO20022:
+        //case PAYMENTS:
         //    definitions = List.of(definition11, definition12);
         //    break;
         //case TRADE:
@@ -1167,7 +1167,7 @@ public class CommonIdempotentInitialization {
         //case ECOMMERCE:
         //    concatenation = "code";
         //    break;
-        //case PAYMENTS_ISO20022:
+        //case PAYMENTS:
         //    concatenation = "code";
         //    break;
         //case TRADE:

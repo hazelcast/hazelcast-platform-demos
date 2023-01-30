@@ -23,7 +23,7 @@ package hazelcast.platform.demos.banking.transactionmonitor;
 public enum TransactionMonitorFlavor {
 
     ECOMMERCE,
-    PAYMENTS_ISO20022,
+    PAYMENTS,
     TRADE;
 
 }

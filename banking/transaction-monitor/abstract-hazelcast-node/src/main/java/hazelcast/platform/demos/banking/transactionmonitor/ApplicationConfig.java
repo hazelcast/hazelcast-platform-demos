@@ -155,8 +155,8 @@ public class ApplicationConfig {
         case ECOMMERCE:
             wanMapNames.addAll(MyConstants.WAN_IMAP_NAMES_ECOMMERCE);
             break;
-        case PAYMENTS_ISO20022:
-            wanMapNames.addAll(MyConstants.WAN_IMAP_NAMES_PAYMENTS_ISO20022);
+        case PAYMENTS:
+            wanMapNames.addAll(MyConstants.WAN_IMAP_NAMES_PAYMENTS);
             break;
         case TRADE:
         default:
@@ -220,8 +220,8 @@ public class ApplicationConfig {
         case ECOMMERCE:
             tieredStoreMapNames = MyConstants.TIERED_STORE_IMAP_NAMES_ECOMMERCE;
             break;
-        case PAYMENTS_ISO20022:
-            tieredStoreMapNames = MyConstants.TIERED_STORE_IMAP_NAMES_PAYMENTS_ISO20022;
+        case PAYMENTS:
+            tieredStoreMapNames = MyConstants.TIERED_STORE_IMAP_NAMES_PAYMENTS;
             break;
         case TRADE:
         default:
@@ -287,8 +287,8 @@ public class ApplicationConfig {
             case ECOMMERCE:
                 mapNames = MyConstants.PERSISTENT_STORE_IMAP_NAMES_ECOMMERCE;
                 break;
-            case PAYMENTS_ISO20022:
-                mapNames = MyConstants.PERSISTENT_STORE_IMAP_NAMES_PAYMENTS_ISO20022;
+            case PAYMENTS:
+                mapNames = MyConstants.PERSISTENT_STORE_IMAP_NAMES_PAYMENTS;
                 break;
             case TRADE:
             default:

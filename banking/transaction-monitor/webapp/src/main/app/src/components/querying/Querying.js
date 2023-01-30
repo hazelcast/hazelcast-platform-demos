@@ -61,7 +61,7 @@ class Querying extends Component {
 			case "ECOMMERCE":
 			    this.state.query = 'SELECT k.id, k.itemCode, k."timestamp", s.itemName, s.category FROM kf_transactions AS k LEFT JOIN products AS s ON k.itemCode = s.__key';
 			    break;
-			case "PAYMENTS_ISO20022":
+			case "PAYMENTS":
 			    this.state.query = 'SELECT k.id, k.bicCreditor, k.ccy, k.amtFloor, s.name, s.country FROM kf_transactions AS k LEFT JOIN bics AS s ON k.bicCreditor = s.__key';
 			    break;
 			case "TRADE":
