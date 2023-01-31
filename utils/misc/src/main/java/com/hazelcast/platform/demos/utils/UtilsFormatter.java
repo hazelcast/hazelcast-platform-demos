@@ -23,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -175,7 +176,7 @@ public class UtilsFormatter {
                 if (j != 0) {
                     line.append(',');
                 }
-                line.append(String.format(format, sqlRow.getObject(j).toString()));
+                line.append(String.format(format, Objects.toString(sqlRow.getObject(j))));
             }
             rows.add(line.toString());
             if (count == UtilsConstants.SQL_RESULT_THRESHOLD) {

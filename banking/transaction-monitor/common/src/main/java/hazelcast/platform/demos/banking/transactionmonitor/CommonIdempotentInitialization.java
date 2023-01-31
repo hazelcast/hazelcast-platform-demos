@@ -862,7 +862,7 @@ public class CommonIdempotentInitialization {
                 + "    __key VARCHAR,"
                 + "    id VARCHAR,"
                 + "    \"timestamp\" BIGINT,"
-                + "    code VARCHAR,"
+                + "    itemCode VARCHAR,"
                 + "    price DECIMAL,"
                 + "    quantity BIGINT"
                 + ")"

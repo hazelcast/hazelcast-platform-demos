@@ -136,7 +136,7 @@ class Home extends Component {
         const WS_HOST = "ws:/" + window.location.host + "/transactions";
 
         return (
-                    <Page header="Transaction Monitor Dashboard">
+                    <Page header="Transaction Processing">
                         <Querying/>
                         <ReactTable
                         className="Table-main"
