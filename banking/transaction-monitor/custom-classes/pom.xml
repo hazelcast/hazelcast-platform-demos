@@ -25,6 +25,12 @@
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
 		
+		<!-- For JSON Deserializers -->
+		<dependency>
+			<groupId>org.apache.kafka</groupId>
+			<artifactId>kafka-clients</artifactId>
+		</dependency>
+		
 		<!-- For Slack integration -->
 		<dependency>
 			<groupId>org.json</groupId>

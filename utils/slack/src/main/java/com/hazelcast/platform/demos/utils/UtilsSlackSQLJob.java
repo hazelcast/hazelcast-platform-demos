@@ -17,6 +17,7 @@
 package com.hazelcast.platform.demos.utils;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -125,7 +126,7 @@ public class UtilsSlackSQLJob {
     private static final Logger LOGGER = LoggerFactory.getLogger(UtilsSlackSQLJob.class);
 
     // Local constant, never needed outside this class
-    private static final List<String> ALLOWED_PREFIXES = List.of("SELECT");
+    private static final List<String> ALLOWED_PREFIXES_UC = List.of("SELECT");
 
     /**
      * <p>Validates the properties and launches the job.
@@ -262,7 +263,7 @@ public class UtilsSlackSQLJob {
                 streamSource
                 .map(str -> {
                     String[] tokens = str.split(" ");
-                    return Tuple2.tuple2(ALLOWED_PREFIXES.contains(tokens[0]), str);
+                    return Tuple2.tuple2(ALLOWED_PREFIXES_UC.contains(tokens[0].toUpperCase(Locale.ROOT)), str);
                 })
                 .setName("determine-if-handled");
 
@@ -273,7 +274,7 @@ public class UtilsSlackSQLJob {
                 .map(Tuple2::f1)
                 .map(str -> {
                     return "Sorry, only '"
-                            + ALLOWED_PREFIXES
+                            + ALLOWED_PREFIXES_UC
                             + "' commands handled, not '" + str + "'";
                 })
                 .setName("not-sql-statement");
