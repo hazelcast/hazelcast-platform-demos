@@ -21,7 +21,7 @@ engine InnoDB;
 -- Dummy data, mainly this table will be used for write-through
 insert into mysql_slf4j (socket_address, when_ts, level, message, thread_name, logger_name)
 values
-('127.0.0.1:5701', NOW(), 'INFO', 'Hello World', 'None', 'None')
+('127.0.0.1:5701', NOW(), 'INFO', 'Hello World', 'Test', 'Test')
 ;
 
 select * from mysql_slf4j;

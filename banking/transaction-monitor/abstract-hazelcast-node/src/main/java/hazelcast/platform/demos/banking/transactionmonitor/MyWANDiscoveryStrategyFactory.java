@@ -43,7 +43,7 @@ public class MyWANDiscoveryStrategyFactory implements DiscoveryStrategyFactory {
 
     MyWANDiscoveryStrategyFactory() {
     }
-    MyWANDiscoveryStrategyFactory(String localClusterName, Properties properties) {
+    MyWANDiscoveryStrategyFactory(String localClusterName, Properties properties) throws Exception {
         this.myLocalDiscoveryStrategy = new MyLocalWANDiscoveryStrategy(localClusterName, properties);
     }
 

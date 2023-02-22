@@ -119,17 +119,19 @@ public class MyLocalWANDiscoveryStrategy implements DiscoveryStrategy {
     private static final long FIVE_SECOND_TIMEOUT = 5000L;
 
     private final String remoteClusterName;
+    private final TransactionMonitorFlavor transactionMonitorFlavor;
 
     private DirContext dirContext;
     private TreeMap<String, DiscoveryNode> previousdiscoverNodes = new TreeMap<>();
     private String serviceDns;
 
-    MyLocalWANDiscoveryStrategy(String localClusterName, Properties properties) {
+    MyLocalWANDiscoveryStrategy(String localClusterName, Properties properties) throws Exception {
         if (localClusterName.equalsIgnoreCase(properties.getProperty("my.cluster1.name"))) {
             this.remoteClusterName = properties.getProperty("my.cluster2.name");
         } else {
             this.remoteClusterName = properties.getProperty("my.cluster1.name");
         }
+        this.transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(properties);
     }
 
     /**
@@ -143,6 +145,7 @@ public class MyLocalWANDiscoveryStrategy implements DiscoveryStrategy {
     @Override
     public void start() {
         this.serviceDns = "transaction-monitor-"
+                + this.transactionMonitorFlavor.toString().toLowerCase(Locale.ROOT) + "-"
                 + this.remoteClusterName.toLowerCase(Locale.ROOT)
                 + "-hazelcast.default.svc.cluster.local";
         LOGGER.info("Target DNS for WAN: {}", this.serviceDns);

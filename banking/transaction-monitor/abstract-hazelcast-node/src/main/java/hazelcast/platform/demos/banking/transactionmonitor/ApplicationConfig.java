@@ -148,11 +148,15 @@ public class ApplicationConfig {
             LOGGER.info("WAN Publishing to cluster: '{}'", wanBatchPublisherConfig.getClusterName());
             DiscoveryConfig discoveryConfig = wanBatchPublisherConfig.getDiscoveryConfig();
 
-            MyWANDiscoveryStrategyFactory myWANDiscoveryStrategyFactory
+            try {
+                MyWANDiscoveryStrategyFactory myWANDiscoveryStrategyFactory
                 = new MyWANDiscoveryStrategyFactory(config.getClusterName(), properties);
 
-            for (DiscoveryStrategyConfig discoveryStrategyConfig : discoveryConfig.getDiscoveryStrategyConfigs()) {
-                discoveryStrategyConfig.setDiscoveryStrategyFactory(myWANDiscoveryStrategyFactory);
+                for (DiscoveryStrategyConfig discoveryStrategyConfig : discoveryConfig.getDiscoveryStrategyConfigs()) {
+                    discoveryStrategyConfig.setDiscoveryStrategyFactory(myWANDiscoveryStrategyFactory);
+                }
+            } catch (Exception e) {
+                LOGGER.error("addWan()", e);
             }
         });
 
