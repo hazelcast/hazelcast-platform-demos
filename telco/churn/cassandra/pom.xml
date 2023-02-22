@@ -30,7 +30,7 @@
 		</dependency>
 		<dependency>
 			<groupId>io.debezium</groupId>
-			<artifactId>debezium-connector-cassandra</artifactId>
+			<artifactId>debezium-connector-cassandra-4</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.netty</groupId>

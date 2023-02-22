@@ -18,7 +18,7 @@
 	<description>Example implementation for monitoring a series of transactions</description>
 
 	<properties>
-		<!-- TMP Java 17 not yet supported in Cloud -->
+		<!-- TMP Java 17 not yet supported in Viridian -->
 		<java.version>11</java.version>
 
 		<my.docker.image.prefix>transaction-monitor-${my.transaction-monitor.flavor}</my.docker.image.prefix>
@@ -32,11 +32,6 @@
 		<javalin.version>3.13.0</javalin.version>
 		<!--  Kafka Clients must match cloud target -->
 		<kafka-clients.version>2.2.2</kafka-clients.version>
-
-		<!-- From ~/.m2/settings.xml. If token set, use cloud. Name not used unless token set -->
-		<hz.cloud.cluster1.discovery.token>${my.hz.cloud.cluster1.discovery.token}</hz.cloud.cluster1.discovery.token>
-		<hz.cloud.cluster1.name>${my.hz.cloud.cluster1.name}</hz.cloud.cluster1.name>
-		<hz.cloud.cluster1.password>${my.hz.cloud.cluster1.password}</hz.cloud.cluster1.password>
 
 		<!-- So Grafana can find Prometheus service, must match K8S YAML -->
 		<my.prometheus.name>${my.docker.image.prefix}-prometheus</my.prometheus.name>
@@ -61,6 +56,7 @@
 		<module>finos-nodejs</module>
 		<module>finos-python</module>
 		<module>management-center</module>
+		<module>mysql</module>
 		<module>prometheus</module>
 		<module>postgres</module>
 		<module>grafana</module>

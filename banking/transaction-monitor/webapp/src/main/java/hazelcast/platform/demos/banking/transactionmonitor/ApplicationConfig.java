@@ -40,9 +40,10 @@ import com.hazelcast.config.SSLConfig;
  */
 public class ApplicationConfig {
     private static final String FILENAME = "application.properties";
-    private static final String HZ_CLOUD_CLUSTER_DISCOVERY_TOKEN = "my.cluster1.discovery-token";
-    private static final String HZ_CLOUD_CLUSTER_NAME = "my.cluster1.name";
-    private static final String HZ_CLOUD_CLUSTER_PASSWORD = "my.cluster1.password";
+    private static final String VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN = "my.viridian.cluster1.discovery.token";
+    private static final String VIRIDIAN_CLUSTER1_ID = "my.viridian.cluster1.id";
+    private static final String VIRIDIAN_CLUSTER1_KEYSTORE_PASSWORD = "my.viridian.cluster1.keystore.password";
+    private static final String VIRIDIAN_CLUSTER1_TRUSTSTORE_PASSWORD = "my.viridian.cluster1.truststore.password";
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
     private static final int EXPECTED_PASSWORD_LENGTH = 11;
     private static final int EXPECTED_TOKEN_LENGTH = 50;
@@ -64,7 +65,7 @@ public class ApplicationConfig {
         ClientNetworkConfig clientNetworkConfig = clientConfig.getNetworkConfig();
         clientNetworkConfig.getAutoDetectionConfig().setEnabled(false);
 
-        // Use cloud even if in Kubernetes if discovery token set
+        // Use Viridian even if in Kubernetes if discovery token set
         Properties myProperties = new Properties();
         try {
             myProperties = MyUtils.loadProperties(FILENAME);
@@ -72,31 +73,32 @@ public class ApplicationConfig {
             LOGGER.error(FILENAME, e);
         }
 
-        String cloudOrHzCloud = myProperties.getProperty(MyConstants.USE_HZ_CLOUD);
-        boolean useHzCloud = MyUtils.useHzCloud(cloudOrHzCloud);
-        LOGGER.info("useHzCloud='{}'", useHzCloud);
+        String kubernetesOrViridian = myProperties.getProperty(MyConstants.USE_VIRIDIAN);
+        boolean useViridian = MyUtils.useViridian(kubernetesOrViridian);
+        LOGGER.info("useViridian='{}'", useViridian);
 
-        // Use cloud if property set
-        if (!myProperties.getProperty(HZ_CLOUD_CLUSTER_DISCOVERY_TOKEN, "").isBlank()
-                && !myProperties.getProperty(HZ_CLOUD_CLUSTER_DISCOVERY_TOKEN, "").equals("unset")
-                && useHzCloud) {
+        // Use Viridian if property set
+        if (!myProperties.getProperty(VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN, "").isBlank()
+                && !myProperties.getProperty(VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN, "").equals("unset")
+                && useViridian) {
             clientNetworkConfig.getKubernetesConfig().setEnabled(false);
             clientNetworkConfig.getCloudConfig().setEnabled(true);
             clientNetworkConfig.getCloudConfig()
-                .setDiscoveryToken(myProperties.getProperty(HZ_CLOUD_CLUSTER_DISCOVERY_TOKEN));
-            clientConfig.setClusterName(myProperties.getProperty(HZ_CLOUD_CLUSTER_NAME));
+                .setDiscoveryToken(myProperties.getProperty(VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN));
+            clientConfig.setClusterName(myProperties.getProperty(VIRIDIAN_CLUSTER1_ID));
 
-            // Cloud uses SSL
-            String password = myProperties.getProperty(HZ_CLOUD_CLUSTER_PASSWORD);
-            Properties sslProps = getSSLProperties(password);
+            // Viridian uses SSL
+            String keystorePassword = myProperties.getProperty(VIRIDIAN_CLUSTER1_KEYSTORE_PASSWORD);
+            String truststorePassword = myProperties.getProperty(VIRIDIAN_CLUSTER1_TRUSTSTORE_PASSWORD);
+            Properties sslProps = getSSLProperties(keystorePassword, truststorePassword);
             clientConfig.getNetworkConfig().setSSLConfig(new SSLConfig().setEnabled(true).setProperties(sslProps));
 
             // Viridian
             clientConfig.setProperty("hazelcast.client.cloud.url", "https://api.viridian.hazelcast.com");
 
-            logCloudConfig(clientConfig);
+            logViridianConfig(clientConfig);
 
-            LOGGER.info("Non-Kubernetes configuration: cloud: "
+            LOGGER.info("Viridian configured, cluster id: "
                     + clientConfig.getClusterName());
         } else {
             if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
@@ -128,18 +130,19 @@ public class ApplicationConfig {
      * <p>Properties for SSL
      * </p>
      *
-     * @param password
+     * @param keystorePassword
+     * @param truststorePassword
      * @return
      */
-    private static Properties getSSLProperties(String password) {
+    private static Properties getSSLProperties(String keystorePassword, String truststorePassword) {
         Properties properties = new Properties();
 
         properties.setProperty("javax.net.ssl.keyStore",
                 new File("./client.keystore").toURI().getPath());
-        properties.setProperty("javax.net.ssl.keyStorePassword", password);
+        properties.setProperty("javax.net.ssl.keyStorePassword", keystorePassword);
         properties.setProperty("javax.net.ssl.trustStore",
                 new File("./client.truststore").toURI().getPath());
-        properties.setProperty("javax.net.ssl.trustStorePassword", password);
+        properties.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
 
         return properties;
     }
@@ -150,8 +153,8 @@ public class ApplicationConfig {
      *
      * @param clientConfig
      */
-    private static void logCloudConfig(ClientConfig clientConfig) {
-        LOGGER.info("Cluster name=='{}'", clientConfig.getClusterName());
+    private static void logViridianConfig(ClientConfig clientConfig) {
+        LOGGER.info("Cluster id=='{}'", clientConfig.getClusterName());
 
         String token = Objects.toString(clientConfig.getNetworkConfig()
                 .getCloudConfig().getDiscoveryToken());
@@ -164,14 +167,25 @@ public class ApplicationConfig {
                     EXPECTED_TOKEN_LENGTH);
         }
 
-        String password = Objects.toString(clientConfig.getNetworkConfig()
-                .getSSLConfig().getProperty("javax.net.ssl.trustStorePassword"));
-        if (password.length() == EXPECTED_PASSWORD_LENGTH) {
-            LOGGER.info("SSL password.length()=={}, ending '{}'", password.length(),
-                    password.substring(password.length() - 1, password.length()));
+        String keystorePassword = Objects.toString(clientConfig.getNetworkConfig()
+                .getSSLConfig().getProperty("javax.net.ssl.keyStorePassword"));
+        if (keystorePassword.length() == EXPECTED_PASSWORD_LENGTH) {
+            LOGGER.info("SSL keystore password.length()=={}, ending '{}'", keystorePassword.length(),
+                    keystorePassword.substring(keystorePassword.length() - 1, keystorePassword.length()));
         } else {
-            LOGGER.warn("SSL password.length()=={}, expected {}",
-                    password.length(),
+            LOGGER.warn("SSL keystore password.length()=={}, expected {}",
+                    keystorePassword.length(),
+                    EXPECTED_PASSWORD_LENGTH);
+        }
+
+        String truststorePassword = Objects.toString(clientConfig.getNetworkConfig()
+                .getSSLConfig().getProperty("javax.net.ssl.trustStorePassword"));
+        if (truststorePassword.length() == EXPECTED_PASSWORD_LENGTH) {
+            LOGGER.info("SSL truststore password.length()=={}, ending '{}'", truststorePassword.length(),
+                    truststorePassword.substring(truststorePassword.length() - 1, truststorePassword.length()));
+        } else {
+            LOGGER.warn("SSL truststore password.length()=={}, expected {}",
+                    truststorePassword.length(),
                     EXPECTED_PASSWORD_LENGTH);
         }
     }

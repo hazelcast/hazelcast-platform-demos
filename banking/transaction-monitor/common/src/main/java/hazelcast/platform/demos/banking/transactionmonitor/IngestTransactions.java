@@ -182,7 +182,7 @@ public class IngestTransactions {
             stringBuilder.append(", \"ccy\" : \"").append(json.getString("ccy")).append("\"");
             stringBuilder.append(", \"amtFloor\" : ").append(json.getDouble("amtFloor"));
         } catch (Exception e) {
-            // Don't log, may be running in the cloud. Null means no entry passed to next stage, filter.
+            // Don't log, if running in Viridian user may not download logs. Null means no entry passed to next stage, filter.
             return null;
         }
         stringBuilder.append("}");
@@ -212,7 +212,7 @@ public class IngestTransactions {
             }
             xml = stringBuilder.toString();
         } catch (Exception e) {
-            // Don't log, may be running in the cloud
+            // Don't log, if running in Viridian user may not download logs
             xml = input.getValue().toString();
         }
         return Tuple2.tuple2(input.getKey(), xml);

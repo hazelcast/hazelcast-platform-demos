@@ -149,8 +149,10 @@ public class UtilsSlackSQLJob {
         String buildUser = safeGet(slackProperties, UtilsConstants.SLACK_BUILD_USER);
         String channelId = safeGet(slackProperties, UtilsConstants.SLACK_CHANNEL_ID);
         String channelName = safeGet(slackProperties, UtilsConstants.SLACK_CHANNEL_NAME);
-        if (accessToken.length() == 0 || channelId.length() == 0 || channelName.length() == 0) {
-            LOGGER.warn("{}: missing values for '{}', '{}' and/or '{}',"
+        if (accessToken.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY
+                || channelId.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY
+                || channelName.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY) {
+            LOGGER.warn("{}: missing sensible values for '{}', '{}' and/or '{}',"
                     + " not launching Slack SQL integration",
                     UtilsSlackSQLJob.class.getSimpleName(),
                     UtilsConstants.SLACK_ACCESS_TOKEN,

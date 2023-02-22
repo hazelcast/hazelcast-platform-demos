@@ -140,12 +140,12 @@ public class ApplicationInitializer {
         String pulsarOrKafka = properties.getProperty(MyConstants.PULSAR_OR_KAFKA_KEY);
         boolean usePulsar = MyUtils.usePulsar(pulsarOrKafka);
         LOGGER.debug("usePulsar='{}'", usePulsar);
-        String cloudOrHzCloud = properties.getProperty(MyConstants.USE_HZ_CLOUD);
-        boolean useHzCloud = MyUtils.useHzCloud(cloudOrHzCloud);
-        LOGGER.debug("useHzCloud='{}'", useHzCloud);
-        if (useHzCloud) {
-            String message = String.format("useHzCloud=%b but running Hazelcast node! (property '%s'=='%s')",
-                    useHzCloud, MyConstants.USE_HZ_CLOUD, cloudOrHzCloud);
+        String kubernetesOrViridian = properties.getProperty(MyConstants.USE_VIRIDIAN);
+        boolean useViridian = MyUtils.useViridian(kubernetesOrViridian);
+        LOGGER.debug("useViridian='{}'", useViridian);
+        if (useViridian) {
+            String message = String.format("useViridian=%b but running Hazelcast node! (property '%s'=='%s')",
+                    useViridian, MyConstants.USE_VIRIDIAN, kubernetesOrViridian);
             throw new RuntimeException(message);
         }
         TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(properties);
@@ -163,7 +163,7 @@ public class ApplicationInitializer {
         addListeners(hazelcastInstance, bootstrapServers, pulsarList, usePulsar, projectName, clusterName,
                 transactionMonitorFlavor);
         CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList, usePulsar,
-                useHzCloud, transactionMonitorFlavor);
+                useViridian, transactionMonitorFlavor);
         CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers, transactionMonitorFlavor);
 
         CommonIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,

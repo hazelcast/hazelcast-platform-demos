@@ -553,7 +553,7 @@ public class ApplicationRunner {
     }
 
     /**
-     * <p>Test serverside. Only really needed if using Hazelcast Cloud
+     * <p>Test serverside. Only really needed if using Viridian
      * to confirm upload of custom classes hasn't been forgotten.
      * </p>
      * @return
@@ -631,9 +631,9 @@ public class ApplicationRunner {
             String pulsarOrKafka = properties.getProperty(MyConstants.PULSAR_OR_KAFKA_KEY);
             boolean usePulsar = MyUtils.usePulsar(pulsarOrKafka);
             LOGGER.debug("usePulsar='{}'", usePulsar);
-            String cloudOrHzCloud = properties.getProperty(MyConstants.USE_HZ_CLOUD);
-            boolean useHzCloud = MyUtils.useHzCloud(cloudOrHzCloud);
-            LOGGER.debug("useHzCloud='{}'", useHzCloud);
+            String kubernetesOrViridian = properties.getProperty(MyConstants.USE_VIRIDIAN);
+            boolean useViridian = MyUtils.useViridian(kubernetesOrViridian);
+            LOGGER.debug("useViridian='{}'", useViridian);
             TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(properties);
             LOGGER.info("TransactionMonitorFlavor=='{}'", transactionMonitorFlavor);
 
@@ -652,7 +652,7 @@ public class ApplicationRunner {
             ok &= CommonIdempotentInitialization.createNeededObjects(hazelcastInstance,
                     postgresProperties, ourProjectProvenance, transactionMonitorFlavor, this.localhost);
             ok &= CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList,
-                    usePulsar, useHzCloud, transactionMonitorFlavor);
+                    usePulsar, useViridian, transactionMonitorFlavor);
             ok &= CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance,
                     bootstrapServers, transactionMonitorFlavor);
             if (ok && !this.localhost) {

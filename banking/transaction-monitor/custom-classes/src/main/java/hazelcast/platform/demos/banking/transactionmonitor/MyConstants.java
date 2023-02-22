@@ -45,7 +45,7 @@ public class MyConstants {
     public static final String PULSAR_TOPIC_NAME_TRANSACTIONS = "pulsar_transactions";
     public static final String PULSAR_OR_KAFKA_KEY = "my.pulsar.or.kafka";
     public static final String TRANSACTION_MONITOR_FLAVOR = "my.transaction-monitor.flavor";
-    public static final String USE_HZ_CLOUD = "use.hz-cloud";
+    public static final String USE_VIRIDIAN = "use.viridian";
 
     public static final String IMAP_NAME_AGGREGATE_QUERY_RESULTS = "AggregateQuery" + "_results";
     public static final String IMAP_NAME_ALERTS_LOG = "alertsLog";

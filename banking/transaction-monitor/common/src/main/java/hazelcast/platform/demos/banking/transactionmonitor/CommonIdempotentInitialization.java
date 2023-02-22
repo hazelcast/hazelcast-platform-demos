@@ -249,7 +249,7 @@ public class CommonIdempotentInitialization {
      * </p>
      */
     public static boolean loadNeededData(HazelcastInstance hazelcastInstance, String bootstrapServers,
-            String pulsarList, boolean usePulsar, boolean useHzCloud, TransactionMonitorFlavor transactionMonitorFlavor) {
+            String pulsarList, boolean usePulsar, boolean useViridian, TransactionMonitorFlavor transactionMonitorFlavor) {
         boolean ok = true;
         try {
             IMap<String, String> jobConfigMap =
@@ -272,7 +272,7 @@ public class CommonIdempotentInitialization {
                 } else {
                     jobConfigMap.put(MyConstants.PULSAR_OR_KAFKA_KEY, "kafka");
                 }
-                jobConfigMap.put(MyConstants.USE_HZ_CLOUD, Boolean.valueOf(useHzCloud).toString());
+                jobConfigMap.put(MyConstants.USE_VIRIDIAN, Boolean.valueOf(useViridian).toString());
 
                 LOGGER.trace("Loaded {} into '{}'", jobConfigMap.size(), jobConfigMap.getName());
             }
@@ -1047,10 +1047,10 @@ public class CommonIdempotentInitialization {
         boolean usePulsar = MyUtils.usePulsar(pulsarOrKafka);
         logUsePulsar(usePulsar, pulsarOrKafka);
 
-        String cloudOrHzCloud = hazelcastInstance
-                .getMap(MyConstants.IMAP_NAME_JOB_CONFIG).get(MyConstants.USE_HZ_CLOUD).toString();
-        boolean useHzCloud = MyUtils.useHzCloud(cloudOrHzCloud);
-        logUseHzCloud(useHzCloud, cloudOrHzCloud);
+        String kubernetesOrViridian = hazelcastInstance
+                .getMap(MyConstants.IMAP_NAME_JOB_CONFIG).get(MyConstants.USE_VIRIDIAN).toString();
+        boolean useViridian = MyUtils.useViridian(kubernetesOrViridian);
+        logUseViridian(useViridian, kubernetesOrViridian);
 
         if (System.getProperty("my.autostart.enabled", "").equalsIgnoreCase("false")) {
             LOGGER.info("Not launching Kafka jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",
@@ -1068,9 +1068,9 @@ public class CommonIdempotentInitialization {
             jobConfigIngestTransactions.setName(IngestTransactions.class.getSimpleName());
             jobConfigIngestTransactions.addClass(IngestTransactions.class);
 
-            if (usePulsar && useHzCloud) {
-                //TODO Fix once supported by HZ Cloud
-                LOGGER.error("Pulsar is not currently supported on Hazelcast Cloud");
+            if (usePulsar && useViridian) {
+                //TODO Fix once supported by Viridian
+                LOGGER.error("Pulsar is not currently supported on Viridian");
             } else {
                 UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineIngestTransactions, jobConfigIngestTransactions);
             }
@@ -1087,9 +1087,9 @@ public class CommonIdempotentInitialization {
                     pulsarList, usePulsar, projectName, jobConfigAggregateQuery.getName(),
                     clusterName, transactionMonitorFlavor);
 
-            if (usePulsar && useHzCloud) {
-                //TODO Fix once supported by HZ Cloud
-                LOGGER.error("Pulsar is not currently supported on Hazelcast Cloud");
+            if (usePulsar && useViridian) {
+                //TODO Fix once supported by Viridian
+                LOGGER.error("Pulsar is not currently supported on Viridian");
             } else {
                 UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAggregateQuery, jobConfigAggregateQuery);
                 // Aggregate query creates alerts to an IMap. Use a separate rather than same job to copy to Kafka.
@@ -1105,7 +1105,7 @@ public class CommonIdempotentInitialization {
         }
 
         // Slack SQL integration (reading/writing) from common utils
-        launchSlackReadWrite(useHzCloud, projectName, hazelcastInstance, properties, transactionMonitorFlavor);
+        launchSlackReadWrite(useViridian, projectName, hazelcastInstance, properties, transactionMonitorFlavor);
 
         launchPostgresCDC(hazelcastInstance, postgresProperties,
                 Objects.toString(properties.get(MyConstants.PROJECT_PROVENANCE)));
@@ -1131,14 +1131,14 @@ public class CommonIdempotentInitialization {
     /**
      * <p>Helper for logging.
      * </p>
-     * @param useHzCloud
-     * @param cloudOrHzCloud
+     * @param useViridian
+     * @param kubernetesOrViridian
      */
-    private static void logUseHzCloud(boolean useHzCloud, String cloudOrHzCloud) {
-        if (useHzCloud) {
-            LOGGER.info("Using Hazelcast Cloud = '{}'=='{}'", MyConstants.USE_HZ_CLOUD, cloudOrHzCloud);
+    private static void logUseViridian(boolean useViridian, String kubernetesOrViridian) {
+        if (useViridian) {
+            LOGGER.info("Using Viridian => '{}'=='{}'", MyConstants.USE_VIRIDIAN, kubernetesOrViridian);
         } else {
-            LOGGER.info("Using Non-Hazelcast Cloud = '{}'=='{}'", MyConstants.USE_HZ_CLOUD, cloudOrHzCloud);
+            LOGGER.info("Not using Viridian => '{}'=='{}'", MyConstants.USE_VIRIDIAN, kubernetesOrViridian);
         }
     }
 
@@ -1211,12 +1211,12 @@ public class CommonIdempotentInitialization {
      * <p>Launch Slack jobs for SQL (read/write) and alerting (write)
      * </p>
      *
-     * @param useHzCloud
+     * @param useViridian
      * @param projectName
      * @param hazelcastInstance
      * @param properties
      */
-    private static void launchSlackReadWrite(boolean useHzCloud, Object projectName,
+    private static void launchSlackReadWrite(boolean useViridian, Object projectName,
             HazelcastInstance hazelcastInstance, Properties properties,
             TransactionMonitorFlavor transactionMonitorFlavor) {
 
@@ -1228,9 +1228,9 @@ public class CommonIdempotentInitialization {
         }
 
         // Slack alerting (writing), indirectly uses common utils
-        if (useHzCloud) {
-            //TODO Fix once supported by HZ Cloud
-            LOGGER.error("Slack is not currently supported on Hazelcast Cloud");
+        if (useViridian) {
+            //TODO Fix once supported by Viridian
+            LOGGER.error("Slack is not currently supported on Viridian");
         } else {
             launchSlackJob(hazelcastInstance, properties, transactionMonitorFlavor);
         }

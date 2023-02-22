@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROJECT=transaction-monitor
-MODULE=postgres
+MODULE=mysql
 
 BASEDIR=`dirname $0`
 cd $BASEDIR/../../../$MODULE
@@ -14,8 +14,8 @@ docker network create $PROJECT --driver bridge > /dev/null 2>&1
 # For easier restarts
 docker container prune --force > /dev/null 2>&1
 
-# External port 5432
-CMD="docker run -p 5432:5432 --rm --name=${MODULE} --network=${PROJECT} ${DOCKER_IMAGE}"
+# External port 3306
+CMD="docker run -p 3306:3306 --rm --name=${MODULE} --network=${PROJECT} ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD

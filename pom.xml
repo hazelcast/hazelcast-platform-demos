@@ -34,13 +34,13 @@
 		<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spotbugs.skip>true</spotbugs.skip>
-                <!-- Configure the build for HZ Cloud or all Kubernetes -->
-                <use.hz-cloud>false</use.hz-cloud>
+                <!-- Configure the build for HZ Viridian or all Kubernetes -->
+                <use.viridian>false</use.viridian>
 
 		<!-- Variations for the Transaction Monitor, TransactionMonitorFlavor.java ENUM -->
-		<my.transaction-monitor.flavor>trade</my.transaction-monitor.flavor>
 		<my.transaction-monitor.flavor>ecommerce</my.transaction-monitor.flavor>
 		<my.transaction-monitor.flavor>payments</my.transaction-monitor.flavor>
+		<my.transaction-monitor.flavor>trade</my.transaction-monitor.flavor>
 
 		<!-- For Management Center, Cassandra/Mongo/MySQL etc logons -->
 		<my.mc.admin.user>admin</my.mc.admin.user>
@@ -62,13 +62,13 @@
 
 		<!-- Version dependencies - ${project.version} should track Hazelcast version -->
 		<cassandra-driver.version>3.5.0</cassandra-driver.version>
-		<debezium-connector-cassandra.version>1.4.0.Alpha1</debezium-connector-cassandra.version>
+		<debezium-connector-cassandra-4.version>2.1.2.Final</debezium-connector-cassandra-4.version>
 		<debezium-connector-mongodb.version>1.3.1.Final</debezium-connector-mongodb.version>
 		<javax-annotation.version>1.3.2</javax-annotation.version>
 		<javax-validation.version>2.0.1.Final</javax-validation.version>
 		<guava.version>29.0-jre</guava.version>
-		<!-- Matches banking/credit-value-adjustment/cpp/Dockerfile2 -->
-		<grpc.version>1.49.1</grpc.version>
+		<!-- See also banking/credit-value-adjustment/cpp/Dockerfile -->
+		<grpc.version>1.52.1</grpc.version>
 		<hazelcast.version>5.3.0-SNAPSHOT</hazelcast.version>
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
 		<hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
@@ -84,11 +84,11 @@
 		<poi-ooxml.version>4.1.2</poi-ooxml.version>
 		<!-- Run same version with 'protoc - -grpc_out=. - -plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin' 
 			banking/credit-value-adjustment/common/src/main/proto/JetToCpp.proto -->
-		<protobuf.version>3.21.6</protobuf.version>
+		<protobuf.version>3.21.12</protobuf.version>
 		<pulsar.version>2.8.0</pulsar.version>
 		<spotbugs-annotations.version>4.7.3</spotbugs-annotations.version>
 		<springdoc.version>2.0.0</springdoc.version>
-		<spring-boot.version>3.0.1</spring-boot.version>
+		<spring-boot.version>3.0.2</spring-boot.version>
 		<spring-cloud.version>2021.0.0</spring-cloud.version>
 		<spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
 		<zipkin.version>2.23.3-SNAPSHOT</zipkin.version>
@@ -100,30 +100,33 @@
 		<docker-maven-plugin.version>0.40.2</docker-maven-plugin.version>
 		<exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
 		<frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
+		<hazelcast-cloud-maven-plugin.version>0.0.6</hazelcast-cloud-maven-plugin.version>
 		<maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
-		<maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
+		<maven-assembly-plugin.version>3.4.2</maven-assembly-plugin.version>
 		<maven-checkstyle-plugin.version>3.1.0</maven-checkstyle-plugin.version>
 		<maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
 		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
 		<maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
-		<maven-shade-plugin.version>3.2.2</maven-shade-plugin.version>
+		<maven-shade-plugin.version>3.4.1</maven-shade-plugin.version>
 		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
 		<os-maven-plugin.version>1.6.2</os-maven-plugin.version>
 		<protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
-		<spotbugs-maven-plugin.version>4.7.2.2</spotbugs-maven-plugin.version>
+		<spotbugs-maven-plugin.version>4.7.3.0</spotbugs-maven-plugin.version>
 
 		<!-- Javascript -->
-		<node.version>v18.12.1</node.version>
-		<npm.version>8.19.3</npm.version>
+		<node.version>v19.6.0</node.version>
+		<npm.version>9.4.0</npm.version>
 	</properties>
 
 	<dependencies>
+		<!-- scope==provided -->
 		<dependency>
 			<groupId>com.github.spotbugs</groupId>
 			<artifactId>spotbugs-annotations</artifactId>
 			<version>${spotbugs-annotations.version}</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- scope==test -->
@@ -218,8 +221,8 @@
 
 			<dependency>
 				<groupId>io.debezium</groupId>
-				<artifactId>debezium-connector-cassandra</artifactId>
-				<version>${debezium-connector-cassandra.version}</version>
+				<artifactId>debezium-connector-cassandra-4</artifactId>
+				<version>${debezium-connector-cassandra-4.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>io.debezium</groupId>
@@ -484,10 +487,11 @@
 								<build>
                     				<args>
 										<!-- Hazelcast cloud -->
-										<HZ_CLOUD_CLUSTER1_DISCOVERY_TOKEN>${my.hz.cloud.cluster1.discovery.token}</HZ_CLOUD_CLUSTER1_DISCOVERY_TOKEN>
-										<HZ_CLOUD_CLUSTER1_NAME>${my.hz.cloud.cluster1.name}</HZ_CLOUD_CLUSTER1_NAME>
-										<HZ_CLOUD_CLUSTER1_PASSWORD>${my.hz.cloud.cluster1.password}</HZ_CLOUD_CLUSTER1_PASSWORD>
-										<HZ_CLOUD_CLUSTER1_KEYS_LOCATION>${my.hz.cloud.cluster1.keys.location}</HZ_CLOUD_CLUSTER1_KEYS_LOCATION>
+										<HZ_VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN>${my.viridian.cluster1.discovery.token}</HZ_VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN>
+										<HZ_VIRIDIAN_CLUSTER1_ID>${my.viridian.cluster1.id}</HZ_VIRIDIAN_CLUSTER1_ID>
+										<HZ_VIRIDIAN_CLUSTER1_KEYS_LOCATION>${my.viridian.cluster1.keys.location}</HZ_VIRIDIAN_CLUSTER1_KEYS_LOCATION>
+										<HZ_VIRIDIAN_CLUSTER1_KEYSTORE_PASSWORD>${my.viridian.cluster1.keystore.password}</HZ_VIRIDIAN_CLUSTER1_KEYSTORE_PASSWORD>
+										<HZ_VIRIDIAN_CLUSTER1_TRUSTSTORE_PASSWORD>${my.viridian.cluster1.truststore.password}</HZ_VIRIDIAN_CLUSTER1_TRUSTSTORE_PASSWORD>
 										<!-- Dockerfile will use for our built modules -->
 										<JAR_FILE>${my.docker.jar.file}</JAR_FILE>
 										<JAR_FILE2>${my.docker.jar.file2}</JAR_FILE2>
@@ -563,61 +567,133 @@
 	<profiles>
 		<profile>
 			<!-- docker-maven-plugin does not like null properties -->
-			<id>no-null-docker-maven-plugin-cluster1-name</id>
+			<id>no-null-docker-maven-plugin-slack-bot-user-oath-access-token</id>
 			<properties>
-				<my.hz.cloud.cluster1.name>unset</my.hz.cloud.cluster1.name>
+				<my.slack.bot.user.oath.access.token>unset</my.slack.bot.user.oath.access.token>
 			</properties>
 			<activation>
 				<property>
-					<name>!my.hz.cloud.cluster1.name</name>
+					<name>!my.slack.bot.user.oath.access.token</name>
 				</property>
 			</activation>
 		</profile>
 		<profile>
 			<!-- docker-maven-plugin does not like null properties -->
-			<id>no-null-docker-maven-plugin-cluster1-password</id>
+			<id>no-null-docker-maven-plugin-slack-bot-channel-id</id>
 			<properties>
-				<my.hz.cloud.cluster1.password>unset</my.hz.cloud.cluster1.password>
+				<my.slack.bot.channel.id>unset</my.slack.bot.channel.id>
 			</properties>
 			<activation>
 				<property>
-					<name>!my.hz.cloud.cluster1.password</name>
+					<name>!my.slack.bot.channel.id</name>
 				</property>
 			</activation>
 		</profile>
 		<profile>
 			<!-- docker-maven-plugin does not like null properties -->
-			<id>no-null-docker-maven-plugin-cluster1-location</id>
+			<id>no-null-docker-maven-plugin-slack-bot-channel-name</id>
 			<properties>
-				<my.hz.cloud.cluster1.keys.location>unset</my.hz.cloud.cluster1.keys.location>
+				<my.slack.bot.channel.name>unset</my.slack.bot.channel.name>
 			</properties>
 			<activation>
 				<property>
-					<name>!my.hz.cloud.cluster1.keys.location</name>
+					<name>!my.slack.bot.channel.name</name>
 				</property>
 			</activation>
 		</profile>
 		<profile>
 			<!-- docker-maven-plugin does not like null properties -->
-			<id>no-null-docker-maven-plugin-cluster1-token</id>
-			<properties>
-				<my.hz.cloud.cluster1.discovery.token>unset</my.hz.cloud.cluster1.discovery.token>
-			</properties>
-			<activation>
-				<property>
-					<name>!my.hz.cloud.cluster1.discovery.token</name>
-				</property>
-			</activation>
-		</profile>
-		<profile>
-			<!-- docker-maven-plugin does not like null properties -->
-			<id>no-null-docker-maven-plugin-mc-licens</id>
+			<id>no-null-docker-maven-plugin-license-key</id>
 			<properties>
 				<my.license.key>unset</my.license.key>
 			</properties>
 			<activation>
 				<property>
 					<name>!my.license.key</name>
+				</property>
+			</activation>
+		</profile>
+		<profile>
+			<!-- docker-maven-plugin does not like null properties -->
+			<id>no-null-docker-maven-plugin-viridian-cluster1-id</id>
+			<properties>
+				<my.viridian.cluster1.id>unset</my.viridian.cluster1.id>
+			</properties>
+			<activation>
+				<property>
+					<name>!my.viridian.cluster1.id</name>
+				</property>
+			</activation>
+		</profile>
+		<profile>
+			<!-- docker-maven-plugin does not like null properties -->
+			<id>no-null-docker-maven-plugin-viridian-cluster1-discovery-token</id>
+			<properties>
+				<my.viridian.cluster1.discovery.token>unset</my.viridian.cluster1.discovery.token>
+			</properties>
+			<activation>
+				<property>
+					<name>!my.viridian.cluster1.discovery.token</name>
+				</property>
+			</activation>
+		</profile>
+		<profile>
+			<!-- docker-maven-plugin does not like null properties -->
+			<id>no-null-docker-maven-plugin-viridian-cluster1-keystore-password</id>
+			<properties>
+				<my.viridian.cluster1.keystore.password>unset</my.viridian.cluster1.keystore.password>
+			</properties>
+			<activation>
+				<property>
+					<name>!my.viridian.cluster1.keystore.password</name>
+				</property>
+			</activation>
+		</profile>
+		<profile>
+			<!-- docker-maven-plugin does not like null properties -->
+			<id>no-null-docker-maven-plugin-viridian-cluster1-truststore-password</id>
+			<properties>
+				<my.viridian.cluster1.truststore.password>unset</my.viridian.cluster1.truststore.password>
+			</properties>
+			<activation>
+				<property>
+					<name>!my.viridian.cluster1.truststore.password</name>
+				</property>
+			</activation>
+		</profile>
+		<profile>
+			<!-- docker-maven-plugin does not like null properties -->
+			<id>no-null-docker-maven-plugin-viridian-cluster1-keys-location</id>
+			<properties>
+				<my.viridian.cluster1.keys.location>unset</my.viridian.cluster1.keys.location>
+			</properties>
+			<activation>
+				<property>
+					<name>!my.viridian.cluster1.keys.location</name>
+				</property>
+			</activation>
+		</profile>
+		<profile>
+			<!-- docker-maven-plugin does not like null properties -->
+			<id>no-null-docker-maven-plugin-viridian-cluster1-api-key</id>
+			<properties>
+				<my.viridian.api.key>unset</my.viridian.api.key>
+			</properties>
+			<activation>
+				<property>
+					<name>!my.viridian.api.key</name>
+				</property>
+			</activation>
+		</profile>
+		<profile>
+			<!-- docker-maven-plugin does not like null properties -->
+			<id>no-null-docker-maven-plugin-viridian-cluster1-api-secret</id>
+			<properties>
+				<my.viridian.api.secret>unset</my.viridian.api.secret>
+			</properties>
+			<activation>
+				<property>
+					<name>!my.viridian.api.secret</name>
 				</property>
 			</activation>
 		</profile>

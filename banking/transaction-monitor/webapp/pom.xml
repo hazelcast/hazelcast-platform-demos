@@ -56,7 +56,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- Need this for SSL for HZ Cloud -->
+		<!-- Need this for SSL for HZ Viridian -->
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-enterprise</artifactId>

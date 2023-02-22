@@ -7,7 +7,7 @@ name to match your image repository.
 kubernetes-1-zookeeper-kafka-firsthalf.yaml
 kubernetes-2-create-configmap.sh
 kubernetes-3-kafka-secondhalf.yaml
-kubernetes-4-kafdrop-topic-postgres.yaml
+kubernetes-4-kafdrop-topic-rdbms.yaml
 kubernetes-5-optional-hazelcast-enterprise.yaml
 kubernetes-5-optional-hazelcast.yaml
 kubernetes-6-webapp-and-monitoring.yaml
@@ -28,9 +28,9 @@ Shell script to create a YAML ConfigMap with external IPs of Kafka brokers.
 
 YAML to create Kafka brokers using above ConfigMap to configure.
 
-### 4. `kubernetes-4-kafdrop-topic-postgres.yaml`
+### 4. `kubernetes-4-kafdrop-topic-mysql.yaml`
 
-YAML to create Kakfa topic with non-default partition count for optimal reading, Kafdrop for inspection and a Postgres database.
+YAML to create Kakfa topic with non-default partition count for optimal reading, Kafdrop for inspection, and MySql and Postgres databases.
 
 ### 5
 

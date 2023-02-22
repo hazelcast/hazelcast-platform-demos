@@ -387,12 +387,12 @@ public class MyUtils {
     }
 
     /**
-     * <p>Determine target, assume Cloud
+     * <p>Determine target, assume Viridian
      * </p>
      * @param s
      * @return
      */
-    public static boolean useHzCloud(String s) {
+    public static boolean useViridian(String s) {
         if (s == null || s.isBlank()) {
             return true;
         } else {
