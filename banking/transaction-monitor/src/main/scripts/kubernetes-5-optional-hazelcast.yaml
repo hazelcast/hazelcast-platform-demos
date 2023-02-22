@@ -70,6 +70,8 @@ spec:
         - env:
           - name: "MY_BOOTSTRAP_SERVERS"
             value: "transaction-monitor-FLAVOR-kafka-broker-0.transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-FLAVOR-kafka-broker-1.transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-FLAVOR-kafka-broker-2.transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local:9092"
+          - name: "MY_MYSQL_ADDRESS"
+            value: "transaction-monitor-FLAVOR-mysql.default.svc.cluster.local:3306"
           - name: "MY_POSTGRES_ADDRESS"
             value: "transaction-monitor-FLAVOR-postgres.default.svc.cluster.local:5432"
           - name: "MY_PULSAR_LIST"

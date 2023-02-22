@@ -56,6 +56,20 @@ spec:
   - port: 9092
   type: LoadBalancer
 ---
+# MySql : DNS will be "transaction-monitor-FLAVOR-mysql.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-FLAVOR-mysql
+spec:
+  selector:
+    app: transaction-monitor-FLAVOR-mysql
+  ports:
+  - port: 3306
+    targetPort: 3306
+  type: LoadBalancer
+---
 # Postgres : DNS will be "transaction-monitor-FLAVOR-postgres.default.svc.cluster.local".
 ---
 apiVersion: v1

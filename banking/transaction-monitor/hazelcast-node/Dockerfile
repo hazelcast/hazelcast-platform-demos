@@ -39,6 +39,7 @@ CMD ["bash", "-c", "set -euo pipefail \
  -Dmy.autostart.enabled=$MY_AUTOSTART_ENABLED \
  -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS \
  -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+ -Dmy.mysql.address=$MY_MYSQL_ADDRESS \
  -Dmy.pulsar.list=$MY_PULSAR_LIST \
  -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
  -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
@@ -47,6 +48,7 @@ CMD ["bash", "-c", "set -euo pipefail \
  -Dmy.autostart.enabled=$MY_AUTOSTART_ENABLED \
  -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS \
  -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+ -Dmy.mysql.address=$MY_MYSQL_ADDRESS \
  -Dmy.pulsar.list=$MY_PULSAR_LIST \
  -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
  -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \

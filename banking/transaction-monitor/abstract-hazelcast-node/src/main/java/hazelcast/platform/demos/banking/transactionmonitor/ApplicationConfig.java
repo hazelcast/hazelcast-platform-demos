@@ -21,6 +21,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
 import java.util.Map.Entry;
@@ -30,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import com.hazelcast.config.ClasspathYamlConfig;
 import com.hazelcast.config.Config;
+import com.hazelcast.config.DataLinkConfig;
 import com.hazelcast.config.DataPersistenceConfig;
 import com.hazelcast.config.DiscoveryConfig;
 import com.hazelcast.config.DiscoveryStrategyConfig;
@@ -44,6 +46,7 @@ import com.hazelcast.config.TcpIpConfig;
 import com.hazelcast.config.TieredStoreConfig;
 import com.hazelcast.config.WanReplicationConfig;
 import com.hazelcast.config.WanReplicationRef;
+import com.hazelcast.datalink.JdbcDataLinkFactory;
 import com.hazelcast.memory.Capacity;
 import com.hazelcast.memory.MemoryUnit;
 
@@ -96,6 +99,9 @@ public class ApplicationConfig {
             LOGGER.info("Non-Kubernetes configuration: member-list: {}", tcpIpConfig.getMembers());
             LOGGER.info("Non-Kubernetes configuration: use port: {}", config.getNetworkConfig().getPort());
         }
+
+        //TODO Fix once supported by Viridian
+        temporaryDefineDataLink(config, properties);
 
         // If using Enterprise
         if (!config.getWanReplicationConfigs().isEmpty()) {
@@ -301,6 +307,48 @@ public class ApplicationConfig {
             MapConfig mapConfig = config.getMapConfig(mapName);
             LOGGER.debug("Setting map '{}' for PersistentStore", mapConfig.getName());
             mapConfig.setDataPersistenceConfig(dataPersistenceConfig);
+        }
+    }
+
+    /**
+     * <p><b>Temporary coding</b></p>
+     * <p>Define an external store (MySql), for use by a map with generic
+     * map store.
+     * </p>
+     *
+     * TODO Once supported by Viridian, move to {@link CommonIdempotentInitialization}/
+     *
+     * @param config To extend
+     * @param properties For logon, password
+     */
+    private static void temporaryDefineDataLink(Config config, Properties properties) {
+        LOGGER.warn("Add generic map-store only currently for self-hosted");
+
+        try {
+            TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(properties);
+
+            String address = System.getProperty(MyConstants.MYSQL_ADDRESS);
+            String database = "transaction-monitor-" + transactionMonitorFlavor.toString().toLowerCase(Locale.ROOT);
+            String username = properties.getProperty("my.mysql.user");
+            String password = properties.getProperty("my.mysql.password");
+            String jdbcUrl = "jdbc:mysql://" + address + "/" + database;
+
+            LOGGER.info("MySql connection: Url: '{}'", jdbcUrl);
+            LOGGER.trace("MySql connection: User: '{}'", username);
+            LOGGER.trace("MySql connection: Pass: '{}'", password);
+
+            DataLinkConfig dataLinkConfig =
+                    new DataLinkConfig(MyConstants.MYSQL_DATASTORE_CONFIG_NAME)
+                    .setClassName(JdbcDataLinkFactory.class.getName())
+                    .setProperty("jdbcUrl", jdbcUrl)
+                    .setProperty("username", username)
+                    .setProperty("password", password)
+                    .setShared(true);
+
+            config.addDataLinkConfig(dataLinkConfig);
+
+        } catch (Exception e) {
+            LOGGER.error("temporaryDefineDataLink()", e);
         }
     }
 }

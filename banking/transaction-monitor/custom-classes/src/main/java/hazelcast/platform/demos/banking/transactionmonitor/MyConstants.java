@@ -28,6 +28,15 @@ public class MyConstants {
     public static final String KAFKA_TOPIC_MAPPING_PREFIX = "";
     public static final String KAFKA_TOPIC_NAME_ALERTS = "kf_alerts";
     public static final String KAFKA_TOPIC_NAME_TRANSACTIONS = "kf_transactions";
+    public static final String MYSQL_ADDRESS = "my.mysql.address";
+    public static final String MYSQL_DATASTORE_CONFIG_NAME = "mysql";
+    public static final String MYSQL_DATASTORE_TABLE_NAME = "mysql_slf4j";
+    public static final String MYSQL_DATASTORE_TABLE_COLUMN0 = "socket_address";
+    public static final String MYSQL_DATASTORE_TABLE_COLUMN1 = "when_ts";
+    public static final String MYSQL_DATASTORE_TABLE_COLUMN2 = "level";
+    public static final String MYSQL_DATASTORE_TABLE_COLUMN3 = "message";
+    public static final String MYSQL_DATASTORE_TABLE_COLUMN4 = "thread_name";
+    public static final String MYSQL_DATASTORE_TABLE_COLUMN5 = "logger_name";
     public static final String POSTGRES_CONFIG_KEY = "my.postgres.address";
     public static final String POSTGRES_ADDRESS = "my.postgres.address";
     public static final String POSTGRES_DATABASE = "my.postgres.db";

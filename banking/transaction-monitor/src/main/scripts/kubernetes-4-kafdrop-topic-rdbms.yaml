@@ -93,6 +93,31 @@ spec:
               port: 9000
             initialDelaySeconds: 30
 ---
+# MySql
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: mysql
+  name: transaction-monitor-FLAVOR-mysql
+spec:
+  selector:
+    matchLabels:
+      app: transaction-monitor-FLAVOR-mysql
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-FLAVOR-mysql
+        app.kubernetes.io/component: mysql
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-mysql"
+          imagePullPolicy: Never
+          name: transaction-monitor-FLAVOR-mysql-container
+          ports:
+            - containerPort: 3306
+---
 # Postgres
 ---
 apiVersion: apps/v1

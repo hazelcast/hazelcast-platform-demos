@@ -18,6 +18,7 @@ package hazelcast.platform.demos.banking.transactionmonitor;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -45,12 +46,14 @@ import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.jet.datamodel.Tuple4;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.map.IMap;
+import com.hazelcast.mapstore.GenericMapStore;
 import com.hazelcast.platform.demos.utils.UtilsConstants;
 import com.hazelcast.platform.demos.utils.UtilsFormatter;
 import com.hazelcast.platform.demos.utils.UtilsJobs;
 import com.hazelcast.platform.demos.utils.UtilsSlack;
 import com.hazelcast.platform.demos.utils.UtilsSlackSQLJob;
 import com.hazelcast.platform.demos.utils.UtilsSlackSink;
+import com.hazelcast.sql.SqlRow;
 
 /**
  * <p>May be invoked from clientside or serverside to ensure serverside ready.
@@ -71,7 +74,12 @@ public class CommonIdempotentInitialization {
      */
     public static boolean createMinimal(HazelcastInstance hazelcastInstance,
             TransactionMonitorFlavor transactionMonitorFlavor) {
-        return defineWANIMaps(hazelcastInstance, transactionMonitorFlavor);
+        boolean ok = defineWANIMaps(hazelcastInstance, transactionMonitorFlavor);
+        if (ok) {
+            logStuff(hazelcastInstance);
+            showMappingsAndViews(hazelcastInstance);
+        }
+        return ok;
     }
 
     /**
@@ -181,6 +189,39 @@ public class CommonIdempotentInitialization {
             hazelcastInstance.getConfig().addMapConfig(alertsMapConfig);
         } else {
             LOGGER.trace("Don't add journal to '{}', map already exists", MyConstants.IMAP_NAME_ALERTS_LOG);
+        }
+
+        // Generic config, MapStore implementation is derived
+        if (!existingIMapNames.contains(MyConstants.IMAP_NAME_MYSQL_SLF4J)) {
+            MapConfig mySqlMapConfig = new MapConfig(MyConstants.IMAP_NAME_MYSQL_SLF4J);
+
+            Properties mySqlProperties = new Properties();
+            mySqlProperties.setProperty("external-data-store-ref", MyConstants.MYSQL_DATASTORE_CONFIG_NAME);
+            mySqlProperties.setProperty("mapping-type", "JDBC");
+            mySqlProperties.setProperty("table-name", MyConstants.MYSQL_DATASTORE_TABLE_NAME);
+            mySqlProperties.setProperty("id-column",
+                    MyConstants.MYSQL_DATASTORE_TABLE_COLUMN0 + "," + MyConstants.MYSQL_DATASTORE_TABLE_COLUMN1);
+            mySqlProperties.setProperty("column",
+                    MyConstants.MYSQL_DATASTORE_TABLE_COLUMN0 + "," + MyConstants.MYSQL_DATASTORE_TABLE_COLUMN1
+                    + "," + MyConstants.MYSQL_DATASTORE_TABLE_COLUMN2 + "," + MyConstants.MYSQL_DATASTORE_TABLE_COLUMN3
+                    + "," + MyConstants.MYSQL_DATASTORE_TABLE_COLUMN4 + "," + MyConstants.MYSQL_DATASTORE_TABLE_COLUMN5);
+
+            MapStoreConfig mySqlStoreConfig = new MapStoreConfig();
+            mySqlStoreConfig.setEnabled(true);
+            mySqlStoreConfig.setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER);
+            mySqlStoreConfig.setClassName(GenericMapStore.class.getName());
+            mySqlStoreConfig.setProperties(mySqlProperties);
+
+            if (localhost) {
+                LOGGER.info("localhost=={}, no map store for MySql", localhost);
+            } else {
+                LOGGER.info("MySql configured using: {}", mySqlMapConfig.getMapStoreConfig().getProperties());
+                mySqlMapConfig.setMapStoreConfig(mySqlStoreConfig);
+            }
+
+            hazelcastInstance.getConfig().addMapConfig(mySqlMapConfig);
+        } else {
+            LOGGER.trace("Don't add generic mapstore to '{}', map already exists", MyConstants.IMAP_NAME_MYSQL_SLF4J);
         }
 
         return true;
@@ -1375,6 +1416,31 @@ public class CommonIdempotentInitialization {
                     iMapName, hazelcastInstance.getMap(iMapName).size());
         }
         LOGGER.info("---------");
+        LOGGER.info("~_~_~_~_~");
+    }
+
+
+    /**
+     * <p>Confirm mappings/views added implicitly or explicitly.
+     * </p>
+     */
+    private static void showMappingsAndViews(HazelcastInstance hazelcastInstance) {
+        for (String query : List.of("SHOW MAPPINGS", "SHOW VIEWS")) {
+            LOGGER.info("~_~_~_~_~");
+            LOGGER.info("{}", query);
+            LOGGER.info("---------");
+            int count = 0;
+            try {
+                Iterator<SqlRow> iterator = hazelcastInstance.getSql().execute(query).iterator();
+                while (iterator.hasNext()) {
+                    count++;
+                    LOGGER.info("{}", iterator.next());
+                }
+                LOGGER.info("[{} row{}]", count, (count == 1 ? "" : "s"));
+            } catch (Exception e) {
+                LOGGER.error("showMappingsAndViews():" + query, e);
+            }
+        }
         LOGGER.info("~_~_~_~_~");
     }
 }

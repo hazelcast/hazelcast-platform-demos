@@ -7,6 +7,7 @@ flush privileges;
 
 use @my.other.admin.database@;
 
+-- Referenced by CommonIdempotentInitialization.java
 create table mysql_slf4j (  
  socket_address      varchar(48) not null, 
  when_ts             timestamp not null,
