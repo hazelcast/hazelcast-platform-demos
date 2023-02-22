@@ -48,6 +48,7 @@ import com.hazelcast.map.IMap;
 import com.hazelcast.platform.demos.utils.UtilsConstants;
 import com.hazelcast.platform.demos.utils.UtilsFormatter;
 import com.hazelcast.platform.demos.utils.UtilsJobs;
+import com.hazelcast.platform.demos.utils.UtilsSlack;
 import com.hazelcast.platform.demos.utils.UtilsSlackSQLJob;
 import com.hazelcast.platform.demos.utils.UtilsSlackSink;
 
@@ -1219,6 +1220,23 @@ public class CommonIdempotentInitialization {
     private static void launchSlackReadWrite(boolean useViridian, Object projectName,
             HazelcastInstance hazelcastInstance, Properties properties,
             TransactionMonitorFlavor transactionMonitorFlavor) {
+
+        String slackAccessToken = Objects.toString(properties.get(UtilsConstants.SLACK_ACCESS_TOKEN));
+        String slackChannelId = Objects.toString(properties.get(UtilsConstants.SLACK_CHANNEL_ID));
+        String slackChannelName = Objects.toString(properties.get(UtilsConstants.SLACK_CHANNEL_NAME));
+
+        if (slackAccessToken.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY) {
+            LOGGER.warn("No Slack jobs, '{}' too short: '{}'", UtilsConstants.SLACK_ACCESS_TOKEN, slackAccessToken);
+            return;
+        }
+        if (slackChannelId.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY) {
+            LOGGER.warn("No Slack jobs, '{}' too short: '{}'", UtilsConstants.SLACK_CHANNEL_ID, slackChannelId);
+            return;
+        }
+        if (slackChannelName.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY) {
+            LOGGER.warn("No Slack jobs, '{}' too short: '{}'", UtilsConstants.SLACK_CHANNEL_NAME, slackChannelName);
+            return;
+        }
 
         try {
             UtilsSlackSQLJob.submitJob(hazelcastInstance,
