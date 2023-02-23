@@ -12,6 +12,7 @@ kubernetes-5-optional-hazelcast-enterprise.yaml
 kubernetes-5-optional-hazelcast.yaml
 kubernetes-6-webapp-and-monitoring.yaml
 kubernetes-7-transaction-producer.yaml
+kubernetes-8-polyglot-clients.yaml
 ```
 
 ## Steps
@@ -63,6 +64,10 @@ YAML to create a stream of transactions.
 
 Can be run before or after `kubernetes-6-webapp-and-monitoring.yaml`. After would be usual, but there is no dependency
 between these two.
+
+### 7=. `kubernetes-8-polyglot-clients.yaml`
+
+Optional step to run clients in non-Java languages, to poll the data.
 
 ## Bonus
 

@@ -75,10 +75,8 @@ public class CommonIdempotentInitialization {
     public static boolean createMinimal(HazelcastInstance hazelcastInstance,
             TransactionMonitorFlavor transactionMonitorFlavor) {
         boolean ok = defineWANIMaps(hazelcastInstance, transactionMonitorFlavor);
-        if (ok) {
-            logStuff(hazelcastInstance);
-            showMappingsAndViews(hazelcastInstance);
-        }
+        logStuff(hazelcastInstance);
+        showMappingsAndViews(hazelcastInstance);
         return ok;
     }
 
@@ -196,7 +194,7 @@ public class CommonIdempotentInitialization {
             MapConfig mySqlMapConfig = new MapConfig(MyConstants.IMAP_NAME_MYSQL_SLF4J);
 
             Properties mySqlProperties = new Properties();
-            mySqlProperties.setProperty("external-data-store-ref", MyConstants.MYSQL_DATASTORE_CONFIG_NAME);
+            mySqlProperties.setProperty("data-link-ref", MyConstants.MYSQL_DATASTORE_CONFIG_NAME);
             mySqlProperties.setProperty("mapping-type", "JDBC");
             mySqlProperties.setProperty("table-name", MyConstants.MYSQL_DATASTORE_TABLE_NAME);
             mySqlProperties.setProperty("id-column",

@@ -63,6 +63,10 @@ wait_for_pod() {
    WAIT_ON=job-trans-producer
    REQUIRED_STATE=Running
    ;;
+  8)
+   WAIT_ON=job-client-golang
+   REQUIRED_STATE=Running
+   ;;
  esac
  echo Waiting for \'$WAIT_ON\' to reach \"$REQUIRED_STATE\" state.
  COUNT=0

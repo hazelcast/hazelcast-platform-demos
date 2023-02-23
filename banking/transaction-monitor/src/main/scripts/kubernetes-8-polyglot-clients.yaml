@@ -1,0 +1,21 @@
+---
+# One of each language
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transaction-monitor-FLAVOR-client-golang
+spec:
+  selector:
+    matchLabels:
+      app: transaction-monitor-FLAVOR-client-golang
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-FLAVOR-client-golang
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-client-golang"
+          imagePullPolicy: Never
+          name: transaction-monitor-FLAVOR-client-golang-container
+---

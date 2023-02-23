@@ -28,6 +28,7 @@ import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
 import com.hazelcast.client.config.YamlClientConfigBuilder;
 import com.hazelcast.config.SSLConfig;
+import com.hazelcast.platform.demos.utils.UtilsFormatter;
 
 /**
  * <p>Configure Jet client for connection to cluster. Use a config file, then override
@@ -61,6 +62,8 @@ public class ApplicationConfig {
     public static ClientConfig buildJetClientConfig() {
         ClientConfig clientConfig = new YamlClientConfigBuilder().build();
         clusterName = clientConfig.getClusterName();
+
+        addLabels(clientConfig);
 
         ClientNetworkConfig clientNetworkConfig = clientConfig.getNetworkConfig();
         clientNetworkConfig.getAutoDetectionConfig().setEnabled(false);
@@ -192,5 +195,15 @@ public class ApplicationConfig {
 
     public static String getClusterName() {
         return ApplicationConfig.clusterName;
+    }
+
+    /**
+     * <p>For Management Center</p>
+     *
+     * @param clientConfig
+     */
+    private static void addLabels(ClientConfig clientConfig) {
+        clientConfig.addLabel(System.getProperty("user.name"));
+        clientConfig.addLabel(UtilsFormatter.timestampToISO8601(System.currentTimeMillis()));
     }
 }
