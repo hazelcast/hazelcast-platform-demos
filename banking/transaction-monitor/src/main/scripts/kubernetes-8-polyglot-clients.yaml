@@ -4,6 +4,60 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: transaction-monitor-FLAVOR-client-command-line
+spec:
+  selector:
+    matchLabels:
+      app: transaction-monitor-FLAVOR-client-command-line
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-FLAVOR-client-command-line
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-client-command-line"
+          imagePullPolicy: Never
+          name: transaction-monitor-FLAVOR-client-command-line-container
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transaction-monitor-FLAVOR-client-csharp
+spec:
+  selector:
+    matchLabels:
+      app: transaction-monitor-FLAVOR-client-csharp
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-FLAVOR-client-csharp
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-client-sharp"
+          imagePullPolicy: Never
+          name: transaction-monitor-FLAVOR-client-csharp-container
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transaction-monitor-FLAVOR-client-cpp
+spec:
+  selector:
+    matchLabels:
+      app: transaction-monitor-FLAVOR-client-cpp
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-FLAVOR-client-cpp
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-client-cpp"
+          imagePullPolicy: Never
+          name: transaction-monitor-FLAVOR-client-cpp-container
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: transaction-monitor-FLAVOR-client-golang
 spec:
   selector:
@@ -18,4 +72,40 @@ spec:
         - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-client-golang"
           imagePullPolicy: Never
           name: transaction-monitor-FLAVOR-client-golang-container
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transaction-monitor-FLAVOR-client-nodejs
+spec:
+  selector:
+    matchLabels:
+      app: transaction-monitor-FLAVOR-client-nodejs
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-FLAVOR-client-nodejs
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-client-nodejs"
+          imagePullPolicy: Never
+          name: transaction-monitor-FLAVOR-client-nodejs-container
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transaction-monitor-FLAVOR-client-python
+spec:
+  selector:
+    matchLabels:
+      app: transaction-monitor-FLAVOR-client-python
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-FLAVOR-client-python
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-client-python"
+          imagePullPolicy: Never
+          name: transaction-monitor-FLAVOR-client-python-container
 ---
