@@ -1,8 +1,11 @@
 FROM --platform=linux/amd64 library/python:3.10
 
 COPY target/classes/*.py /
+COPY target/classes/requirements.txt /
 
+RUN pip install --upgrade pip
 RUN pip install hazelcast-python-client
+RUN pip install psutil
 
 CMD ["bash", "-c", "set -euo pipefail \
       && echo @@@@@@@@@@ \
