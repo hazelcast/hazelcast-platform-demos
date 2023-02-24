@@ -38,9 +38,10 @@
                 <use.viridian>false</use.viridian>
 
 		<!-- Variations for the Transaction Monitor, TransactionMonitorFlavor.java ENUM -->
-		<my.transaction-monitor.flavor>ecommerce</my.transaction-monitor.flavor>
+		<!-- "ecommerce" is last, hence is the value used, as most generally applicable -->
 		<my.transaction-monitor.flavor>payments</my.transaction-monitor.flavor>
 		<my.transaction-monitor.flavor>trade</my.transaction-monitor.flavor>
+		<my.transaction-monitor.flavor>ecommerce</my.transaction-monitor.flavor>
 
 		<!-- For Management Center, Cassandra/Mongo/MySQL etc logons -->
 		<my.mc.admin.user>admin</my.mc.admin.user>

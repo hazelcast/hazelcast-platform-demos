@@ -84,6 +84,7 @@ public class ApplicationConfig {
         if (!myProperties.getProperty(VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN, "").isBlank()
                 && !myProperties.getProperty(VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN, "").equals("unset")
                 && useViridian) {
+            clientNetworkConfig.setSmartRouting(false);
             clientNetworkConfig.getKubernetesConfig().setEnabled(false);
             clientNetworkConfig.getCloudConfig().setEnabled(true);
             clientNetworkConfig.getCloudConfig()
@@ -125,6 +126,7 @@ public class ApplicationConfig {
                         + clientNetworkConfig.getAddresses());
             }
         }
+        LOGGER.info("smart-routing=='{}'", clientNetworkConfig.isSmartRouting());
 
         return clientConfig;
     }

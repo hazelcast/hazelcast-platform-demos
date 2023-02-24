@@ -64,7 +64,7 @@ wait_for_pod() {
    REQUIRED_STATE=Running
    ;;
   8)
-   WAIT_ON=job-client-golang
+   WAIT_ON=client-python
    REQUIRED_STATE=Running
    ;;
  esac

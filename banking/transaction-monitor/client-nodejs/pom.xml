@@ -29,21 +29,9 @@
 
 		<plugins>
 			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<configuration>
-					<target>
-						<echo message="@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" />
-						<echo message="TODO TODO TODO TODO TODO TODO TODO" />
-						<echo message="@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" />
-					</target>
-				</configuration>
-			</plugin>
-			<!--
-			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
 			</plugin>
-			-->
 		</plugins>
 	</build>
 </project>
