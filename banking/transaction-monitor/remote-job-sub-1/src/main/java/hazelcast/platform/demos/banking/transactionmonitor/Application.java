@@ -33,6 +33,7 @@ import com.hazelcast.map.IMap;
  * </p>
  */
 public class Application {
+    private static final String FILENAME = "application.properties";
 
     /**
      * <p>Use the Jet connection provided by "{@code Jet.bootstrappedInstance()}"
@@ -42,10 +43,14 @@ public class Application {
     public static void main(String[] args) throws Exception {
         HazelcastInstance hazelcastInstance = Hazelcast.bootstrappedInstance();
 
-        Properties properties = buildKafkaProperties(hazelcastInstance);
-        String buildTimestamp = getBuildTimestamp();
+        Properties buildProperties = MyUtils.loadProperties(FILENAME);
 
-        Pipeline pipelinePythonAnalysis = PythonAnalysis.buildPipeline(properties, buildTimestamp);
+        checkFlavor(hazelcastInstance, buildProperties);
+
+        Properties clusterProperties = buildKafkaProperties(hazelcastInstance);
+        String buildTimestamp = getBuildTimestamp(buildProperties);
+
+        Pipeline pipelinePythonAnalysis = PythonAnalysis.buildPipeline(clusterProperties, buildTimestamp);
 
         JobConfig jobConfigPythonAnalysis = new JobConfig();
         jobConfigPythonAnalysis.addClass(PythonAnalysis.class);
@@ -53,6 +58,41 @@ public class Application {
 
         // Fails if job exists with same job name, unlike "newJobIfAbsent"
         hazelcastInstance.getJet().newJob(pipelinePythonAnalysis, jobConfigPythonAnalysis);
+    }
+
+    /**
+     * <p>Check the build flavor matches the cluster.
+     * </p>
+     *
+     * @param hazelcastInstance
+     * @throws Exception
+     */
+    private static void checkFlavor(HazelcastInstance hazelcastInstance, Properties buildProperties) throws Exception {
+        IMap<String, String> configMap =
+                hazelcastInstance.getMap(MyConstants.IMAP_NAME_JOB_CONFIG);
+
+        String buildFlavor = buildProperties.getProperty(MyConstants.TRANSACTION_MONITOR_FLAVOR);
+        if (buildFlavor == null || buildFlavor.isBlank()) {
+            String message = String.format("'%s' not found in '%s' file",
+                    MyConstants.TRANSACTION_MONITOR_FLAVOR, FILENAME);
+            System.err.println(message);
+            throw new RuntimeException(message);
+        }
+
+        String clusterFlavor = configMap.get(MyConstants.TRANSACTION_MONITOR_FLAVOR);
+        if (clusterFlavor == null || clusterFlavor.isBlank()) {
+            String message = String.format("Map '%s' is empty, run WEBAPP to load",
+                    configMap.getName());
+            System.err.println(message);
+            throw new RuntimeException(message);
+        }
+
+        if (!clusterFlavor.equalsIgnoreCase(buildFlavor)) {
+            String message = String.format("'%s': Build is '%s', cluster is '%s'",
+                    MyConstants.TRANSACTION_MONITOR_FLAVOR, buildFlavor, clusterFlavor);
+            System.err.println(message);
+            throw new RuntimeException(message);
+        }
     }
 
     /**
@@ -65,12 +105,12 @@ public class Application {
      * @return
      */
     private static Properties buildKafkaProperties(HazelcastInstance hazelcastInstance) throws Exception {
-        IMap<String, String> kafkaConfigMap =
+        IMap<String, String> configMap =
                 hazelcastInstance.getMap(MyConstants.IMAP_NAME_JOB_CONFIG);
 
-        if (kafkaConfigMap.isEmpty()) {
+        if (configMap.isEmpty()) {
             String message = String.format("Map '%s' is empty, run WEBAPP to load",
-                    kafkaConfigMap.getName());
+                    configMap.getName());
             System.err.println(message);
             throw new RuntimeException(message);
         }
@@ -79,27 +119,26 @@ public class Application {
 
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                kafkaConfigMap.get(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
+                configMap.get(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, UUID.randomUUID().toString());
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
-                kafkaConfigMap.get(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG));
+                configMap.get(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG));
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-                kafkaConfigMap.get(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG));
+                configMap.get(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG));
 
         return properties;
     }
 
 
     /**
-     * <p>Finds the Maven build from the classpath.
+     * <p>Finds the Maven build from properties from the classpath.
      * </p>
      *
      * @return
      * @throws Exception
      */
-    private static String getBuildTimestamp() throws Exception {
-        Properties properties = MyUtils.loadProperties("application.properties");
-        String buildTimestamp = properties.getProperty("my.build-timestamp");
+    private static String getBuildTimestamp(Properties buildProperties) throws Exception {
+        String buildTimestamp = buildProperties.getProperty("my.build-timestamp");
         if (buildTimestamp == null || buildTimestamp.length() == 0) {
             throw new RuntimeException("Could not find 'my.build-timestamp' in 'application.properties'");
         }

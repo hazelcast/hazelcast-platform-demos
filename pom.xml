@@ -81,7 +81,7 @@
 		<jython.version>2.7.2</jython.version>
 		<kafka-connect.version>2.6.0</kafka-connect.version>
 		<mongo-java-driver.version>3.12.8</mongo-java-driver.version>
-		<mysql-connector-java.version>8.0.32</mysql-connector-java.version>
+		<mysql-connector-j.version>8.0.32</mysql-connector-j.version>
 		<netty-tcnative.version>2.0.52.Final</netty-tcnative.version>
 		<poi-ooxml.version>4.1.2</poi-ooxml.version>
 		<!-- Run same version with 'protoc - -grpc_out=. - -plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin' 
@@ -90,7 +90,7 @@
 		<pulsar.version>2.8.0</pulsar.version>
 		<spotbugs-annotations.version>4.7.3</spotbugs-annotations.version>
 		<springdoc.version>2.0.0</springdoc.version>
-		<spring-boot.version>3.0.2</spring-boot.version>
+		<spring-boot.version>3.0.3</spring-boot.version>
 		<spring-cloud.version>2021.0.0</spring-cloud.version>
 		<spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
 		<zipkin.version>2.23.3-SNAPSHOT</zipkin.version>
@@ -261,9 +261,9 @@
 			</dependency>
 
 			<dependency>
-				<groupId>mysql</groupId>
-				<artifactId>mysql-connector-java</artifactId>
-				<version>${mysql-connector-java.version}</version>
+				<groupId>com.mysql</groupId>
+				<artifactId>mysql-connector-j</artifactId>
+				<version>${mysql-connector-j.version}</version>
 			</dependency>
 
 			<dependency>

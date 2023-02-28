@@ -26,12 +26,15 @@ import (
 
 	"github.com/hazelcast/hazelcast-go-client"
 	"github.com/hazelcast/hazelcast-go-client/logger"
+	"github.com/hazelcast/hazelcast-go-client/sql"
+	"github.com/hazelcast/hazelcast-go-client/types"
 )
 
 const clusterName = "@my.cluster1.name@"
 const instanceName = "@project.artifactId@"
 const serviceDns = "@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local"
 
+const genericRecordMap = "__map-store.mysql_slf4j"
 const loggingLevel = logger.InfoLevel
 
 func getClient(ctx context.Context, kubernetes string) *hazelcast.Client {
@@ -77,10 +80,25 @@ func runSqlQuery(ctx context.Context, hazelcastClient *hazelcast.Client, query s
 		str := ""
 		for i := 0; i < cols; i++ {
 			col, _ := row.Get(i)
-			if i == 0 {
-				str = fmt.Sprintf("%s", col)
+			if metaData.Columns()[i].Type() == sql.ColumnTypeVarchar {
+				if i == 0 {
+					str = fmt.Sprintf("%v", col)
+				} else {
+					str = fmt.Sprintf("%s %v", str, col)
+				}
 			} else {
-				str = fmt.Sprintf("%s %v", str, col)
+				if metaData.Columns()[i].Type() == sql.ColumnTypeTimestamp {
+					dateTimeValue := col.(types.LocalDateTime)
+					ts := time.Time(dateTimeValue)
+					printDateTimeValue := ts.Format(time.RFC3339)
+					if i == 0 {
+						str = fmt.Sprintf("%v", printDateTimeValue)
+					} else {
+						str = fmt.Sprintf("%s %v", str, printDateTimeValue)
+					}
+				} else {
+					str = fmt.Sprintf("%s Unhandled Type for Column '%v'", str, metaData.Columns()[i].Name())
+				}
 			}
 		}
 		fmt.Printf("%s\n", str)
@@ -97,7 +115,8 @@ func listDistributedObjects(ctx context.Context, hazelcastClient *hazelcast.Clie
 	for _, distributedObject := range distributedObjectInfo {
 		do_name := distributedObject.Name
 		if strings.Compare("__", do_name[0:2]) != 0 {
-			fmt.Printf("%s\n", do_name)
+			do_service_name := distributedObject.ServiceName
+			fmt.Printf("%s => '%s'\n", do_service_name, do_name)
 			count++
 		}
 	}
@@ -106,8 +125,9 @@ func listDistributedObjects(ctx context.Context, hazelcastClient *hazelcast.Clie
 
 func getGenericRecord(ctx context.Context, hazelcastClient *hazelcast.Client) {
 	fmt.Printf("--------------------------------------\n")
-	fmt.Printf("GenericRecord\n")
-	//FIXME Needs 1.4.0 hazelcast-go-client
+	fmt.Printf("GenericRecord, map '%s'\n", genericRecordMap)
+	//TODO Needs 1.4.0 hazelcast-go-client
+	fmt.Printf("Coming in 1.4.0\n")
 }
 
 func main() {
@@ -132,7 +152,7 @@ func main() {
 
 	getGenericRecord(ctx, hazelcastClient)
 
-	runSqlQuery(ctx, hazelcastClient, "SELECT * FROM \"__map-store.mysql_slf4j\"")
+	runSqlQuery(ctx, hazelcastClient, "SELECT * FROM \""+genericRecordMap+"\"")
 
 	endTime := time.Now().Format(time.RFC3339)
 	fmt.Printf("=================== %s ===================\n", endTime)

@@ -312,6 +312,7 @@ public class CommonIdempotentInitialization {
                 } else {
                     jobConfigMap.put(MyConstants.PULSAR_OR_KAFKA_KEY, "kafka");
                 }
+                jobConfigMap.put(MyConstants.TRANSACTION_MONITOR_FLAVOR, transactionMonitorFlavor.toString());
                 jobConfigMap.put(MyConstants.USE_VIRIDIAN, Boolean.valueOf(useViridian).toString());
 
                 LOGGER.trace("Loaded {} into '{}'", jobConfigMap.size(), jobConfigMap.getName());
