@@ -70,7 +70,8 @@ hazelcast::client::hazelcast_client get_client(const char* kubernetes) {
 	return hazelcast_client;
 }
 
-/*TODO Remove once https://github.com/hazelcast/hazelcast-cpp-client/issues/1125 fixed							
+/*TODO Remove once https://github.com/hazelcast/hazelcast-cpp-client/issues/1125 
+ * and https://github.com/hazelcast/hazelcast-cpp-client/pull/1127 fixed							
  */
 inline std::ostream& operator<<(std::ostream& os, const hazelcast::client::local_date_time& dt)
 {
@@ -138,13 +139,13 @@ void get_generic_record(hazelcast::client::hazelcast_client hazelcast_client) {
 	std::cout << "GenericRecord, map '" << genericRecordMap << "'" << std::endl;
 	auto map = hazelcast_client.get_map(genericRecordMap).get();
 	int count = 0;
-	for (auto& key : map->key_set<std::string>().get()) {
-	//TODO Key not String ? How show generic record
+	//for (auto& key : map->key_set<typed_data>().get()) {
+	//TODO <generic_record> in 5.2
 		//auto& value = map->get<>(key).get();
 		//std::cout << key << "," << value << std::endl;
-        std::cout << key << std::endl;
-        count++;
-	}
+        //std::cout << key << std::endl;
+        //count++;
+	//}
 	std::cout << "[" << count << " rows]" << std::endl;
 
 }
