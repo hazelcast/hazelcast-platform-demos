@@ -1,0 +1,6 @@
+cluster:
+  name: "@my.cluster1.name@"
+  # Instance name and labels go here - https://github.com/hazelcast/hazelcast-commandline-client/issues/185
+  address: "@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local"
+log:
+ level: info
