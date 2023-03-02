@@ -18,6 +18,9 @@ CMD ["bash", "-c", "set -euo pipefail \
       && echo arch \
       && arch \
       && echo @@@@@@@@@@ \
+      && echo date \
+      && date \
+      && echo @@@@@@@@@@ \
       && echo /tmp/client \
       && /tmp/client \
      "]

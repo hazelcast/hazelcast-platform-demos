@@ -15,6 +15,9 @@ CMD ["bash", "-c", "set -euo pipefail \
       && echo arch \
       && arch \
       && echo @@@@@@@@@@ \
+      && echo date \
+      && date \
+      && echo @@@@@@@@@@ \
       && echo npm --loglevel=error start \
       && npm --loglevel=error start \
      "]

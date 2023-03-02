@@ -16,6 +16,9 @@ CMD ["bash", "-c", "set -euo pipefail \
       && echo arch \
       && arch \
       && echo @@@@@@@@@@ \
+      && echo date \
+      && date \
+      && echo @@@@@@@@@@ \
       && echo python client.py \
       && python client.py \
      "]

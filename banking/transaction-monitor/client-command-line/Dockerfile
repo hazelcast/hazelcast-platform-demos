@@ -23,6 +23,9 @@ CMD ["bash", "-c", "set -euo pipefail \
       && echo arch \
       && arch \
       && echo @@@@@@@@@@ \
+      && echo date \
+      && date \
+      && echo @@@@@@@@@@ \
       && echo /tmp/client.sh /tmp/hazelcast-commandline-client /tmp/hazelcast-client-clc.yaml \
       && /tmp/client.sh /tmp/hazelcast-commandline-client /tmp/hazelcast-client-clc.yaml \
      "]
