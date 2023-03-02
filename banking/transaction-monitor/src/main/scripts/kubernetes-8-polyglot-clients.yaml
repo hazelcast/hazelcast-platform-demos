@@ -33,7 +33,7 @@ spec:
         app: transaction-monitor-FLAVOR-client-csharp
     spec:
       containers:
-        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-client-sharp"
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-client-csharp"
           imagePullPolicy: Never
           name: transaction-monitor-FLAVOR-client-csharp-container
 ---

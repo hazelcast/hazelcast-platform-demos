@@ -39,8 +39,6 @@ hazelcast::client::hazelcast_client get_client(const char* kubernetes) {
     hazelcast::client::client_config client_config;
 	client_config.set_cluster_name(clusterName);
 
-	client_config.set_cluster_name("grid1");
-
     client_config.set_instance_name(instanceName);
 	char* home = std::getenv("HOME");
 	char* user = home + 1;
