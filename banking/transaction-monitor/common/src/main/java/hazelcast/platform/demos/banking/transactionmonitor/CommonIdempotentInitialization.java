@@ -37,6 +37,7 @@ import com.hazelcast.config.IndexConfig;
 import com.hazelcast.config.IndexType;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MapStoreConfig;
+import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.jet.Job;
@@ -1423,18 +1424,33 @@ public class CommonIdempotentInitialization {
     }
 
     /**
-     * <p>Log the logs saved into an {@link com.hazelcast.map.IMap IMap}.
+     * <p>Log the logs saved into an {@link com.hazelcast.map.IMap IMap}
+     * if it exists.
      * </p>
      */
+    @SuppressWarnings("unchecked")
     private static void logMySqlSlf4j(HazelcastInstance hazelcastInstance) {
-        IMap<GenericRecord, GenericRecord> mapMySqlSlf4j
-            = hazelcastInstance.getMap(MyConstants.IMAP_NAME_MYSQL_SLF4J);
+        IMap<GenericRecord, GenericRecord> mapMySqlSlf4j = null;
+
+        // Do not look up by name, as that force creates
+        for (DistributedObject distributedObject : hazelcastInstance.getDistributedObjects()) {
+            if (distributedObject instanceof IMap
+                    && distributedObject.getName().equals(MyConstants.IMAP_NAME_MYSQL_SLF4J)) {
+                mapMySqlSlf4j = (IMap<GenericRecord, GenericRecord>) distributedObject;
+            }
+        }
 
         LOGGER.info("~_~_~_~_~");
         LOGGER.info("logMySqlSlf4j()");
         LOGGER.info("---------");
-        for (Entry<GenericRecord, GenericRecord> entry : mapMySqlSlf4j.entrySet()) {
-            LOGGER.info("Key '{}', Value '{}'", entry.getKey(), entry.getValue());
+        if (mapMySqlSlf4j == null) {
+            LOGGER.info("Map does not currently exist");
+        } else {
+            Set<Entry<GenericRecord, GenericRecord>> entrySet = mapMySqlSlf4j.entrySet();
+            for (Entry<GenericRecord, GenericRecord> entry : entrySet) {
+                LOGGER.info("Key '{}', Value '{}'", entry.getKey(), entry.getValue());
+            }
+            LOGGER.info("[{} entr{}]", entrySet.size(), entrySet.size() == 1 ? "y" : "ies");
         }
         LOGGER.info("---------");
     }
