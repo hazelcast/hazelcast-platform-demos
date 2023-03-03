@@ -26,6 +26,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.platform.demos.utils</groupId>
+			<artifactId>utils-miscellaneous</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.platform.demos.utils</groupId>
 			<artifactId>utils-slack-integration</artifactId>
 			<version>${project.version}</version>
 		</dependency>

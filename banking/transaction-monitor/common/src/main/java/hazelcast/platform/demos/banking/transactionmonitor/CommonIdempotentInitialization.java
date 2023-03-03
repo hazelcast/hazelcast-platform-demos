@@ -39,6 +39,7 @@ import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MapStoreConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
+import com.hazelcast.jet.Job;
 import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.config.JobConfigArguments;
 import com.hazelcast.jet.config.ProcessingGuarantee;
@@ -47,6 +48,7 @@ import com.hazelcast.jet.datamodel.Tuple4;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.map.IMap;
 import com.hazelcast.mapstore.GenericMapStore;
+import com.hazelcast.nio.serialization.genericrecord.GenericRecord;
 import com.hazelcast.platform.demos.utils.UtilsConstants;
 import com.hazelcast.platform.demos.utils.UtilsFormatter;
 import com.hazelcast.platform.demos.utils.UtilsJobs;
@@ -65,6 +67,7 @@ import com.hazelcast.sql.SqlRow;
 @SuppressWarnings("checkstyle:MethodCount")
 public class CommonIdempotentInitialization {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonIdempotentInitialization.class);
+    private static final Logger LOGGER_TO_IMAP = IMapLoggerFactory.getLogger(CommonIdempotentInitialization.class);
     private static final int POS4 = 4;
     private static final int POS6 = 6;
 
@@ -1111,9 +1114,11 @@ public class CommonIdempotentInitialization {
 
             if (usePulsar && useViridian) {
                 //TODO Fix once supported by Viridian
-                LOGGER.error("Pulsar is not currently supported on Viridian");
+                LOGGER_TO_IMAP.error("Pulsar is not currently supported on Viridian");
             } else {
-                UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineIngestTransactions, jobConfigIngestTransactions);
+                Job job = UtilsJobs.myNewJobIfAbsent(LOGGER,
+                        hazelcastInstance, pipelineIngestTransactions, jobConfigIngestTransactions);
+                LOGGER_TO_IMAP.info(Objects.toString(job));
             }
 
             // Transaction aggregation
@@ -1130,9 +1135,10 @@ public class CommonIdempotentInitialization {
 
             if (usePulsar && useViridian) {
                 //TODO Fix once supported by Viridian
-                LOGGER.error("Pulsar is not currently supported on Viridian");
+                LOGGER_TO_IMAP.error("Pulsar is not currently supported on Viridian");
             } else {
-                UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAggregateQuery, jobConfigAggregateQuery);
+                Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAggregateQuery, jobConfigAggregateQuery);
+                LOGGER_TO_IMAP.info(Objects.toString(job));
                 // Aggregate query creates alerts to an IMap. Use a separate rather than same job to copy to Kafka.
                 launchAlertsToKafkaAndToLog(hazelcastInstance, bootstrapServers, transactionMonitorFlavor);
             }
@@ -1232,7 +1238,8 @@ public class CommonIdempotentInitialization {
             jobConfigAlertingToKafka.setName(AlertingToKafka.class.getSimpleName());
             jobConfigAlertingToKafka.addClass(HazelcastJsonValueSerializer.class);
 
-            UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToKafka, jobConfigAlertingToKafka);
+            Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToKafka, jobConfigAlertingToKafka);
+            LOGGER_TO_IMAP.info(Objects.toString(job));
         } catch (Exception e) {
             LOGGER.error("launchAlertsSqlToKafka:", e);
         }
@@ -1318,9 +1325,8 @@ public class CommonIdempotentInitialization {
             jobConfigAlertingToSlack.addClass(AlertingToSlack.class);
             jobConfigAlertingToSlack.addClass(UtilsSlackSink.class);
 
-            LOGGER.info("Job - {}",
-                UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToSlack, jobConfigAlertingToSlack)
-            );
+            Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToSlack, jobConfigAlertingToSlack);
+            LOGGER_TO_IMAP.info(Objects.toString(job));
         } catch (Exception e) {
             LOGGER.error("launchNeededJobs:" + AlertingToSlack.class.getSimpleName(), e);
         }
@@ -1353,9 +1359,8 @@ public class CommonIdempotentInitialization {
             jobConfigPostgresCDC.setName(PostgresCDC.class.getSimpleName());
             jobConfigPostgresCDC.addClass(PostgresCDC.class);
 
-            LOGGER.info("Job - {}",
-                UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelinePostgresCDC, jobConfigPostgresCDC)
-            );
+            Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelinePostgresCDC, jobConfigPostgresCDC);
+            LOGGER_TO_IMAP.info(Objects.toString(job));
         } catch (Exception e) {
             LOGGER.error("launchNeededJobs:" + PostgresCDC.class.getSimpleName(), e);
         }
@@ -1365,6 +1370,7 @@ public class CommonIdempotentInitialization {
     public static void logStuff(HazelcastInstance hazelcastInstance) {
         logJobs(hazelcastInstance);
         logMaps(hazelcastInstance);
+        logMySqlSlf4j(hazelcastInstance);
     }
 
     /**
@@ -1392,7 +1398,6 @@ public class CommonIdempotentInitialization {
             }
         });
         LOGGER.info("---------");
-        LOGGER.info("~_~_~_~_~");
     }
 
     /**
@@ -1415,9 +1420,24 @@ public class CommonIdempotentInitialization {
                     iMapName, hazelcastInstance.getMap(iMapName).size());
         }
         LOGGER.info("---------");
-        LOGGER.info("~_~_~_~_~");
     }
 
+    /**
+     * <p>Log the logs saved into an {@link com.hazelcast.map.IMap IMap}.
+     * </p>
+     */
+    private static void logMySqlSlf4j(HazelcastInstance hazelcastInstance) {
+        IMap<GenericRecord, GenericRecord> mapMySqlSlf4j
+            = hazelcastInstance.getMap(MyConstants.IMAP_NAME_MYSQL_SLF4J);
+
+        LOGGER.info("~_~_~_~_~");
+        LOGGER.info("logMySqlSlf4j()");
+        LOGGER.info("---------");
+        for (Entry<GenericRecord, GenericRecord> entry : mapMySqlSlf4j.entrySet()) {
+            LOGGER.info("Key '{}', Value '{}'", entry.getKey(), entry.getValue());
+        }
+        LOGGER.info("---------");
+    }
 
     /**
      * <p>Confirm mappings/views added implicitly or explicitly.

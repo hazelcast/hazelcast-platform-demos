@@ -64,12 +64,14 @@ public class ApplicationRunner {
     private static Map<String, WsContext> sessions = new ConcurrentHashMap<>();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationRunner.class);
+    private static final Logger LOGGER_TO_IMAP = IMapLoggerFactory.getLogger(CommonIdempotentInitialization.class);
 
     private static final String DRILL_ITEM = "DRILL_ITEM";
     private static final String LOAD_ITEMS = "LOAD_ITEMS";
 
     private final HazelcastInstance  hazelcastInstance;
     private final TransactionMonitorFlavor transactionMonitorFlavor;
+    private final String moduleName;
     private final boolean localhost;
     private IMap<String, Tuple3<Long, Long, Integer>> aggregateQueryResultsMap;
     private IMap<String, BicInfo> bicsMap;
@@ -83,9 +85,10 @@ public class ApplicationRunner {
      * </p>
      */
     @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Hazelcast instance must be shared, not cloned")
-    public ApplicationRunner(HazelcastInstance arg0, TransactionMonitorFlavor arg1) throws Exception {
+    public ApplicationRunner(HazelcastInstance arg0, TransactionMonitorFlavor arg1, String arg2) throws Exception {
         this.hazelcastInstance = arg0;
         this.transactionMonitorFlavor = arg1;
+        this.moduleName = arg2;
         // If specifically indicated as localhost, don't do some steps
         this.localhost =
            System.getProperty("my.docker.enabled", "").equalsIgnoreCase("false");
@@ -101,6 +104,7 @@ public class ApplicationRunner {
      * @throws Exception
      */
     public void run() throws Exception {
+        LOGGER_TO_IMAP.info(String.format("'%s' run() START", this.moduleName));
         boolean ok = initialize(ApplicationConfig.getClusterName());
 
         this.aggregateQueryResultsMap =
@@ -500,6 +504,7 @@ public class ApplicationRunner {
             //{ "IMap",    "SELECT stock FROM " + MyConstants.IMAP_NAME_PORTFOLIOS + " ORDER BY 1 DESC LIMIT 3"},
             { "IMap",    "SHOW MAPPINGS" },
             { "IMap",    "SHOW VIEWS" },
+            //{ "IMap",    "SELECT * FROM \"" + MyConstants.IMAP_NAME_MYSQL_SLF4J + "\""},
         };
 
         int originalLen = queries.length;

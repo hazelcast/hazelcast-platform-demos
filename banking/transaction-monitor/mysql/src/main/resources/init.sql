@@ -8,11 +8,12 @@ flush privileges;
 use @my.other.admin.database@;
 
 -- Referenced by CommonIdempotentInitialization.java
+-- Size limits should match IMapLogger.java
 create table mysql_slf4j (  
  socket_address      varchar(48) not null, 
  when_ts             timestamp not null,
  level               varchar(8) not null,
- message             varchar(48) not null, 
+ message             varchar(128) not null, 
  thread_name         varchar(48) not null, 
  logger_name         varchar(48) not null, 
  primary key (socket_address, when_ts)) 

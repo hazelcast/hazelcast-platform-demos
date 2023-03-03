@@ -16,6 +16,8 @@
 
 package hazelcast.platform.demos.banking.transactionmonitor;
 
+import java.util.Properties;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,36 +64,44 @@ public class Application {
             LOGGER.debug("Using port {} from command line argument.", port);
         }
 
+        Properties applicationProperties = UtilsProperties.loadClasspathProperties(MyConstants.APPLICATION_PROPERTIES_FILE);
         String propertyName1 = "my.bootstrap.servers";
-        String propertyName2 = MyConstants.PULSAR_CONFIG_KEY;
-        String propertyName3 = MyConstants.POSTGRES_CONFIG_KEY;
+        String propertyName2 = MyConstants.PROJECT_MODULE;
+        String propertyName3 = MyConstants.PULSAR_CONFIG_KEY;
+        String propertyName4 = MyConstants.POSTGRES_CONFIG_KEY;
         String bootstrapServers = System.getProperty(propertyName1, "");
-        String pulsarList = System.getProperty(propertyName2, "");
-        String postgresAddress = System.getProperty(propertyName3, "");
-        TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(
-                UtilsProperties.loadClasspathProperties(MyConstants.APPLICATION_PROPERTIES_FILE));
+        String moduleName = applicationProperties.getProperty(propertyName2, "");
+        String pulsarList = System.getProperty(propertyName3, "");
+        String postgresAddress = System.getProperty(propertyName4, "");
+        TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(applicationProperties);
+
         if (bootstrapServers.isBlank()) {
             LOGGER.error("No value for " + propertyName1);
             System.exit(1);
         }
-        if (pulsarList.isBlank()) {
+        if (moduleName.isBlank()) {
             LOGGER.error("No value for " + propertyName2);
             System.exit(1);
         }
-        if (postgresAddress.isBlank()) {
+        if (pulsarList.isBlank()) {
             LOGGER.error("No value for " + propertyName3);
             System.exit(1);
         }
+        if (postgresAddress.isBlank()) {
+            LOGGER.error("No value for " + propertyName4);
+            System.exit(1);
+        }
         LOGGER.info("'bootstrapServers'=='{}'", bootstrapServers);
+        LOGGER.info("'moduleName'=='{}'", moduleName);
         LOGGER.info("'pulsarList'=='{}'", pulsarList);
         LOGGER.info("'postgresAddress'=='{}'", postgresAddress);
         LOGGER.info("TransactionMonitorFlavor=='{}'", transactionMonitorFlavor);
 
-        ClientConfig clientConfig = ApplicationConfig.buildJetClientConfig();
+        ClientConfig clientConfig = ApplicationConfig.buildClientConfig();
 
         HazelcastInstance hazelcastInstance = HazelcastClient.newHazelcastClient(clientConfig);
 
-        new ApplicationRunner(hazelcastInstance, transactionMonitorFlavor).run();
+        new ApplicationRunner(hazelcastInstance, transactionMonitorFlavor, moduleName).run();
 
         hazelcastInstance.shutdown();
     }

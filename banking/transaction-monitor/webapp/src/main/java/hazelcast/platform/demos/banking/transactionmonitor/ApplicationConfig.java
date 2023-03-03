@@ -31,7 +31,7 @@ import com.hazelcast.config.SSLConfig;
 import com.hazelcast.platform.demos.utils.UtilsFormatter;
 
 /**
- * <p>Configure Jet client for connection to cluster. Use a config file, then override
+ * <p>Configure client for connection to cluster. Use a config file, then override
  * if necessary.
  * </p>
  * <p>The cluster may be running in Kubernetes, Docker or direct on the host. The client
@@ -59,7 +59,7 @@ public class ApplicationConfig {
      * declared configuration and replace it with localhost or Docker.
      * </p>
      */
-    public static ClientConfig buildJetClientConfig() {
+    public static ClientConfig buildClientConfig() {
         ClientConfig clientConfig = new YamlClientConfigBuilder().build();
         clusterName = clientConfig.getClusterName();
 
