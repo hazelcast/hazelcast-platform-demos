@@ -104,8 +104,8 @@ public class ApplicationRunner {
      * @throws Exception
      */
     public void run() throws Exception {
-        LOGGER_TO_IMAP.info(String.format("'%s' run() START", this.moduleName));
         boolean ok = initialize(ApplicationConfig.getClusterName());
+        LOGGER_TO_IMAP.info(String.format("'%s' run() START", this.moduleName));
 
         this.aggregateQueryResultsMap =
                 this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS);

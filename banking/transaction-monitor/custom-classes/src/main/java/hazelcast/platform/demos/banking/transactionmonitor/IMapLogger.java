@@ -28,6 +28,8 @@ import com.hazelcast.map.IMap;
 import com.hazelcast.nio.serialization.genericrecord.GenericRecord;
 import com.hazelcast.nio.serialization.genericrecord.GenericRecordBuilder;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * <p>An implementation of logging that saves to an {@link com.hazelcast.map.IMap IMap}
  * using {@link com.hazelcast.nio.serialization.genericrecord.GenericRecord GenericRecord}.
@@ -44,13 +46,16 @@ public class IMapLogger implements Logger {
     private static final int TWO_HUNDRED_AND_FIFTY_SIX = 256;
 
     private final String name;
-    private final IMap<GenericRecord, GenericRecord> mySqlSlf4jMap;
+    private final HazelcastInstance hazelcastInstance;
     private final String socketAddress;
     private final Level level;
 
-    public IMapLogger(String arg0, HazelcastInstance hazelcastInstance, Level arg2) {
+    private IMap<GenericRecord, GenericRecord> mySqlSlf4jMap;
+
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "HazelcastInstance is thread-safe")
+    public IMapLogger(String arg0, HazelcastInstance arg1, Level arg2) {
         this.name = arg0;
-        this.mySqlSlf4jMap = hazelcastInstance.getMap(MyConstants.IMAP_NAME_MYSQL_SLF4J);
+        this.hazelcastInstance = arg1;
         this.socketAddress = hazelcastInstance.getLocalEndpoint().getSocketAddress().toString().substring(1);
         this.level = arg2;
     }
@@ -61,6 +66,11 @@ public class IMapLogger implements Logger {
     }
 
     private void saveToHazelcast(Level arg0, String arg1) {
+        // To give map loader a chance to attach, defer map access until needed
+        if (this.mySqlSlf4jMap == null) {
+            this.mySqlSlf4jMap = hazelcastInstance.getMap(MyConstants.IMAP_NAME_MYSQL_SLF4J);
+        }
+
         GenericRecord key = GenericRecordBuilder.compact(MyConstants.IMAP_NAME_MYSQL_SLF4J + ".key")
                 .setString("socket_address", nullSafeTruncate(this.socketAddress, FORTY_EIGHT))
                 .setTimestamp("when_ts", LocalDateTime.now())

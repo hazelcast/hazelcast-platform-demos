@@ -185,12 +185,13 @@ public class CommonIdempotentInitialization {
             if (localhost) {
                 LOGGER.info("localhost=={}, no map store for Postgres", localhost);
             } else {
+                LOGGER.info("Postgres configured using: {}", alertsMapConfig.getMapStoreConfig().getProperties());
                 alertsMapConfig.setMapStoreConfig(mapStoreConfig);
             }
 
             hazelcastInstance.getConfig().addMapConfig(alertsMapConfig);
         } else {
-            LOGGER.trace("Don't add journal to '{}', map already exists", MyConstants.IMAP_NAME_ALERTS_LOG);
+            LOGGER.info("Don't add journal to '{}', map already exists", MyConstants.IMAP_NAME_ALERTS_LOG);
         }
 
         // Generic config, MapStore implementation is derived
@@ -223,7 +224,7 @@ public class CommonIdempotentInitialization {
 
             hazelcastInstance.getConfig().addMapConfig(mySqlMapConfig);
         } else {
-            LOGGER.trace("Don't add generic mapstore to '{}', map already exists", MyConstants.IMAP_NAME_MYSQL_SLF4J);
+            LOGGER.info("Don't add generic mapstore to '{}', map already exists", MyConstants.IMAP_NAME_MYSQL_SLF4J);
         }
 
         return true;
