@@ -53,7 +53,7 @@ Docker exists and build container images for deployment.
 
 ## Modules
 
-There are 20 modules in this example, alphabetically:
+There are 21 modules in this example, alphabetically:
 
 ```
 abstract-hazelcast-node/
@@ -68,6 +68,7 @@ hazelcast-node-enterprise-2/
 kafdrop/
 kafka-broker/
 management-center/
+mysql/
 postgres/
 prometheus/
 pulsar/
@@ -147,25 +148,29 @@ Kafdrop itself is unchanged in this module.
 
 ### 7. `transaction-producer`
 
-The `transaction-producer` module is the data feed the 
+The `transaction-producer` module is the data feed the Transaction
 Monitor application is monitoring.
+
+Transactions are generated at a default rate of 300 per second to the Kafka topic named
+"`kf_transactions`". 
+
+You can generate millions of trades this way, depending what rate you set for
+generation, how long you leave the `transaction-producer` running for, and how much
+disk space Kafka has for retention.
+
+This is part of the purpose of this demonstration. Millions of transactions can be
+processed in seconds, depending on how many machines you have and how many
+CPUs each has.
+
+The exact nature of the transactions depends on the flavor of the build.
+
+Assuming the "_trade_" flavor, then stock market trades are generated.
 
 The companies being traded are real, the trades are not.
 
 What this module does is random select from 3000 companies listed on the New York
 Stock Exchange ( [NASDAQ](https://www.nasdaq.com/) ), and generate trades for
 these companies. The trades have random prices and random quantities.
-
-Tras are generated at a default rate of 300 per second to the Kafka topic named
-"`kf_transactions`". 
-
-You can generated millions of trades this way, depending what rate you set for
-generation, how long you leave the `trade-producer` running for, and how much
-disk space Kafka has for retention.
-
-This is part of the purpose of this demonstration. Millions of trades can be
-processed in seconds, depending on how many machines you have and how many
-CPUs each has.
 
 Trades have a random [UUID](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/UUID.html)
 as their key on the Kafka topic. The main trade details are the value on the Kafka topic, structured as
@@ -191,7 +196,14 @@ So `kafdrop` etc won't show anything useful.
 To show interaction with external stores, a Postgres database is used. Max volume alerts are
 saved here, as an example of data we might wish to keep a history of.
 
-### 10. `abstract-hazelcast-node`
+### 10. `mysql`
+
+A different demo of external stores from Postgres, the MySql database is automatically used
+with a map store, using a no-code connection.
+
+In the configuration, the JDBC URL is provided, and everything else is deduced.
+
+### 11. `abstract-hazelcast-node`
 
 The `abstract-hazelcast-node` is the module where actual work of the Trade Monitor is done, even though
 this needs the separate `webapp` module below to visualize. It is bundled in to `hazelcast-node`
@@ -354,6 +366,8 @@ created, but it shows the most if the topic exists and is being written to.
 [pom.xml](https://github.com/hazelcast/hazelcast-platform-demos/blob/master/banking/trade-monitor/pom.xml)
 configuration
 
+3.== `mysql` Creates MySql, for storage of logging information.
+
 3.== `postgres` Creates Postgres, for storage of max volume alerts.
 
 4.== `trade-producer` This writes the trade data to the Kafka topic created.
@@ -431,28 +445,29 @@ In sequence:
 4. [docker-kafka2.sh](./src/main/scripts/docker-kafka2.sh)
 5. [docker-topic-create.sh](./src/main/scripts/docker-topic-create.sh)
 6. [docker-kafdrop.sh](./src/main/scripts/docker-kafdrop.sh)
-7. [docker-postgres.sh](./src/main/scripts/docker-postgres.sh)
-8. [docker-pulsar.sh](./src/main/scripts/docker-pulsar.sh)
-9. [docker-trade-producer.sh](./src/main/scripts/docker-trade-producer.sh)
-10. [docker-hazelcast-node0.sh](./src/main/scripts/docker-hazelcast-node0.sh)
-11. [docker-hazelcast-node1.sh](./src/main/scripts/docker-hazelcast-node1.sh)
-12. [docker-hazelcast-node2.sh](./src/main/scripts/docker-hazelcast-node2.sh)
-13. [docker-webapp.sh](./src/main/scripts/docker-webapp.sh)
-14. [docker-management-center.sh](./src/main/scripts/docker-management-center.sh)
+7. [docker-mysql.sh](./src/main/scripts/docker-mysql.sh)
+8. [docker-postgres.sh](./src/main/scripts/docker-postgres.sh)
+9. [docker-pulsar.sh](./src/main/scripts/docker-pulsar.sh)
+10. [docker-trade-producer.sh](./src/main/scripts/docker-trade-producer.sh)
+11. [docker-hazelcast-node0.sh](./src/main/scripts/docker-hazelcast-node0.sh)
+12. [docker-hazelcast-node1.sh](./src/main/scripts/docker-hazelcast-node1.sh)
+13. [docker-hazelcast-node2.sh](./src/main/scripts/docker-hazelcast-node2.sh)
+14. [docker-webapp.sh](./src/main/scripts/docker-webapp.sh)
+15. [docker-management-center.sh](./src/main/scripts/docker-management-center.sh)
 
 You should wait for Zookeeper (1) to have started before starting the three Kafka brokers (2,3,4).
 
 You should wait for Kafka brokers (2,3,4) before starting the container that creates the topic (5).
 
-Kafdrop (6), Postgres (7) and Pulsar (8) can then be started.
+Kafdrop (6), MySql(7), Postgres (8) and Pulsar (9) can then be started.
 
-The Trade Producer (9) and a Hazelcast nodes (10, 11, 12) can all be started in parallel once the topic exists.
+The Trade Producer (10) and a Hazelcast nodes (11, 12, 13) can all be started in parallel once the topic exists.
 
-The Web UI (13) is started last, once everything else is ready.
+The Web UI (14) is started last, once everything else is ready.
 
 Once started, the `webapp` UI is available as http://localhost:8081/ and `kafdrop` as http://localhost:8083/.
 
-If you chose to start the `management-center` (14) it is on http://localhost:8080.
+If you chose to start the `management-center` (15) it is on http://localhost:8080.
 
 ### Host network
 
@@ -475,7 +490,7 @@ If you have multiple network cards on your host machine the scripts won't be abl
 1. [kubernetes-1-zookeeper-kafka-firsthalf.yaml](./src/main/scripts/kubernetes-1-zookeeper-kafka-firsthalf.yaml)
 2. [kubernetes-2-create-configmap.sh](./src/main/scripts/kubernetes-2-create-configmap.sh)
 3. [kubernetes-3-kafka-secondhalf.yaml](./src/main/scripts/kubernetes-3-kafka-secondhalf.yaml)
-4. [kubernetes-4-kafdrop-topic-postgres.yaml](./src/main/scripts/kubernetes-4-kafdrop-topic-postgres.yaml)
+4. [kubernetes-4-kafdrop-topic-rdbms.yaml](./src/main/scripts/kubernetes-4-kafdrop-topic-rdbms.yaml)
 5. [kubernetes-5-optional-hazelcast.yaml](./src/main/scripts/kubernetes-5-optional-hazelcast.yaml)
 6. [kubernetes-6-webapp-and-monitoring.yaml](./src/main/scripts/kubernetes-6-webapp-and-monitoring.yaml)
 7. [kubernetes-7-trade-producer.yaml](./src/main/scripts/kubernetes-7-trade-producer.yaml)
