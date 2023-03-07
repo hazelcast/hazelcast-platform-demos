@@ -102,6 +102,12 @@ interact with.
 
 Some of the demos can run the Hazelcast server code on Viridian or on a Hazelcast instance that you host.
 
+##### Activation
+
+To build for Hazelcast Viridian, set the property `use-viridian` to `true` in the top-level _pom.xml_.
+
+##### Properties
+
 If you wish to use a managed Hazelcast instance, sign-up for [Hazelcast Viridian](https://viridian.hazelcast.com) and create a cluster.
 
 This needs 7 properties.
