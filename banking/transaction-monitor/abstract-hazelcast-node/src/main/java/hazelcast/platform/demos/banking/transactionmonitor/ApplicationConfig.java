@@ -46,7 +46,7 @@ import com.hazelcast.config.TcpIpConfig;
 import com.hazelcast.config.TieredStoreConfig;
 import com.hazelcast.config.WanReplicationConfig;
 import com.hazelcast.config.WanReplicationRef;
-import com.hazelcast.datalink.JdbcDataLinkFactory;
+import com.hazelcast.datalink.JdbcDataLink;
 import com.hazelcast.memory.Capacity;
 import com.hazelcast.memory.MemoryUnit;
 
@@ -343,7 +343,7 @@ public class ApplicationConfig {
 
             DataLinkConfig dataLinkConfig =
                     new DataLinkConfig(MyConstants.MYSQL_DATASTORE_CONFIG_NAME)
-                    .setClassName(JdbcDataLinkFactory.class.getName())
+                    .setClassName(JdbcDataLink.class.getName())
                     .setProperty("jdbcUrl", jdbcUrl)
                     .setProperty("username", username)
                     .setProperty("password", password)

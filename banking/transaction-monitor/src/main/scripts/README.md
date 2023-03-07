@@ -35,7 +35,7 @@ YAML to create Kakfa topic with non-default partition count for optimal reading,
 
 ### 5
 
-Do one of 5.A, 5.B or 5.3.
+Do one of 5.A, 5.B or 5.C.
 
 ### 5.A `kubernetes-5-optional-hazelcast-enterprise.yaml`
 
