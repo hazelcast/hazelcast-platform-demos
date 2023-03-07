@@ -61,8 +61,8 @@ and apply the value in your build.
         <my.viridian.cluster1.id>GOES HERE</my.viridian.cluster1.id>
         <my.viridian.cluster1.discovery.token>GOES HERE</my.viridian.cluster1.discovery.token>
         <my.viridian.cluster1.keys.location>GOES HERE</my.viridian.cluster1.keys.location>
-        <my.viridian.cluster1.keys.keystore.password>GOES HERE</my.viridian.cluster1.keys.keystore.password>
-        <my.viridian.cluster1.keys.truststore.password>GOES HERE</my.viridian.cluster1.keys.truststore.password>
+        <my.viridian.cluster1.keystore.password>GOES HERE</my.viridian.cluster1.keystore.password>
+        <my.viridian.cluster1.truststore.password>GOES HERE</my.viridian.cluster1.truststore.password>
         <my.viridian.api.key>GOES HERE</my.viridian.api.key>
         <my.viridian.api.secret>GOES HERE</my.viridian.api.secret>
       </properties>
@@ -104,7 +104,7 @@ Some of the demos can run the Hazelcast server code on Viridian or on a Hazelcas
 
 ##### Activation
 
-To build for Hazelcast Viridian, set the property `use-viridian` to `true` in the top-level _pom.xml_.
+To build for Hazelcast Viridian, set the property `use.viridian` to `true` in the top-level _pom.xml_.
 
 ##### Properties
 
@@ -128,7 +128,7 @@ On the "_Advanced Set-up_" tab, you should download the keystore files and put t
 It might have a value such as `/home/myname/keys/hzcloud_1234_keys`. The build script will copy files from this directory
 into the Docker images it builds.
 
-`<my.viridian.cluster1.keys.keystore.password>` and `<my.viridian.cluster1.keys.truststore.password>` is the password
+`<my.viridian.cluster1.keystore.password>` and `<my.viridian.cluster1.truststore.password>` is the password
 shown on "_Advanced Set-up_" for the keystore and truststore. The same password is currently used for both.
 
 Finally `<my.viridian.api.key>` and `<my.viridian.api.secret>` are used for automated upload of Maven artifacts

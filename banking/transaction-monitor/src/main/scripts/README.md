@@ -40,6 +40,7 @@ Do one of 5.A, 5.B or 5.C.
 ### 5.A `kubernetes-5-optional-hazelcast-enterprise.yaml`
 
 Create Enterprise Hazelcast clusters for transaction storage.
+
 Use `kubectl exec --stdin --tty transaction-monitor-ecommerce-grid1-hazelcast-0 -- /bin/bash` to connect to see tiered store
 directory "/data/transaction-monitor".
 
@@ -71,6 +72,6 @@ Optional step to run clients in non-Java languages, to poll the data.
 
 ## Bonus
 
-If running on Google Cloud, there is a script `gke.sh` that should do all these steps for you.
+If running on Google Cloud, there is a script `gke.sh` that should do all these steps for you, selection option 5.A.
 
 

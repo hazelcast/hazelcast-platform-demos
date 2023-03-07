@@ -53,30 +53,38 @@ Docker exists and build container images for deployment.
 
 ## Modules
 
-There are 21 modules in this example, alphabetically:
+There are many modules in this example, alphabetically:
 
 ```
-abstract-hazelcast-node/
-common/
-custom-classes/
-finos-nodejs/
-finos-python/
-grafana/
-hazelcast-node/
-hazelcast-node-enterprise-1/
-hazelcast-node-enterprise-2/
-kafdrop/
-kafka-broker/
-management-center/
-mysql/
-postgres/
-prometheus/
-pulsar/
-remote-job-sub-1/
-topic-create/
-transaction-producer/
-webapp/
-zookeeper/
+abstract-hazelcast-node
+client-command-line
+client-cpp
+client-csharp
+client-golang
+client-nodejs
+client-python
+common
+custom-classes
+finos-nodejs
+finos-python
+grafana
+hazelcast-node
+hazelcast-node-enterprise-1
+hazelcast-node-enterprise-2
+kafdrop
+kafka-broker
+management-center
+mysql
+pom.xml
+postgres
+prometheus
+pulsar
+remote-job-sub-1
+topic-create
+transaction-producer
+webapp
+zookeeper
+
 ```
 
 These are described below, a partial ordering on the way you should
@@ -84,7 +92,7 @@ understand and execute them.
 
 ### 1. `custom-classes`
 
-The `custom-classes` module is for uploading to Hazelcast Cloud.
+The `custom-classes` module is for uploading to Hazelcast Viridian.
 
 ### 2. `common`
 
@@ -280,17 +288,17 @@ For each trade that comes in, the running total for that trade is updated in the
 Jet job `AggregatedQuery` processes the same input as Jet job `IngestTrades`, and at the same
 time. So they could be merged for efficiency, but here they are kept apart for clarity of understanding.
 
-### 10.A `hazelcast-node`
+### 12.A `hazelcast-node`
 
 Builds the open-source version, named `grid1`.
 
-### 10.b `hazelcast-node-enterprise-1` & `hazelcast-node-enterprise-2`
+### 12.b `hazelcast-node-enterprise-1` & `hazelcast-node-enterprise-2`
 
 Builds the enterprise version, two clusters `grid1` and `grid2` connected for data replication.
 
 In this version, data replication is one-way, for selected maps.
 
-### 11. `webapp`
+### 13. `webapp`
 
 The last main module in the demo is a web-based UI to display the trade data and trade aggregation
 stored in the Hazelcast grid.
@@ -312,7 +320,7 @@ the demonstration. The trades for that symbol are listed most recent first, but 
 millions of trades then that means thousands of trades for each stock symbol, so potentially
 a very long list.
 
-### 12. `management-center` (optional)
+### 14. `management-center` (optional)
 
 This is Hazelcast's Management Center, for collating, viewing and controlling a cluster.
 
@@ -323,19 +331,19 @@ Register [here](https://hazelcast.com/download/) to request the evaluation licen
 need, and put them in your `settings.xml` file as described in [Repository top-level README.md](../../README.md).
 Be sure to mention this is for Trade Monitor so you get a license with the correct capabilities.
 
-### 13. `prometheus` (optional)
+### 15. `prometheus` (optional)
 
 Prometheus is an open-source time-series database. It connects to `management-center` for its
 data, so if you choose not to run `management-center` there's no need to bother with
 `prometheus`.
 
-### 14. `grafana` (optional)
+### 16. `grafana` (optional)
 
 Grafana is open-source dashboarding software. If connects to `prometheus` for its data, so
 if you don't run `management-center` and so don't run `prometheus`, don't bother with
 `grafana` either.
 
-### 15. `remote-job-sub-1` (optional)
+### 17. `remote-job-sub-1` (optional)
 
 The main jobs in this example are started with the cluster automatically.
 
@@ -343,10 +351,15 @@ This module is an optional extra to show how to package and submit from the comm
 The job involvd is an extra, it does not produce data for the web application. You can
 browse it's output with the Management Center.
 
-### 16. `finos-nodejs` (optional) & `finos-python` (optional)
+### 18. `finos-nodejs` (optional) & `finos-python` (optional)
 
 Two options clients using the [Perspective](https://perspective.finos.org/) plugin from
 [FinOS](https://www.finos.org/).
+
+### 19. `client-command-line`, `client-csharp`, `client-cpp`, `client-golang`, `client-nodejs` & `client-python` (all optional)
+
+These modules build clients in other languages than Java, to show how you can connect to the grid
+from these, and work with Hazelcast data.
 
 ## Running -- sequence
 
@@ -394,6 +407,11 @@ Ignoring the partial ordering, the recommended start sequence would be `zookeepe
 
 If you add the optional monitoring, then `management-center`, `prometheus` and `grafana`.
 
+9. `client-command-line`, `client-csharp`, `client-cpp`, `client-golang`, `client-nodejs` and `client-python`
+
+These clients connect to the grid and query it's data via SQL, so won't do anything useful until the grid is
+running and populated with data.
+
 ## Running -- Localhost
 
 For running directly on your local machine, the assumption is made that you already have Kafka,
@@ -436,7 +454,7 @@ command scripts in the obvious places.
 
 ## Running -- Docker
 
-14 scripts are provided to run the various modules as Docker containers.
+Scripts are provided to run the various modules as Docker containers.
 In sequence:
 
 1. [docker-zookeeper.sh](./src/main/scripts/docker-zookeeper.sh)
@@ -454,6 +472,12 @@ In sequence:
 13. [docker-hazelcast-node2.sh](./src/main/scripts/docker-hazelcast-node2.sh)
 14. [docker-webapp.sh](./src/main/scripts/docker-webapp.sh)
 15. [docker-management-center.sh](./src/main/scripts/docker-management-center.sh)
+16. [docker-client-command-line.sh](./src/main/scripts/docker-client-command-line.sh)
+17. [docker-client-csharp.sh](./src/main/scripts/docker-client-csharp.sh)
+18. [docker-client-cpp.sh](./src/main/scripts/docker-client-cpp.sh)
+19. [docker-client-golang.sh](./src/main/scripts/docker-client-golang.sh)
+20. [docker-client-nodejs.sh](./src/main/scripts/docker-client-nodejs.sh)
+21. [docker-client-python.sh](./src/main/scripts/docker-client-python.sh)
 
 You should wait for Zookeeper (1) to have started before starting the three Kafka brokers (2,3,4).
 
@@ -468,6 +492,9 @@ The Web UI (14) is started last, once everything else is ready.
 Once started, the `webapp` UI is available as http://localhost:8081/ and `kafdrop` as http://localhost:8083/.
 
 If you chose to start the `management-center` (15) it is on http://localhost:8080.
+
+Lastly, `client-command-line` (16), `client-csharp` (17), `client-cpp` (18), `client-golang` (19), `client-nodejs` (20)
+and `client-python` (21) if you wish to run these. They are non-interactive, output is to the system log
 
 ### Host network
 
@@ -494,7 +521,7 @@ If you have multiple network cards on your host machine the scripts won't be abl
 5. [kubernetes-5-optional-hazelcast.yaml](./src/main/scripts/kubernetes-5-optional-hazelcast.yaml)
 6. [kubernetes-6-webapp-and-monitoring.yaml](./src/main/scripts/kubernetes-6-webapp-and-monitoring.yaml)
 7. [kubernetes-7-trade-producer.yaml](./src/main/scripts/kubernetes-7-trade-producer.yaml)
-
+8. [kubernetes-8-polyglot-clients.yaml](./src/main/scriptes/kubernetes-8-polyglot-clients.yaml)
 
 These are deliberately simple Kubernetes deployment files. Resource limits, auto-scaling,
 namespaces, etc could all be added to move towards production quality.
@@ -516,6 +543,8 @@ Cloud instead.
 The sixth creates the web app and launches job processing.
 
 The seventh starts the production of data to monitor.
+
+The eighth starts the clients in languages other than Java.
 
 If all looks well, you should something like this listed for the default namespace:
 
