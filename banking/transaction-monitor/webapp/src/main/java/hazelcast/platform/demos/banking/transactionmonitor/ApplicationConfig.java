@@ -43,8 +43,7 @@ public class ApplicationConfig {
     private static final String FILENAME = "application.properties";
     private static final String VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN = "my.viridian.cluster1.discovery.token";
     private static final String VIRIDIAN_CLUSTER1_ID = "my.viridian.cluster1.id";
-    private static final String VIRIDIAN_CLUSTER1_KEYSTORE_PASSWORD = "my.viridian.cluster1.keystore.password";
-    private static final String VIRIDIAN_CLUSTER1_TRUSTSTORE_PASSWORD = "my.viridian.cluster1.truststore.password";
+    private static final String VIRIDIAN_CLUSTER1_KEY_PASSWORD = "my.viridian.cluster1.key.password";
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
     private static final int EXPECTED_PASSWORD_LENGTH = 11;
     private static final int EXPECTED_TOKEN_LENGTH = 50;
@@ -92,9 +91,8 @@ public class ApplicationConfig {
             clientConfig.setClusterName(myProperties.getProperty(VIRIDIAN_CLUSTER1_ID));
 
             // Viridian uses SSL
-            String keystorePassword = myProperties.getProperty(VIRIDIAN_CLUSTER1_KEYSTORE_PASSWORD);
-            String truststorePassword = myProperties.getProperty(VIRIDIAN_CLUSTER1_TRUSTSTORE_PASSWORD);
-            Properties sslProps = getSSLProperties(keystorePassword, truststorePassword);
+            String keyPassword = myProperties.getProperty(VIRIDIAN_CLUSTER1_KEY_PASSWORD);
+            Properties sslProps = getSSLProperties(keyPassword);
             clientConfig.getNetworkConfig().setSSLConfig(new SSLConfig().setEnabled(true).setProperties(sslProps));
 
             // Viridian
@@ -135,19 +133,18 @@ public class ApplicationConfig {
      * <p>Properties for SSL
      * </p>
      *
-     * @param keystorePassword
-     * @param truststorePassword
+     * @param keyPassword - same for both KeyStore and TrustStore
      * @return
      */
-    private static Properties getSSLProperties(String keystorePassword, String truststorePassword) {
+    private static Properties getSSLProperties(String keyPassword) {
         Properties properties = new Properties();
 
         properties.setProperty("javax.net.ssl.keyStore",
                 new File("./client.keystore").toURI().getPath());
-        properties.setProperty("javax.net.ssl.keyStorePassword", keystorePassword);
+        properties.setProperty("javax.net.ssl.keyStorePassword", keyPassword);
         properties.setProperty("javax.net.ssl.trustStore",
                 new File("./client.truststore").toURI().getPath());
-        properties.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
+        properties.setProperty("javax.net.ssl.trustStorePassword", keyPassword);
 
         return properties;
     }

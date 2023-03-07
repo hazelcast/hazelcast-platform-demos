@@ -185,8 +185,8 @@ public class CommonIdempotentInitialization {
             if (localhost) {
                 LOGGER.info("localhost=={}, no map store for Postgres", localhost);
             } else {
-                LOGGER.info("Postgres configured using: {}", alertsMapConfig.getMapStoreConfig().getProperties());
                 alertsMapConfig.setMapStoreConfig(mapStoreConfig);
+                LOGGER.info("Postgres configured using: {}", alertsMapConfig.getMapStoreConfig().getProperties());
             }
 
             hazelcastInstance.getConfig().addMapConfig(alertsMapConfig);

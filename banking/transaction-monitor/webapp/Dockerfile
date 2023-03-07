@@ -15,7 +15,7 @@ ARG JAR_FILE
 # Maven compiled target
 COPY target/${JAR_FILE} application.jar
 
-# Need existing file so Docker copy does not fail if not keystore/truststore found. Put in target by maven-antrun-plugin
+# Need existing file so Docker copy does not fail if no keystore/truststore found. Put in target by maven-antrun-plugin
 COPY target/${JAR_FILE} target/client.keystore* /
 COPY target/${JAR_FILE} target/client.truststore* /
 RUN rm /${JAR_FILE}

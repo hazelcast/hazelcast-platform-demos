@@ -86,7 +86,7 @@
 				<artifactId>maven-antrun-plugin</artifactId>
 				<configuration>
 					<target>
-						<ant antfile="src/main/scripts/build.xml" target="conditionalcopy"/>
+						<ant antfile="../../../ant/build.xml" target="conditionalcopy"/>
 					</target>
 				</configuration>
 			</plugin>

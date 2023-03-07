@@ -3,8 +3,8 @@
 		<echo message="====================================" />
 		<echo message="$my.viridian.cluster1.id=${my.viridian.cluster1.id}" />
 		<echo message="$my.viridian.cluster1.discovery.token=${my.viridian.cluster1.discovery.token}" />
-		<echo message="$my.viridian.cluster1.password=${my.viridian.cluster1.password}" />
 		<echo message="$my.viridian.cluster1.keys.location=${my.viridian.cluster1.keys.location}" />
+		<echo message="$my.viridian.cluster1.key.password=${my.viridian.cluster1.key.password}" />
 		<echo message="====================================" />
 	</target>
 
@@ -19,6 +19,7 @@
 		<echo message="====================================" />
        		<copy todir="${project.build.directory}">
        			<fileset dir="${my.viridian.cluster1.keys.location}" includes="client.*store"/>
+       			<fileset dir="${my.viridian.cluster1.keys.location}" includes="*pem"/>
         	</copy>
 	</target>
 	<target name="mydontcopy" depends="mytestdir" unless="keys.directory.exists">

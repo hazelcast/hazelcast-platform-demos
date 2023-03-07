@@ -34,8 +34,8 @@
 		<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spotbugs.skip>true</spotbugs.skip>
-                <!-- Configure the build for HZ Viridian or all Kubernetes -->
-                <use.viridian>false</use.viridian>
+		<!-- Configure the build for HZ Viridian or all Kubernetes -->
+		<use.viridian>true</use.viridian>
 
 		<!-- Variations for the Transaction Monitor, TransactionMonitorFlavor.java ENUM -->
 		<!-- "ecommerce" is last, hence is the value used, as most generally applicable -->
@@ -490,6 +490,11 @@
 					<version>${frontend-maven-plugin.version}</version>
 				</plugin>
 				<plugin>
+					<groupId>com.hazelcast.cloud</groupId>
+					<artifactId>hazelcast-cloud-maven-plugin</artifactId>
+					<version>${hazelcast-cloud-maven-plugin.version}</version>
+				</plugin>
+				<plugin>
 					<groupId>io.fabric8</groupId>
 					<artifactId>docker-maven-plugin</artifactId>
 					<version>${docker-maven-plugin.version}</version>
@@ -506,6 +511,7 @@
 										<HZ_VIRIDIAN_CLUSTER1_KEYSTORE_PASSWORD>${my.viridian.cluster1.keystore.password}</HZ_VIRIDIAN_CLUSTER1_KEYSTORE_PASSWORD>
 										<HZ_VIRIDIAN_CLUSTER1_TRUSTSTORE_PASSWORD>${my.viridian.cluster1.truststore.password}</HZ_VIRIDIAN_CLUSTER1_TRUSTSTORE_PASSWORD>
 										<!-- Dockerfile will use for our built modules -->
+										<CONTROL_FILE>${my.docker.control.file}</CONTROL_FILE>
 										<JAR_FILE>${my.docker.jar.file}</JAR_FILE>
 										<JAR_FILE2>${my.docker.jar.file2}</JAR_FILE2>
 										<MAIN_CLASS>${main.class}</MAIN_CLASS>
@@ -780,6 +786,20 @@
 					</plugin>
 				</plugins>
 			</build>
+		</profile>
+		<profile>
+			<id>viridian</id>
+			<activation>
+				<property>
+					<name>use.viridian</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<properties>
+				<!-- See https://github.com/hazelcast/hazelcast-cloud-maven-plugin/issues/26
+				<dockerfile.skip>false</dockerfile.skip>
+				-->
+			</properties>
 		</profile>
 	</profiles>
 </project>
