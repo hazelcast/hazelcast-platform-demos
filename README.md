@@ -79,9 +79,9 @@ There are three groups of properties: licensing, Slack and Viridian. All are opt
 
 #### Licensing settings
 
-Some of the demos using Hazelcast Enterprise, and some can optionally use Hazelcast Enterprise.
+Some of the demos use Hazelcast Enterprise, and some can optionally use Hazelcast Enterprise.
 
-If you want to use these, contact Hazelcast [here](https://hazelcast.com/contact/) to obtain a trial license key.
+If you want to run these, contact Hazelcast [here](https://hazelcast.com/contact/) to obtain a trial license key.
 
 Once provided, put the value in the `<my.license.key>` setting and build.
 
