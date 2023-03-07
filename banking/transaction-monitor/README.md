@@ -512,7 +512,7 @@ If you have multiple network cards on your host machine the scripts won't be abl
 
 ## Running -- Kubernetes
 
-7 deployment files are provided to run the Trade Monitor in Kubernetes.
+8 deployment files are provided to run the Trade Monitor in Kubernetes.
 
 1. [kubernetes-1-zookeeper-kafka-firsthalf.yaml](./src/main/scripts/kubernetes-1-zookeeper-kafka-firsthalf.yaml)
 2. [kubernetes-2-create-configmap.sh](./src/main/scripts/kubernetes-2-create-configmap.sh)
@@ -568,7 +568,7 @@ trade-monitor-webapp-56df458979-4mmjj              1/1     Running     0        
 trade-monitor-zookeeper-799ff845d5-fjfq6           1/1     Running     0          67m
 ```
 
-All nodes are at "_READY_" status "_1/1_" (exception the topic creation job which has completed).
+All nodes are at "_READY_" status "_1/1_" (except the topic creation job which has completed).
 
 Once all are running, use `kubectl get services` to find the location of `kafdrop` and `webapp`.
 
@@ -634,7 +634,7 @@ the member. Once successful, this should list the running jobs in the cluster,
 Then do this to launch the additional job
 
 ```
-hazelcast/bin/hz-cli -t grid1@123.456.789.0 submit target/trade-monitor-remote-job-sub-1-5.0.jar
+hazelcast/bin/hz-cli -t grid1@123.456.789.0 submit target/trade-monitor-remote-job-sub-5.3.0.jar
 ```
 
 This will send the job from your machine to wherever in the world the cluster
@@ -717,7 +717,7 @@ aggregate, so the format is the same as for `trade-producer` log and the `Ingest
 14:43:11.181 INFO  trade-monitor-webapp.event-2 c.h.p.d.b.trademonitor.TradesMapListener - Received 1 => "{"id": "5af8cf39-4db7-4663-8b31-1169dd9398ca","timestamp": 1583934191165,"symbol": "MTGE","price": 2501,"quantity": 5729}" 
 ```
 
-## Running -- Hazelcast Cloud
+## Running -- Hazelcast Viridian
 
 Create a Hazelcast Cloud cluster if you don't have one.
 
