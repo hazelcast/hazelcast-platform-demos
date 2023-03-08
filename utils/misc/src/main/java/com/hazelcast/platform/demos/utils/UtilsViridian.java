@@ -34,8 +34,8 @@ import com.hazelcast.config.SSLConfig;
 public class UtilsViridian {
     private static final Logger LOGGER = LoggerFactory.getLogger(UtilsViridian.class);
 
-    // Docker images copies keystore/truststore into working directory
-    private static final String DOCKER_KEYSTORE_TRUSTSTORE_DIRECTORY = ".";
+    // Docker images copies keystore/truststore into riit directory
+    private static final String DOCKER_KEYSTORE_TRUSTSTORE_DIRECTORY = "/";
     private static final int EXPECTED_PASSWORD_LENGTH = 11;
     private static final int EXPECTED_TOKEN_LENGTH = 50;
 
@@ -77,10 +77,10 @@ public class UtilsViridian {
         Properties properties = new Properties();
 
         properties.setProperty("javax.net.ssl.keyStore",
-                new File(directory + "/client.keystore").toURI().getPath());
+                new File(directory + "client.keystore").toURI().getPath());
         properties.setProperty("javax.net.ssl.keyStorePassword", keyPassword);
         properties.setProperty("javax.net.ssl.trustStore",
-                new File(directory + "/client.truststore").toURI().getPath());
+                new File(directory + "client.truststore").toURI().getPath());
         properties.setProperty("javax.net.ssl.trustStorePassword", keyPassword);
 
         return properties;

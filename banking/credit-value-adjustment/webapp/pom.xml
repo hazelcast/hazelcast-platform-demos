@@ -154,6 +154,15 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
+				<!-- Copy keystore/truststore if found -->
+				<artifactId>maven-antrun-plugin</artifactId>
+				<configuration>
+					<target>
+						<ant antfile="../../../ant/build.xml" target="conditionalcopy"/>
+					</target>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
 			</plugin>
