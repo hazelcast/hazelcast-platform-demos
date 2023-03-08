@@ -16,31 +16,21 @@
 
 package hazelcast.platform.demos.banking.transactionmonitor;
 
-import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
-import org.apache.pulsar.client.api.Message;
-import org.apache.pulsar.client.api.PulsarClient;
-import org.apache.pulsar.client.api.Schema;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.hazelcast.core.HazelcastJsonValue;
-import com.hazelcast.function.FunctionEx;
-import com.hazelcast.function.SupplierEx;
 import com.hazelcast.jet.Util;
 import com.hazelcast.jet.accumulator.LongAccumulator;
-import com.hazelcast.jet.contrib.pulsar.PulsarSources;
 import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.kafka.KafkaSources;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.ServiceFactories;
 import com.hazelcast.jet.pipeline.Sinks;
-import com.hazelcast.jet.pipeline.StreamSource;
 import com.hazelcast.jet.pipeline.StreamStage;
-import com.hazelcast.platform.demos.utils.UtilsUrls;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -67,21 +57,25 @@ public class IngestTransactions {
      * </p>
      *
      * @param bootstrapServers Kafka brokers list
+     * @param pulsarInputSource Ready made source to use for Pulsar instead of Kafka
+     * @param transactionMonitorFlavor
      * @return A pipeline to run
+     * @return
      */
-    public static Pipeline buildPipeline(String bootstrapServers, String pulsarList, boolean usePulsar,
+    public static Pipeline buildPipeline(String bootstrapServers,
+            StreamStage<Entry<String, HazelcastJsonValue>> pulsarInputSource,
             TransactionMonitorFlavor transactionMonitorFlavor) {
 
         Properties properties = InitializerConfig.kafkaSourceProperties(bootstrapServers);
 
-        Pipeline pipeline = Pipeline.create();
-
+        Pipeline pipeline = null;
         StreamStage<Entry<String, HazelcastJsonValue>> inputSource;
-        if (usePulsar) {
-            inputSource =
-                    pipeline.readFrom(IngestTransactions.pulsarSource(pulsarList))
-                    .withoutTimestamps();
+
+        if (pulsarInputSource != null) {
+            pipeline = pulsarInputSource.getPipeline();
+            inputSource = pulsarInputSource;
         } else {
+            pipeline = Pipeline.create();
             inputSource =
                     pipeline.readFrom(KafkaSources.<String, String, Entry<String, HazelcastJsonValue>>
                         kafka(properties,
@@ -124,40 +118,6 @@ public class IngestTransactions {
         }
 
         return pipeline;
-    }
-
-    /**
-     * <p>This is similar to {@link AggregateQuery#IngestTransactions()} but
-     * returns a different type.
-     * </p>
-     * @param pulsarList
-     * @return
-     */
-    private static StreamSource<Entry<String, HazelcastJsonValue>> pulsarSource(String pulsarList) {
-        String serviceUrl = UtilsUrls.getPulsarServiceUrl(pulsarList);
-
-        SupplierEx<PulsarClient> pulsarConnectionSupplier =
-                () -> PulsarClient.builder()
-                .connectionTimeout(1, TimeUnit.SECONDS)
-                .serviceUrl(serviceUrl)
-                .build();
-
-        SupplierEx<Schema<String>> pulsarSchemaSupplier =
-                () -> Schema.STRING;
-
-        FunctionEx<Message<String>, Entry<String, HazelcastJsonValue>> pulsarProjectionFunction =
-                message -> {
-                    String key = message.getKey();
-                    String transaction = message.getValue();
-                    HazelcastJsonValue value = new HazelcastJsonValue(transaction);
-                    return new SimpleImmutableEntry<>(key, value);
-                };
-
-        return PulsarSources.pulsarReaderBuilder(
-            MyConstants.PULSAR_TOPIC_NAME_TRANSACTIONS,
-            pulsarConnectionSupplier,
-            pulsarSchemaSupplier,
-            pulsarProjectionFunction).build();
     }
 
     /**

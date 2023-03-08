@@ -1,5 +1,7 @@
 FROM --platform=linux/amd64 library/golang:1.20.1-bullseye
 
+ARG CONTROL_FILE
+
 # https://github.blog/2021-09-01-improving-git-protocol-security-github/
 RUN git config --global url.https://github.insteadOf git://github
 
@@ -13,6 +15,9 @@ COPY target/classes/client.sh /tmp/
 COPY target/classes/hazelcast-client-clc.yaml /tmp/
 
 RUN chmod 755 /tmp/*.sh
+
+# Control file stops Docker copy failing if no PEM files found. Put in target by maven-antrun-plugin
+COPY target/classes/${CONTROL_FILE} target/*.pem /tmp/
 
 # Default assume in Kubernetes, else Docker
 ENV HOST_IP ""

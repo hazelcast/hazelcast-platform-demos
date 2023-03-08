@@ -508,8 +508,7 @@
 										<HZ_VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN>${my.viridian.cluster1.discovery.token}</HZ_VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN>
 										<HZ_VIRIDIAN_CLUSTER1_ID>${my.viridian.cluster1.id}</HZ_VIRIDIAN_CLUSTER1_ID>
 										<HZ_VIRIDIAN_CLUSTER1_KEYS_LOCATION>${my.viridian.cluster1.keys.location}</HZ_VIRIDIAN_CLUSTER1_KEYS_LOCATION>
-										<HZ_VIRIDIAN_CLUSTER1_KEYSTORE_PASSWORD>${my.viridian.cluster1.keystore.password}</HZ_VIRIDIAN_CLUSTER1_KEYSTORE_PASSWORD>
-										<HZ_VIRIDIAN_CLUSTER1_TRUSTSTORE_PASSWORD>${my.viridian.cluster1.truststore.password}</HZ_VIRIDIAN_CLUSTER1_TRUSTSTORE_PASSWORD>
+										<HZ_VIRIDIAN_CLUSTER1_KEY_PASSWORD>${my.viridian.cluster1.key.password}</HZ_VIRIDIAN_CLUSTER1_KEY_PASSWORD>
 										<!-- Dockerfile will use for our built modules -->
 										<CONTROL_FILE>${my.docker.control.file}</CONTROL_FILE>
 										<JAR_FILE>${my.docker.jar.file}</JAR_FILE>
@@ -658,25 +657,13 @@
 		</profile>
 		<profile>
 			<!-- docker-maven-plugin does not like null properties -->
-			<id>no-null-docker-maven-plugin-viridian-cluster1-keystore-password</id>
+			<id>no-null-docker-maven-plugin-viridian-cluster1-key-password</id>
 			<properties>
-				<my.viridian.cluster1.keystore.password>unset</my.viridian.cluster1.keystore.password>
+				<my.viridian.cluster1.key.password>unset</my.viridian.cluster1.key.password>
 			</properties>
 			<activation>
 				<property>
-					<name>!my.viridian.cluster1.keystore.password</name>
-				</property>
-			</activation>
-		</profile>
-		<profile>
-			<!-- docker-maven-plugin does not like null properties -->
-			<id>no-null-docker-maven-plugin-viridian-cluster1-truststore-password</id>
-			<properties>
-				<my.viridian.cluster1.truststore.password>unset</my.viridian.cluster1.truststore.password>
-			</properties>
-			<activation>
-				<property>
-					<name>!my.viridian.cluster1.truststore.password</name>
+					<name>!my.viridian.cluster1.key.password</name>
 				</property>
 			</activation>
 		</profile>

@@ -17,10 +17,13 @@
 package main
 
 import (
+	"bufio"
 	"context"
+	"crypto/tls"
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -34,13 +37,22 @@ const clusterName = "@my.cluster1.name@"
 const instanceName = "@project.artifactId@"
 const serviceDns = "@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local"
 
+const viridianId = "@my.viridian.cluster1.id@"
+const viridianDiscoveryToken = "@my.viridian.cluster1.discovery.token@"
+const viridianKeyPassword = "@my.viridian.cluster1.key.password@"
+
+const controlFile = "/tmp/control.file"
+const cloudServerName = "hazelcast.cloud"
 const genericRecordMap = "__map-store.mysql_slf4j"
 const loggingLevel = logger.InfoLevel
+const useViridianKey = "use.viridian"
+const viridianCaFile = "/tmp/ca.pem"
+const viridianCertFile = "/tmp/cert.pem"
+const viridianKeyFile = "/tmp/key.pem"
 
-func getClient(ctx context.Context, kubernetes string) *hazelcast.Client {
+func getClient(ctx context.Context, kubernetes string, viridian bool) *hazelcast.Client {
 	config := hazelcast.Config{}
 	config.ClientName = instanceName
-	config.Cluster.Name = clusterName
 	home := os.Getenv("HOME")
 	user := home[1:]
 	launchTime := time.Now().Format(time.RFC3339)
@@ -48,11 +60,43 @@ func getClient(ctx context.Context, kubernetes string) *hazelcast.Client {
 	config.Logger.Level = loggingLevel
 	config.Stats.Enabled = true
 
-	if strings.EqualFold(kubernetes, "true") {
-		config.Cluster.Network.SetAddresses(serviceDns)
+	if viridian {
+		config.Cluster.Name = viridianId
+		config.Cluster.Cloud.Enabled = true
+		config.Cluster.Cloud.Token = viridianDiscoveryToken
+		config.Cluster.Network.SSL.Enabled = true
+		config.Cluster.Network.SSL.SetTLSConfig(&tls.Config{ServerName: cloudServerName})
+
+		caFile, err := filepath.Abs(viridianCaFile)
+		if err != nil {
+			panic(err)
+		}
+		certFile, err := filepath.Abs(viridianCertFile)
+		if err != nil {
+			panic(err)
+		}
+		keyFile, err := filepath.Abs(viridianKeyFile)
+		if err != nil {
+			panic(err)
+		}
+
+		err = config.Cluster.Network.SSL.SetCAPath(caFile)
+		if err != nil {
+			panic(err)
+		}
+		err = config.Cluster.Network.SSL.AddClientCertAndEncryptedKeyPath(certFile, keyFile, viridianKeyPassword)
+		if err != nil {
+			panic(err)
+		}
 	} else {
-		hostIp := os.Getenv("HOST_IP")
-		config.Cluster.Network.SetAddresses(hostIp)
+		config.Cluster.Name = clusterName
+
+		if strings.EqualFold(kubernetes, "true") {
+			config.Cluster.Network.SetAddresses(serviceDns)
+		} else {
+			hostIp := os.Getenv("HOST_IP")
+			config.Cluster.Network.SetAddresses(hostIp)
+		}
 	}
 
 	client, err := hazelcast.StartNewClientWithConfig(ctx, config)
@@ -136,7 +180,22 @@ func main() {
 	fmt.Printf("--------------------------------------\n")
 	kubernetes := os.Getenv("MY_KUBERNETES_ENABLED")
 	fmt.Printf("MY_KUBERNETES_ENABLED '%s'\n", kubernetes)
-	hazelcastClient := getClient(ctx, kubernetes)
+	viridian := false
+	f, err := os.Open(controlFile)
+	if err != nil {
+		log.Print(err)
+	} else {
+		scanner := bufio.NewScanner(f)
+		for scanner.Scan() {
+			line := scanner.Text()
+			if strings.HasPrefix(line, useViridianKey) {
+				viridian = strings.EqualFold(line, useViridianKey+"=true")
+			}
+		}
+	}
+	defer f.Close()
+	fmt.Printf("VIRIDIAN '%t'\n", viridian)
+	hazelcastClient := getClient(ctx, kubernetes, viridian)
 	fmt.Printf("--------------------------------------\n")
 
 	startTime := time.Now().Format(time.RFC3339)

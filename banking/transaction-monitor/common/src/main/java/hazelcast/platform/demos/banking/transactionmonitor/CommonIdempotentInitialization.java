@@ -17,8 +17,6 @@
 package hazelcast.platform.demos.banking.transactionmonitor;
 
 import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -37,26 +35,23 @@ import com.hazelcast.config.IndexConfig;
 import com.hazelcast.config.IndexType;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MapStoreConfig;
-import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.jet.Job;
 import com.hazelcast.jet.config.JobConfig;
-import com.hazelcast.jet.config.JobConfigArguments;
 import com.hazelcast.jet.config.ProcessingGuarantee;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.jet.datamodel.Tuple4;
 import com.hazelcast.jet.pipeline.Pipeline;
+import com.hazelcast.jet.pipeline.StreamStage;
 import com.hazelcast.map.IMap;
 import com.hazelcast.mapstore.GenericMapStore;
-import com.hazelcast.nio.serialization.genericrecord.GenericRecord;
 import com.hazelcast.platform.demos.utils.UtilsConstants;
 import com.hazelcast.platform.demos.utils.UtilsFormatter;
 import com.hazelcast.platform.demos.utils.UtilsJobs;
 import com.hazelcast.platform.demos.utils.UtilsSlack;
 import com.hazelcast.platform.demos.utils.UtilsSlackSQLJob;
 import com.hazelcast.platform.demos.utils.UtilsSlackSink;
-import com.hazelcast.sql.SqlRow;
 
 /**
  * <p>May be invoked from clientside or serverside to ensure serverside ready.
@@ -79,8 +74,8 @@ public class CommonIdempotentInitialization {
     public static boolean createMinimal(HazelcastInstance hazelcastInstance,
             TransactionMonitorFlavor transactionMonitorFlavor) {
         boolean ok = defineWANIMaps(hazelcastInstance, transactionMonitorFlavor);
-        logStuff(hazelcastInstance);
-        showMappingsAndViews(hazelcastInstance);
+        MyUtils.logStuff(hazelcastInstance);
+        MyUtils.showMappingsAndViews(hazelcastInstance);
         return ok;
     }
 
@@ -97,7 +92,7 @@ public class CommonIdempotentInitialization {
      */
     public static boolean createNeededObjects(HazelcastInstance hazelcastInstance,
             Properties postgresProperties, String ourProjectProvenance,
-            TransactionMonitorFlavor transactionMonitorFlavor, boolean localhost) {
+            TransactionMonitorFlavor transactionMonitorFlavor, boolean localhost, boolean useViridian) {
         // Capture what was present before
         Set<String> existingIMapNames = hazelcastInstance.getDistributedObjects()
                 .stream()
@@ -108,7 +103,7 @@ public class CommonIdempotentInitialization {
 
         // Add journals and map stores to maps before they are created
         boolean ok = dynamicMapConfig(hazelcastInstance, existingIMapNames,
-                postgresProperties, ourProjectProvenance, localhost);
+                postgresProperties, ourProjectProvenance, localhost, useViridian);
 
         // Accessing non-existing maps does not return any failures
         List<String> iMapNames;
@@ -160,21 +155,18 @@ public class CommonIdempotentInitialization {
      */
     private static boolean dynamicMapConfig(HazelcastInstance hazelcastInstance,
             Set<String> existingIMapNames, Properties postgresProperties, String ourProjectProvenance,
-            boolean localhost) {
+            boolean localhost, boolean useViridian) {
         final String alertsWildcard = "alerts*";
 
-        EventJournalConfig eventJournalConfig = new EventJournalConfig();
-        eventJournalConfig.setEnabled(true);
+        EventJournalConfig eventJournalConfig = new EventJournalConfig().setEnabled(true);
 
         if (!existingIMapNames.contains(MyConstants.IMAP_NAME_ALERTS_LOG)) {
             MapConfig alertsMapConfig = new MapConfig(alertsWildcard);
             alertsMapConfig.setEventJournalConfig(eventJournalConfig);
 
-            AlertingToPostgresMapStore alertingToPostgresMapStore
-                = new AlertingToPostgresMapStore();
+            AlertingToPostgresMapStore alertingToPostgresMapStore = new AlertingToPostgresMapStore();
 
-            MapStoreConfig mapStoreConfig = new MapStoreConfig();
-            mapStoreConfig.setEnabled(true);
+            MapStoreConfig mapStoreConfig = new MapStoreConfig().setEnabled(true);
             mapStoreConfig.setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER);
             mapStoreConfig.setImplementation(alertingToPostgresMapStore);
             Properties properties = new Properties();
@@ -185,8 +177,13 @@ public class CommonIdempotentInitialization {
             if (localhost) {
                 LOGGER.info("localhost=={}, no map store for Postgres", localhost);
             } else {
-                alertsMapConfig.setMapStoreConfig(mapStoreConfig);
-                LOGGER.info("Postgres configured using: {}", alertsMapConfig.getMapStoreConfig().getProperties());
+                if (useViridian) {
+                    //FIXME Not yet available on Viridian @ March 2023.
+                    LOGGER.warn("use.virian={}, no map store for Postgres", useViridian);
+                } else {
+                    alertsMapConfig.setMapStoreConfig(mapStoreConfig);
+                    LOGGER.info("Postgres configured using: {}", alertsMapConfig.getMapStoreConfig().getProperties());
+                }
             }
 
             hazelcastInstance.getConfig().addMapConfig(alertsMapConfig);
@@ -209,8 +206,7 @@ public class CommonIdempotentInitialization {
                     + "," + MyConstants.MYSQL_DATASTORE_TABLE_COLUMN2 + "," + MyConstants.MYSQL_DATASTORE_TABLE_COLUMN3
                     + "," + MyConstants.MYSQL_DATASTORE_TABLE_COLUMN4 + "," + MyConstants.MYSQL_DATASTORE_TABLE_COLUMN5);
 
-            MapStoreConfig mySqlStoreConfig = new MapStoreConfig();
-            mySqlStoreConfig.setEnabled(true);
+            MapStoreConfig mySqlStoreConfig = new MapStoreConfig().setEnabled(true);
             mySqlStoreConfig.setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER);
             mySqlStoreConfig.setClassName(GenericMapStore.class.getName());
             mySqlStoreConfig.setProperties(mySqlProperties);
@@ -218,8 +214,13 @@ public class CommonIdempotentInitialization {
             if (localhost) {
                 LOGGER.info("localhost=={}, no map store for MySql", localhost);
             } else {
-                LOGGER.info("MySql configured using: {}", mySqlMapConfig.getMapStoreConfig().getProperties());
-                mySqlMapConfig.setMapStoreConfig(mySqlStoreConfig);
+                if (useViridian) {
+                    //FIXME Not yet available on Viridian @ March 2023.
+                    LOGGER.warn("use.virian={}, no data link for MySql", useViridian);
+                } else {
+                    mySqlMapConfig.setMapStoreConfig(mySqlStoreConfig);
+                    LOGGER.info("MySql configured using: {}", mySqlMapConfig.getMapStoreConfig().getProperties());
+                }
             }
 
             hazelcastInstance.getConfig().addMapConfig(mySqlMapConfig);
@@ -1085,6 +1086,7 @@ public class CommonIdempotentInitialization {
     public static boolean launchNeededJobs(HazelcastInstance hazelcastInstance, String bootstrapServers,
             String pulsarList, Properties postgresProperties, Properties properties, String clusterName,
             TransactionMonitorFlavor transactionMonitorFlavor) {
+        boolean ok = true;
         String projectName = properties.getOrDefault(UtilsConstants.SLACK_PROJECT_NAME,
                 CommonIdempotentInitialization.class.getSimpleName()).toString();
 
@@ -1099,52 +1101,26 @@ public class CommonIdempotentInitialization {
         logUseViridian(useViridian, kubernetesOrViridian);
 
         if (System.getProperty("my.autostart.enabled", "").equalsIgnoreCase("false")) {
-            LOGGER.info("Not launching Kafka jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",
+            LOGGER.info("Not launching transaction input jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",
                     System.getProperty("my.autostart.enabled"));
         } else {
-            LOGGER.info("Launching Kafka jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",
+            LOGGER.info("Launching transaction input jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",
                     System.getProperty("my.autostart.enabled"));
-
-            // Transaction ingest
-            Pipeline pipelineIngestTransactions = IngestTransactions.buildPipeline(bootstrapServers, pulsarList,
-                    usePulsar, transactionMonitorFlavor);
-
-            JobConfig jobConfigIngestTransactions = new JobConfig();
-            jobConfigIngestTransactions.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
-            jobConfigIngestTransactions.setName(IngestTransactions.class.getSimpleName());
-            jobConfigIngestTransactions.addClass(IngestTransactions.class);
-
-            if (usePulsar && useViridian) {
-                //TODO Fix once supported by Viridian
-                LOGGER_TO_IMAP.error("Pulsar is not currently supported on Viridian");
-            } else {
-                Job job = UtilsJobs.myNewJobIfAbsent(LOGGER,
-                        hazelcastInstance, pipelineIngestTransactions, jobConfigIngestTransactions);
-                LOGGER_TO_IMAP.info(Objects.toString(job));
+            try {
+                ok = launchTransactionJobs(hazelcastInstance, bootstrapServers, pulsarList,
+                        usePulsar, useViridian, projectName, clusterName, transactionMonitorFlavor);
+                if (!ok) {
+                    return ok;
+                }
+            } catch (Exception e) {
+                LOGGER.error("launchNeededJobs(): launchTransactionJobs()", e);
+                return false;
             }
+        }
 
-            // Transaction aggregation
-            JobConfig jobConfigAggregateQuery = new JobConfig();
-            jobConfigAggregateQuery.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
-            jobConfigAggregateQuery.setName(AggregateQuery.class.getSimpleName());
-            jobConfigAggregateQuery.addClass(AggregateQuery.class);
-            jobConfigAggregateQuery.addClass(MaxAggregator.class);
-            jobConfigAggregateQuery.addClass(UtilsFormatter.class);
-
-            Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(bootstrapServers,
-                    pulsarList, usePulsar, projectName, jobConfigAggregateQuery.getName(),
-                    clusterName, transactionMonitorFlavor);
-
-            if (usePulsar && useViridian) {
-                //TODO Fix once supported by Viridian
-                LOGGER_TO_IMAP.error("Pulsar is not currently supported on Viridian");
-            } else {
-                Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAggregateQuery, jobConfigAggregateQuery);
-                LOGGER_TO_IMAP.info(Objects.toString(job));
-                // Aggregate query creates alerts to an IMap. Use a separate rather than same job to copy to Kafka.
-                launchAlertsToKafkaAndToLog(hazelcastInstance, bootstrapServers, transactionMonitorFlavor);
-            }
-
+        if (!usePulsar && ok) {
+            // Aggregate query creates alerts to an IMap. Use a separate rather than same job to copy to Kafka.
+            ok &=  launchAlertsToKafkaAndToLog(hazelcastInstance, bootstrapServers, transactionMonitorFlavor);
         }
 
         // Remaining jobs need properties
@@ -1153,13 +1129,99 @@ public class CommonIdempotentInitialization {
             return false;
         }
 
-        // Slack SQL integration (reading/writing) from common utils
-        launchSlackReadWrite(useViridian, projectName, hazelcastInstance, properties, transactionMonitorFlavor);
+        if (ok) {
+            // Slack SQL integration (reading/writing) from common utils
+            ok &= launchSlackReadWrite(useViridian, projectName, hazelcastInstance, properties, transactionMonitorFlavor);
+        }
 
-        launchPostgresCDC(hazelcastInstance, postgresProperties,
-                Objects.toString(properties.get(MyConstants.PROJECT_PROVENANCE)));
+        if (ok) {
+            // Feed changes from Postgres directly into Hazelcast
+            ok &= launchPostgresCDC(hazelcastInstance, postgresProperties,
+                    Objects.toString(properties.get(MyConstants.PROJECT_PROVENANCE)));
+        }
 
-        logStuff(hazelcastInstance);
+        // Optional
+        MyUtils.logStuff(hazelcastInstance);
+        return ok;
+    }
+
+    /**
+     * <p>The main two jobs upload and aggregate the transaction input feed.
+     * This is done as two jobs for simplicity, but would be more efficient to have one reader on the
+     * input feed sending data to two legs of processing.
+     * </p>
+     *
+     * @param hazelcastInstance
+     * @param bootstrapServers
+     * @param pulsarList
+     * @param clusterName
+     * @param usePulsar
+     * @param useViridian
+     * @param projectName
+     * @param clusterName
+     * @param transactionMonitorFlavor
+     * @return
+     */
+    public static boolean launchTransactionJobs(HazelcastInstance hazelcastInstance, String bootstrapServers,
+            String pulsarList, boolean usePulsar, boolean useViridian, String projectName, String clusterName,
+            TransactionMonitorFlavor transactionMonitorFlavor) {
+
+        /* Transaction ingest
+         */
+        JobConfig jobConfigIngestTransactions = new JobConfig();
+        jobConfigIngestTransactions.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
+        jobConfigIngestTransactions.setName(IngestTransactions.class.getSimpleName());
+        jobConfigIngestTransactions.addClass(IngestTransactions.class);
+
+        StreamStage<Entry<String, HazelcastJsonValue>> pulsarInputSource1 = null;
+        if (usePulsar) {
+            // Attach Pulsar classes only if needed
+            pulsarInputSource1 = MyPulsarSource.inputSourceKeyAndJson(pulsarList);
+            jobConfigIngestTransactions.addClass(MyPulsarSource.class);
+        }
+
+        Pipeline pipelineIngestTransactions = IngestTransactions.buildPipeline(bootstrapServers,
+                pulsarInputSource1, transactionMonitorFlavor);
+
+        if (usePulsar && useViridian) {
+            //FIXME Not yet available on Viridian @ March 2023.
+            LOGGER_TO_IMAP.error("Pulsar is not currently supported on Viridian");
+            return false;
+        } else {
+            Job job = UtilsJobs.myNewJobIfAbsent(LOGGER,
+                    hazelcastInstance, pipelineIngestTransactions, jobConfigIngestTransactions);
+            LOGGER_TO_IMAP.info(Objects.toString(job));
+        }
+
+        /* Transaction aggregation
+         */
+        JobConfig jobConfigAggregateQuery = new JobConfig();
+        jobConfigAggregateQuery.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
+        jobConfigAggregateQuery.setName(AggregateQuery.class.getSimpleName());
+        jobConfigAggregateQuery.addClass(AggregateQuery.class);
+        jobConfigAggregateQuery.addClass(MaxAggregator.class);
+        jobConfigAggregateQuery.addClass(UtilsFormatter.class);
+
+        StreamStage<?> pulsarInputSource2 = null;
+        if (usePulsar) {
+            // Attach Pulsar classes only if needed
+            pulsarInputSource2 = MyPulsarSource.inputSourceTransaction(pulsarList, transactionMonitorFlavor);
+            jobConfigAggregateQuery.addClass(MyPulsarSource.class);
+        }
+
+        Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(bootstrapServers,
+                pulsarInputSource2, projectName, jobConfigAggregateQuery.getName(),
+                clusterName, transactionMonitorFlavor);
+
+        if (usePulsar && useViridian) {
+            //FIXME Not yet available on Viridian @ March 2023.
+            LOGGER_TO_IMAP.error("Pulsar is not currently supported on Viridian");
+            return false;
+        } else {
+            Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAggregateQuery, jobConfigAggregateQuery);
+            LOGGER_TO_IMAP.info(Objects.toString(job));
+        }
+
         return true;
     }
 
@@ -1198,7 +1260,7 @@ public class CommonIdempotentInitialization {
      * @param hazelcastInstance
      * @param bootstrapServers
      */
-    private static void launchAlertsToKafkaAndToLog(HazelcastInstance hazelcastInstance, String bootstrapServers,
+    private static boolean launchAlertsToKafkaAndToLog(HazelcastInstance hazelcastInstance, String bootstrapServers,
             TransactionMonitorFlavor transactionMonitorFlavor) {
         String topic = MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_ALERTS;
 
@@ -1244,6 +1306,7 @@ public class CommonIdempotentInitialization {
             LOGGER_TO_IMAP.info(Objects.toString(job));
         } catch (Exception e) {
             LOGGER.error("launchAlertsSqlToKafka:", e);
+            return false;
         }
 
         //FIXME Submit "sqlJobMapToKafka", will complete until ready for streaming as reminder
@@ -1253,8 +1316,10 @@ public class CommonIdempotentInitialization {
                 LOGGER.info("SQL running: '{}'", sql);
             } catch (Exception e) {
                 LOGGER.error("launchAlertsSqlToKafka:" + sql, e);
+                return false;
             }
         }
+        return true;
     }
 
     /**
@@ -1266,7 +1331,7 @@ public class CommonIdempotentInitialization {
      * @param hazelcastInstance
      * @param properties
      */
-    private static void launchSlackReadWrite(boolean useViridian, Object projectName,
+    private static boolean launchSlackReadWrite(boolean useViridian, Object projectName,
             HazelcastInstance hazelcastInstance, Properties properties,
             TransactionMonitorFlavor transactionMonitorFlavor) {
 
@@ -1276,32 +1341,32 @@ public class CommonIdempotentInitialization {
 
         if (slackAccessToken.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY) {
             LOGGER.warn("No Slack jobs, '{}' too short: '{}'", UtilsConstants.SLACK_ACCESS_TOKEN, slackAccessToken);
-            return;
+            return false;
         }
         if (slackChannelId.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY) {
             LOGGER.warn("No Slack jobs, '{}' too short: '{}'", UtilsConstants.SLACK_CHANNEL_ID, slackChannelId);
-            return;
+            return false;
         }
         if (slackChannelName.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY) {
             LOGGER.warn("No Slack jobs, '{}' too short: '{}'", UtilsConstants.SLACK_CHANNEL_NAME, slackChannelName);
-            return;
-        }
-
-        try {
-            UtilsSlackSQLJob.submitJob(hazelcastInstance,
-                    projectName == null ? "" : projectName.toString());
-        } catch (Exception e) {
-            LOGGER.error("launchNeededJobs:" + UtilsSlackSQLJob.class.getSimpleName(), e);
+            return false;
         }
 
         // Slack alerting (writing), indirectly uses common utils
         if (useViridian) {
-            //TODO Fix once supported by Viridian
+            //FIXME Not yet available on Viridian @ March 2023.
             LOGGER.error("Slack is not currently supported on Viridian");
         } else {
+            try {
+                UtilsSlackSQLJob.submitJob(hazelcastInstance,
+                        projectName == null ? "" : projectName.toString());
+            } catch (Exception e) {
+                LOGGER.error("launchNeededJobs:" + UtilsSlackSQLJob.class.getSimpleName(), e);
+                return false;
+            }
             launchSlackJob(hazelcastInstance, properties, transactionMonitorFlavor);
         }
-
+        return true;
     }
 
     /**
@@ -1310,7 +1375,7 @@ public class CommonIdempotentInitialization {
      * @param hazelcastInstance
      * @param properties
      */
-    private static void launchSlackJob(HazelcastInstance hazelcastInstance, Properties properties,
+    private static boolean launchSlackJob(HazelcastInstance hazelcastInstance, Properties properties,
             TransactionMonitorFlavor transactionMonitorFlavor) {
         try {
             Pipeline pipelineAlertingToSlack = AlertingToSlack.buildPipeline(
@@ -1331,7 +1396,9 @@ public class CommonIdempotentInitialization {
             LOGGER_TO_IMAP.info(Objects.toString(job));
         } catch (Exception e) {
             LOGGER.error("launchNeededJobs:" + AlertingToSlack.class.getSimpleName(), e);
+            return false;
         }
+        return true;
     }
 
     /**
@@ -1342,7 +1409,7 @@ public class CommonIdempotentInitialization {
      * @param hazelcastInstance
      * @param properties
      */
-    private static void launchPostgresCDC(HazelcastInstance hazelcastInstance,
+    private static boolean launchPostgresCDC(HazelcastInstance hazelcastInstance,
             Properties properties, String ourProjectProvenance) {
 
         try {
@@ -1365,118 +1432,9 @@ public class CommonIdempotentInitialization {
             LOGGER_TO_IMAP.info(Objects.toString(job));
         } catch (Exception e) {
             LOGGER.error("launchNeededJobs:" + PostgresCDC.class.getSimpleName(), e);
+            return false;
         }
-
+        return true;
     }
 
-    public static void logStuff(HazelcastInstance hazelcastInstance) {
-        logJobs(hazelcastInstance);
-        logMaps(hazelcastInstance);
-        logMySqlSlf4j(hazelcastInstance);
-    }
-
-    /**
-     * <p>Confirm the running jobs to the console.
-     * </p>
-     */
-    private static void logJobs(HazelcastInstance hazelcastInstance) {
-        LOGGER.info("~_~_~_~_~");
-        LOGGER.info("logJobs()");
-        LOGGER.info("---------");
-        hazelcastInstance.getJet().getJobs().forEach(job -> {
-            try {
-                LOGGER.info("Job name '{}', id {}, status {}, submission {} ({})",
-                    Objects.toString(job.getName()), job.getId(), job.getStatus(),
-                    job.getSubmissionTime(), new Date(job.getSubmissionTime()));
-                JobConfig jobConfig = job.getConfig();
-                Object originalSql =
-                        jobConfig.getArgument(JobConfigArguments.KEY_SQL_QUERY_TEXT);
-                if (originalSql != null) {
-                    LOGGER.info(" Original SQL: {}", originalSql);
-                }
-            } catch (Exception e) {
-                String message = String.format("logJobs(): %s: %s", job.getId(), e.getMessage());
-                LOGGER.warn(message);
-            }
-        });
-        LOGGER.info("---------");
-    }
-
-    /**
-     * <p>Confirm the maps sizes to the console.
-     * </p>
-     */
-    private static void logMaps(HazelcastInstance hazelcastInstance) {
-        Set<String> iMapNames = hazelcastInstance.getDistributedObjects()
-                .stream()
-                .filter(distributedObject -> distributedObject instanceof IMap)
-                .filter(distributedObject -> !distributedObject.getName().startsWith("__"))
-                .map(distributedObject -> distributedObject.getName())
-                .collect(Collectors.toCollection(TreeSet::new));
-
-        LOGGER.info("~_~_~_~_~");
-        LOGGER.info("logMaps()");
-        LOGGER.info("---------");
-        for (String iMapName : iMapNames) {
-            LOGGER.info("IMap: name '{}', size {}",
-                    iMapName, hazelcastInstance.getMap(iMapName).size());
-        }
-        LOGGER.info("---------");
-    }
-
-    /**
-     * <p>Log the logs saved into an {@link com.hazelcast.map.IMap IMap}
-     * if it exists.
-     * </p>
-     */
-    @SuppressWarnings("unchecked")
-    private static void logMySqlSlf4j(HazelcastInstance hazelcastInstance) {
-        IMap<GenericRecord, GenericRecord> mapMySqlSlf4j = null;
-
-        // Do not look up by name, as that force creates
-        for (DistributedObject distributedObject : hazelcastInstance.getDistributedObjects()) {
-            if (distributedObject instanceof IMap
-                    && distributedObject.getName().equals(MyConstants.IMAP_NAME_MYSQL_SLF4J)) {
-                mapMySqlSlf4j = (IMap<GenericRecord, GenericRecord>) distributedObject;
-            }
-        }
-
-        LOGGER.info("~_~_~_~_~");
-        LOGGER.info("logMySqlSlf4j()");
-        LOGGER.info("---------");
-        if (mapMySqlSlf4j == null) {
-            LOGGER.info("Map does not currently exist");
-        } else {
-            Set<Entry<GenericRecord, GenericRecord>> entrySet = mapMySqlSlf4j.entrySet();
-            for (Entry<GenericRecord, GenericRecord> entry : entrySet) {
-                LOGGER.info("Key '{}', Value '{}'", entry.getKey(), entry.getValue());
-            }
-            LOGGER.info("[{} entr{}]", entrySet.size(), entrySet.size() == 1 ? "y" : "ies");
-        }
-        LOGGER.info("---------");
-    }
-
-    /**
-     * <p>Confirm mappings/views added implicitly or explicitly.
-     * </p>
-     */
-    private static void showMappingsAndViews(HazelcastInstance hazelcastInstance) {
-        for (String query : List.of("SHOW MAPPINGS", "SHOW VIEWS")) {
-            LOGGER.info("~_~_~_~_~");
-            LOGGER.info("{}", query);
-            LOGGER.info("---------");
-            int count = 0;
-            try {
-                Iterator<SqlRow> iterator = hazelcastInstance.getSql().execute(query).iterator();
-                while (iterator.hasNext()) {
-                    count++;
-                    LOGGER.info("{}", iterator.next());
-                }
-                LOGGER.info("[{} row{}]", count, (count == 1 ? "" : "s"));
-            } catch (Exception e) {
-                LOGGER.error("showMappingsAndViews():" + query, e);
-            }
-        }
-        LOGGER.info("~_~_~_~_~");
-    }
 }

@@ -18,17 +18,20 @@ package hazelcast.platform.demos.banking.transactionmonitor;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.jet.Job;
 import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.config.ProcessingGuarantee;
 import com.hazelcast.jet.core.JobStatus;
 import com.hazelcast.jet.pipeline.Pipeline;
+import com.hazelcast.jet.pipeline.StreamStage;
 
 /**
  * <p>Starts at most one job with the given name.
@@ -82,12 +85,19 @@ public class JobControlStartRunnable implements Runnable {
         // Actually launch
         if (targetJobNamePrefix.equals(IngestTransactions.class.getSimpleName())) {
             // Transaction ingest
-            Pipeline pipelineIngestTransactions = IngestTransactions.buildPipeline(this.bootstrapServers,
-                this.pulsarList, this.usePulsar, this.transactionMonitorFlavor);
-
             JobConfig jobConfigIngestTransactions = new JobConfig();
             jobConfigIngestTransactions.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
             jobConfigIngestTransactions.setName(IngestTransactions.class.getSimpleName() + "@" + now);
+
+            StreamStage<Entry<String, HazelcastJsonValue>> inputSource1 = null;
+            if (usePulsar) {
+                // Attach Pulsar classes only if needed
+                inputSource1 = MyPulsarSource.inputSourceKeyAndJson(pulsarList);
+                jobConfigIngestTransactions.addClass(MyPulsarSource.class);
+            }
+
+            Pipeline pipelineIngestTransactions = IngestTransactions.buildPipeline(bootstrapServers,
+                    inputSource1, transactionMonitorFlavor);
 
             try {
                 hazelcastInstance.getJet().newJob(pipelineIngestTransactions, jobConfigIngestTransactions);
@@ -102,8 +112,15 @@ public class JobControlStartRunnable implements Runnable {
                 jobConfigAggregateQuery.setName(AggregateQuery.class.getSimpleName() + "@" + now);
                 jobConfigAggregateQuery.addClass(MaxAggregator.class);
 
+                StreamStage<?> inputSource2 = null;
+                if (usePulsar) {
+                    // Attach Pulsar classes only if needed
+                    inputSource2 = MyPulsarSource.inputSourceTransaction(pulsarList, transactionMonitorFlavor);
+                    jobConfigAggregateQuery.addClass(MyPulsarSource.class);
+                }
+
                 Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(this.bootstrapServers,
-                        this.pulsarList, this.usePulsar, projectName, jobConfigAggregateQuery.getName(),
+                        inputSource2, projectName, jobConfigAggregateQuery.getName(),
                         this.clusterName, this.transactionMonitorFlavor);
 
                 try {

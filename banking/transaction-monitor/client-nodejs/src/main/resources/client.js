@@ -17,12 +17,25 @@
 'use strict';
 
 const { Client } = require('hazelcast-client');
+const fs = require('fs');
+const path = require('path');
+const readline = require('readline');
 
 const clusterName = '@my.cluster1.name@';
 const instanceName = '@project.artifactId@';
 const serviceDns = '@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local';
 
+const viridianId = "@my.viridian.cluster1.id@";
+const viridianDiscoveryToken = "@my.viridian.cluster1.discovery.token@";
+const viridianKeyPassword = "@my.viridian.cluster1.key.password@";
+
+const controlFile = "/tmp/control.file";
+const cloudServerUrl = "https://api.viridian.hazelcast.com";
 const genericRecordMap = "__map-store.mysql_slf4j"
+const useViridianKey = "use.viridian"
+const viridianCaFile = "/tmp/ca.pem"
+const viridianCertFile = "/tmp/cert.pem"
+const viridianKeyFile = "/tmp/key.pem"
 
 const kubernetes = process.env.MY_KUBERNETES_ENABLED
 const host_ip = process.env.HOST_IP
@@ -51,6 +64,30 @@ const clientConfig = {
         ],
     },
     properties: {
+        'hazelcast.client.statistics.enabled': true,
+    }
+};
+const clientConfigViridian = {
+	clusterName: viridianId,
+	instanceName: instanceName,
+	clientLabels: [ user, launchTime ],
+    network: {
+        hazelcastCloud: {
+            discoveryToken: viridianDiscoveryToken
+        },
+        ssl: {
+            enabled: true,
+            sslOptions: {
+                ca: [fs.readFileSync(path.resolve(viridianCaFile))],
+                cert: [fs.readFileSync(path.resolve(viridianCertFile))],
+                key: [fs.readFileSync(path.resolve(viridianKeyFile))],
+                passphrase: viridianKeyPassword,
+                checkServerIdentity: () => null
+            }
+        }
+    },
+    properties: {
+        'hazelcast.client.cloud.url': cloudServerUrl,
         'hazelcast.client.statistics.enabled': true,
     }
 };
@@ -110,7 +147,25 @@ async function getGenericRecord(hazelcastClient) {
     try {
         console.log('--------------------------------------')
 		console.log('MY_KUBERNETES_ENABLED ', kubernetes)
-        const hazelcastClient = await Client.newHazelcastClient(clientConfig);
+        var viridian = false;
+        var readerI = readline.createInterface({
+            input: fs.createReadStream(controlFile)
+        });
+        const matchStr = useViridianKey + "=true";
+        const checkViridian = async () =>{
+            for await (const line of readerI) {
+                if (line.toLowerCase() == matchStr) {
+                    viridian = true;
+                }
+            }
+        }
+        await checkViridian()
+        console.log('VIRIDIAN \'', viridian, '\'')
+        if (viridian) {
+            const hazelcastClient = await Client.newHazelcastClient(clientConfigViridian);
+        } else {
+            const hazelcastClient = await Client.newHazelcastClient(clientConfig);
+        }
         console.log('--------------------------------------')
 
 		const startTime = myISO8601(new Date())

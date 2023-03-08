@@ -16,22 +16,15 @@
 
 package hazelcast.platform.demos.banking.transactionmonitor;
 
-import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.pulsar.client.api.Message;
-import org.apache.pulsar.client.api.PulsarClient;
-import org.apache.pulsar.client.api.Schema;
 
 import com.hazelcast.core.HazelcastJsonValue;
-import com.hazelcast.function.FunctionEx;
 import com.hazelcast.function.Functions;
-import com.hazelcast.function.SupplierEx;
 import com.hazelcast.function.ToDoubleFunctionEx;
 import com.hazelcast.function.ToLongFunctionEx;
 import com.hazelcast.jet.accumulator.LongAccumulator;
@@ -39,7 +32,6 @@ import com.hazelcast.jet.accumulator.MutableReference;
 import com.hazelcast.jet.aggregate.AggregateOperation;
 import com.hazelcast.jet.aggregate.AggregateOperation1;
 import com.hazelcast.jet.aggregate.AggregateOperations;
-import com.hazelcast.jet.contrib.pulsar.PulsarSources;
 import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.jet.datamodel.Tuple4;
@@ -47,10 +39,8 @@ import com.hazelcast.jet.kafka.KafkaSources;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.ServiceFactories;
 import com.hazelcast.jet.pipeline.Sinks;
-import com.hazelcast.jet.pipeline.StreamSource;
 import com.hazelcast.jet.pipeline.StreamStage;
 import com.hazelcast.jet.pipeline.WindowDefinition;
-import com.hazelcast.platform.demos.utils.UtilsUrls;
 
 /**
  * <p>Creates a pipeline job to "<i>query</i>" Kafka transactions.
@@ -94,27 +84,35 @@ public class AggregateQuery {
      * </p>
      *
      * @param bootstrapServers Connection list for Kafka
+     * @param pulsarInputSource Ready made source to use for Pulsar instead of Kafka
+     * @param transactionMonitorFlavor
      * @return A pipeline job to run in Jet.
      */
-    public static Pipeline buildPipeline(String bootstrapServers, String pulsarList,
-            boolean usePulsar, String projectName, String jobName, String clusterName,
+    @SuppressWarnings("unchecked")
+    public static Pipeline buildPipeline(String bootstrapServers, StreamStage<?> pulsarInputSource,
+            String projectName, String jobName, String clusterName,
             TransactionMonitorFlavor transactionMonitorFlavor) {
 
         Properties properties = InitializerConfig.kafkaSourceProperties(bootstrapServers);
 
-        Pipeline pipeline = Pipeline.create();
+        Pipeline pipeline = null;
+        if (pulsarInputSource != null) {
+            pipeline = pulsarInputSource.getPipeline();
+        } else {
+            pipeline = Pipeline.create();
+        }
 
         StreamStage<Entry<String, Tuple3<Long, Double, Double>>> aggregated;
         switch (transactionMonitorFlavor) {
         case ECOMMERCE:
-            aggregated = aggregatedEcommerce(pipeline, properties, usePulsar, pulsarList);
+            aggregated = aggregatedEcommerce(pipeline, properties, (StreamStage<TransactionEcommerce>) pulsarInputSource);
             break;
         case PAYMENTS:
-            aggregated = aggregatedPayments(pipeline, properties, usePulsar, pulsarList);
+            aggregated = aggregatedPayments(pipeline, properties, (StreamStage<TransactionPayments>) pulsarInputSource);
             break;
         case TRADE:
         default:
-            aggregated = aggregatedTrade(pipeline, properties, usePulsar, pulsarList);
+            aggregated = aggregatedTrade(pipeline, properties, (StreamStage<TransactionTrade>) pulsarInputSource);
             break;
         }
 
@@ -153,13 +151,11 @@ public class AggregateQuery {
      * @return A trio for the product - count, sum and latest
      */
     private static StreamStage<Entry<String, Tuple3<Long, Double, Double>>> aggregatedEcommerce(
-            Pipeline pipeline, Properties properties, boolean usePulsar, String pulsarList) {
+        Pipeline pipeline, Properties properties, StreamStage<TransactionEcommerce> pulsarInputSource) {
 
         StreamStage<TransactionEcommerce> inputSource;
-        if (usePulsar) {
-            inputSource =
-                    pipeline.readFrom(AggregateQuery.pulsarSourceEcommerce(pulsarList))
-                    .withoutTimestamps();
+        if (pulsarInputSource != null) {
+            inputSource = pulsarInputSource;
         } else {
             // Override the value de-serializer to produce a different type
             properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
@@ -201,13 +197,11 @@ public class AggregateQuery {
      * @return A trio for the product - count, sum and latest
      */
     private static StreamStage<Entry<String, Tuple3<Long, Double, Double>>> aggregatedPayments(
-            Pipeline pipeline, Properties properties, boolean usePulsar, String pulsarList) {
+            Pipeline pipeline, Properties properties, StreamStage<TransactionPayments> pulsarInputSource) {
 
         StreamStage<TransactionPayments> inputSource;
-        if (usePulsar) {
-            inputSource =
-                    pipeline.readFrom(AggregateQuery.pulsarSourcePayments(pulsarList))
-                    .withoutTimestamps();
+        if (pulsarInputSource != null) {
+            inputSource = pulsarInputSource;
         } else {
             // Override the value de-serializer to produce a different type
             properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
@@ -249,13 +243,11 @@ public class AggregateQuery {
      * @return A trio for the stock - count, sum and latest
      */
     private static StreamStage<Entry<String, Tuple3<Long, Double, Double>>> aggregatedTrade(
-            Pipeline pipeline, Properties properties, boolean usePulsar, String pulsarList) {
+            Pipeline pipeline, Properties properties, StreamStage<TransactionTrade> pulsarInputSource) {
 
         StreamStage<TransactionTrade> inputSource;
-        if (usePulsar) {
-            inputSource =
-                    pipeline.readFrom(AggregateQuery.pulsarSourceTrade(pulsarList))
-                    .withoutTimestamps();
+        if (pulsarInputSource != null) {
+            inputSource = pulsarInputSource;
         } else {
             // Override the value de-serializer to produce a different type
             properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
@@ -340,99 +332,5 @@ public class AggregateQuery {
         .writeTo(Sinks.map(MyConstants.IMAP_NAME_ALERTS_LOG));
     }
 
-    /**
-     * <p>This is similar to {@link IngestTransactions#IngestTransactions()} but
-     * returns a different type.
-     * </p>
-     *
-     * @param pulsarList
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    private static StreamSource<TransactionEcommerce> pulsarSourceEcommerce(String pulsarList) {
-        FunctionEx<Message<String>, TransactionEcommerce> pulsarProjectionFunction =
-                message -> {
-                    //TODO: A new deserializer for each message, could optimize with shared if thread-safe
-                    try (TransactionEcommerceJsonDeserializer transactionJsonDeserializer =
-                            new TransactionEcommerceJsonDeserializer()) {
-                        byte[] bytes = message.getValue().getBytes(StandardCharsets.UTF_8);
-                        return transactionJsonDeserializer.deserialize("", bytes);
-                    }
-                };
 
-        return (StreamSource<TransactionEcommerce>) pulsarSource(pulsarList, pulsarProjectionFunction);
-    }
-
-    /**
-     * <p>This is similar to {@link IngestTransactions#IngestTransactions()} but
-     * returns a different type.
-     * </p>
-     *
-     * @param pulsarList
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    private static StreamSource<TransactionPayments> pulsarSourcePayments(String pulsarList) {
-        FunctionEx<Message<String>, TransactionPayments> pulsarProjectionFunction =
-                message -> {
-                    //TODO: A new deserializer for each message, could optimize with shared if thread-safe
-                    try (TransactionPaymentsJsonDeserializer transactionJsonDeserializer =
-                            new TransactionPaymentsJsonDeserializer()) {
-                        byte[] bytes = message.getValue().getBytes(StandardCharsets.UTF_8);
-                        return transactionJsonDeserializer.deserialize("", bytes);
-                    }
-                };
-
-        return (StreamSource<TransactionPayments>) pulsarSource(pulsarList, pulsarProjectionFunction);
-    }
-
-    /**
-     * <p>This is similar to {@link IngestTransactions#IngestTransactions()} but
-     * returns a different type.
-     * </p>
-     *
-     * @param pulsarList
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    private static StreamSource<TransactionTrade> pulsarSourceTrade(String pulsarList) {
-        FunctionEx<Message<String>, TransactionTrade> pulsarProjectionFunction =
-                message -> {
-                    //TODO: A new deserializer for each message, could optimize with shared if thread-safe
-                    try (TransactionTradeJsonDeserializer transactionJsonDeserializer = new TransactionTradeJsonDeserializer()) {
-                        byte[] bytes = message.getValue().getBytes(StandardCharsets.UTF_8);
-                        return transactionJsonDeserializer.deserialize("", bytes);
-                    }
-                };
-
-        return (StreamSource<TransactionTrade>) pulsarSource(pulsarList, pulsarProjectionFunction);
-    }
-
-    /**
-     * <p>Builds a source for Pulsar
-     * </p>
-     *
-     * @param pulsarList
-     * @param pulsarProjectionFunction - Extracts the data
-     * @return
-     */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    private static StreamSource pulsarSource(String pulsarList, FunctionEx pulsarProjectionFunction) {
-        String serviceUrl = UtilsUrls.getPulsarServiceUrl(pulsarList);
-
-        SupplierEx<PulsarClient> pulsarConnectionSupplier =
-                () -> PulsarClient.builder()
-                .connectionTimeout(1, TimeUnit.SECONDS)
-                .serviceUrl(serviceUrl)
-                .build();
-
-        SupplierEx<Schema<String>> pulsarSchemaSupplier =
-                () -> Schema.STRING;
-
-        return PulsarSources.pulsarReaderBuilder(
-                        MyConstants.PULSAR_TOPIC_NAME_TRANSACTIONS,
-                        pulsarConnectionSupplier,
-                        pulsarSchemaSupplier,
-                        pulsarProjectionFunction).build();
-    }
 }

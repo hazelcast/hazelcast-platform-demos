@@ -1,5 +1,6 @@
 FROM --platform=linux/amd64 library/fedora:22
 
+ARG CONTROL_FILE
 ARG VERSION=5.1.0
 
 RUN dnf groups install -y "Development Tools"
@@ -41,6 +42,9 @@ RUN cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
  && cp build/cpp_client /tmp/client
 
 ENV LD_LIBRARY_PATH /usr/local/lib
+
+# Control file stops Docker copy failing if no PEM files found. Put in target by maven-antrun-plugin
+COPY target/classes/${CONTROL_FILE} target/*.pem /tmp/
 
 # Default assume in Kubernetes, else Docker
 ENV HOST_IP ""

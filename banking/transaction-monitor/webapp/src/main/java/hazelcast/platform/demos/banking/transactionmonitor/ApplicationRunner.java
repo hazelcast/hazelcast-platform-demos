@@ -152,7 +152,7 @@ public class ApplicationRunner {
 
         // If SQL is broken, abort
         if (!ok) {
-            CommonIdempotentInitialization.logStuff(this.hazelcastInstance);
+            MyUtils.logStuff(this.hazelcastInstance);
             Javalin javalin = Javalin.create();
 
             // ReactJS, see src/main/app
@@ -655,7 +655,7 @@ public class ApplicationRunner {
             }
 
             ok &= CommonIdempotentInitialization.createNeededObjects(hazelcastInstance,
-                    postgresProperties, ourProjectProvenance, transactionMonitorFlavor, this.localhost);
+                    postgresProperties, ourProjectProvenance, transactionMonitorFlavor, this.localhost, useViridian);
             ok &= CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList,
                     usePulsar, useViridian, transactionMonitorFlavor);
             ok &= CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance,

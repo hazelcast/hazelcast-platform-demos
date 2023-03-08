@@ -28,12 +28,15 @@ import java.nio.file.StandardCopyOption;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -41,10 +44,16 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hazelcast.core.DistributedObject;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.jet.config.JobConfig;
+import com.hazelcast.jet.config.JobConfigArguments;
 import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.jet.datamodel.Tuple4;
 import com.hazelcast.jet.python.PythonServiceConfig;
+import com.hazelcast.map.IMap;
+import com.hazelcast.nio.serialization.genericrecord.GenericRecord;
 import com.hazelcast.sql.SqlResult;
 import com.hazelcast.sql.SqlRow;
 import com.hazelcast.sql.SqlRowMetadata;
@@ -543,4 +552,116 @@ public class MyUtils {
     public static String xmlLineToJsonString(String line) {
         return line.replace("\"", "\\\"");
     }
+
+    public static void logStuff(HazelcastInstance hazelcastInstance) {
+        logJobs(hazelcastInstance);
+        logMaps(hazelcastInstance);
+        logMySqlSlf4j(hazelcastInstance);
+    }
+
+    /**
+     * <p>Confirm the running jobs to the console.
+     * </p>
+     */
+    private static void logJobs(HazelcastInstance hazelcastInstance) {
+        LOGGER.info("~_~_~_~_~");
+        LOGGER.info("logJobs()");
+        LOGGER.info("---------");
+        hazelcastInstance.getJet().getJobs().forEach(job -> {
+            try {
+                LOGGER.info("Job name '{}', id {}, status {}, submission {} ({})",
+                    Objects.toString(job.getName()), job.getId(), job.getStatus(),
+                    job.getSubmissionTime(), new Date(job.getSubmissionTime()));
+                JobConfig jobConfig = job.getConfig();
+                Object originalSql =
+                        jobConfig.getArgument(JobConfigArguments.KEY_SQL_QUERY_TEXT);
+                if (originalSql != null) {
+                    LOGGER.info(" Original SQL: {}", originalSql);
+                }
+            } catch (Exception e) {
+                String message = String.format("logJobs(): %s: %s", job.getId(), e.getMessage());
+                LOGGER.warn(message);
+            }
+        });
+        LOGGER.info("---------");
+    }
+
+    /**
+     * <p>Confirm the maps sizes to the console.
+     * </p>
+     */
+    private static void logMaps(HazelcastInstance hazelcastInstance) {
+        Set<String> iMapNames = hazelcastInstance.getDistributedObjects()
+                .stream()
+                .filter(distributedObject -> distributedObject instanceof IMap)
+                .filter(distributedObject -> !distributedObject.getName().startsWith("__"))
+                .map(distributedObject -> distributedObject.getName())
+                .collect(Collectors.toCollection(TreeSet::new));
+
+        LOGGER.info("~_~_~_~_~");
+        LOGGER.info("logMaps()");
+        LOGGER.info("---------");
+        for (String iMapName : iMapNames) {
+            LOGGER.info("IMap: name '{}', size {}",
+                    iMapName, hazelcastInstance.getMap(iMapName).size());
+        }
+        LOGGER.info("---------");
+    }
+
+    /**
+     * <p>Log the logs saved into an {@link com.hazelcast.map.IMap IMap}
+     * if it exists.
+     * </p>
+     */
+    @SuppressWarnings("unchecked")
+    private static void logMySqlSlf4j(HazelcastInstance hazelcastInstance) {
+        IMap<GenericRecord, GenericRecord> mapMySqlSlf4j = null;
+
+        // Do not look up by name, as that force creates
+        for (DistributedObject distributedObject : hazelcastInstance.getDistributedObjects()) {
+            if (distributedObject instanceof IMap
+                    && distributedObject.getName().equals(MyConstants.IMAP_NAME_MYSQL_SLF4J)) {
+                mapMySqlSlf4j = (IMap<GenericRecord, GenericRecord>) distributedObject;
+            }
+        }
+
+        LOGGER.info("~_~_~_~_~");
+        LOGGER.info("logMySqlSlf4j()");
+        LOGGER.info("---------");
+        if (mapMySqlSlf4j == null) {
+            LOGGER.info("Map does not currently exist");
+        } else {
+            Set<Entry<GenericRecord, GenericRecord>> entrySet = mapMySqlSlf4j.entrySet();
+            for (Entry<GenericRecord, GenericRecord> entry : entrySet) {
+                LOGGER.info("Key '{}', Value '{}'", entry.getKey(), entry.getValue());
+            }
+            LOGGER.info("[{} entr{}]", entrySet.size(), entrySet.size() == 1 ? "y" : "ies");
+        }
+        LOGGER.info("---------");
+    }
+
+    /**
+     * <p>Confirm mappings/views added implicitly or explicitly.
+     * </p>
+     */
+    public static void showMappingsAndViews(HazelcastInstance hazelcastInstance) {
+        for (String query : List.of("SHOW MAPPINGS", "SHOW VIEWS")) {
+            LOGGER.info("~_~_~_~_~");
+            LOGGER.info("{}", query);
+            LOGGER.info("---------");
+            int count = 0;
+            try {
+                Iterator<SqlRow> iterator = hazelcastInstance.getSql().execute(query).iterator();
+                while (iterator.hasNext()) {
+                    count++;
+                    LOGGER.info("{}", iterator.next());
+                }
+                LOGGER.info("[{} row{}]", count, (count == 1 ? "" : "s"));
+            } catch (Exception e) {
+                LOGGER.error("showMappingsAndViews():" + query, e);
+            }
+        }
+        LOGGER.info("~_~_~_~_~");
+    }
+
 }
