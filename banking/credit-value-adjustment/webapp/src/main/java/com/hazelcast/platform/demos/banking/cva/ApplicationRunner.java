@@ -63,6 +63,7 @@ public class ApplicationRunner implements CommandLineRunner {
      */
     @Override
     public void run(String... args) throws Exception {
+        CommonIdempotentInitialization.fullInitialize(this.hazelcastInstance);
 
         ITopic<Tuple2<HazelcastJsonValue, JobStatus>> jobStateTopic =
                 this.hazelcastInstance.getTopic(MyConstants.ITOPIC_NAME_JOB_STATE);

@@ -18,33 +18,30 @@ package com.hazelcast.platform.demos.banking.cva;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 import com.hazelcast.core.HazelcastInstance;
 
 /**
- * <p>Ensure the server is in a ready state, by requesting all the
- * set-up processing runs. This is idempotent. All servers will request
- * but only the <i>n</i>th will result in anything happening.
+ * <p>Before any of the other runners, ensure all mappings
+ * are set up.
  * </p>
  */
-@Configuration
-public class ApplicationInitializer {
+@Component
+@Order(value = Integer.MIN_VALUE)
+public class ApplicationRunner implements CommandLineRunner {
 
     @Autowired
     private HazelcastInstance hazelcastInstance;
 
     /**
-     * <p>Use a Spring "{@code @Bean}" to kick off the necessary
-     * initialisation after the objects we need are ready.
+     * <p>Ensure mappings, etc present.
      * </p>
      */
-    @Bean
-    public CommandLineRunner commandLineRunner() {
-       return args -> {
-           CommonIdempotentInitialization.fullInitialize(this.hazelcastInstance);
-       };
+    @Override
+    public void run(String... args) throws Exception {
+        CommonIdempotentInitialization.fullInitialize(this.hazelcastInstance);
     }
 
 }
