@@ -65,6 +65,8 @@ public class ApplicationConfig {
     public ClientConfig clientConfig(MyProperties myProperties) throws Exception {
         ClientConfig clientConfig = new YamlClientConfigBuilder().build();
 
+        clientConfig.addLabel(myProperties.getBuildTimestamp());
+
         ClientNetworkConfig clientNetworkConfig = clientConfig.getNetworkConfig();
         clientNetworkConfig.getAutoDetectionConfig().setEnabled(false);
 
