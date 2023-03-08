@@ -16,9 +16,7 @@
 
 package hazelcast.platform.demos.banking.transactionmonitor;
 
-import java.io.File;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -27,8 +25,8 @@ import org.slf4j.LoggerFactory;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
 import com.hazelcast.client.config.YamlClientConfigBuilder;
-import com.hazelcast.config.SSLConfig;
 import com.hazelcast.platform.demos.utils.UtilsFormatter;
+import com.hazelcast.platform.demos.utils.UtilsViridian;
 
 /**
  * <p>Configure client for connection to cluster. Use a config file, then override
@@ -45,8 +43,6 @@ public class ApplicationConfig {
     private static final String VIRIDIAN_CLUSTER1_ID = "my.viridian.cluster1.id";
     private static final String VIRIDIAN_CLUSTER1_KEY_PASSWORD = "my.viridian.cluster1.key.password";
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
-    private static final int EXPECTED_PASSWORD_LENGTH = 11;
-    private static final int EXPECTED_TOKEN_LENGTH = 50;
     private static String clusterName = "";
 
     /**
@@ -58,7 +54,7 @@ public class ApplicationConfig {
      * declared configuration and replace it with localhost or Docker.
      * </p>
      */
-    public static ClientConfig buildClientConfig() {
+    public static ClientConfig buildClientConfig() throws Exception {
         ClientConfig clientConfig = new YamlClientConfigBuilder().build();
         clusterName = clientConfig.getClusterName();
 
@@ -78,27 +74,20 @@ public class ApplicationConfig {
         String kubernetesOrViridian = myProperties.getProperty(MyConstants.USE_VIRIDIAN);
         boolean useViridian = MyUtils.useViridian(kubernetesOrViridian);
         LOGGER.info("useViridian='{}'", useViridian);
+        String publicAddress = System.getProperty("hazelcast.local.publicAddress", "");
+        boolean localhost = publicAddress.length() == 0;
 
-        // Use Viridian if property set
-        if (!myProperties.getProperty(VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN, "").isBlank()
-                && !myProperties.getProperty(VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN, "").equals("unset")
-                && useViridian) {
-            clientNetworkConfig.setSmartRouting(false);
-            clientNetworkConfig.getKubernetesConfig().setEnabled(false);
-            clientNetworkConfig.getCloudConfig().setEnabled(true);
-            clientNetworkConfig.getCloudConfig()
-                .setDiscoveryToken(myProperties.getProperty(VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN));
-            clientConfig.setClusterName(myProperties.getProperty(VIRIDIAN_CLUSTER1_ID));
+        if (localhost && useViridian) {
+            String message = "Localhost access not implemented for Viridian, keystore/truststore location"
+                    + " not known, use Docker script instead";
+            throw new RuntimeException(message);
+        }
 
-            // Viridian uses SSL
-            String keyPassword = myProperties.getProperty(VIRIDIAN_CLUSTER1_KEY_PASSWORD);
-            Properties sslProps = getSSLProperties(keyPassword);
-            clientConfig.getNetworkConfig().setSSLConfig(new SSLConfig().setEnabled(true).setProperties(sslProps));
-
-            // Viridian
-            clientConfig.setProperty("hazelcast.client.cloud.url", "https://api.viridian.hazelcast.com");
-
-            logViridianConfig(clientConfig);
+        if (useViridian) {
+            UtilsViridian.configure(clientConfig,
+                    myProperties.getProperty(VIRIDIAN_CLUSTER1_ID),
+                    myProperties.getProperty(VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN),
+                    myProperties.getProperty(VIRIDIAN_CLUSTER1_KEY_PASSWORD));
 
             LOGGER.info("Viridian configured, cluster id: "
                     + clientConfig.getClusterName());
@@ -109,12 +98,14 @@ public class ApplicationConfig {
             } else {
                 clientNetworkConfig.getKubernetesConfig().setEnabled(false);
 
+                // Can run from desktop to connect into Kubernetes
+                clientNetworkConfig.setSmartRouting(false);
+
                 if (System.getProperty("MY_HAZELCAST_SERVERS", "").length() != 0) {
                     clientNetworkConfig.setAddresses(Arrays.asList(System.getProperty("MY_HAZELCAST_SERVERS").split(",")));
                 } else {
-                    if (System.getProperty("hazelcast.local.publicAddress", "").length() != 0) {
-                        clientNetworkConfig.setAddresses(Arrays.asList(
-                                System.getProperty("hazelcast.local.publicAddress").split(",")));
+                    if (publicAddress.length() != 0) {
+                        clientNetworkConfig.setAddresses(Arrays.asList(publicAddress.split(",")));
                     } else {
                         clientNetworkConfig.setAddresses(Arrays.asList("127.0.0.1"));
                     }
@@ -127,69 +118,6 @@ public class ApplicationConfig {
         LOGGER.info("smart-routing=='{}'", clientNetworkConfig.isSmartRouting());
 
         return clientConfig;
-    }
-
-    /**
-     * <p>Properties for SSL
-     * </p>
-     *
-     * @param keyPassword - same for both KeyStore and TrustStore
-     * @return
-     */
-    private static Properties getSSLProperties(String keyPassword) {
-        Properties properties = new Properties();
-
-        properties.setProperty("javax.net.ssl.keyStore",
-                new File("./client.keystore").toURI().getPath());
-        properties.setProperty("javax.net.ssl.keyStorePassword", keyPassword);
-        properties.setProperty("javax.net.ssl.trustStore",
-                new File("./client.truststore").toURI().getPath());
-        properties.setProperty("javax.net.ssl.trustStorePassword", keyPassword);
-
-        return properties;
-    }
-
-    /**
-     * <p>Confirms properties set correctly for Maven to pick up.
-     * </p>
-     *
-     * @param clientConfig
-     */
-    private static void logViridianConfig(ClientConfig clientConfig) {
-        LOGGER.info("Cluster id=='{}'", clientConfig.getClusterName());
-
-        String token = Objects.toString(clientConfig.getNetworkConfig()
-                .getCloudConfig().getDiscoveryToken());
-        if (token.length() == EXPECTED_TOKEN_LENGTH) {
-            LOGGER.info("Discovery token.length()=={}, ending '{}'", token.length(),
-                    token.substring(token.length() - 1, token.length()));
-        } else {
-            LOGGER.warn("Discovery token.length()=={}, expected {}",
-                    token.length(),
-                    EXPECTED_TOKEN_LENGTH);
-        }
-
-        String keystorePassword = Objects.toString(clientConfig.getNetworkConfig()
-                .getSSLConfig().getProperty("javax.net.ssl.keyStorePassword"));
-        if (keystorePassword.length() == EXPECTED_PASSWORD_LENGTH) {
-            LOGGER.info("SSL keystore password.length()=={}, ending '{}'", keystorePassword.length(),
-                    keystorePassword.substring(keystorePassword.length() - 1, keystorePassword.length()));
-        } else {
-            LOGGER.warn("SSL keystore password.length()=={}, expected {}",
-                    keystorePassword.length(),
-                    EXPECTED_PASSWORD_LENGTH);
-        }
-
-        String truststorePassword = Objects.toString(clientConfig.getNetworkConfig()
-                .getSSLConfig().getProperty("javax.net.ssl.trustStorePassword"));
-        if (truststorePassword.length() == EXPECTED_PASSWORD_LENGTH) {
-            LOGGER.info("SSL truststore password.length()=={}, ending '{}'", truststorePassword.length(),
-                    truststorePassword.substring(truststorePassword.length() - 1, truststorePassword.length()));
-        } else {
-            LOGGER.warn("SSL truststore password.length()=={}, expected {}",
-                    truststorePassword.length(),
-                    EXPECTED_PASSWORD_LENGTH);
-        }
     }
 
     public static String getClusterName() {
