@@ -22,10 +22,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -33,7 +31,6 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hazelcast.cluster.Member;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.crdt.pncounter.PNCounter;
@@ -45,6 +42,7 @@ import com.hazelcast.query.impl.predicates.EqualPredicate;
 import com.hazelcast.sql.SqlResult;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import hazelcast.platform.demos.utils.CheckConnectIdempotentCallable;
 import io.javalin.Javalin;
 import io.javalin.core.JavalinServer;
 import io.javalin.http.HandlerType;
@@ -151,7 +149,7 @@ public class ApplicationRunner {
         System.out.println("");
 
         // If SQL is broken, abort
-        if (!ok) {
+        if (ok) {
             MyUtils.logStuff(this.hazelcastInstance);
             Javalin javalin = Javalin.create();
 
@@ -558,45 +556,6 @@ public class ApplicationRunner {
     }
 
     /**
-     * <p>Test serverside. Only really needed if using Viridian
-     * to confirm upload of custom classes hasn't been forgotten.
-     * </p>
-     * @return
-     */
-    private boolean testCustomClassesUploaded() {
-        boolean ok = true;
-        String message;
-
-        ConnectIdempotentCallable connectIdempotentCallable = new ConnectIdempotentCallable();
-
-        // Oldest
-        Member member = this.hazelcastInstance.getCluster().getMembers().iterator().next();
-
-        LOGGER.debug("Send {} to {}", connectIdempotentCallable.getClass().getSimpleName(), member.getAddress());
-        Future<List<String>> future =
-                this.hazelcastInstance.getExecutorService("default").submitToMember(connectIdempotentCallable, member);
-
-        try {
-            List<String> list = future.get();
-            if (list == null || list.isEmpty()) {
-                message = String.format("connectIdempotentCallable :: => :: '%s'", Objects.toString(list));
-                LOGGER.error(message);
-                ok = false;
-            } else {
-                for (String item : list) {
-                    message = String.format("connectIdempotentCallable :: => :: '%s'", item);
-                    LOGGER.info(message);
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.error("connectIdempotentCallable", e);
-            ok = false;
-        }
-        return ok;
-    }
-
-
-    /**
      * <p>Ensure serverside set up. Idempotent as triggered by client but client
      * may be restarted several times.
      * </p>
@@ -613,7 +572,7 @@ public class ApplicationRunner {
         String postgresAddress = System.getProperty(propertyName3, "");
         for (String propertyName : List.of(propertyName1, propertyName2, propertyName3)) {
             String propertyValue = System.getProperty(propertyName, "");
-            if (propertyValue.isBlank()) {
+            if (propertyValue.isEmpty()) {
                 LOGGER.error("No value for '{}' " + propertyName1);
                 return false;
             } else {
@@ -621,7 +580,7 @@ public class ApplicationRunner {
             }
         }
 
-        boolean ok = testCustomClassesUploaded();
+        boolean ok = this.checkCustomClasses();
 
         if (ok) {
             Properties properties;
@@ -670,6 +629,20 @@ public class ApplicationRunner {
         }
 
         LOGGER.info("initialize(): -=-=-=-=- END, success=={} -=-=-=-=-=-", ok);
+        return ok;
+    }
+
+    /**
+     * <p>Check custom classes are on server classpath, if Viridian this isn't
+     * automatic if upload failed.
+     * </p>
+     */
+    private boolean checkCustomClasses() throws Exception {
+        boolean ok = CheckConnectIdempotentCallable.performCheck(this.hazelcastInstance);
+        if (ok) {
+            String message = "CheckConnectIdempotentCallable failed, custom classes not uploaded to Viridian?";
+            throw new RuntimeException(message);
+        }
         return ok;
     }
 }

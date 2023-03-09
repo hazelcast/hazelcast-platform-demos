@@ -71,11 +71,15 @@ public class ApplicationConfig {
             LOGGER.error(FILENAME, e);
         }
 
-        String kubernetesOrViridian = myProperties.getProperty(MyConstants.USE_VIRIDIAN);
-        boolean useViridian = MyUtils.useViridian(kubernetesOrViridian);
+        String useViridianStr = myProperties.getProperty(MyConstants.USE_VIRIDIAN);
+        boolean useViridian = MyUtils.useViridian(useViridianStr);
         LOGGER.info("useViridian='{}'", useViridian);
+        boolean kubernetesEnabled = System.getProperty("my.kubernetes.enabled", "")
+                .equalsIgnoreCase("true");
+        boolean dockerEnabled = System.getProperty("my.docker.enabled", "")
+                .equalsIgnoreCase("true");
+        boolean localhost = !dockerEnabled && !kubernetesEnabled;
         String publicAddress = System.getProperty("hazelcast.local.publicAddress", "");
-        boolean localhost = publicAddress.length() == 0;
 
         if (localhost && useViridian) {
             String message = "Localhost access not implemented for Viridian, keystore/truststore location"

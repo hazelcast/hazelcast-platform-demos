@@ -24,6 +24,7 @@
 	<modules>
 		<module>misc</module>
 		<module>slack</module>
+		<module>viridian-clusterside</module>
 		<module>zoom</module>
 	</modules>
 

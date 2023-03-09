@@ -30,6 +30,7 @@ import com.hazelcast.platform.demos.utils.UtilsSlack;
 import com.hazelcast.platform.demos.utils.UtilsSlackSQLJob;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import hazelcast.platform.demos.utils.CheckConnectIdempotentCallable;
 
 /**
  * <p>Initialise the Jet cluster to ensure the necessary extra parts
@@ -100,6 +101,13 @@ public class ApplicationInitializer {
         TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(properties);
         LOGGER.info("TransactionMonitorFlavor=='{}'", transactionMonitorFlavor);
         boolean localhost = System.getProperty("my.docker.enabled", "").equalsIgnoreCase("false");
+
+        // All nodes test
+        boolean ok = CheckConnectIdempotentCallable.performCheck(hazelcastInstance);
+        if (!ok) {
+            String message = "CheckConnectIdempotentCallable failed, bad Maven dependency";
+            throw new RuntimeException(message);
+        }
 
         // First node runs initialization
         int size = hazelcastInstance.getCluster().getMembers().size();

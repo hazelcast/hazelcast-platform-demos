@@ -1,4 +1,4 @@
-FROM bitnami/kafka:3.1.0
+FROM --platform=linux/amd64 bitnami/kafka:3.4.0
 
 COPY target/classes/custom-entrypoint.sh  /
 ENTRYPOINT ["/bin/bash", "/custom-entrypoint.sh"]

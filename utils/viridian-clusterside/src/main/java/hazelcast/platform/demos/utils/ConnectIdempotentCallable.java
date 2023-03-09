@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hazelcast.platform.demos.banking.transactionmonitor;
+package hazelcast.platform.demos.utils;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -31,12 +31,12 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * <p>
- * Idempotent callable, ensure all is setup. Runs on any node.
+ * Idempotent callable, used to help confirm clusterside classes have been uploaded.
  * </p>
  */
 public class ConnectIdempotentCallable implements Callable<List<String>>, HazelcastInstanceAware, Serializable {
     private static final long serialVersionUID = 1L;
-    private static final String FILENAME = "my.properties";
+    private static final String FILENAME = ConnectIdempotentCallable.class.getName() + ".properties";
 
     @SuppressFBWarnings(value = "UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR", justification = "Set by setHazelcastInstance()")
     private transient HazelcastInstance hazelcastInstance;
