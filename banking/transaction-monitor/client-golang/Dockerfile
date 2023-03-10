@@ -11,7 +11,8 @@ COPY target/classes/hz/   /build/hz/
 RUN go mod download
 RUN env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /tmp/client ./hz/client
 
-# Control file stops Docker copy failing if no PEM files found. Put in target by maven-antrun-plugin
+# Control file stops Docker copy failing if no PFX/PEM files found. Put in target by maven-antrun-plugin
+COPY target/classes/${CONTROL_FILE} target/*.pfx /tmp/
 COPY target/classes/${CONTROL_FILE} target/*.pem /tmp/
 
 # Default assume in Kubernetes, else Docker

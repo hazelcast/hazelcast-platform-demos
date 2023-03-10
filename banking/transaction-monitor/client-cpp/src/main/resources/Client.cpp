@@ -25,7 +25,16 @@ const char* clusterName = "@my.cluster1.name@";
 const char* instanceName = "@project.artifactId@";
 const char* serviceDns = "@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local";
 
+const char* viridianId = "@my.viridian.cluster1.id@";
+const char* viridianDiscoveryToken = "@my.viridian.cluster1.discovery.token@";
+const char* viridianKeyPassword = "@my.viridian.cluster1.key.password@";
+
+const char* controlFile = "/tmp/control.file";
 std::string genericRecordMap = "__map-store.mysql_slf4j";
+const char* useViridianKey = "use.viridian";
+const char* viridianCaFile = "/tmp/ca.pem";
+const char* viridianCertFile = "/tmp/cert.pem";
+const char* viridianKeyFile = "/tmp/key.pem";
 
 char* get_time_iso8601() {
 	time_t now;
@@ -35,9 +44,12 @@ char* get_time_iso8601() {
 	return result;
 }
 
-hazelcast::client::hazelcast_client get_client(const char* kubernetes) {
+bool is_viridian() {
+	return false;
+}
+
+hazelcast::client::hazelcast_client get_client(const char* kubernetes, bool viridian) {
     hazelcast::client::client_config client_config;
-	client_config.set_cluster_name(clusterName);
 
     client_config.set_instance_name(instanceName);
 	char* home = std::getenv("HOME");
@@ -50,19 +62,40 @@ hazelcast::client::hazelcast_client get_client(const char* kubernetes) {
 	//client_config.get_logger_config().level(hazelcast::logger::level::finest);
 	client_config.set_property("hazelcast.client.statistics.enabled", "true");
 
-	std::string kubernetesStr(kubernetes);
-	for (int i = 0; i < strlen(kubernetes); ++i) {
-		char c = *(kubernetes + i);
-		kubernetesStr[i] = tolower(c);
-   	}
+	if (viridian) {
+		client_config.set_cluster_name(viridianId);
 
-	if (kubernetesStr.compare("false")==0) {
-   	 	client_config.get_network_config()
-		.add_address(hazelcast::client::address(std::getenv("HOST_IP"), 5701));
+		auto &cloud_configuration = client_config.get_network_config().get_cloud_config();
+    	cloud_configuration.enabled = true;
+    	cloud_configuration.discovery_token = viridianDiscoveryToken;
+    	boost::asio::ssl::context ctx(boost::asio::ssl::context::tlsv12);
+    	ctx.load_verify_file(viridianCaFile);
+    	ctx.use_certificate_file(viridianCertFile, boost::asio::ssl::context::pem);
+    	ctx.set_password_callback([&] (std::size_t max_length, boost::asio::ssl::context::password_purpose purpose) {
+        	return viridianKeyPassword;
+    	});
+    	ctx.use_private_key_file(viridianKeyFile, boost::asio::ssl::context::pem);
+    	config.get_network_config().get_ssl_config().set_context(std::move(ctx));
+
+		//FIXME Required until 5.3.0?
+		std::cout << "TODO: Remove " << hazelcast::client::client_properties::CLOUD_URL_BASE << std::cout;
+		config.set_property(hazelcast::client::client_properties::CLOUD_URL_BASE, "api.viridian.hazelcast.com");
 	} else {
-    	client_config.get_network_config()
-		.add_address(hazelcast::client::address(serviceDns, 5701))
-		;
+		client_config.set_cluster_name(clusterName);
+
+		std::string kubernetesStr(kubernetes);
+		for (int i = 0; i < strlen(kubernetes); ++i) {
+			char c = *(kubernetes + i);
+			kubernetesStr[i] = tolower(c);
+   		}
+
+		if (kubernetesStr.compare("false")==0) {
+   	 		client_config.get_network_config()
+			.add_address(hazelcast::client::address(std::getenv("HOST_IP"), 5701));
+		} else {
+    		client_config.get_network_config()
+			.add_address(hazelcast::client::address(serviceDns, 5701));
+		}
 	}
 
 	auto hazelcast_client = hazelcast::new_client(std::move(client_config)).get();
@@ -153,8 +186,10 @@ void get_generic_record(hazelcast::client::hazelcast_client hazelcast_client) {
 int main (int argc, char *argv[]) {
 	std::cout << "--------------------------------------" << std::endl;
 	const char* kubernetes = std::getenv("MY_KUBERNETES_ENABLED");
+	bool viridian = is_viridian();
 	std::cout << "MY_KUBERNETES_ENABLED '" << kubernetes << "'" << std::endl;
-    auto hazelcast_client = get_client(kubernetes);
+	std::cout << "VIRIDIAN '" << viridian << "'" << std::endl;
+    auto hazelcast_client = get_client(kubernetes, viridian);
 	std::cout << "--------------------------------------" << std::endl;
 
 	const char* start_time = get_time_iso8601();

@@ -65,6 +65,8 @@ func getClient(ctx context.Context, kubernetes string, viridian bool) *hazelcast
 		config.Cluster.Cloud.Enabled = true
 		config.Cluster.Cloud.Token = viridianDiscoveryToken
 		config.Cluster.Network.SSL.Enabled = true
+		//FIXME Remove line before when 1.4.0 is out
+		fmt.Println("When 1.4.0 is out, cloudServerName defaults correctly")
 		config.Cluster.Network.SSL.SetTLSConfig(&tls.Config{ServerName: cloudServerName})
 
 		caFile, err := filepath.Abs(viridianCaFile)

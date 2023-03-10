@@ -26,7 +26,17 @@ cluster_name = "@my.cluster1.name@"
 instance_name = "@project.artifactId@" 
 service_dns = "@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local"
 
+viridianId = "@my.viridian.cluster1.id@"
+viridianDiscoveryToken = "@my.viridian.cluster1.discovery.token@"
+viridianKeyPassword = "@my.viridian.cluster1.key.password@"
+
+controlFile = "/tmp/control.file"
 generic_record_map = "__map-store.mysql_slf4j"
+useViridianKey = "use.viridian"
+viridianCaFile = "/tmp/ca.pem"
+viridianCertFile = "/tmp/cert.pem"
+viridianKeyFile = "/tmp/key.pem"
+
 logging.basicConfig(level=logging.INFO)
 
 kubernetes = os.environ.get('MY_KUBERNETES_ENABLED')
@@ -38,9 +48,19 @@ if kubernetes.lower() == 'false':
     member = host_ip
 current_date = datetime.now()
 
+def isViridian():
+    file = open(controlFile)
+    lines = file.readlines()
+    for line in lines:
+        if line.lower() == useViridianKey + "=true":
+            return True
+    return False
+
+viridian = isViridian()
+
 def run_sql_query(client: hazelcast.HazelcastClient, query: str):
     print("--------------------------------------", flush=True)
-    print(query)
+    print(query, flush=True)
     try:
         count = 0
         result = client.sql.execute(query).result()
@@ -92,15 +112,30 @@ def get_generic_record(client: hazelcast.HazelcastClient):
 
 print("--------------------------------------", flush=True)
 print("MY_KUBERNETES_ENABLED '", kubernetes, "'", flush=True)
+print("VIRIDIAN '", viridian, "'", flush=True)
 current_date = datetime.now()
 launch_time = current_date.strftime('%Y-%m-%dT%H:%M:%S')
-client = hazelcast.HazelcastClient(
-    client_name=instance_name,
-    cluster_name=cluster_name,
-    cluster_members=[member],
-    labels=[user, launch_time],
-    statistics_enabled=True
-)
+if viridian:
+    client = hazelcast.HazelcastClient(
+        client_name=instance_name,
+        cluster_name=viridianId,
+        cloud_discovery_token=viridianDiscoveryToken,
+        labels=[user, launch_time],
+        statistics_enabled=True,
+        ssl_enabled=True,
+        ssl_cafile=os.path.abspath(viridianCaFile),
+        ssl_certfile=os.path.abspath(viridianCertFile),
+        ssl_keyfile=os.path.abspath(viridianKeyFile),
+        ssl_password=viridianKeyPassword,
+    )
+else:
+    client = hazelcast.HazelcastClient(
+        client_name=instance_name,
+        cluster_name=cluster_name,
+        cluster_members=[member],
+        labels=[user, launch_time],
+        statistics_enabled=True
+    )
 print("--------------------------------------", flush=True) 
 
 current_date = datetime.now()

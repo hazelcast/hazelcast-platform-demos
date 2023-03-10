@@ -23,6 +23,8 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.map.IMap;
 
+import hazelcast.platform.demos.utils.CheckConnectIdempotentCallable;
+
 /**
  * <p>Initialization that can be run by a client or a server.
  * Each should run this (as it's idempotent) to be sure necessary
@@ -39,8 +41,12 @@ public class CommonIdempotentInitialization {
      * </p>
      *
      * @param hazelcastInstance
+     * @throws Exception -- from checks
      */
-    public static void fullInitialize(HazelcastInstance hazelcastInstance) {
+    public static void fullInitialize(HazelcastInstance hazelcastInstance) throws Exception {
+        //@throws Exception
+        CheckConnectIdempotentCallable.silentCheckCustomClasses(hazelcastInstance);
+
         createNeededMappingsAndViews(hazelcastInstance);
         createNeededObjects(hazelcastInstance);
     }

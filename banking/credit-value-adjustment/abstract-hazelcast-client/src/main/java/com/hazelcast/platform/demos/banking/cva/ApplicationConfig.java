@@ -71,7 +71,9 @@ public class ApplicationConfig {
         clientNetworkConfig.getAutoDetectionConfig().setEnabled(false);
 
         LOGGER.info("useViridian='{}'", myProperties.isUseViridian());
-        boolean localhost = this.publicAddress.length() == 0;
+        boolean dockerEnabled = Boolean.valueOf(System.getProperty("my.docker.enabled", "false"));
+        boolean kubernetesEnabled = Boolean.valueOf(System.getProperty("my.kubernetes.enabled", "false"));
+        boolean localhost = !dockerEnabled && !kubernetesEnabled;
 
         if (localhost && myProperties.isUseViridian()) {
             String message = "Localhost access not implemented for Viridian, keystore/truststore location"

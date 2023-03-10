@@ -565,22 +565,21 @@ public class ApplicationRunner {
         LOGGER.info("initialize(): -=-=-=-=- START -=-=-=-=-=-");
 
         String propertyName1 = "my.bootstrap.servers";
-        String propertyName2 = MyConstants.PULSAR_CONFIG_KEY;
-        String propertyName3 = MyConstants.POSTGRES_CONFIG_KEY;
         String bootstrapServers = System.getProperty(propertyName1, "");
-        String pulsarList = System.getProperty(propertyName2, "");
-        String postgresAddress = System.getProperty(propertyName3, "");
-        for (String propertyName : List.of(propertyName1, propertyName2, propertyName3)) {
+        String pulsarList = System.getProperty(MyConstants.PULSAR_CONFIG_KEY, "");
+        String postgresAddress = System.getProperty(MyConstants.POSTGRES_CONFIG_KEY, "");
+        for (String propertyName : List.of(propertyName1, MyConstants.PULSAR_CONFIG_KEY, MyConstants.POSTGRES_CONFIG_KEY)) {
             String propertyValue = System.getProperty(propertyName, "");
             if (propertyValue.isEmpty()) {
-                LOGGER.error("No value for '{}' " + propertyName1);
+                LOGGER.error("No value for '{}' " + propertyName);
                 return false;
             } else {
                 LOGGER.debug("Using '{}'=='{}'", propertyName, propertyValue);
             }
         }
 
-        boolean ok = this.checkCustomClasses();
+        CheckConnectIdempotentCallable.silentCheckCustomClasses(this.hazelcastInstance);
+        boolean ok = true;
 
         if (ok) {
             Properties properties;
@@ -617,8 +616,8 @@ public class ApplicationRunner {
                     postgresProperties, ourProjectProvenance, transactionMonitorFlavor, this.localhost, useViridian);
             ok &= CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList,
                     usePulsar, useViridian, transactionMonitorFlavor);
-            ok &= CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance,
-                    bootstrapServers, transactionMonitorFlavor);
+            ok &= CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers,
+                    transactionMonitorFlavor);
             if (ok && !this.localhost) {
                 // Don't even try if broken by this point
                 ok = CommonIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
@@ -632,17 +631,4 @@ public class ApplicationRunner {
         return ok;
     }
 
-    /**
-     * <p>Check custom classes are on server classpath, if Viridian this isn't
-     * automatic if upload failed.
-     * </p>
-     */
-    private boolean checkCustomClasses() throws Exception {
-        boolean ok = CheckConnectIdempotentCallable.performCheck(this.hazelcastInstance);
-        if (ok) {
-            String message = "CheckConnectIdempotentCallable failed, custom classes not uploaded to Viridian?";
-            throw new RuntimeException(message);
-        }
-        return ok;
-    }
 }

@@ -22,18 +22,37 @@ cd `dirname $0`
 set -m
 
 CLC_DIR=$1
-CONFIG=$2
+CONFIG_NON_VIRIDIAN=$2
+CONFIG_VIRIDIAN=$3
 
 USER=`echo $HOME | cut -c2-`
 HOST_IP="${HOST_IP}"
 KUBERNETES="${MY_KUBERNETES_ENABLED}"
+
+CONTROL_FILE = "/tmp/control.file"
+USE_VIRIDIAN_KEY = "use.viridian"
+VIRIDIAN=`grep "${USE_VIRIDIAN_KEY}" $CONTROL_FILE | tail -1 | cut -d= -f1 `
+if [ `echo "$VIRIDIAN" | tr '[:upper:]' '[:lower:]'` == "true" ]
+then 
+ VIRIDIAN=true
+else
+ VIRIDIAN=false
+fi
 
 ONE_MINUTE=60
 ONE_DAY=$(($ONE_MINUTE * 60 * 24))
 
 echo "--------------------------------------"
 echo MY_KUBERNETES_ENABLED \'${KUBERNETES}\'
+echo VIRIDIAN \'${VIRIDIAN}\'
 echo "--------------------------------------"
+
+if [ "$VIRIDIAN" == "true" ]
+then 
+ CONFIG=$CONFIG_VIRIDIAN
+else 
+ CONFIG=$CONFIG_NON_VIRIDIAN
+fi
 
 if [ `echo "$KUBERNETES" | tr A-Z a-z` == "false" ]
 then

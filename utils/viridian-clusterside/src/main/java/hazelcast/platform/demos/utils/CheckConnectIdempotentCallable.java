@@ -16,6 +16,7 @@
 
 package hazelcast.platform.demos.utils;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Future;
@@ -23,6 +24,7 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.cluster.Member;
 import com.hazelcast.core.HazelcastInstance;
 
@@ -72,4 +74,31 @@ public class CheckConnectIdempotentCallable {
         return ok;
     }
 
+    /**
+     * <p>Check the custom classes. If fail, use client/server to determine a possible
+     * cause.
+     * </p>
+     * <p>For live running each JVM will contain 1 client or 1 server. If the client
+     * list is empty we are a server, else we are a client.
+     * </p>
+     *
+     * @param hazelcastInstance
+     * @throws Exception -- includes suggestion
+     */
+    public static void silentCheckCustomClasses(HazelcastInstance hazelcastInstance) throws Exception {
+        boolean ok = CheckConnectIdempotentCallable.performCheck(hazelcastInstance);
+        if (!ok) {
+            String message = ConnectIdempotentCallable.class.getSimpleName() + " failed:";
+
+            // All clients in current JVM
+            Collection<HazelcastInstance> clients = HazelcastClient.getAllHazelcastClients();
+            if (clients.isEmpty()) {
+                message += "bad Maven dependency if classes not found?";
+            } else {
+                message += "custom classes not uploaded to Viridian?";
+            }
+
+            throw new RuntimeException(message);
+        }
+    }
 }

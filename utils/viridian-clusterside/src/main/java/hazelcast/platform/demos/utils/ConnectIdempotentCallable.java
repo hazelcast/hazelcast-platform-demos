@@ -36,7 +36,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 public class ConnectIdempotentCallable implements Callable<List<String>>, HazelcastInstanceAware, Serializable {
     private static final long serialVersionUID = 1L;
-    private static final String FILENAME = ConnectIdempotentCallable.class.getName() + ".properties";
+    private static final String FILENAME = ConnectIdempotentCallable.class.getSimpleName() + ".properties";
 
     @SuppressFBWarnings(value = "UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR", justification = "Set by setHazelcastInstance()")
     private transient HazelcastInstance hazelcastInstance;

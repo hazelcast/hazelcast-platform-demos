@@ -18,7 +18,7 @@
 		<echo message="Copy from ${my.viridian.cluster1.keys.location}" />
 		<echo message="====================================" />
        		<copy todir="${project.build.directory}">
-       			<fileset dir="${my.viridian.cluster1.keys.location}" includes="client.*store"/>
+       			<fileset dir="${my.viridian.cluster1.keys.location}" includes="client.*"/>
        			<fileset dir="${my.viridian.cluster1.keys.location}" includes="*pem"/>
         	</copy>
 	</target>

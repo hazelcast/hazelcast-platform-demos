@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.Security.Authentication;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Hazelcast;
@@ -30,7 +31,15 @@ namespace Client
         public const string instanceName = "@project.artifactId@";
         public const string serviceDns = "@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local";
 
+        public const string viridianId = "@my.viridian.cluster1.id@";
+        public const string viridianDiscoveryToken = "@my.viridian.cluster1.discovery.token@";
+        public const string viridianKeyPassword = "@my.viridian.cluster1.key.password@";
+
+        public const string controlFile = "/tmp/control.file";
         public const string genericRecordMap = "__map-store.mysql_slf4j";
+        public const string useViridianKey = "use.viridian";
+        public const string viridianPfxFile = "/tmp/client.pfx";
+
         public const int ONE_MINUTE = 60 * 1000;
         public const int ONE_DAY = 24 * 60 * 60 * 1000;
     }
@@ -52,7 +61,17 @@ namespace Client
                             .AddConsole());
                 });
         }
-        public static HazelcastOptions GetClientConfig(string kubernetes) 
+        public static bool IsViridian() {
+            string[] lines = File.ReadAllLines(MyConstants.controlFile);
+            bool viridian = false;
+            foreach (string line in lines) {
+                if (line.Equals(MyConstants.useViridianKey + "=true", StringComparison.OrdinalIgnoreCase)) {
+                    viridian = true;
+                }
+            }
+            return viridian;
+        }
+        public static HazelcastOptions GetClientConfig(string kubernetes, bool viridian)
         {
             var options = new HazelcastOptionsBuilder()
                 .WithConsoleLogger()
@@ -60,7 +79,6 @@ namespace Client
                 //.With("Logging:LogLevel:Hazelcast", "Debug")
                 .Build();
 
-            options.ClusterName = MyConstants.clusterName;
             options.ClientName = MyConstants.instanceName;
             string home = Environment.GetEnvironmentVariable("HOME") ?? "/?";
             string user = "?";
@@ -74,14 +92,32 @@ namespace Client
 
             options.Metrics.Enabled = true;
 
-            if (kubernetes.Equals("false", StringComparison.OrdinalIgnoreCase)) {
-                string hostIp = Environment.GetEnvironmentVariable("HOST_IP") ?? "";
-                if (String.IsNullOrEmpty(hostIp)) {
-                    hostIp = "127.0.0.1";
-                }
-                options.Networking.Addresses.Add(hostIp);
+            if (viridian) {
+                options.ClusterName = MyConstants.viridianId;
+
+                options.Networking.Cloud.DiscoveryToken = MyConstants.viridianDiscoveryToken;
+                //FIXME IS THIS NEEDED
+                Console.WriteLine("TODO IS THIS NEEDED");
+                options.Networking.Cloud.Url = new Uri("https://api.viridian.hazelcast.com");
+
+                options.Networking.Ssl.Enabled = true;
+                options.Networking.Ssl.ValidateCertificateChain = false;
+                options.Networking.Ssl.Protocol = SslProtocols.Tls12;
+                options.Networking.Ssl.CertificatePath = MyConstants.viridianPfxFile;
+                options.Networking.Ssl.CertificatePassword = MyConstants.viridianKeyPassword;
+
             } else {
-                options.Networking.Addresses.Add(MyConstants.serviceDns);
+                options.ClusterName = MyConstants.clusterName;
+
+                if (kubernetes.Equals("false", StringComparison.OrdinalIgnoreCase)) {
+                    string hostIp = Environment.GetEnvironmentVariable("HOST_IP") ?? "";
+                    if (String.IsNullOrEmpty(hostIp)) {
+                        hostIp = "127.0.0.1";
+                    }
+                    options.Networking.Addresses.Add(hostIp);
+                } else {
+                    options.Networking.Addresses.Add(MyConstants.serviceDns);
+                }
             }
 
             return options;
@@ -154,7 +190,9 @@ namespace Client
             Console.WriteLine("--------------------------------------");
             string kubernetes = Environment.GetEnvironmentVariable("MY_KUBERNETES_ENABLED") ?? "";
             Console.WriteLine("MY_KUBERNETES_ENABLED '" + kubernetes + "'");
-            var options = GetClientConfig(kubernetes);
+            bool viridian = IsViridian();
+            Console.WriteLine("VIRIDIAN '" + viridian + "'");
+            var options = GetClientConfig(kubernetes, viridian);
             await using var hazelcast_client = await HazelcastClientFactory.StartNewClientAsync(options);
             Console.WriteLine("--------------------------------------");
 

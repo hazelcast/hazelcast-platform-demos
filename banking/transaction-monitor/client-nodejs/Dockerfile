@@ -8,7 +8,8 @@ COPY target/classes/client.js ./
 RUN npm install -g npm@9.5.0
 RUN npm install hazelcast-client
 
-# Control file stops Docker copy failing if no PEM files found. Put in target by maven-antrun-plugin
+# Control file stops Docker copy failing if no PFX/PEM files found. Put in target by maven-antrun-plugin
+COPY target/classes/${CONTROL_FILE} target/*.pfx /tmp/
 COPY target/classes/${CONTROL_FILE} target/*.pem /tmp/
 
 # Default assume in Kubernetes, else Docker

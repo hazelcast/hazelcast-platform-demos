@@ -101,9 +101,14 @@ public class Application {
 
         HazelcastInstance hazelcastInstance = HazelcastClient.newHazelcastClient(clientConfig);
 
-        new ApplicationRunner(hazelcastInstance, transactionMonitorFlavor, moduleName).run();
+        try {
+            new ApplicationRunner(hazelcastInstance, transactionMonitorFlavor, moduleName).run();
+        } catch (Exception e) {
+            LOGGER.error("main()", e);
+        }
 
         hazelcastInstance.shutdown();
+        System.exit(0);
     }
 
     /**

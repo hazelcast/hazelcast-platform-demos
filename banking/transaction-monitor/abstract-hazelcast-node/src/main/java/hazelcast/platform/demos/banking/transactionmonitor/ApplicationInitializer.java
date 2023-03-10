@@ -102,12 +102,8 @@ public class ApplicationInitializer {
         LOGGER.info("TransactionMonitorFlavor=='{}'", transactionMonitorFlavor);
         boolean localhost = System.getProperty("my.docker.enabled", "").equalsIgnoreCase("false");
 
-        // All nodes test
-        boolean ok = CheckConnectIdempotentCallable.performCheck(hazelcastInstance);
-        if (!ok) {
-            String message = "CheckConnectIdempotentCallable failed, bad Maven dependency";
-            throw new RuntimeException(message);
-        }
+        // Custom classes on classpath check, only likely to fail if Viridian and not uploaded
+        CheckConnectIdempotentCallable.silentCheckCustomClasses(hazelcastInstance);
 
         // First node runs initialization
         int size = hazelcastInstance.getCluster().getMembers().size();

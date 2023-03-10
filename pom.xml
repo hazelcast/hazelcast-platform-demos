@@ -35,7 +35,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spotbugs.skip>true</spotbugs.skip>
 		<!-- Configure the build for HZ Viridian or all Kubernetes -->
-		<use.viridian>true</use.viridian>
+		<use.viridian>false</use.viridian>
 
 		<!-- Variations for the Transaction Monitor, TransactionMonitorFlavor.java ENUM -->
 		<!-- "ecommerce" is last, hence is the value used, as most generally applicable -->
