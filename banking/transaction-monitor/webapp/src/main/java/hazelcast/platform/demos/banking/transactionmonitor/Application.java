@@ -107,6 +107,7 @@ public class Application {
             LOGGER.error("main()", e);
         }
 
+        LOGGER.info("shutdown()");
         hazelcastInstance.shutdown();
         System.exit(0);
     }

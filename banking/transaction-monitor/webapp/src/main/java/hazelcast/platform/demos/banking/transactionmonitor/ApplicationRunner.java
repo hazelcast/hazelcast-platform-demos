@@ -448,7 +448,7 @@ public class ApplicationRunner {
      * @return {@code true} if all worked.
      */
     private boolean demoSql() {
-        boolean didFail = false;
+        boolean noFail = true;
         String[][] queries = getQueries();
 
         int count = 0;
@@ -476,13 +476,14 @@ public class ApplicationRunner {
                 }
                 System.out.println("");
             } catch (Exception e) {
-                didFail = true;
+                noFail = false;
                 String message = String.format("SQL '%s'", Arrays.asList(query));
                 LOGGER.error(message + ": " + e.getMessage());
             }
         }
 
-        return didFail;
+        LOGGER.info("demoSql() -> {}", noFail);
+        return noFail;
     }
 
     /**

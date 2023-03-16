@@ -161,10 +161,11 @@ async function getGenericRecord(hazelcastClient) {
         }
         await checkViridian()
         console.log('VIRIDIAN \'', viridian, '\'')
+        var hazelcastClient;
         if (viridian) {
-            const hazelcastClient = await Client.newHazelcastClient(clientConfigViridian);
+            hazelcastClient = await Client.newHazelcastClient(clientConfigViridian);
         } else {
-            const hazelcastClient = await Client.newHazelcastClient(clientConfig);
+            hazelcastClient = await Client.newHazelcastClient(clientConfig);
         }
         console.log('--------------------------------------')
 

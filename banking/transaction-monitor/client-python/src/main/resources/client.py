@@ -17,6 +17,7 @@
 
 from datetime import datetime
 import hazelcast
+from hazelcast.discovery import HazelcastCloudDiscovery
 from hazelcast.sql import SqlColumnType
 import logging
 import os
@@ -52,7 +53,7 @@ def isViridian():
     file = open(controlFile)
     lines = file.readlines()
     for line in lines:
-        if line.lower() == useViridianKey + "=true":
+        if line.lower().startswith(useViridianKey + "=true"):
             return True
     return False
 
@@ -116,6 +117,9 @@ print("VIRIDIAN '", viridian, "'", flush=True)
 current_date = datetime.now()
 launch_time = current_date.strftime('%Y-%m-%dT%H:%M:%S')
 if viridian:
+    #FIXME Should become default
+    print("CLOUD_URL_BASE TO REMOVE")
+    HazelcastCloudDiscovery._CLOUD_URL_BASE = "api.viridian.hazelcast.com"
     client = hazelcast.HazelcastClient(
         client_name=instance_name,
         cluster_name=viridianId,

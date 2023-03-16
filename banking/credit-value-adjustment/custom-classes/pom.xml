@@ -31,6 +31,18 @@
 			<artifactId>cva-protobuf</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+		<!-- scope==provided -->
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet-grpc</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
