@@ -61,9 +61,10 @@ import com.hazelcast.platform.demos.utils.UtilsSlackSink;
  * </p>
  */
 @SuppressWarnings("checkstyle:MethodCount")
-public class CommonIdempotentInitialization {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommonIdempotentInitialization.class);
-    private static final Logger LOGGER_TO_IMAP = IMapLoggerFactory.getLogger(CommonIdempotentInitialization.class);
+public class TransactionMonitorIdempotentInitialization {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TransactionMonitorIdempotentInitialization.class);
+    private static final Logger LOGGER_TO_IMAP =
+            IMapLoggerFactory.getLogger(TransactionMonitorIdempotentInitialization.class);
     private static final int POS4 = 4;
     private static final int POS6 = 6;
 
@@ -218,7 +219,9 @@ public class CommonIdempotentInitialization {
                     //FIXME Not yet available on Viridian @ March 2023.
                     LOGGER.warn("use.virian={}, no data link for MySql", useViridian);
                 } else {
-                    mySqlMapConfig.setMapStoreConfig(mySqlStoreConfig);
+                    //XXX Gives "MapStore init failed for map: mysql_slf4j" due to key
+                    LOGGER.error("MySql temporarily de-activated");
+                    //FIXME mySqlMapConfig.setMapStoreConfig(mySqlStoreConfig);
                     LOGGER.info("MySql configured using: {}", mySqlMapConfig.getMapStoreConfig().getProperties());
                 }
             }
@@ -1088,7 +1091,7 @@ public class CommonIdempotentInitialization {
             TransactionMonitorFlavor transactionMonitorFlavor) {
         boolean ok = true;
         String projectName = properties.getOrDefault(UtilsConstants.SLACK_PROJECT_NAME,
-                CommonIdempotentInitialization.class.getSimpleName()).toString();
+                TransactionMonitorIdempotentInitialization.class.getSimpleName()).toString();
 
         String pulsarOrKafka = hazelcastInstance
                 .getMap(MyConstants.IMAP_NAME_JOB_CONFIG).get(MyConstants.PULSAR_OR_KAFKA_KEY).toString();
@@ -1302,6 +1305,7 @@ public class CommonIdempotentInitialization {
             jobConfigAlertingToKafka.setName(AlertingToKafka.class.getSimpleName());
             jobConfigAlertingToKafka.addClass(HazelcastJsonValueSerializer.class);
 
+            //FIXME Fails on Viridian, issue 4241 ??
             Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToKafka, jobConfigAlertingToKafka);
             LOGGER_TO_IMAP.info(Objects.toString(job));
         } catch (Exception e) {

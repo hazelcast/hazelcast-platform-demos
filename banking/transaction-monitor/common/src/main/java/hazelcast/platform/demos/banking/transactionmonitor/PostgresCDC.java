@@ -117,7 +117,7 @@ public class PostgresCDC {
 
     /**
      * <p>Create data object. Format should match {@link MaxAggregator}
-     * and mapping defined in {@link CommonIdempotentInitialization}.
+     * and mapping defined in {@link TransactionMonitorIdempotentInitialization}.
      * </p>
      * <p>For any records on the Postgres change stream that were due to
      * a write by Hazelcast, return "{@code null}" to drop them before

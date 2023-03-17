@@ -188,7 +188,7 @@ public class ApplicationConfig {
     /**
      * <p>Add tiered store configuration.
      * </p>
-     * <p>Watch for no clash with {@link CommonIdempotentInitialization}. In this method
+     * <p>Watch for no clash with {@link TransactionMonitorIdempotentInitialization}. In this method
      * we add configuration for the "{@code transactions}" map, where in the other class
      * we amend the map itself.
      * </p>
@@ -320,7 +320,7 @@ public class ApplicationConfig {
      * map store.
      * </p>
      *
-     * TODO Once supported by Viridian, move to {@link CommonIdempotentInitialization}/
+     * TODO Once supported by Viridian, move to {@link TransactionMonitorIdempotentInitialization}/
      *
      * @param config To extend
      * @param properties For logon, password

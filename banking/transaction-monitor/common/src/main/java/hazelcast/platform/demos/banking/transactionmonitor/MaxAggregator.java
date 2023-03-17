@@ -111,7 +111,7 @@ public class MaxAggregator implements Serializable {
 
     /**
      * <p>Format result. Format needs to match or at least correspond with
-     * Postgres database definition, and with mapping in {@link CommonIdempotentInitialization}.
+     * Postgres database definition, and with mapping in {@link TransactionMonitorIdempotentInitialization}.
      * and {@link PostgresCDC}
      * </p>
      */

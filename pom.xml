@@ -35,6 +35,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spotbugs.skip>true</spotbugs.skip>
 		<!-- Configure the build for HZ Viridian or all Kubernetes -->
+		<use.viridian>true</use.viridian>
 		<use.viridian>false</use.viridian>
 
 		<!-- Variations for the Transaction Monitor, TransactionMonitorFlavor.java ENUM -->
@@ -71,6 +72,7 @@
 		<!-- See also banking/credit-value-adjustment/cpp/Dockerfile -->
 		<grpc.version>1.52.1</grpc.version>
 		<hazelcast.version>5.3.0-SNAPSHOT</hazelcast.version>
+		<hazelcast.version>5.3.0-BETA-1</hazelcast.version>
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
 		<hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
 		<jackson.version>2.12.4</jackson.version>
@@ -90,7 +92,7 @@
 		<pulsar.version>2.8.0</pulsar.version>
 		<spotbugs-annotations.version>4.7.3</spotbugs-annotations.version>
 		<springdoc.version>2.0.0</springdoc.version>
-		<spring-boot.version>3.0.3</spring-boot.version>
+		<spring-boot.version>3.0.4</spring-boot.version>
 		<spring-cloud.version>2021.0.0</spring-cloud.version>
 		<spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
 		<zipkin.version>2.23.3-SNAPSHOT</zipkin.version>

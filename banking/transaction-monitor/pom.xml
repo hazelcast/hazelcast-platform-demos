@@ -43,7 +43,9 @@
 		<module>abstract-hazelcast-node</module>
 		<module>client-command-line</module>
 		<module>client-csharp</module>
+		<!--
 		<module>client-cpp</module>
+		-->
 		<module>client-golang</module>
 		<module>client-nodejs</module>
 		<module>client-python</module>

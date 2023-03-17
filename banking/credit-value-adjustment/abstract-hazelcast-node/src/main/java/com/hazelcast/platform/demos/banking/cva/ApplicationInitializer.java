@@ -43,7 +43,7 @@ public class ApplicationInitializer {
     @Bean
     public CommandLineRunner commandLineRunner() {
        return args -> {
-           CommonIdempotentInitialization.fullInitialize(this.hazelcastInstance);
+           CVAIdempotentInitialization.fullInitialize(this.hazelcastInstance);
        };
     }
 

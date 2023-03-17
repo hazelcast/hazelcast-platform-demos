@@ -130,7 +130,7 @@ public class ApplicationInitializer {
      */
     public static void miniInitialize(HazelcastInstance hazelcastInstance,
             TransactionMonitorFlavor transactionMonitorFlavor, boolean useViridian) throws Exception {
-        CommonIdempotentInitialization.createMinimal(hazelcastInstance, transactionMonitorFlavor);
+        TransactionMonitorIdempotentInitialization.createMinimal(hazelcastInstance, transactionMonitorFlavor);
     }
 
     /**
@@ -164,15 +164,16 @@ public class ApplicationInitializer {
                 ApplicationInitializer.class.getSimpleName()).toString();
 
         Properties postgresProperties = MyUtils.getPostgresProperties(properties);
-        CommonIdempotentInitialization.createNeededObjects(hazelcastInstance,
+        TransactionMonitorIdempotentInitialization.createNeededObjects(hazelcastInstance,
                 postgresProperties, ourProjectProvenance, transactionMonitorFlavor, localhost, useViridian);
         addListeners(hazelcastInstance, bootstrapServers, pulsarList, usePulsar, projectName, clusterName,
                 transactionMonitorFlavor);
-        CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList, usePulsar,
+        TransactionMonitorIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList, usePulsar,
                 useViridian, transactionMonitorFlavor);
-        CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers, transactionMonitorFlavor);
+        TransactionMonitorIdempotentInitialization.defineQueryableObjects(hazelcastInstance,
+                bootstrapServers, transactionMonitorFlavor);
 
-        CommonIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
+        TransactionMonitorIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
                 pulsarList, postgresProperties, properties, clusterName, transactionMonitorFlavor);
     }
 

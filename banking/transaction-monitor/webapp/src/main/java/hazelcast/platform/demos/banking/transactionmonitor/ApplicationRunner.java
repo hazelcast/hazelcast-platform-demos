@@ -62,7 +62,7 @@ public class ApplicationRunner {
     private static Map<String, WsContext> sessions = new ConcurrentHashMap<>();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationRunner.class);
-    private static final Logger LOGGER_TO_IMAP = IMapLoggerFactory.getLogger(CommonIdempotentInitialization.class);
+    private static final Logger LOGGER_TO_IMAP = IMapLoggerFactory.getLogger(TransactionMonitorIdempotentInitialization.class);
 
     private static final String DRILL_ITEM = "DRILL_ITEM";
     private static final String LOAD_ITEMS = "LOAD_ITEMS";
@@ -613,15 +613,15 @@ public class ApplicationRunner {
                 return false;
             }
 
-            ok &= CommonIdempotentInitialization.createNeededObjects(hazelcastInstance,
+            ok &= TransactionMonitorIdempotentInitialization.createNeededObjects(hazelcastInstance,
                     postgresProperties, ourProjectProvenance, transactionMonitorFlavor, this.localhost, useViridian);
-            ok &= CommonIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList,
+            ok &= TransactionMonitorIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList,
                     usePulsar, useViridian, transactionMonitorFlavor);
-            ok &= CommonIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers,
+            ok &= TransactionMonitorIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers,
                     transactionMonitorFlavor);
             if (ok && !this.localhost) {
                 // Don't even try if broken by this point
-                ok = CommonIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
+                ok = TransactionMonitorIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
                         pulsarList, postgresProperties, properties, clusterName, transactionMonitorFlavor);
             } else {
                 LOGGER.info("ok=={}, localhost=={} - no job submission", ok, this.localhost);

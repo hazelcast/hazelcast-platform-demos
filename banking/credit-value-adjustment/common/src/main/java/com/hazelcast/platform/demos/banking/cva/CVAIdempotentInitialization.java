@@ -31,8 +31,8 @@ import hazelcast.platform.demos.utils.CheckConnectIdempotentCallable;
  * objects exist before their first use.
  * <p>
  */
-public class CommonIdempotentInitialization {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommonIdempotentInitialization.class);
+public class CVAIdempotentInitialization {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CVAIdempotentInitialization.class);
 
     /**
      * <p>Full version of initialization. In the future may wish a partial
