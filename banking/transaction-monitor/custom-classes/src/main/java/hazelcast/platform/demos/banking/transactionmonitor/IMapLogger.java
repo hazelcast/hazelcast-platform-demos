@@ -50,7 +50,7 @@ public class IMapLogger implements Logger {
     private final String socketAddress;
     private final Level level;
 
-    private IMap<GenericRecord, GenericRecord> mySqlSlf4jMap;
+    private IMap<Long, GenericRecord> mySqlSlf4jMap;
 
     @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "HazelcastInstance is thread-safe")
     public IMapLogger(String arg0, HazelcastInstance arg1, Level arg2) {
@@ -71,19 +71,42 @@ public class IMapLogger implements Logger {
             this.mySqlSlf4jMap = hazelcastInstance.getMap(MyConstants.IMAP_NAME_MYSQL_SLF4J);
         }
 
+        String hashStr = nullSafeTruncate(this.socketAddress, FORTY_EIGHT) + LocalDateTime.now();
+        long hash = hashStr.hashCode();
+        /*FIXME Once MySql compound key supported by Data Link
         GenericRecord key = GenericRecordBuilder.compact(MyConstants.IMAP_NAME_MYSQL_SLF4J + ".key")
-                .setString("socket_address", nullSafeTruncate(this.socketAddress, FORTY_EIGHT))
-                .setTimestamp("when_ts", LocalDateTime.now())
+                .setString(MyConstants.MYSQL_DATASTORE_TABLE_COLUMN0, nullSafeTruncate(this.socketAddress, FORTY_EIGHT))
+                .setTimestamp(MyConstants.MYSQL_DATASTORE_TABLE_COLUMN1, LocalDateTime.now())
                 .build();
 
         GenericRecord value = GenericRecordBuilder.compact(MyConstants.IMAP_NAME_MYSQL_SLF4J + ".value")
-                .setString("level", nullSafeTruncate(arg0, EIGHT))
-                .setString("message", nullSafeTruncate(arg1, TWO_HUNDRED_AND_FIFTY_SIX))
-                .setString("thread_name", nullSafeTruncate(Thread.currentThread().getName(), FORTY_EIGHT))
-                .setString("logger_name", nullSafeTruncate(this.name, FORTY_EIGHT))
+                .setString(MyConstants.MYSQL_DATASTORE_TABLE_COLUMN2,
+                        nullSafeTruncate(arg0, EIGHT))
+                .setString(MyConstants.MYSQL_DATASTORE_TABLE_COLUMN3,
+                        nullSafeTruncate(arg1, TWO_HUNDRED_AND_FIFTY_SIX))
+                .setString(MyConstants.MYSQL_DATASTORE_TABLE_COLUMN4,
+                        nullSafeTruncate(Thread.currentThread().getName(), FORTY_EIGHT))
+                .setString(MyConstants.MYSQL_DATASTORE_TABLE_COLUMN5,
+                        nullSafeTruncate(this.name, FORTY_EIGHT))
+                .build();
+                */
+        GenericRecord value = GenericRecordBuilder.compact(MyConstants.IMAP_NAME_MYSQL_SLF4J + ".value")
+                .setString(MyConstants.MYSQL_DATASTORE_TABLE_COLUMN0,
+                        nullSafeTruncate(this.socketAddress, FORTY_EIGHT))
+                .setTimestamp(MyConstants.MYSQL_DATASTORE_TABLE_COLUMN1,
+                        LocalDateTime.now())
+                .setString(MyConstants.MYSQL_DATASTORE_TABLE_COLUMN2,
+                        nullSafeTruncate(arg0, EIGHT))
+                .setString(MyConstants.MYSQL_DATASTORE_TABLE_COLUMN3,
+                        nullSafeTruncate(arg1, TWO_HUNDRED_AND_FIFTY_SIX))
+                .setString(MyConstants.MYSQL_DATASTORE_TABLE_COLUMN4,
+                        nullSafeTruncate(Thread.currentThread().getName(), FORTY_EIGHT))
+                .setString(MyConstants.MYSQL_DATASTORE_TABLE_COLUMN5,
+                        nullSafeTruncate(this.name, FORTY_EIGHT))
                 .build();
 
-        this.mySqlSlf4jMap.set(key, value);
+        //FIXME Once GenericRecord as key is supported
+        this.mySqlSlf4jMap.set(hash, value);
     }
 
     /**

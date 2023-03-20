@@ -201,7 +201,9 @@ public class TransactionMonitorIdempotentInitialization {
             mySqlProperties.setProperty("mapping-type", "JDBC");
             mySqlProperties.setProperty("table-name", MyConstants.MYSQL_DATASTORE_TABLE_NAME);
             mySqlProperties.setProperty("id-column",
-                    MyConstants.MYSQL_DATASTORE_TABLE_COLUMN0 + "," + MyConstants.MYSQL_DATASTORE_TABLE_COLUMN1);
+                    //FIXME Once MySql compound key supported by Data Link
+                    //MyConstants.MYSQL_DATASTORE_TABLE_COLUMN0 + "," + MyConstants.MYSQL_DATASTORE_TABLE_COLUMN1);
+                    "hash");
             mySqlProperties.setProperty("column",
                     MyConstants.MYSQL_DATASTORE_TABLE_COLUMN0 + "," + MyConstants.MYSQL_DATASTORE_TABLE_COLUMN1
                     + "," + MyConstants.MYSQL_DATASTORE_TABLE_COLUMN2 + "," + MyConstants.MYSQL_DATASTORE_TABLE_COLUMN3
@@ -219,9 +221,7 @@ public class TransactionMonitorIdempotentInitialization {
                     //FIXME Not yet available on Viridian @ March 2023.
                     LOGGER.warn("use.virian={}, no data link for MySql", useViridian);
                 } else {
-                    //XXX Gives "MapStore init failed for map: mysql_slf4j" due to key
-                    LOGGER.error("MySql temporarily de-activated");
-                    //FIXME mySqlMapConfig.setMapStoreConfig(mySqlStoreConfig);
+                    mySqlMapConfig.setMapStoreConfig(mySqlStoreConfig);
                     LOGGER.info("MySql configured using: {}", mySqlMapConfig.getMapStoreConfig().getProperties());
                 }
             }

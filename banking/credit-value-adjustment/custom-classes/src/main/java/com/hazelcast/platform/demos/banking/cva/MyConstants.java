@@ -27,6 +27,7 @@ public class MyConstants {
 
     // Map names, for eager creation
     public static final String IMAP_NAME_CP_CDS  = "cva_cp_cds";
+    public static final String IMAP_NAME_CVA_CONFIG  = "cva_config";
     public static final String IMAP_NAME_CVA_CSV  = "cva_csv";
     public static final String IMAP_NAME_CVA_DATA  = "cva_data";
     public static final String IMAP_NAME_CVA_XLSX  = "cva_xlsx";
@@ -38,7 +39,8 @@ public class MyConstants {
     public static final String IMAP_NAME_STOCK  = "stock";
 
     public static final List<String> IMAP_NAMES =
-            List.of(IMAP_NAME_CP_CDS, IMAP_NAME_CVA_CSV, IMAP_NAME_CVA_DATA, IMAP_NAME_CVA_XLSX,
+            List.of(IMAP_NAME_CP_CDS, IMAP_NAME_CVA_CONFIG,
+                    IMAP_NAME_CVA_CSV, IMAP_NAME_CVA_DATA, IMAP_NAME_CVA_XLSX,
                     IMAP_NAME_FIXINGS, IMAP_NAME_IRCURVES, IMAP_NAME_TRADES,
                     IMAP_NAME_POSITION, IMAP_NAME_RISK, IMAP_NAME_STOCK);
 
@@ -71,4 +73,6 @@ public class MyConstants {
     // For calling C++, not necessarily perfect but a decent start
     public static final int DEFAULT_BATCH_SIZE = 100;
 
+    // For config map
+    public static final String CONFIG_CPP_SERVICE_KEY = "cpp.service";
 }
