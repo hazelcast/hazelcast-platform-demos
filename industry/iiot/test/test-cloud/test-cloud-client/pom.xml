@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.industry.iiot</groupId>
 		<artifactId>iiot-test-cloud-root</artifactId>
-		<version>5.1</version>
+		<version>5.3</version>
 	</parent>
 
 	<artifactId>iiot-test-cloud-client</artifactId>
@@ -15,8 +15,8 @@
 	<description>For online testing, a client connecting to the Hazelcast Cloud cluster</description>
 
 	<properties>
-		<docker.image.name>test-cloud-client</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<my.docker.image.name>test-cloud-client</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 
@@ -42,8 +42,8 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

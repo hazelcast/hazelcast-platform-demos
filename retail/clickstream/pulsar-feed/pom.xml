@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.retail.clickstream</groupId>
 		<artifactId>clickstream-root</artifactId>
-		<version>5.1</version>
+		<version>5.3</version>
 	</parent>
 
 	<artifactId>clickstream-pulsar-feed</artifactId>
@@ -15,8 +15,8 @@
 	<description>Feeds data to Pulsar</description>
 
 	<properties>
-		<docker.image.name>pulsar-feed</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<my.docker.image.name>pulsar-feed</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 
@@ -46,8 +46,8 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

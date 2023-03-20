@@ -1,0 +1,33 @@
+hazelcast:
+  cluster-name: '@my.cluster1.name@'
+
+  properties:
+    # In favour of verbosegc.log
+    hazelcast.health.monitoring.level: OFF
+    # Property from Dockerfile, via kubernetes-1.yaml
+    hazelcast.partition.count: '${my.partitions}'
+    # Graceful shutdown is helpful for Kubernetes scale-down.
+    hazelcast.shutdownhook.policy: GRACEFUL
+
+  # Assuming Kubernetes, but override from Java code if we detect otherwise
+  network:
+    join:
+      auto-detection:
+        enabled: false
+      multicast:
+        enabled: false
+      kubernetes:
+        enabled: true
+        service-dns: '@my.docker.image.prefix@-hazelcast.default.svc.cluster.local'
+    rest-api:
+      enabled: true
+      endpoint-groups:
+        HEALTH_CHECK:
+          enabled: true
+  #
+  jet:
+    enabled: true
+    resource-upload-enabled: true
+    # "we size Jet’s thread pool a bit below the system capacity: up to 14 threads on 16-vCPU machines.
+    # This important trick allows the GC to work in the background without interfering with Jet’s real-time computations."
+    cooperative-thread-count: ${my.cooperative.thread.count}

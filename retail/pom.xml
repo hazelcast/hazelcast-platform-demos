@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos</groupId>
 		<artifactId>hazelcast-platform-demos-root</artifactId>
-		<version>5.1</version>
+		<version>5.3</version>
 	</parent>
 
 	<groupId>com.hazelcast.platform.demos.retail</groupId>
@@ -23,7 +23,7 @@
 		<!-- Common logons for Management Center, Grafana etc -->
 		<my.other.admin.user>admin</my.other.admin.user>
 		<my.other.admin.password>password1</my.other.admin.password>
-		<my.other.admin.database>${docker.image.prefix}</my.other.admin.database>
+		<my.other.admin.database>${my.docker.image.prefix}</my.other.admin.database>
 	</properties>
 
 	<modules>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2023, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,9 @@ import java.util.Properties;
  * </p>
  */
 public class UtilsSlack {
+    // For validation of properties.
+    public static final int REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY = 8;
+
     // Local constant, never needed outside this class
     private static final String SLACK_PROPERTIES = "platform-utils-slack.properties";
 

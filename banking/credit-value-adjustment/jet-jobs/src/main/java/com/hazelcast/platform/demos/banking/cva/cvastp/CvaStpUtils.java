@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2023, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,17 @@
 
 package com.hazelcast.platform.demos.banking.cva.cvastp;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.hazelcast.jet.pipeline.JoinClause;
 
-import io.grpc.ManagedChannelBuilder;
-
 /**
  * <p>Helper functions for the {@code CvaStpJob}
  * </p>
  */
 public class CvaStpUtils {
-
-    private static final double FIVE_ATTEMPTS = 5d;
 
     /**
      * <p>
@@ -217,53 +209,4 @@ public class CvaStpUtils {
         return s.replace("\"", "\\\"");
     }
 
-    /**
-     * <p>Construct and configure the gRPC connection, see
-     * <a href="https://github.com/grpc/proposal/blob/master/A6-client-retries.md#retry-policy-capabilities">
-     * retry-policy-capabilities</a> and
-     * <a href=""
-     * </p>
-     * <p>TODO Make these parameterisable</p>
-     *
-     * @param host A load balancer DNS name
-     * @param port Load balancer port
-     * @return
-     */
-    public static ManagedChannelBuilder<?> getManagedChannelBuilder(String host, int port) {
-
-        ManagedChannelBuilder<?> managedChannelBuilder =
-                ManagedChannelBuilder.forAddress(host, port);
-
-        // No SSL, only a demo.
-        managedChannelBuilder.usePlaintext();
-
-        // May retries for each RPC
-        Map<String, Object> retryPolicy = new HashMap<>();
-        retryPolicy.put("maxAttempts", Double.valueOf(FIVE_ATTEMPTS));
-        retryPolicy.put("initialBackoff", "0.2s");
-        retryPolicy.put("maxBackoff", "10s");
-        retryPolicy.put("backoffMultiplier", Double.valueOf(2));
-        retryPolicy.put("retryableStatusCodes", List.of("RESOURCE_EXHAUSTED"));
-
-        Map<String, Object> methodConfig = new HashMap<>();
-        Map<String, Object> name = new HashMap<>();
-        name.put("service", "com_hazelcast_platform_demos_banking_cva.JetToCpp");
-        name.put("method", "streamingCall");
-
-        methodConfig.put("name", List.of(name));
-        methodConfig.put("retryPolicy", retryPolicy);
-
-        Map<String, Object> serviceConfig = new HashMap<>();
-        serviceConfig.put("methodConfig", List.of(methodConfig));
-
-        managedChannelBuilder.defaultServiceConfig(serviceConfig);
-
-        // Deactivates stats
-        managedChannelBuilder.enableRetry();
-
-        // Don't use - May not be fully implemented. Max retries for all RPCs
-        //managedChannelBuilder.maxRetryAttempts(3);
-
-        return managedChannelBuilder;
-    }
 }

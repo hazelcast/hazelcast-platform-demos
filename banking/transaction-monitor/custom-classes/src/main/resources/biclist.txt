@@ -1,0 +1,54 @@
+# Bank Identifier Code (4 letters, country code, location code), description, branch location
+AAWMFRPP|ABN Amro Investment|Paris
+ABGOESSE|Abengoa|Sevilla
+ABOCGB3L|Agricultural Bank of China|London
+ACRNGB2L|Association of Chartered Accountants|Edinburgh
+ACTVPTPL|Activo Bank|Lisbon
+AIBKIE2D|AIB Bank|Dublin
+AIRRHKHH|Airstar Bank Limited|Tsim Sha Tsui
+AKROITMM|Banco Agros|Milano
+ANACGB2L|Anglo American Capital|London
+ARNBGB2L|Arab National Bank|London
+ARSPBE22|Argenta|Antwerpen
+AXABBE22|AXA Bank|Berchem
+BBRUBEBB|ING Belgique|Brussels
+BBVAESMM|Banco Bilbao Vizcaya Argentaria|Madrid
+BCEPITMM|Banca Cesare Ponti|Milano
+BELADEBE|Berliner Sparkasse|Berlin
+BEVODEBB|Berliner Volksbank|Berlin
+BILLLULL|Banque Internationale A Luxembourg|Luxembourg
+BITAIT3E|Banca Di Italia|Roma
+BKAUATWW|Unicredit Bank AG|Wien
+BKCHFRPP|Bank Of China|Paris
+BKIDFRPP|Bank Of India|Paris
+BOFAFRPP|Bank Of America|Paris
+BOFIIE2D|Bank Of Ireland|Dublin
+BOTBBSNS|Bank Of The Bahamas|Nassau
+BSABESBB|Banco De Sabadell|Sant Cugat Del Valles
+BSABFRPP|Banco De Sabadell|Paris
+BSCHESMM|Banco Santader|Madrid
+CAIXESBB|Caixabank|Barcelona
+CCRTIT2T|Banca Di Credito Cooperativo|Castel Gandolfo
+COBADEFF|Commerzbank|Frankfurt
+CRESCHZZ|Credit Suisse|Zurich
+CRGEITGG|Banca Carige|Genova
+CTASCZ22|Banca Creditas|Prague
+CUBLBSNS|Capital Union Bank|Nassau
+CZEECZPP|Czech Export Bank|Prague
+DEUTDEFF|Deutsche Bank|Frankfurt
+DEUTHKHH|Deutsche Bank AG|Hong Kong
+EFGBHKHH|EFG Bank|West Kowloon
+GEBABEBB|BNP Paribas Fortis|Brussels
+GRACFRP2|Accor|Issy Les Moulineaux
+HASPDEHH|Hamburger Sparkasse|Hamburg
+KREDBEBB|KBC BANK NV|Brussels
+MEESGBKA|ABN Amro|London
+OBKLAT2L|Oberbank AG|Linz
+OEKOATWW|Oesterreichische Kontrollbank AG|Wien
+PBNKDEFF|Deutsche Postbank|Frankfurt
+PKOPPLPW|Bank Pekao|Warsawa
+RLNWATWW|Raiffeisenlandesbank|Wien
+UBSACHZH|UBS Asset Management|Zurich
+UBSWCHZH|UBS Switzerland|Zurich
+ULSBIE2D|Ulster Bank|Dublin
+VBOECZ2X|Sberbank Cz|Prague

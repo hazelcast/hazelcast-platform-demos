@@ -7,7 +7,7 @@
         <parent>
                 <groupId>com.hazelcast.platform.demos.ml</groupId>
                 <artifactId>ml-root</artifactId>
-                <version>5.1</version>
+                <version>5.3</version>
         </parent>
 
 	<groupId>com.hazelcast.platform.demos.ml.ri</groupId>
@@ -18,7 +18,7 @@
         <description>Reference Implementation for ML</description>
 
         <properties>
-                <docker.image.prefix>ml-ri</docker.image.prefix>
+                <my.docker.image.prefix>ml-ri</my.docker.image.prefix>
                 <main.basedir>${project.parent.parent.basedir}</main.basedir>
                 <my.cluster.name>ml-ri</my.cluster.name>
         </properties>

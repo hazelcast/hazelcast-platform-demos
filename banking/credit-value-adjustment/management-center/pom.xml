@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.banking.cva</groupId>
 		<artifactId>cva-root</artifactId>
-		<version>5.1</version>
+		<version>5.3</version>
 	</parent>
 
 	<artifactId>cva-management-center</artifactId>
@@ -15,7 +15,7 @@
 	<description>Credit Value Adjustment - Hazelcast Management Center</description>
 
 	<properties>
-		<docker.image.name>management-center</docker.image.name>
+		<my.docker.image.name>management-center</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 
 		<!-- Pre-configure the build image -->
@@ -23,16 +23,16 @@
 		<my.mc.admin.password>${my.other.admin.password}</my.mc.admin.password>
 		<my.mc.license.key>${my.license.key}</my.mc.license.key>
                 <my.mc.cluster1.name>${my.cluster1.name}</my.mc.cluster1.name>
-                <my.mc.cluster1.addresslist>${docker.image.prefix}-${my.cluster1.name}-hazelcast.default.svc.cluster.local</my.mc.cluster1.addresslist>
+                <my.mc.cluster1.addresslist>${my.docker.image.prefix}-${my.cluster1.name}-hazelcast.default.svc.cluster.local</my.mc.cluster1.addresslist>
                 <my.mc.cluster2.name>${my.cluster2.name}</my.mc.cluster2.name>
-                <my.mc.cluster2.addresslist>${docker.image.prefix}-${my.cluster2.name}-hazelcast.default.svc.cluster.local</my.mc.cluster2.addresslist>
+                <my.mc.cluster2.addresslist>${my.docker.image.prefix}-${my.cluster2.name}-hazelcast.default.svc.cluster.local</my.mc.cluster2.addresslist>
 	</properties>
 
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

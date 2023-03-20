@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hazelcast.platform.demos.banking</groupId>
+		<artifactId>banking-root</artifactId>
+		<version>5.3</version>
+	</parent>
+
+	<groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
+	<artifactId>transaction-monitor-root</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Hazelcast Platform - Banking - Transaction Monitor</name>
+	<description>Example implementation for monitoring a series of transactions</description>
+
+	<properties>
+		<!-- TMP Java 17 not yet supported in Viridian -->
+		<java.version>11</java.version>
+
+		<my.docker.image.prefix>transaction-monitor-${my.transaction-monitor.flavor}</my.docker.image.prefix>
+		<main.basedir>${project.parent.parent.basedir}</main.basedir>
+		<my.cluster1.name>grid1</my.cluster1.name>
+		<my.cluster2.name>grid2</my.cluster2.name>
+		<my.pulsar.or.kafka>pulsar</my.pulsar.or.kafka>
+		<my.pulsar.or.kafka>kafka</my.pulsar.or.kafka>
+
+		<!-- Project specific versions -->
+		<javalin.version>3.13.0</javalin.version>
+		<!--  Kafka Clients must match cloud target -->
+		<kafka-clients.version>2.2.2</kafka-clients.version>
+
+		<!-- So Grafana can find Prometheus service, must match K8S YAML -->
+		<my.prometheus.name>${my.docker.image.prefix}-prometheus</my.prometheus.name>
+		<my.prometheus.port>9090</my.prometheus.port>
+		<my.management.center.name>${my.docker.image.prefix}-management-center</my.management.center.name>
+	</properties>
+
+	<modules>
+		<module>abstract-hazelcast-node</module>
+		<module>client-command-line</module>
+		<module>client-csharp</module>
+		<!--
+		<module>client-cpp</module>
+		-->
+		<module>client-golang</module>
+		<module>client-nodejs</module>
+		<module>client-python</module>
+		<module>custom-classes</module>
+		<module>common</module>
+		<module>hazelcast-node</module>
+		<module>hazelcast-node-enterprise-1</module>
+		<module>hazelcast-node-enterprise-2</module>
+		<module>transaction-producer</module>
+		<module>webapp</module>
+		<module>remote-job-sub-1</module>
+		<module>zookeeper</module>
+		<module>kafka-broker</module>
+		<module>kafdrop</module>
+		<module>topic-create</module>
+		<module>finos-nodejs</module>
+		<module>finos-python</module>
+		<module>management-center</module>
+		<module>mysql</module>
+		<module>prometheus</module>
+		<module>postgres</module>
+		<module>grafana</module>
+		<module>pulsar</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.hazelcast.jet.contrib</groupId>
+				<artifactId>pulsar</artifactId>
+				<version>${hazelcast-jet-pulsar.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.javalin</groupId>
+				<artifactId>javalin</artifactId>
+				<version>${javalin.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.kafka</groupId>
+				<artifactId>kafka-clients</artifactId>
+				<version>${kafka-clients.version}</version>
+			</dependency>
+
+            <dependency>
+                <groupId>org.apache.pulsar</groupId>
+                <artifactId>pulsar-client</artifactId>
+                <version>${pulsar.version}</version>
+            </dependency>
+                
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-web</artifactId>
+				<version>${spring-boot.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
+	<build>
+		<plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <configuration>
+                        <target>
+                        <echo message="@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" />
+                        <echo message="Set in top level pom.xml" />
+                        <echo message="$my.pulsar.or.kafka=${my.pulsar.or.kafka}" />
+                        <echo message="$my.transaction-monitor.flavor=${my.transaction-monitor.flavor}" />
+                        <echo message="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" />
+                        <echo message="MySql:" />
+                        <echo message="Database is 'transaction-monitor-${my.transaction-monitor.flavor}', just amend IP in:" />
+                        <echo message="jdbc:mysql://127.0.0.1:3306/transaction-monitor-${my.transaction-monitor.flavor}" />
+                        <echo message="Postgres:" />
+                        <echo message="Database is 'transaction-monitor-${my.transaction-monitor.flavor}', just amend IP in:" />
+                        <echo message="jdbc:postgresql://127.0.0.1:5432/transaction-monitor-${my.transaction-monitor.flavor}" />
+                        <echo message="@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" />
+                    </target>
+                </configuration>
+            </plugin>
+		</plugins>	
+	</build>
+</project>

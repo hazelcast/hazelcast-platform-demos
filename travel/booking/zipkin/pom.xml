@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.travel.booking</groupId>
 		<artifactId>booking-root</artifactId>
-		<version>5.1</version>
+		<version>5.3</version>
 	</parent>
 
 	<artifactId>booking-zipkin</artifactId>
@@ -15,8 +15,8 @@
 	<description>Travel Booking - Re-package Zipkin</description>
 
 	<properties>
-		<docker.image.name>zipkin</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<my.docker.image.name>zipkin</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 		<main.class>zipkin.server.ZipkinServer</main.class>
 	</properties>
@@ -38,8 +38,8 @@
                                 </configuration>
 			</plugin>
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

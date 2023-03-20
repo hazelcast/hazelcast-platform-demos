@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.telco</groupId>
 		<artifactId>telco-root</artifactId>
-		<version>5.1</version>
+		<version>5.3</version>
 	</parent>
 
 	<groupId>com.hazelcast.platform.demos.telco.churn</groupId>
@@ -18,7 +18,7 @@
 	<description>Uses ML to predict customer churn</description>
 
 	<properties>
-		<docker.image.prefix>churn</docker.image.prefix>
+		<my.docker.image.prefix>churn</my.docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
 
 		<my.cluster1.init.size>1</my.cluster1.init.size>
@@ -27,12 +27,12 @@
 		<!-- Common logons for Management Center, Grafana, Prometheus -->
 		<my.other.admin.user>admin</my.other.admin.user>
 		<my.other.admin.password>password1</my.other.admin.password>
-		<my.other.admin.database>${docker.image.prefix}</my.other.admin.database>
+		<my.other.admin.database>${my.docker.image.prefix}</my.other.admin.database>
 
 		<!-- So Grafana can find Prometheus service, must match K8S YAML -->
-		<my.prometheus.name>${docker.image.prefix}-prometheus</my.prometheus.name>
+		<my.prometheus.name>${my.docker.image.prefix}-prometheus</my.prometheus.name>
 		<my.prometheus.port>9090</my.prometheus.port>
-		<my.management.center.name>${docker.image.prefix}-management-center</my.management.center.name>
+		<my.management.center.name>${my.docker.image.prefix}-management-center</my.management.center.name>
 	</properties>
 
 	<modules>
@@ -81,8 +81,8 @@
 		</dependency>
 
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
 		</dependency>
 
 		<dependency>

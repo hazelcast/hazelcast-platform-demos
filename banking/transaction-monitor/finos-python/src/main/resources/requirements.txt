@@ -1,0 +1,5 @@
+#
+hazelcast-python-client
+#TODO - causes build error
+#perspective-python
+psutil

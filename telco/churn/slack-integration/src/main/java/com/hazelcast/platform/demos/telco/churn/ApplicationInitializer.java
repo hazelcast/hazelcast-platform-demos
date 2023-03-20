@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2023, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,10 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.jet.Job;
 import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.pipeline.Pipeline;
+import com.hazelcast.platform.demos.utils.UtilsConstants;
+import com.hazelcast.platform.demos.utils.UtilsFormatter;
+import com.hazelcast.platform.demos.utils.UtilsSlackSQLJob;
+import com.hazelcast.platform.demos.utils.UtilsSlackSink;
 
 /**
  * <p>A job launcher for the optional Slack jobs
@@ -73,9 +77,6 @@ public class ApplicationInitializer {
             String jobNamePrefixTopicToSlack = TopicToSlack.JOB_NAME_PREFIX;
             String jobNameTopicToSlack = jobNamePrefixTopicToSlack + "@" + timestampStr;
 
-            String jobNamePrefixSlackToSlackCLI = SlackToSlackCLI.JOB_NAME_PREFIX;
-            String jobNameSlackToSlackCLI = jobNamePrefixSlackToSlackCLI + "@" + timestampStr;
-
             /* Slack publish still works if Slack properties aren't present, but publishess to STDOUT instead.
              * Slack reader obviously can't.
              */
@@ -88,6 +89,7 @@ public class ApplicationInitializer {
                         && this.myProperties.getSlackChannelId().length() > 0
                         && this.myProperties.getSlackChannelName().length() > 0) {
                     properties.setProperty(MyConstants.SLACK_ACCESS_TOKEN, this.myProperties.getSlackAccessToken());
+                    properties.setProperty(UtilsConstants.SLACK_BUILD_USER, this.myProperties.getBuildUserName());
                     properties.setProperty(MyConstants.SLACK_CHANNEL_ID, this.myProperties.getSlackChannelId());
                     properties.setProperty(MyConstants.SLACK_CHANNEL_NAME, this.myProperties.getSlackChannelName());
                     slackUseable = true;
@@ -102,20 +104,18 @@ public class ApplicationInitializer {
             jobConfigTopicToSlack.setName(jobNameTopicToSlack);
             jobConfigTopicToSlack.addClass(TopicToSlack.class);
             jobConfigTopicToSlack.addClass(MyTopicSource.class);
-            jobConfigTopicToSlack.addClass(MySlackSink.class);
-
-            Pipeline pipelineSlackToSlackCLI = SlackToSlackCLI.buildPipeline(properties, projectName);
-
-            JobConfig jobConfigSlackToSlackCLI = new JobConfig();
-            jobConfigSlackToSlackCLI.setName(jobNameSlackToSlackCLI);
-            jobConfigSlackToSlackCLI.addClass(SlackToSlackCLI.class);
-            jobConfigSlackToSlackCLI.addClass(MySlackSource.class);
-            jobConfigSlackToSlackCLI.addClass(MySlackSink.class);
-            jobConfigSlackToSlackCLI.addClass(MyUtils.class);
+            jobConfigTopicToSlack.addClass(UtilsSlackSink.class);
+            jobConfigTopicToSlack.addClass(UtilsFormatter.class);
 
             this.trySubmit(jobNamePrefixTopicToSlack, jobConfigTopicToSlack, pipelineTopicToSlack);
             if (slackUseable) {
-                this.trySubmit(jobNamePrefixSlackToSlackCLI, jobConfigSlackToSlackCLI, pipelineSlackToSlackCLI);
+                // Slack SQL integration from common utils
+                try {
+                    UtilsSlackSQLJob.submitJob(hazelcastInstance,
+                            projectName == null ? "" : projectName);
+                } catch (Exception e) {
+                    LOGGER.error("launchNeededJobs:" + UtilsSlackSQLJob.class.getSimpleName(), e);
+                }
             }
 
             LOGGER.info("-=-=-=-=-  END  '{}'  END  -=-=-=-=-=-", hazelcastInstance.getName());

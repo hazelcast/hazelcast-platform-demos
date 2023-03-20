@@ -9,4 +9,4 @@ hazelcast:
     join:
       kubernetes:
         enabled: true
-        service-dns: '@docker.image.prefix@-@my.cluster.name@-hazelcast.default.svc.cluster.local'
+        service-dns: '@my.docker.image.prefix@-@my.cluster.name@-hazelcast.default.svc.cluster.local'

@@ -40,7 +40,7 @@ Configuration:
           AppenderRef:
             ref: ConsoleCyan
         - name: com.hazelcast.enterprise.security
-          level: trace
+          level: debug
           additivity: false
           AppenderRef:
             ref: ConsoleYellow
@@ -50,7 +50,7 @@ Configuration:
           AppenderRef:
             ref: ConsoleBlue
         - name: com.hazelcast.security
-          level: trace
+          level: debug
           additivity: false
           AppenderRef:
             ref: ConsoleYellow

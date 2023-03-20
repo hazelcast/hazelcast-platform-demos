@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2023, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,6 +63,7 @@ public class ApplicationRunner implements CommandLineRunner {
      */
     @Override
     public void run(String... args) throws Exception {
+        CVAIdempotentInitialization.fullInitialize(this.hazelcastInstance);
 
         ITopic<Tuple2<HazelcastJsonValue, JobStatus>> jobStateTopic =
                 this.hazelcastInstance.getTopic(MyConstants.ITOPIC_NAME_JOB_STATE);
@@ -71,11 +72,14 @@ public class ApplicationRunner implements CommandLineRunner {
 
         Map<Long, JobStatus> currentState;
         Map<Long, JobStatus> previousState = new TreeMap<>(Collections.reverseOrder());
+        Tuple2<HazelcastJsonValue, JobStatus> dummyMessage = Tuple2.tuple2(this.jobToJson(null), JobStatus.NOT_RUNNING);
 
         while (true) {
             try {
                 // Checkstyle thinks the below is more obvious than "TimeUnit.SECONDS.sleep(5)"
                 TimeUnit.SECONDS.sleep(FIVE);
+                // Nudge page to refresh even when nothing happening
+                jobStateTopic.publish(dummyMessage);
 
                 currentState = this.hazelcastInstance.getJet().getJobs()
                         .stream()
@@ -146,11 +150,18 @@ public class ApplicationRunner implements CommandLineRunner {
 
         stringBuilder.append("{ ");
 
+        stringBuilder.append(" \"dummy\": " + (job == null));
+
         if (job != null) {
-            stringBuilder.append("\"id\": \"" + job.getId() + "\"");
+            stringBuilder.append(", \"id\": \"" + job.getId() + "\"");
             stringBuilder.append(", \"name\": \"" + (job.getName() == null ? "" : job.getName()) + "\"");
             stringBuilder.append(", \"status\": \"" + job.getStatus() + "\"");
             stringBuilder.append(", \"submission_time\": \"" + job.getSubmissionTime() + "\"");
+        } else {
+            stringBuilder.append(", \"id\": \"\"");
+            stringBuilder.append(", \"name\": \"\"");
+            stringBuilder.append(", \"status\": \"\"");
+            stringBuilder.append(", \"submission_time\": \"\"");
         }
 
         stringBuilder.append(" }");

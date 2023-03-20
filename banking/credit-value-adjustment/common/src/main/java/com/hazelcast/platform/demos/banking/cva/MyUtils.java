@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2023, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +35,10 @@ import com.hazelcast.jet.core.JobStatus;
 import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.platform.demos.banking.cva.MyConstants.Site;
 
+import io.grpc.ManagedChannelBuilder;
+import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
+import io.grpc.netty.shaded.io.netty.channel.ChannelOption;
+
 /**
  * <p>Utility functions that may be useful to more than one module.
  * </p>
@@ -40,6 +47,10 @@ public class MyUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(MyUtils.class);
 
     private static final int PORT_RANGE = 1000;
+    // Needs to match C++ gRPC Server.
+    private static final int PORT = 30001;
+    private static final int FIVE_ATTEMPTS = 5;
+    private static final int TEN_THOUSAND = 10_000;
 
     /**
      * <p>When trying to run two clusters on the same host,
@@ -163,6 +174,58 @@ public class MyUtils {
         }
 
         return timestampStr;
+    }
+
+    /**
+     * <p>Construct and configure the gRPC connection, see
+     * <a href="https://github.com/grpc/proposal/blob/master/A6-client-retries.md#retry-policy-capabilities">
+     * retry-policy-capabilities</a> and
+     * <a href=""
+     * </p>
+     *
+     * @param host A load balancer DNS name
+     * @return
+     */
+    public static ManagedChannelBuilder<?> getManagedChannelBuilder(String host) {
+        LOGGER.info("ManagedChannelBuild for '{}'", host);
+
+        ManagedChannelBuilder<?> managedChannelBuilder =
+                // ManagedChannelBuilder.forAddress(host, port);
+                // Use Netty directly for "withOption"
+                NettyChannelBuilder.forAddress(host, PORT).withOption(ChannelOption.CONNECT_TIMEOUT_MILLIS,
+                        TEN_THOUSAND);
+
+        // No SSL, only a demo.
+        managedChannelBuilder.usePlaintext();
+
+        // May retries for each RPC
+        Map<String, Object> retryPolicy = new HashMap<>();
+        retryPolicy.put("maxAttempts", Double.valueOf(FIVE_ATTEMPTS));
+        retryPolicy.put("initialBackoff", "0.2s");
+        retryPolicy.put("maxBackoff", "10s");
+        retryPolicy.put("backoffMultiplier", Double.valueOf(2));
+        retryPolicy.put("retryableStatusCodes", List.of("RESOURCE_EXHAUSTED"));
+
+        Map<String, Object> methodConfig = new HashMap<>();
+        Map<String, Object> name = new HashMap<>();
+        name.put("service", "com_hazelcast_platform_demos_banking_cva.JetToCpp");
+        name.put("method", "streamingCall");
+
+        methodConfig.put("name", List.of(name));
+        methodConfig.put("retryPolicy", retryPolicy);
+
+        Map<String, Object> serviceConfig = new HashMap<>();
+        serviceConfig.put("methodConfig", List.of(methodConfig));
+
+        managedChannelBuilder.defaultServiceConfig(serviceConfig);
+
+        // Deactivates stats
+        managedChannelBuilder.enableRetry();
+
+        // Don't use - May not be fully implemented. Max retries for all RPCs
+        //managedChannelBuilder.maxRetryAttempts(3);
+
+        return managedChannelBuilder;
     }
 
 }

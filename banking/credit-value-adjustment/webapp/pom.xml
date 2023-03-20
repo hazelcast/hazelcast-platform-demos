@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.banking.cva</groupId>
 		<artifactId>cva-root</artifactId>
-		<version>5.1</version>
+		<version>5.3</version>
 	</parent>
 
 	<artifactId>cva-webapp</artifactId>
@@ -15,8 +15,8 @@
 	<description>Credit Value Adjustment - Web Application</description>
 
 	<properties>
-		<docker.image.name>webapp</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<my.docker.image.name>webapp</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 
 		<!-- For src/main/resources/templates/fragments.html -->
@@ -24,8 +24,6 @@
 
 		<!-- React.js app in src/main/app -->
 		<frontend.app.dir>${project.basedir}/src/main/app</frontend.app.dir>
-		<node.version>v12.16.2</node.version>
-		<npm.version>6.14.4</npm.version>
 	</properties>
 
 	<dependencies>
@@ -36,16 +34,8 @@
 		</dependency>
 
 		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger2</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger-ui</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-boot-starter</artifactId>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 		</dependency>
 
 		<dependency>
@@ -164,8 +154,17 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
+				<!-- Copy keystore/truststore if found -->
+				<artifactId>maven-antrun-plugin</artifactId>
+				<configuration>
+					<target>
+						<ant antfile="../../../ant/build.xml" target="conditionalcopy"/>
+					</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2023, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
 import com.hazelcast.client.config.YamlClientConfigBuilder;
 import com.hazelcast.config.KubernetesConfig;
+import com.hazelcast.platform.demos.utils.UtilsViridian;
 
 /**
  * <p>Common configuration for clients of the clusters. Uses
@@ -61,45 +62,69 @@ public class ApplicationConfig {
      * </p>
      */
     @Bean
-    public ClientConfig clientConfig(MyProperties myProperties) {
+    public ClientConfig clientConfig(MyProperties myProperties) throws Exception {
         ClientConfig clientConfig = new YamlClientConfigBuilder().build();
 
-        clientConfig.setClusterName(myProperties.getSite().toString());
+        clientConfig.addLabel(myProperties.getBuildTimestamp());
 
         ClientNetworkConfig clientNetworkConfig = clientConfig.getNetworkConfig();
+        clientNetworkConfig.getAutoDetectionConfig().setEnabled(false);
 
-        if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
-            KubernetesConfig kubernetesConfig = new KubernetesConfig();
+        LOGGER.info("useViridian='{}'", myProperties.isUseViridian());
+        boolean dockerEnabled = Boolean.valueOf(System.getProperty("my.docker.enabled", "false"));
+        boolean kubernetesEnabled = Boolean.valueOf(System.getProperty("my.kubernetes.enabled", "false"));
+        boolean localhost = !dockerEnabled && !kubernetesEnabled;
 
-            kubernetesConfig.setEnabled(true);
-            kubernetesConfig.setProperty("service-dns",
-                    System.getProperty("my.project") + "-"
-                    + System.getProperty("my.site") + "-hazelcast.default.svc.cluster.local");
+        if (localhost && myProperties.isUseViridian()) {
+            String message = "Localhost access not implemented for Viridian, keystore/truststore location"
+                    + " not known, use Docker script instead";
+            throw new RuntimeException(message);
+        }
 
-            clientNetworkConfig.setKubernetesConfig(kubernetesConfig);
+        if (myProperties.isUseViridian()) {
+            UtilsViridian.configure(clientConfig,
+                    myProperties.getViridianCluster1Id(),
+                    myProperties.getViridianCluster1DiscoveryToken(),
+                    myProperties.getViridianCluster1KeyPassword());
 
-            LOGGER.warn("Kubernetes configuration: service-dns: "
-                    + clientNetworkConfig.getKubernetesConfig().getProperty("service-dns"));
+            LOGGER.info("Viridian configured, cluster id: "
+                    + clientConfig.getClusterName());
         } else {
-            clientNetworkConfig.getKubernetesConfig().setEnabled(false);
+            clientConfig.setClusterName(myProperties.getSite().toString());
 
-            String host;
-            if (this.publicAddress.isEmpty()) {
-                LOGGER.info("this.publicAddress.isEmpty()");
-                host = System.getProperty("hazelcast.local.publicAddress", "127.0.0.1");
+            if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
+                KubernetesConfig kubernetesConfig = new KubernetesConfig();
+
+                kubernetesConfig.setEnabled(true);
+                kubernetesConfig.setProperty("service-dns",
+                        System.getProperty("my.project") + "-"
+                        + System.getProperty("my.site") + "-hazelcast.default.svc.cluster.local");
+
+                clientNetworkConfig.setKubernetesConfig(kubernetesConfig);
+
+                LOGGER.warn("Kubernetes configuration: service-dns: "
+                        + clientNetworkConfig.getKubernetesConfig().getProperty("service-dns"));
             } else {
-                LOGGER.info("!this.publicAddress.isEmpty()");
-                host = this.publicAddress;
+                clientNetworkConfig.getKubernetesConfig().setEnabled(false);
+
+                String host;
+                if (this.publicAddress.isEmpty()) {
+                    LOGGER.info("this.publicAddress.isEmpty()");
+                    host = System.getProperty("hazelcast.local.publicAddress", "127.0.0.1");
+                } else {
+                    LOGGER.info("!this.publicAddress.isEmpty()");
+                    host = this.publicAddress;
+                }
+
+                int port = MyUtils.getLocalhostBasePort(myProperties.getSite());
+
+                List<String> memberList = List.of(host + ":" + port,
+                        host + ":" + (port + 1), host + ":" + (port + 2));
+                clientNetworkConfig.setAddresses(memberList);
+
+                LOGGER.warn("Non-Kubernetes configuration: member-list: "
+                        + clientNetworkConfig.getAddresses());
             }
-
-            int port = MyUtils.getLocalhostBasePort(myProperties.getSite());
-
-            List<String> memberList = List.of(host + ":" + port,
-                    host + ":" + (port + 1), host + ":" + (port + 2));
-            clientNetworkConfig.setAddresses(memberList);
-
-            LOGGER.warn("Non-Kubernetes configuration: member-list: "
-                    + clientNetworkConfig.getAddresses());
         }
 
         return clientConfig;

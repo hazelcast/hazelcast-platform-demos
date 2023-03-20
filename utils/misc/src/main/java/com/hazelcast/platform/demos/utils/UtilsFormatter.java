@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2023, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +71,12 @@ public class UtilsFormatter {
      * @return
      */
     public static String safeForJsonStr(String input) {
-        return input.replaceAll("\"", "'");
+        String[] tokens = input.replaceAll("\"", "'").split(System.getProperty("line.separator"));
+        StringBuffer result = new StringBuffer(tokens[0]);
+        for (int i = 1; i < tokens.length; i++) {
+            result.append("+").append(tokens[i]);
+        }
+        return result.toString();
     }
 
     /**
@@ -170,7 +176,7 @@ public class UtilsFormatter {
                 if (j != 0) {
                     line.append(',');
                 }
-                line.append(String.format(format, sqlRow.getObject(j).toString()));
+                line.append(String.format(format, Objects.toString(sqlRow.getObject(j))));
             }
             rows.add(line.toString());
             if (count == UtilsConstants.SQL_RESULT_THRESHOLD) {

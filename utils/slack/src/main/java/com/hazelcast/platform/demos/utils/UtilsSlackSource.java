@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2023, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,8 +53,19 @@ public class UtilsSlackSource {
     private long lastPoll;
 
     public UtilsSlackSource(String accessToken, String channelId) {
-        this.accessToken = accessToken;
-        this.channelId = channelId;
+        this.accessToken = Objects.toString(accessToken);
+        this.channelId = Objects.toString(channelId);
+
+        if (this.accessToken.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY) {
+            String message = String.format("No Slack jobs, '%s' too short: '%s'",
+                    UtilsConstants.SLACK_ACCESS_TOKEN, Objects.toString(this.accessToken));
+            throw new RuntimeException(message);
+        }
+        if (this.channelId.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY) {
+            String message = String.format("No Slack jobs, '%s' too short: '%s'",
+                    UtilsConstants.SLACK_CHANNEL_ID, Objects.toString(this.channelId));
+            throw new RuntimeException(message);
+        }
 
         // Start to consume messages since launch
         this.lastPoll = Instant.now().getEpochSecond();
@@ -66,12 +77,12 @@ public class UtilsSlackSource {
      *
      * @param accessToken For access to Slack
      * @param channelId For access to Slack
-     * @param channelName For job name
+     * @param channelName For stage name
      * @return
      */
     public static StreamSource<String> slackSource(String accessToken, String channelId, String channelName) {
         return SourceBuilder.stream(
-                    "slackSource-" + channelName,
+                    "slackSource-" + Objects.toString(channelName),
                     __ -> {
                         return new UtilsSlackSource(accessToken, channelId);
                     }

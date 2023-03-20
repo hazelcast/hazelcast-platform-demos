@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.banking.cva</groupId>
 		<artifactId>cva-root</artifactId>
-		<version>5.1</version>
+		<version>5.3</version>
 	</parent>
 
 	<artifactId>cva-hazelcast-node-site1</artifactId>
@@ -15,8 +15,8 @@
 	<description>Credit Value Adjustment - Hazelcast Node - Site 1</description>
 
 	<properties>
-		<docker.image.name>hazelcast-node-site1</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<my.docker.image.name>hazelcast-node-site1</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 		<my.cluster.name>${my.cluster1.name}</my.cluster.name>
 		<my.init.size>${my.cluster1.init.size}</my.init.size>
@@ -46,8 +46,8 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

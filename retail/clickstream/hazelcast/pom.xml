@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.retail.clickstream</groupId>
 		<artifactId>clickstream-root</artifactId>
-		<version>5.1</version>
+		<version>5.3</version>
 	</parent>
 
 	<artifactId>clickstream-hazelcast</artifactId>
@@ -15,8 +15,8 @@
 	<description>Hazelcast node for Blue or Green</description>
 
 	<properties>
-		<docker.image.name>hazelcast</docker.image.name>
-		<docker.jar.file>${project.artifactId}-${project.version}.jar</docker.jar.file>
+		<my.docker.image.name>hazelcast</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 
@@ -57,8 +57,19 @@
 		</dependency>
 
 		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-stub</artifactId>
+			<version>${grpc.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.apache.pulsar</groupId>
 			<artifactId>pulsar-client</artifactId>
+		</dependency>
+
+		<dependency>
+    		<groupId>org.apache.logging.log4j</groupId>
+    		<artifactId>log4j-slf4j-impl</artifactId>
 		</dependency>
 
 		<dependency>
@@ -85,8 +96,8 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

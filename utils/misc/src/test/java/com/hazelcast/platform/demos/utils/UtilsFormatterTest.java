@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2023, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -138,6 +138,18 @@ public class UtilsFormatterTest {
     public void testSafeForJson(TestInfo testInfo) {
       String input = "Permission (\"MapPermission\" \"mapName\" \"read\") denied!";
       String expected = "Permission ('MapPermission' 'mapName' 'read') denied!";
+      String output = UtilsFormatter.safeForJsonStr(input);
+      LOGGER.info("{} :: input=='{}', output=='{}'", testInfo.getDisplayName(), input, output);
+
+      assertNotNull(output);
+      assertTrue(output instanceof String);
+      assertEquals(expected, output);
+    }
+
+    @Test
+    public void testSafeForJsonMultiLine(TestInfo testInfo) {
+      String input = "one" + System.getProperty("line.separator") + "two" + System.getProperty("line.separator") + "three";
+      String expected = "one+two+three";
       String output = UtilsFormatter.safeForJsonStr(input);
       LOGGER.info("{} :: input=='{}', output=='{}'", testInfo.getDisplayName(), input, output);
 

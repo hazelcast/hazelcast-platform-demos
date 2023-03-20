@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="./favicon.ico">
+    <link rel="stylesheet" type="text/css" href="./main.css" />
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <py-config>
+		packages = [
+        	"hazelcast-python-client"
+      	]    
+      	[[fetch]]
+    </py-config>    
+    <py-env>
+    - paths:
+      - ./custom_entrypoint.py
+      - ./cli.py
+      - ./cli2.py
+    </py-env>    
+    <title>@my.docker.image.name@</title>
+  </head>
+  <body>
+    <div class="headerfooter">
+      <div>
+        <center><img src="./hazelcast-horz-flat-rev-sm.png"
+                     alt="Hazelcast logo" width="200" height="42"></img></center>
+                        <h5>Build @maven.build.timestamp@</h5>
+      </div>
+      <hr class="headerfooterline"/>
+    </div>
+ 
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div class="major_pane">
+      <div id="root">
+      	<div id="loading" style="display:block; text-align:center;">
+      		<h2>Loading...</h2>
+      		<font size="xx-small"><p><span id="when"></span></p><p>(May take a few minutes)</p></font>
+      	</div>
+      	<div id="loaded">
+      	</div>
+
+        <script>
+          var now = new Date().toLocaleTimeString();
+          document.getElementById("when").textContent = now; 
+        </script>
+
+		<py-script src="./cli.py"></py-script>
+      </div>
+    </div>
+
+    <div class="headerfooter">
+      <hr class="headerfooterline"/>
+      <p>&copy; Hazelcast <span id="copyrightyear">2022</span></p>
+    </div>
+  </body> 
+</html>

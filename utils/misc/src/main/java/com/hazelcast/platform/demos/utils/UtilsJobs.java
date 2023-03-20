@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2023, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,9 +49,13 @@ public class UtilsJobs {
         String jobName = jobConfig.getName();
         List<Job> jobs = hazelcastInstance.getJet().getJobs();
         for (Job job : jobs) {
-            if (!job.getName().isBlank() && job.getName().equals(jobName)) {
-                logger.debug("myNewJobIfAbsent: skip '{}', exists with status {}", jobName, job.getStatus());
-                return null;
+            if (job.getName() == null) {
+                logger.error("Job with null name: {}", job);
+            } else {
+                if (!job.getName().isBlank() && job.getName().equals(jobName)) {
+                    logger.debug("myNewJobIfAbsent: skip '{}', exists with status {}", jobName, job.getStatus());
+                    return null;
+                }
             }
         }
         try {

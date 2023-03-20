@@ -1,0 +1,32 @@
+hazelcast:
+  # Replaced by Maven
+  cluster-name: '@my.cluster1.name@'
+  import:
+    # Import section same for three clusters in this example
+    - hazelcast-common.yml  
+  #
+  # Assuming Kubernetes, but override from Java code if we detect otherwise
+  network:
+    join:
+      kubernetes:
+        enabled: true
+        service-dns: '@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local'
+  #
+  # Target endpoints added by Java
+  wan-replication:
+    'only-to-@my.cluster2.name@':
+      batch-publisher:
+        '@my.cluster2.name@-publisher':
+          cluster-name: '@my.cluster2.name@'
+          batch-size: 100
+          batch-max-delay-millis: 2000
+          discovery-period-seconds: 30
+          use-endpoint-private-address: false
+          discovery-strategies:
+            # See https://github.com/hazelcast/hazelcast/issues/16792
+            discovery-strategies:
+              - class: hazelcast.platform.demos.banking.transactionmonitor.MyWANDiscoveryStrategyFactory
+                enabled: true         
+  # For Tiered-Storage
+  native-memory:
+    enabled: true

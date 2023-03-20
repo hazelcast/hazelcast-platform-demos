@@ -1,0 +1,13 @@
+hazelcast:
+  # Replaced by Maven
+  cluster-name: '@my.cluster1.name@'
+  import:
+    # Import section same for three clusters in this example
+    - hazelcast-common.yml  
+  #
+  # Assuming Kubernetes, but override from Java code if we detect otherwise
+  network:
+    join:
+      kubernetes:
+        enabled: true
+        service-dns: '@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local'

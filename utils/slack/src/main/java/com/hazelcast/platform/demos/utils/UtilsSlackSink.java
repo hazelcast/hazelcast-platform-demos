@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2023, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,10 +42,21 @@ public class UtilsSlackSink {
     private final String channelName;
     private final String messagePrefix;
 
-    public UtilsSlackSink(String accessToken, String channelName, String projectName) {
-        this.accessToken = accessToken;
-        this.channelName = channelName;
-        this.messagePrefix = "(_" + projectName + "_): ";
+    public UtilsSlackSink(String accessToken, String channelName, String projectName, String buildUser) {
+        this.accessToken = Objects.toString(accessToken);
+        this.channelName = Objects.toString(channelName);
+        this.messagePrefix = "(_" + Objects.toString(projectName) + "/" + Objects.toString(buildUser) + "_): ";
+
+        if (this.accessToken.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY) {
+            String message = String.format("No Slack jobs, '%s' too short: '%s'",
+                    UtilsConstants.SLACK_ACCESS_TOKEN, Objects.toString(this.accessToken));
+            throw new RuntimeException(message);
+        }
+        if (this.channelName.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY) {
+            String message = String.format("No Slack jobs, '%s' too short: '%s'",
+                    UtilsConstants.SLACK_CHANNEL_ID, Objects.toString(this.channelName));
+            throw new RuntimeException(message);
+        }
     }
 
     /**
@@ -53,14 +64,15 @@ public class UtilsSlackSink {
      * </p>
      *
      * @param accessToken For access to Slack
-     * @param channelName For job name
+     * @param channelName For stage name
      * @param projectName Prefix message so to know which demo produces
+     * @param buildUser Who built, in case multiple people running same demo
      * @return
      */
-    public static Sink<JSONObject> slackSink(String accessToken, String channelName, String projectName) {
+    public static Sink<JSONObject> slackSink(String accessToken, String channelName, String projectName, String buildUser) {
         return SinkBuilder.sinkBuilder(
-                    "slackSink-" + channelName,
-                    __ -> new UtilsSlackSink(accessToken, channelName, projectName)
+                    "slackSink-" + Objects.toString(channelName),
+                    __ -> new UtilsSlackSink(accessToken, channelName, projectName, buildUser)
                 )
                 .receiveFn(
                         (UtilsSlackSink utilsSlackSink, JSONObject item) -> utilsSlackSink.receiveFn(item)

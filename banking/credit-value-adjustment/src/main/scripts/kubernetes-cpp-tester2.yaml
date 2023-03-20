@@ -1,0 +1,26 @@
+---
+# Tester for CPP, set IP address or leave blank. When set, connects to that IP, so use
+# the IP address for the LoadBalance of the CPP Service.
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: cva-cpp-tester2
+  name: cva-cpp-tester2
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: cva-cpp-tester2
+    spec:
+      containers:
+        - env:
+          - name: "HOST_IP"
+            value: ""
+          image: "hazelcast-platform-demos/cva-cpp-tester2"
+          imagePullPolicy: Never
+          name: cva-cpp-tester2-container
+      restartPolicy: Never
+---
