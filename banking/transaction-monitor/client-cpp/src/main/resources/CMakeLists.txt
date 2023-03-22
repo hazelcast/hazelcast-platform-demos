@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.26)
 
 project(transaction-monitor-@my.transaction-monitor.flavor@
         VERSION 1.0.0
@@ -6,9 +6,8 @@ project(transaction-monitor-@my.transaction-monitor.flavor@
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS -DHZ_BUILD_WITH_SSL)
 
-find_package(hazelcast-cpp-client REQUIRED)
+find_package(hazelcast-cpp-client CONFIG REQUIRED)
 
 add_executable(cpp_client Client.cpp)
 

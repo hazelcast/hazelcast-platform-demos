@@ -1,10 +1,11 @@
 {
   	"name": "@project.artifactId@",
   	"version": "@project.version@",
-  	"builtin-baseline": "e249dfb528731136b66d5fab6c6e00be243cbbbc",
+  	"builtin-baseline": "ae59b93af0c1dce4126e963fca5b330662495fa1",
     "dependencies": [ 
 		{
 			"name": "hazelcast-cpp-client",
+			"features": ["openssl"],
             "version>=": "5.2.0"
 		}
     ],

@@ -85,7 +85,7 @@
 		<mongo-java-driver.version>3.12.8</mongo-java-driver.version>
 		<mysql-connector-j.version>8.0.32</mysql-connector-j.version>
 		<netty-tcnative.version>2.0.52.Final</netty-tcnative.version>
-		<poi-ooxml.version>4.1.2</poi-ooxml.version>
+		<poi-ooxml.version>5.2.3</poi-ooxml.version>
 		<!-- Run same version with 'protoc - -grpc_out=. - -plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin' 
 			banking/credit-value-adjustment/common/src/main/proto/JetToCpp.proto -->
 		<protobuf.version>3.21.12</protobuf.version>
