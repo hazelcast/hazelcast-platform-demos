@@ -31,8 +31,6 @@ spec:
     spec:
       containers:
         - env:
-          - name: "MY_CPP_SERVICE"
-            value: "cva-cpp.default.svc.cluster.local"
           - name: "MY_SITE"
             value: "site1"
           image: "hazelcast-platform-demos/cva-webapp"

@@ -18,10 +18,16 @@ ENV MY_THRESHOLD ""
 ENV JAVA_ARGS ""
 ENV JAVA_OPTS "--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
 
-ENTRYPOINT exec java $JAVA_ARGS $JAVA_OPTS \
- -Dmy.cpp.service=$MY_CPP_SERVICE \
- -Dmy.docker.enabled=true \
- -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
- -Dmy.site=$MY_SITE \
- -Dmy.threshold=$MY_THRESHOLD \
- -jar application.jar $0 $1
+COPY target/classes/custom-entrypoint.sh  /
+CMD ["bash", "-c", "set -euo pipefail \
+      && echo @@@@@@@@@@ \
+      && echo arch \
+      && arch \
+      && echo @@@@@@@@@@ \
+      && echo java --version \
+      && java --version \
+      && echo @@@@@@@@@@ \
+      && chmod 755 /custom-entrypoint.sh \
+      && echo /custom-entrypoint.sh \
+      && /custom-entrypoint.sh \
+     "]

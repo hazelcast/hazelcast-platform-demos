@@ -120,7 +120,7 @@ fi
 POSTGRESCOUNT=`echo $POSTGRESADDRESS | sed 's/,/ /g' | wc -w`
 if [ $POSTGRESCOUNT -ne 1 ]
 then
- echo `basename $0`: ERROR: Need 1 IPs in Postgres IP list: \"$POSTGRESADDRES\"
+ echo `basename $0`: ERROR: Need 1 IPs in Postgres IP list: \"$POSTGRESADDRESS\"
  exit 1
 fi
 PULSARCOUNT=`echo $PULSARLIST | sed 's/,/ /g' | wc -w`

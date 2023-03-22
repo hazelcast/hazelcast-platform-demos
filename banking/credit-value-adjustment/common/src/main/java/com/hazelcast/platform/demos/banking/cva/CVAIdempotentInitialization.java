@@ -16,12 +16,18 @@
 
 package com.hazelcast.platform.demos.banking.cva;
 
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
 import com.hazelcast.map.IMap;
+import com.hazelcast.topic.ITopic;
 
 import hazelcast.platform.demos.utils.CheckConnectIdempotentCallable;
 
@@ -44,11 +50,15 @@ public class CVAIdempotentInitialization {
      * @throws Exception -- from checks
      */
     public static void fullInitialize(HazelcastInstance hazelcastInstance) throws Exception {
+        LOGGER.info("fullInitialize(): START");
+
         //@throws Exception
         CheckConnectIdempotentCallable.silentCheckCustomClasses(hazelcastInstance);
 
         createNeededMappingsAndViews(hazelcastInstance);
         createNeededObjects(hazelcastInstance);
+
+        LOGGER.info("fullInitialize(): END");
     }
 
     /**
@@ -57,27 +67,29 @@ public class CVAIdempotentInitialization {
      * </p>
      */
     public static void createNeededMappingsAndViews(HazelcastInstance hazelcastInstance) {
-        String definition1 = defineIMapCpCds();
-        String definition1v = defineIMapCpCdsView();
-        String definition2 = defineIMapFixings();
-        String definition2v = defineIMapFixingsView();
-        String definition3 = defineIMapIrCurves();
-        String definition3v = defineIMapIrCurvesView();
-        String definition4 = defineIMapTrades();
-        String definition5 = defineIMapPosition();
-        String definition6 = defineIMapRisk();
-        String definition7 = defineIMapStock();
+        String definition1 = defineIMapConfig();
+        String definition2 = defineIMapCpCds();
+        String definition2v = defineIMapCpCdsView();
+        String definition3 = defineIMapFixings();
+        String definition3v = defineIMapFixingsView();
+        String definition4 = defineIMapIrCurves();
+        String definition4v = defineIMapIrCurvesView();
+        String definition5 = defineIMapTrades();
+        String definition6 = defineIMapPosition();
+        String definition7 = defineIMapRisk();
+        String definition8 = defineIMapStock();
 
         define(hazelcastInstance, definition1);
-        define(hazelcastInstance, definition1v);
         define(hazelcastInstance, definition2);
         define(hazelcastInstance, definition2v);
         define(hazelcastInstance, definition3);
         define(hazelcastInstance, definition3v);
         define(hazelcastInstance, definition4);
+        define(hazelcastInstance, definition4v);
         define(hazelcastInstance, definition5);
         define(hazelcastInstance, definition6);
         define(hazelcastInstance, definition7);
+        define(hazelcastInstance, definition8);
     }
 
     /**
@@ -87,12 +99,53 @@ public class CVAIdempotentInitialization {
      * </p>
      */
     public static void createNeededObjects(HazelcastInstance hazelcastInstance) {
+        // Capture map/topic names before
+        Set<String> existingMapNames = hazelcastInstance
+                .getDistributedObjects()
+                .stream()
+                .filter(distributedObject -> !distributedObject.getName().startsWith("__"))
+                .filter(distributedObject -> distributedObject instanceof IMap)
+                .map(DistributedObject::getName)
+                .collect(Collectors.toCollection(TreeSet::new));
+        Set<String> existingTopicNames = hazelcastInstance
+                .getDistributedObjects()
+                .stream()
+                .filter(distributedObject -> !distributedObject.getName().startsWith("__"))
+                .filter(distributedObject -> distributedObject instanceof ITopic)
+                .map(DistributedObject::getName)
+                .collect(Collectors.toCollection(TreeSet::new));
+
+        // Create if not present
         for (String iMapName : MyConstants.IMAP_NAMES) {
-            hazelcastInstance.getMap(iMapName);
+            if (!existingMapNames.remove(iMapName)) {
+                hazelcastInstance.getMap(iMapName);
+            }
         }
         for (String iTopicName : MyConstants.ITOPIC_NAMES) {
-            hazelcastInstance.getTopic(iTopicName);
+            if (!existingTopicNames.remove(iTopicName)) {
+                hazelcastInstance.getTopic(iTopicName);
+            }
         }
+
+        // Should not be anything left
+        existingMapNames.forEach(name -> LOGGER.warn("Unexpected IMap '{}' found", name));
+        existingTopicNames.forEach(name -> LOGGER.warn("Unexpected ITopic '{}' found", name));
+    }
+
+    /**
+     * <p>String key, string value for config.
+     * </p>
+     */
+    private static String defineIMapConfig() {
+        return "CREATE OR REPLACE MAPPING "
+                + MyConstants.IMAP_NAME_CVA_CONFIG
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = '" + String.class.getCanonicalName() + "'"
+                + " )";
     }
 
     /**

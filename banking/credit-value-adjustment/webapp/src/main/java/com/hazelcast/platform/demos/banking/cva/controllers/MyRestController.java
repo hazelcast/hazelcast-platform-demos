@@ -234,6 +234,7 @@ public class MyRestController {
             LocalDate calcDate = LocalDate.parse(calcDateStr);
             Job job = CvaStpJobSubmitter.submitCvaStpJob(this.hazelcastInstance,
                     calcDate, batchSize, parallelism, debug);
+            LOGGER.info("Submitted job: {}", job);
 
             stringBuilder.append(", \"id\": \"" + job.getId() + "\"");
             stringBuilder.append(", \"name\": \"" + job.getName() + "\"");
@@ -244,6 +245,7 @@ public class MyRestController {
             stringBuilder.append(", \"name\": \"\"");
             stringBuilder.append(", \"error\": " + true + "");
             stringBuilder.append(", \"error_message\": \"" + e.getMessage() + "\"");
+            LOGGER.info("cvaRun()", e);
         }
 
         stringBuilder.append(" }");

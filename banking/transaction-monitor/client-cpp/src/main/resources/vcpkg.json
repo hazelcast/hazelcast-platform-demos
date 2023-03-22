@@ -1,0 +1,14 @@
+{
+  	"name": "@project.artifactId@",
+  	"version": "@project.version@",
+  	"builtin-baseline": "e249dfb528731136b66d5fab6c6e00be243cbbbc",
+    "dependencies": [ 
+		{
+			"name": "hazelcast-cpp-client",
+            "version>=": "5.2.0"
+		}
+    ],
+    "overrides": [
+        { "name": "hazelcast-cpp-client", "version": "5.2.0" }
+    ]    
+}
