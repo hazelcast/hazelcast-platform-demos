@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <chrono>
 #include <ctime>
+#include <fstream>
 #include <hazelcast/client/hazelcast_client.h>
 #include <iostream>
 #include <thread>
@@ -31,7 +32,7 @@ const char* viridianKeyPassword = "@my.viridian.cluster1.key.password@";
 
 const char* controlFile = "/tmp/control.file";
 std::string genericRecordMap = "__map-store.mysql_slf4j";
-const char* useViridianKey = "use.viridian";
+std::string useViridianKey = "use.viridian";
 const char* viridianCaFile = "/tmp/ca.pem";
 const char* viridianCertFile = "/tmp/cert.pem";
 const char* viridianKeyFile = "/tmp/key.pem";
@@ -45,7 +46,17 @@ char* get_time_iso8601() {
 }
 
 bool is_viridian() {
-	return false;
+	std::string targetForTrue = useViridianKey.append("=true");
+    std::ifstream file;
+    file.open(controlFile);
+    bool viridian = false;
+    std::string line;
+	while(getline(file, line)) {
+        if (line.compare(targetForTrue)==0) {
+    	    viridian = true;
+        }
+    }
+    return viridian;
 }
 
 hazelcast::client::hazelcast_client get_client(const char* kubernetes, bool viridian) {
@@ -75,11 +86,11 @@ hazelcast::client::hazelcast_client get_client(const char* kubernetes, bool viri
         	return viridianKeyPassword;
     	});
     	ctx.use_private_key_file(viridianKeyFile, boost::asio::ssl::context::pem);
-    	config.get_network_config().get_ssl_config().set_context(std::move(ctx));
+    	client_config.get_network_config().get_ssl_config().set_context(std::move(ctx));
 
 		//FIXME Required until 5.3.0?
-		std::cout << "TODO: Remove " << hazelcast::client::client_properties::CLOUD_URL_BASE << std::cout;
-		config.set_property(hazelcast::client::client_properties::CLOUD_URL_BASE, "api.viridian.hazelcast.com");
+		std::cout << "TODO: Remove " << hazelcast::client::client_properties::CLOUD_URL_BASE << std::endl;
+		client_config.set_property(hazelcast::client::client_properties::CLOUD_URL_BASE, "api.viridian.hazelcast.com");
 	} else {
 		client_config.set_cluster_name(clusterName);
 
