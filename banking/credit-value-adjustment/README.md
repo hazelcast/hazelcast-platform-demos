@@ -4,13 +4,14 @@
 
 This example is "_straight-through processing_" of Risk, and uses commercial Hazelcast features.
 
-You will need a Jet Enterprise license.
+You will need a Enterprise license.
 
-Register [here](https://hazelcast.com/contact/) to request the evaluation license keys you
-need, and put them in your `settings.xml` file as described in [Repository top-level README.md](../../README.md).
+Follow the instructions into the [Repository top-level README.md](../../README.md) to obtain
+a license key and place it in the correct location for a Maven build to find it.
+
 Be sure to mention this is for Credit Value Adjustment so you get a license with the correct capabilities.
 
-## 3 billion intermediate results!
+## Billions of intermediate results!
 
 *NOTE* By default the Jet job in this example will invoke 3,000,000,000 pricing calculations from C++.
 
@@ -18,7 +19,7 @@ Make sure you have sufficient hardware if you're going to run the full volume.
 
 ## Description
 
-This section is a very brief overview of Credit Value Adjustment, and the architecture for running high-speed "Risk" calculations. For more details, refer to <a href="_blank">TODO Link to website goes here once ready TODO</a>.
+This section is a very brief overview of Credit Value Adjustment, and the architecture for running high-speed "Risk" calculations.
 
 ### Credit Value Adjustment (CVA)
 
@@ -74,18 +75,56 @@ perhaps as much as an hour. To be successful, you will need to ensure your Docke
 capacity. Changing from the default 2GB to 8GB of memory and restarting the Docker daemon has been seen
 to be necessary.
 
+## Running
+
+There are two ways to run the example.
+
+Firstly, where you manage everything yourself - the Hazelcast servers, C++ pricers, etc.
+If you do it this way, there should be two Hazelcast clusters, connected by WAN replication.
+
+Secondly, where data is hosted in Hazelcast Viridian, but C++ pricing is still elsewhere.
+For simplicity, this uses only a single Hazelcast cluster, the one provided by the Viridian.
+
+Clusters on Viridian can be linked for WAN replication, so you can add WAN to this yourself
+easily.
+
+### Running on Viridian
+
+If the build property `use.viridian` is _true_, the build will be configured for Viridian.
+
+This requires the `cva-custom-classes-*-jar-with-dependencies.jar` file to be uploaded to
+Viridian and then all the clients will connect as before.
+
+You don't then need to create Hazelcast clusters as Viridian will be used instead.
+
 ## Modules
 
 This example creates two Hazelcast clusters, named "*site1*" and "*site2*" to demonstrate WAN replication
 between sites for Disaster Recovery and other failovers. It is not necessary to run both to run the calculations.
 
-### 1. `common`
+### 1. `protobuf`
 
-The main item of interest in the `common` module is `src/main/proto/JetToCpp.proto`.
+This module uses Protobuf to generate Java code for the gRPC calls.
 
-This is a Protobuf3 definition of the gRPC communications between Jet and C++.
+The main item of interest in this module is `src/main3yy/proto/JetToCpp.proto`.
 
-### 2. `cva-cpp`
+This is a Protobuf3 definition of the gRPC communications be1tween Jet and C++.
+
+### 2. `custom-classes`
+
+This module is used to upload to Viridian, when running from Viridian.
+
+### 3. `common`
+
+This module holds items that are shared between client-side and server-side.
+
+It is separate to `custom-classes` is it includes extra modules that are needed to run
+without Viridian, that are provided by Viridian.
+
+For example, logging classes. Viridian has these, so we don't include them in `custom-classes`
+to upload. But we will need logging classes if running elsewhere, hence this `common` module.
+
+### 4. `cva-cpp`
 
 This module contains the C++ code that executes the pricing.
 
@@ -97,7 +136,7 @@ to price. One output is given for each input.
 For normal gRPC use, this module would be accessed via  load balancer.
 It is only available as a Docker image, as it is based on a customerized Ubuntu image.
 
-### 3. `abstract-hazelcast-node`
+### 5. `abstract-hazelcast-node`
 
 This module contains code common the Hazelcast sewrvers in cluster "*site1*" and "*site2*".
 It will set up some configuration based on whether it deduces it is running Kubernetes or outside.
@@ -109,18 +148,18 @@ In a Kubernetes environment, WAN replication will be enabled via the custom code
 the `MyLocalWANDiscoveryStrategy.java` file. This will probe the Kubernetes DNS server and
 determine if another cluster is running, and initiate a WAN connection to it.
 
-### 4. `hazelcast-node-site1`
+### 6. `hazelcast-node-site1`
 
 This module is the Hazelcast server for "*site1*".
 
 It is built pre-set as "*site1*" rather than parameterised to demonstrate one build mechanism. The `webapp`
 module demonstrates the alternative approach using parameterisation.
 
-### 5. `hazelcast-node-site2`
+### 7. `hazelcast-node-site2`
 
 This module is the Hazelcast server for "*site2*". 
 
-### 6. `jet-jobs`
+### 8. `jet-jobs`
 
 The Jet processing jobs for the CVA application are defined in their own module.
 
@@ -141,12 +180,12 @@ It has 4 parameters:
     to maps with the naming prefix "debug_". These are sink stages, not inserted into the main pipeline
     log as intermediate stages.
 
-### 7. `abstract-hazelcast-client`
+### 9. `abstract-hazelcast-client`
 
 This module is the common code for clients of the Hazelcast grids, and mainly just sets up the
 configuration for connectivity.
 
-### 8. `data-loader`
+### 10. `data-loader`
 
 The `data-loader` is a Hazelcast client that connects to a Hazelcast cluster,
 reads the JSON data in its `src/main/resources` folder and inserts this data
@@ -160,7 +199,7 @@ are loaded.
 
 The second parameter is the cluster to connect to, "*site1*" or "*site2*".
 
-### 9. `management-center`
+### 11. `management-center`
 
 This module extends the Management Center's existing Docker image with preset
 configuration to make it simpler to connect to this application's Hazelcast
@@ -174,12 +213,12 @@ on "*localhost:6701*".
 The build for this module pre-configures the license and the logon/password
 for you. See [management-center/README.md](./management-center/README.md).
 
-### 10. `grafana`
+### 12. `grafana`
 
 This module creates a Grafana image for Docker, with a special statistics panel
 for the CVA application imported.
 
-### 11. `webapp`
+### 13. `webapp`
 
 This module is a web front-end, the main user-experience for the CVA application.
 Note CVA is compute heavy, so not particularly visual or interactive.
@@ -205,7 +244,7 @@ Across the bottle is a table showing the Jet jobs that have run or are running,
 and their status. For CVA jobs that have completed successfully, a download link
 enables you to get the results as a CSV file or Excel spreadsheet.
 
-### 12. `prometheus`
+### 14. `prometheus`
 
 This module creates a Prometheus image for Docker, pre-configured to connect
 to the Management Center in Kubernetes environments only.
@@ -224,6 +263,7 @@ These should be started first.
  These should be started second.
  Run as many of each as you want. If you don't wish to use WAN, one cluster is enough,
 and *WAN* is only available in Kubernetes.
+ Omit these if using Viridian instead.
 
 * *data-loader*, *prometheus*, *management-center* &amp; *webapp* -
  These should be started last.
@@ -303,11 +343,11 @@ So if your IP 192.168.1.2, the connection for "_site1_" is "_192.168.1.2:5701_",
 connection for "_site2_" is "_192.168.1.2:6701_".
 
 *Note* the password in pre-configured Management Center is different from pre-configured Grafana,
-as Management Center has stricter rules for allowable passwords. However, neither are production
+as Management Center has stricter rules for allowable pas:swords. However, neither are production
 strength, and you shouldn't put them on public Github repositories either. This is just an
 example, not a practice to copy.
 
-## Running -- Kubernetes
+## Running -- Kubernetes (and Viridian)
 
 Kubernetes is slightly more complicated, as it is a full enterprise-grade product. However, the steps
 are much the same.
@@ -340,7 +380,7 @@ First, Grafana and Prometheus together and also C++, independent of the first tw
 kubectl create -f kubernetes-grafana-prometheus.yaml -f kubernetes-cpp.yaml
 ```
 
-Second, the two Hazelcast clusters.
+Second, the two Hazelcast clusters if not using Viridian.
 
 ```
 kubectl create -f kubernetes-hazelcast-node-site1.yaml -f kubernetes-hazelcast-node-site2.yaml

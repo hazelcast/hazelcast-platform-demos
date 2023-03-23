@@ -233,7 +233,7 @@ public class MyRestController {
         try {
             LocalDate calcDate = LocalDate.parse(calcDateStr);
             Job job = CvaStpJobSubmitter.submitCvaStpJob(this.hazelcastInstance,
-                    calcDate, batchSize, parallelism, debug);
+                    calcDate, batchSize, parallelism, debug, this.myProperties.isUseViridian());
             LOGGER.info("Submitted job: {}", job);
 
             stringBuilder.append(", \"id\": \"" + job.getId() + "\"");
