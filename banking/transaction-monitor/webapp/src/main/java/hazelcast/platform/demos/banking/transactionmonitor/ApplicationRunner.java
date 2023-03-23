@@ -71,6 +71,7 @@ public class ApplicationRunner {
     private final TransactionMonitorFlavor transactionMonitorFlavor;
     private final String moduleName;
     private final boolean localhost;
+    private final boolean useViridian;
     private IMap<String, Tuple3<Long, Long, Integer>> aggregateQueryResultsMap;
     private IMap<String, BicInfo> bicsMap;
     private IMap<String, ProductInfo> productsMap;
@@ -83,13 +84,15 @@ public class ApplicationRunner {
      * </p>
      */
     @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Hazelcast instance must be shared, not cloned")
-    public ApplicationRunner(HazelcastInstance arg0, TransactionMonitorFlavor arg1, String arg2) throws Exception {
+    public ApplicationRunner(HazelcastInstance arg0, TransactionMonitorFlavor arg1, String arg2,
+            boolean arg3) throws Exception {
         this.hazelcastInstance = arg0;
         this.transactionMonitorFlavor = arg1;
         this.moduleName = arg2;
         // If specifically indicated as localhost, don't do some steps
         this.localhost =
            System.getProperty("my.docker.enabled", "").equalsIgnoreCase("false");
+        this.useViridian = arg3;
     }
 
     /**
@@ -133,7 +136,7 @@ public class ApplicationRunner {
             PNCounter updateCounter = this.hazelcastInstance.getPNCounter(MyConstants.PN_UPDATER);
             if (updateCounter.get() == 0L) {
                 PerspectiveUpdater perspectiveUpdater
-                    = new PerspectiveUpdater(transactionMonitorFlavor);
+                    = new PerspectiveUpdater(transactionMonitorFlavor, this.useViridian);
                 this.hazelcastInstance.getExecutorService("default").execute(perspectiveUpdater);
                 updateCounter.incrementAndGet();
                 LOGGER.info("Launch '{}'", perspectiveUpdater.getClass());

@@ -61,18 +61,34 @@ public class PostgresCDC {
      * and save to a single map in Hazelcast.
      * </p>
      */
+    @SuppressWarnings({"checkstyle:ParameterNumber"})
     public static Pipeline buildPipeline(String address, String database, String schema,
-            String user, String password, String clusterName, String mapName, String ourProvenanceProject)
+            String user, String password, String clusterName, String mapName, String ourProvenanceProject,
+            boolean useViridian)
                     throws Exception {
+        LOGGER.info("address={}", address);
+        LOGGER.info("database='{}'", database);
+        LOGGER.info("schema='{}'", schema);
+        LOGGER.info("user='{}'", user);
+        LOGGER.info("password.length()={}", password.length());
+        LOGGER.info("clusterName='{}'", clusterName);
+        if (clusterName.contains("-") || clusterName.contains("_")) {
+            // Postgres doesn't like these
+            clusterName = clusterName.replaceAll("-", "").replaceAll("_", "");
+            LOGGER.info("clusterName=>'{}'", clusterName);
+        }
+        LOGGER.info("mapName='{}'", mapName);
+        LOGGER.info("ourProvenanceProject='{}'", ourProvenanceProject);
+        LOGGER.info("useViridian={}", useViridian);
 
         Pipeline pipeline = Pipeline.create();
 
         StreamSource<ChangeRecord> postgresCdc = PostgresCDC.postgresCdc(address,
-                database, schema, MyConstants.POSTGRES_TABLE_NAME, user, password, clusterName);
+                database, schema, MyConstants.POSTGRES_TABLE_NAME, user, password, clusterName, useViridian);
 
         pipeline
         .readFrom(postgresCdc).withoutTimestamps()
-        .map(PostgresCDC.filterAndFormat(ourProvenanceProject))
+        .map(PostgresCDC.filterAndFormat(ourProvenanceProject, useViridian))
         .writeTo(Sinks.map(mapName));
 
         return pipeline;
@@ -89,10 +105,11 @@ public class PostgresCDC {
      * @param user
      * @param password
      * @param clusterName
+     * @param useViridian
      * @return
      */
     public static StreamSource<ChangeRecord> postgresCdc(String address, String database,
-            String schema, String table, String user, String password, String clusterName) {
+            String schema, String table, String user, String password, String clusterName, boolean useViridian) {
 
         int port = POSTGRES_PORT;
         int colon = address.indexOf(":");
@@ -102,7 +119,9 @@ public class PostgresCDC {
         }
 
         String whitelist = schema + "." + table;
-        LOGGER.info("Database: '{}', whitelisting: '{}'", database, whitelist);
+        if (!useViridian) {
+            LOGGER.info("Database: '{}', whitelisting: '{}'", database, whitelist);
+        }
 
         return PostgresCdcSources.postgres("postgres-cdc-from-database:" + database)
                 .setDatabaseAddress(address)
@@ -125,10 +144,12 @@ public class PostgresCDC {
      * </p>
      *
      * @param ourProvenanceProject "{@code transaction-monitor}"
+     * @param useViridian
      * @return
      */
+    @SuppressWarnings({"checkstyle:MethodLength", "checkstyle:CyclomaticComplexity"})
     public static FunctionEx<ChangeRecord, Tuple2<Long, HazelcastJsonValue>>
-        filterAndFormat(String ourProvenanceProject) {
+        filterAndFormat(String ourProvenanceProject, boolean useViridian) {
         return changeRecord -> {
             try {
                 Map<String, Object> keyFields = changeRecord.key().toMap();
@@ -136,7 +157,9 @@ public class PostgresCDC {
 
                 Long key;
                 if (keyFields.size() != 1) {
-                    LOGGER.error("Composite key unexpected, {}", keyFields.keySet());
+                    if (!useViridian) {
+                        LOGGER.error("Composite key unexpected, {}", keyFields.keySet());
+                    }
                     return null;
                 } else {
                     // getKey() should be "now"
@@ -147,7 +170,9 @@ public class PostgresCDC {
                         if (keyObject instanceof Long) {
                             key = (Long) keyObject;
                         } else {
-                            LOGGER.error("Key class unexpected, {}", keyObject.getClass().getCanonicalName());
+                            if (!useViridian) {
+                                LOGGER.error("Key class unexpected, {}", keyObject.getClass().getCanonicalName());
+                            }
                             return null;
                         }
                     }
@@ -158,7 +183,9 @@ public class PostgresCDC {
                 Object whence = valueFields.get("whence");
                 Object volume = valueFields.get("volume");
                 if (code == null || provenance == null || whence == null || volume == null) {
-                    LOGGER.error("Value fields incomplete, {}", valueFields.keySet());
+                    if (!useViridian) {
+                        LOGGER.error("Value fields incomplete, {}", valueFields.keySet());
+                    }
                     return null;
                 }
 
@@ -178,14 +205,20 @@ public class PostgresCDC {
                      * test data loaded by MapLoader or writes by Jet which
                      * we don't wish to re-read.
                      */
-                    LOGGER.info("Skip re-read of own write ('{}'): {}", provenance, tuple2);
+                    if (!useViridian) {
+                        LOGGER.info("Skip re-read of own write ('{}'): {}", provenance, tuple2);
+                    }
                     return null;
                 } else {
-                    LOGGER.info("Save: {}", tuple2);
+                    if (!useViridian) {
+                        LOGGER.info("Save: {}", tuple2);
+                    }
                     return tuple2;
                 }
             } catch (Exception e) {
-                LOGGER.error("Failed to process: " + changeRecord, e);
+                if (!useViridian) {
+                    LOGGER.error("Failed to process: " + changeRecord, e);
+                }
                 return null;
             }
         };

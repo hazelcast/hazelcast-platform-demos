@@ -48,12 +48,14 @@ public class PerspectiveUpdater implements Runnable, Serializable, HazelcastInst
     private static final Random RANDOM = new Random();
 
     private final TransactionMonitorFlavor transactionMonitorFlavor;
+    private final boolean useViridian;
     private transient HazelcastInstance hazelcastInstance;
     private int binaryLoggingInterval = 1;
     private int count;
 
-    PerspectiveUpdater(TransactionMonitorFlavor arg0) {
+    PerspectiveUpdater(TransactionMonitorFlavor arg0, boolean arg1) {
         this.transactionMonitorFlavor = arg0;
+        this.useViridian = arg1;
     }
     /**
      * <p>Randomly update data for FINOS Perspective periodically.
@@ -61,7 +63,9 @@ public class PerspectiveUpdater implements Runnable, Serializable, HazelcastInst
      */
     @Override
     public void run() {
-        LOGGER.info("START run()");
+        if (!useViridian) {
+            LOGGER.info("START run()");
+        }
         ThreadLocalRandom random = ThreadLocalRandom.current();
 
         String[] selectedKeys = this.getSelectedKeys();
@@ -74,7 +78,9 @@ public class PerspectiveUpdater implements Runnable, Serializable, HazelcastInst
         // Init
         for (int i = 0; i < selectedKeys.length; i++) {
             Object object = this.etl(selectedKeys[i], sourceMap, targetMap);
-            this.logExponentially(object);
+            if (!useViridian) {
+                this.logExponentially(object);
+            }
         }
 
         // Randomly update
@@ -89,11 +95,15 @@ public class PerspectiveUpdater implements Runnable, Serializable, HazelcastInst
             } catch (InterruptedException e) {
                 break;
             } catch (Exception e) {
-                LOGGER.info("EXCEPTION run()", e);
+                if (!useViridian) {
+                    LOGGER.info("EXCEPTION run()", e);
+                }
                 break;
             }
         }
-        LOGGER.info("END run()");
+        if (!useViridian) {
+            LOGGER.info("END run()");
+        }
     }
 
     /**

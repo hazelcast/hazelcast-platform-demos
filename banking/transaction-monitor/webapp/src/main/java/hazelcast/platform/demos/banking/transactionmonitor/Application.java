@@ -36,6 +36,7 @@ public class Application {
     private static final int DEFAULT_PORT = 8080;
 
     private static int port;
+    private static boolean useViridian;
 
     /**
      * <p>Configure Hazelcast logging via Slf4j. Implementation
@@ -69,10 +70,12 @@ public class Application {
         String propertyName2 = MyConstants.PROJECT_MODULE;
         String propertyName3 = MyConstants.PULSAR_CONFIG_KEY;
         String propertyName4 = MyConstants.POSTGRES_CONFIG_KEY;
+        String propertyName5 = MyConstants.USE_VIRIDIAN;
         String bootstrapServers = System.getProperty(propertyName1, "");
         String moduleName = applicationProperties.getProperty(propertyName2, "");
         String pulsarList = System.getProperty(propertyName3, "");
         String postgresAddress = System.getProperty(propertyName4, "");
+        String useViridianStr = applicationProperties.getProperty(propertyName5, "");
         TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(applicationProperties);
 
         if (bootstrapServers.isBlank()) {
@@ -91,6 +94,12 @@ public class Application {
             LOGGER.error("No value for " + propertyName4);
             System.exit(1);
         }
+        if (useViridianStr.isBlank()) {
+            LOGGER.error("No value for " + propertyName5);
+            System.exit(1);
+        } else {
+            useViridian = Boolean.parseBoolean(useViridianStr);
+        }
         LOGGER.info("'bootstrapServers'=='{}'", bootstrapServers);
         LOGGER.info("'moduleName'=='{}'", moduleName);
         LOGGER.info("'pulsarList'=='{}'", pulsarList);
@@ -102,7 +111,7 @@ public class Application {
         HazelcastInstance hazelcastInstance = HazelcastClient.newHazelcastClient(clientConfig);
 
         try {
-            new ApplicationRunner(hazelcastInstance, transactionMonitorFlavor, moduleName).run();
+            new ApplicationRunner(hazelcastInstance, transactionMonitorFlavor, moduleName, useViridian).run();
         } catch (Exception e) {
             LOGGER.error("main()", e);
         }

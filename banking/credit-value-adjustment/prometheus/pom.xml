@@ -14,6 +14,7 @@
         <description>Credit Value Adjustment - Prometheus</description>
 
 	<properties>
+                <dockerfile.skip>${skip.when.viridian}</dockerfile.skip>
 		<my.docker.image.name>prometheus</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>

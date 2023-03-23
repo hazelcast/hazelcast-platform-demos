@@ -719,10 +719,11 @@ aggregate, so the format is the same as for `trade-producer` log and the `Ingest
 
 ## Running -- Hazelcast Viridian
 
-Create a Hazelcast Cloud cluster if you don't have one.
+Create a Hazelcast Viridian cluster if you don't have one.
 
-Follow the instructions in [here](../../README.md) to obtain cloud credentials, save them to your `settings.xml`
-and compile.
+Follow the instructions in [here](../../README.md) to obtain cloud credentials, save them to your `settings.xml`.
+
+Ensure the flag `use.viridian` in the top level _pom.xml_ file is set to "*true*".
 
 ## Summary
 

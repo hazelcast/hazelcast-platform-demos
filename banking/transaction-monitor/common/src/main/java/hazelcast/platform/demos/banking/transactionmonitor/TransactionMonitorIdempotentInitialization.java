@@ -1140,7 +1140,7 @@ public class TransactionMonitorIdempotentInitialization {
         if (ok) {
             // Feed changes from Postgres directly into Hazelcast
             ok &= launchPostgresCDC(hazelcastInstance, postgresProperties,
-                    Objects.toString(properties.get(MyConstants.PROJECT_PROVENANCE)));
+                    Objects.toString(properties.get(MyConstants.PROJECT_PROVENANCE)), useViridian);
         }
 
         // Optional
@@ -1414,7 +1414,7 @@ public class TransactionMonitorIdempotentInitialization {
      * @param properties
      */
     private static boolean launchPostgresCDC(HazelcastInstance hazelcastInstance,
-            Properties properties, String ourProjectProvenance) {
+            Properties properties, String ourProjectProvenance, boolean useViridian) {
 
         try {
             Pipeline pipelinePostgresCDC = PostgresCDC.buildPipeline(
@@ -1425,7 +1425,8 @@ public class TransactionMonitorIdempotentInitialization {
                     Objects.toString(properties.get(MyConstants.POSTGRES_PASSWORD)),
                     hazelcastInstance.getConfig().getClusterName(),
                     MyConstants.IMAP_NAME_ALERTS_LOG,
-                    ourProjectProvenance
+                    ourProjectProvenance,
+                    useViridian
                     );
 
             JobConfig jobConfigPostgresCDC = new JobConfig();
