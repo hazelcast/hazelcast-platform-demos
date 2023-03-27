@@ -10,7 +10,7 @@ kubernetes-3-kafka-secondhalf.yaml
 kubernetes-4-kafdrop-topic-rdbms.yaml
 kubernetes-5-optional-hazelcast-enterprise.yaml
 kubernetes-5-optional-hazelcast.yaml
-kubernetes-6-webapp-and-monitoring.yaml
+kubernetes-6-webapp.yaml
 kubernetes-7-transaction-producer.yaml
 kubernetes-8-polyglot-clients.yaml
 ```
@@ -39,7 +39,7 @@ Do one of 5.A, 5.B or 5.C.
 
 ### 5.A `kubernetes-5-optional-hazelcast-enterprise.yaml`
 
-Create Enterprise Hazelcast clusters for transaction storage.
+Create Enterprise Hazelcast clusters for transaction storage, and Grafana/Prometheus for charting.
 
 Use `kubectl exec --stdin --tty transaction-monitor-ecommerce-grid1-hazelcast-0 -- /bin/bash` to connect to see tiered store
 directory "/data/transaction-monitor".
@@ -52,9 +52,9 @@ Create open source Hazelcast cluster for transaction storage.
 
 Use an existing Viridian cluster, so don't run any YAML for step 5.
 
-### 6=. `kubernetes-6-webapp-and-monitoring.yaml`
+### 6=. `kubernetes-6-webapp.yaml`
 
-YAML to create WebApp connecting to Hazelcast Cloud, and Grafana/Prometheus for charting.
+YAML to create WebApp connecting to Hazelcast Cloud.
 
 Can be run before or after `kubernetes-7-transaction-producer.yaml`. Before would be usual, but there is no dependency
 between these two.

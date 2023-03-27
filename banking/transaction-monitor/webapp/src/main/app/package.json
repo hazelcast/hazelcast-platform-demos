@@ -6,16 +6,16 @@
     "detect-browser-language": "^0.0.2",
     "immutability-helper": "^3.1.1",
     "prop-types": "^15.8.1",
-    "react": "^16.14.0",
-    "react-collapsible": "^2.8.4",
-    "react-dom": "^16.14.0",
-    "react-router": "^5.0.1",
+    "react": "^18.2.0",
+    "react-collapsible": "^2.10.0",
+    "react-dom": "^18.2.0",
+    "react-router": "^6.9.0",
     "react-router-dom": "^5.0.1",
     "react-scripts": "^3.4.4",
-    "react-table": "^6.11.0",
+    "react-table": "^7.8.0",
     "react-websocket": "^2.1.0",
     "rest": "^2.0.0",
-    "styled-components": "^5.3.3"
+    "styled-components": "^5.3.9"
   },
   "scripts": {
     "start": "react-scripts start",

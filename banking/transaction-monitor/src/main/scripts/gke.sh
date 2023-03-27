@@ -1,6 +1,8 @@
 #!/bin/bash
 
 ARG1=`echo $1 | awk '{print tolower($0)}'`
+ARG2=`echo $2 | awk '{print tolower($0)}'`
+
 if [ "${ARG1}" == "ecommerce" ]
 then
  FLAVOR=ecommerce
@@ -16,8 +18,17 @@ fi
 
 if [ "${FLAVOR}" == "" ]
 then
- echo $0: usage: `basename $0` '<flavor>'
+ echo $0: usage: `basename $0` '<flavor>' '<viridian>'
+ echo $0: eg: `basename $0` ecommerce true
  exit 1
+fi
+
+# False if absent
+if [ "${ARG2}" == "true" ]
+then
+ USE_VIRIDIAN=true
+else
+ USE_VIRIDIAN=false
 fi
 
 echo ============================================================
@@ -25,6 +36,7 @@ echo Attempts to do all steps for Google Cloud
 echo ============================================================
 echo `date +"%H:%M:%S"`
 echo Flavor: $FLAVOR
+echo Use-Viridian: $USE_VIRIDIAN
 echo ----
 
 PROJECT=transaction-monitor
@@ -144,7 +156,14 @@ do_cmd() {
 }
 
 # Apply the files in order
-ls kubernetes* | grep -v kubernetes-5-optional-hazelcast.yaml | while read -r INPUT_FILE
+if [ "$USE_VIRIDIAN" == "true" ]
+then
+ FILES=`ls kubernetes* | grep -v kubernetes-5`
+else
+ FILES=`ls kubernetes* | grep -v kubernetes-5-optional-hazelcast.yaml`
+fi
+
+for INPUT_FILE in $FILES
 do
  echo START: $INPUT_FILE
  echo ====

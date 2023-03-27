@@ -2,8 +2,6 @@
 # Service DNS for Webapp will be "transaction-monitor-FLAVOR-webapp.default.svc.cluster.local".
 # Service DNS for FINOS Node.js will be "transaction-monitor-FLAVOR-finos-nodejs.default.svc.cluster.local".
 # Service DNS for FINOS Python will be "transaction-monitor-FLAVOR-finos-python.default.svc.cluster.local".
-# Service DNS for Prometheus will be "transaction-monitor-FLAVOR-prometheus.default.svc.cluster.local".
-# Service DNS for Grafana will be "transaction-monitor-FLAVOR-grafana.default.svc.cluster.local".
 ---
 # Webapp
 ---
@@ -162,74 +160,4 @@ spec:
 #          configMap:
 #            name: transaction-monitor-FLAVOR-configmap
 #            defaultMode: 0755
----
-# Service for Prometheus
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: transaction-monitor-FLAVOR-prometheus
-spec:
-  selector:
-    app: transaction-monitor-FLAVOR-prometheus
-  ports:
-    - name: prometheus
-      port: 9090
-      targetPort: 9090
-  type: LoadBalancer
----
-# Pods for Prometheus, only need one
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: transaction-monitor-FLAVOR-prometheus
-spec:
-  selector:
-    matchLabels:
-      app: transaction-monitor-FLAVOR-prometheus
-  template:
-    metadata:
-      labels:
-        app: transaction-monitor-FLAVOR-prometheus
-    spec:
-      containers:
-        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-prometheus"
-          imagePullPolicy: Never
-          name: transaction-monitor-FLAVOR-prometheus-container
----
-# Service for Grafana
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: transaction-monitor-FLAVOR-grafana
-spec:
-  selector:
-    app: transaction-monitor-FLAVOR-grafana
-  ports:
-    - name: grafana
-      port: 80
-      targetPort: 3000
-  type: LoadBalancer
----
-# Pods for Grafana, only need one
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: transaction-monitor-FLAVOR-grafana
-spec:
-  selector:
-    matchLabels:
-      app: transaction-monitor-FLAVOR-grafana
-  template:
-    metadata:
-      labels:
-        app: transaction-monitor-FLAVOR-grafana
-    spec:
-      containers:
-        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-grafana"
-          imagePullPolicy: Never
-          name: transaction-monitor-FLAVOR-grafana-container
 ---

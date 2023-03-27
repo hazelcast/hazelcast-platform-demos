@@ -519,7 +519,7 @@ If you have multiple network cards on your host machine the scripts won't be abl
 3. [kubernetes-3-kafka-secondhalf.yaml](./src/main/scripts/kubernetes-3-kafka-secondhalf.yaml)
 4. [kubernetes-4-kafdrop-topic-rdbms.yaml](./src/main/scripts/kubernetes-4-kafdrop-topic-rdbms.yaml)
 5. [kubernetes-5-optional-hazelcast.yaml](./src/main/scripts/kubernetes-5-optional-hazelcast.yaml)
-6. [kubernetes-6-webapp-and-monitoring.yaml](./src/main/scripts/kubernetes-6-webapp-and-monitoring.yaml)
+6. [kubernetes-6-webapp.yaml](./src/main/scripts/kubernetes-6-webapp.yaml)
 7. [kubernetes-7-trade-producer.yaml](./src/main/scripts/kubernetes-7-trade-producer.yaml)
 8. [kubernetes-8-polyglot-clients.yaml](./src/main/scriptes/kubernetes-8-polyglot-clients.yaml)
 

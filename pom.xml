@@ -38,6 +38,7 @@
 		<spotbugs.skip>true</spotbugs.skip>
 		<!-- Configure the build for HZ Viridian or all Kubernetes -->
 		<use.viridian>true</use.viridian>
+		<use.viridian>false</use.viridian>
 
 		<!-- Variations for the Transaction Monitor, TransactionMonitorFlavor.java ENUM -->
 		<!-- "ecommerce" is last, hence is the value used, as most generally applicable -->
@@ -71,15 +72,16 @@
 		<javax-validation.version>2.0.1.Final</javax-validation.version>
 		<guava.version>29.0-jre</guava.version>
 		<!-- See also banking/credit-value-adjustment/cpp/Dockerfile -->
-		<grpc.version>1.52.1</grpc.version>
+		<!-- Same as version using in Hazelcast https://github.com/hazelcast/hazelcast/blob/master/pom.xml#L99 -->
+		<grpc.version>1.48.0</grpc.version>
 		<hazelcast.version>5.3.0-SNAPSHOT</hazelcast.version>
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
 		<hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
 		<jackson.version>2.12.4</jackson.version>
-		<json.version>20220320</json.version>
-		<json-smart.version>2.4.8</json-smart.version>
-		<junit-jupiter.version>5.7.2</junit-jupiter.version>
-		<junit-vintage.version>5.7.2</junit-vintage.version>
+		<json.version>20230227</json.version>
+		<json-smart.version>2.4.9</json-smart.version>
+		<junit-jupiter.version>5.9.2</junit-jupiter.version>
+		<junit-vintage.version>5.9.2</junit-vintage.version>
 		<jython.version>2.7.2</jython.version>
 		<kafka-connect.version>2.6.0</kafka-connect.version>
 		<mongo-java-driver.version>3.12.8</mongo-java-driver.version>
@@ -92,7 +94,7 @@
 		<pulsar.version>2.8.0</pulsar.version>
 		<spotbugs-annotations.version>4.7.3</spotbugs-annotations.version>
 		<springdoc.version>2.0.0</springdoc.version>
-		<spring-boot.version>3.0.4</spring-boot.version>
+		<spring-boot.version>3.0.5</spring-boot.version>
 		<spring-cloud.version>2021.0.0</spring-cloud.version>
 		<spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
 		<zipkin.version>2.23.3-SNAPSHOT</zipkin.version>
@@ -110,18 +112,18 @@
 		<maven-checkstyle-plugin.version>3.1.0</maven-checkstyle-plugin.version>
 		<maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-		<maven-failsafe-plugin.version>3.0.0-M9</maven-failsafe-plugin.version>
+		<maven-failsafe-plugin.version>3.0.0</maven-failsafe-plugin.version>
 		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
 		<maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
 		<maven-shade-plugin.version>3.4.1</maven-shade-plugin.version>
-		<maven-surefire-plugin.version>3.0.0-M9</maven-surefire-plugin.version>
+		<maven-surefire-plugin.version>3.0.0</maven-surefire-plugin.version>
 		<os-maven-plugin.version>1.6.2</os-maven-plugin.version>
 		<protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
 		<spotbugs-maven-plugin.version>4.7.3.0</spotbugs-maven-plugin.version>
 
 		<!-- Javascript -->
-		<node.version>v19.7.0</node.version>
-		<npm.version>9.5.1</npm.version>
+		<node.version>v19.8.1</node.version>
+		<npm.version>9.6.2</npm.version>
 	</properties>
 
 	<dependencies>
