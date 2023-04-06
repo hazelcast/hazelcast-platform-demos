@@ -59,8 +59,10 @@
 		<module>kafka-broker</module>
 		<module>kafdrop</module>
 		<module>topic-create</module>
+		<!-- Remove until complete
 		<module>finos-nodejs</module>
 		<module>finos-python</module>
+		-->
 		<module>management-center</module>
 		<module>mysql</module>
 		<module>prometheus</module>

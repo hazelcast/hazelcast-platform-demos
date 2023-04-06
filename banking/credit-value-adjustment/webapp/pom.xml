@@ -70,26 +70,6 @@
 
 		<plugins>
 			<plugin>
-				<!-- Remove previous node builds if "mvn clean" -->
-				<artifactId>maven-clean-plugin</artifactId>
-				<configuration>
-					<filesets>
-						<fileset>
-							<directory>${frontend.app.dir}/node_modules</directory>
-							<includes>
-								<include>**</include>
-							</includes>
-						</fileset>
-						<fileset>
-							<directory>${frontend.app.dir}/static</directory>
-							<includes>
-								<include>**</include>
-							</includes>
-						</fileset>
-					</filesets>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
 				<configuration>

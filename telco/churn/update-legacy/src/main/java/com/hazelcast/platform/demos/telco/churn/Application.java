@@ -37,7 +37,7 @@ public class Application {
     static {
         Properties properties = new Properties();
         if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
-            properties.put("spring.data.cassandra.contact-points",
+            properties.put("spring.cassandra.contact-points",
                     "churn-cassandra.default.svc.cluster.local");
             properties.put("spring.data.mongodb.host",
                     "churn-mongo.default.svc.cluster.local");
@@ -45,7 +45,7 @@ public class Application {
                     "jdbc:mysql://churn-mysql.default.svc.cluster.local:3306/churn"
                     + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC");
         } else {
-            properties.put("spring.data.cassandra.contact-points", "cassandra");
+            properties.put("spring.cassandra.contact-points", "cassandra");
             properties.put("spring.data.mongodb.host", "mongo");
             properties.put("spring.datasource.url",
                     "jdbc:mysql://mysql:3306/churn"

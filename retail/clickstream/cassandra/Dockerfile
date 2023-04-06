@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 cassandra:3.11.4
+FROM --platform=linux/amd64 cassandra:4.1.1
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MY_OTHERUSER
@@ -15,5 +15,4 @@ COPY target/classes/cql  /cql
 COPY target/classes/custom-entrypoint.sh  /
 RUN chmod 755 /custom-entrypoint.sh
 ENTRYPOINT ["/custom-entrypoint.sh"]
-#CMD ["cassandra", "-f"] 
-
+#CMD ["cassandra", "-f"]

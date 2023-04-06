@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package FlumaionQL;
+
+message Curve {
+    string curvename = 1;
+    string index = 2;
+    int32 index_frequency = 3;
+    int64 index_frequency_type = 4;
+    string calendar = 5;
+    int32 bussiness_convention = 6;
+    string dcc = 7;
+    bool end_of_month_flag = 8;
+    int32 settlement_days = 9;
+    repeated int32 maturity_period_value = 10;
+    repeated int32 maturity_period_type = 11;
+    repeated float rates = 12;
+}

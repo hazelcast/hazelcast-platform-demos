@@ -38,7 +38,6 @@
 		<spotbugs.skip>true</spotbugs.skip>
 		<!-- Configure the build for HZ Viridian or all Kubernetes -->
 		<use.viridian>true</use.viridian>
-		<use.viridian>false</use.viridian>
 
 		<!-- Variations for the Transaction Monitor, TransactionMonitorFlavor.java ENUM -->
 		<!-- "ecommerce" is last, hence is the value used, as most generally applicable -->
@@ -64,13 +63,12 @@
 		<my.mc.cluster2.name>unset</my.mc.cluster2.name>
 		<my.mc.cluster2.addresslist>unset</my.mc.cluster2.addresslist>
 
-		<!-- Version dependencies - ${project.version} should track Hazelcast version -->
-		<cassandra-driver.version>3.5.0</cassandra-driver.version>
-		<debezium-connector-cassandra-4.version>2.1.2.Final</debezium-connector-cassandra-4.version>
+		<!-- Version dependencies -->
+		<cassandra-driver.version>4.15.0</cassandra-driver.version>
+		<debezium-connector-cassandra-4.version>2.1.3.Final</debezium-connector-cassandra-4.version>
 		<debezium-connector-mongodb.version>1.3.1.Final</debezium-connector-mongodb.version>
 		<javax-annotation.version>1.3.2</javax-annotation.version>
 		<javax-validation.version>2.0.1.Final</javax-validation.version>
-		<guava.version>29.0-jre</guava.version>
 		<!-- See also banking/credit-value-adjustment/cpp/Dockerfile -->
 		<!-- Same as version using in Hazelcast https://github.com/hazelcast/hazelcast/blob/master/pom.xml#L99 -->
 		<grpc.version>1.48.0</grpc.version>
@@ -90,7 +88,7 @@
 		<poi-ooxml.version>5.2.3</poi-ooxml.version>
 		<!-- Run same version with 'protoc - -grpc_out=. - -plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin' 
 			banking/credit-value-adjustment/common/src/main/proto/JetToCpp.proto -->
-		<protobuf.version>3.21.12</protobuf.version>
+		<protobuf.version>3.22.1</protobuf.version>
 		<pulsar.version>2.8.0</pulsar.version>
 		<spotbugs-annotations.version>4.7.3</spotbugs-annotations.version>
 		<springdoc.version>2.0.0</springdoc.version>
@@ -147,8 +145,8 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>com.datastax.cassandra</groupId>
-				<artifactId>cassandra-driver-core</artifactId>
+				<groupId>com.datastax.oss</groupId>
+				<artifactId>java-driver-core</artifactId>
 				<version>${cassandra-driver.version}</version>
 			</dependency>
 
@@ -158,11 +156,6 @@
 				<version>${jackson.version}</version>
 			</dependency>
 
-			<dependency>
-				<groupId>com.google.guava</groupId>
-				<artifactId>guava</artifactId>
-				<version>${guava.version}</version>
-			</dependency>
 			<dependency>
 				<groupId>com.google.protobuf</groupId>
 				<artifactId>protobuf-java</artifactId>

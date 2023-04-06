@@ -108,7 +108,7 @@ This module uses Protobuf to generate Java code for the gRPC calls.
 
 The main item of interest in this module is `src/main3yy/proto/JetToCpp.proto`.
 
-This is a Protobuf3 definition of the gRPC communications be1tween Jet and C++.
+This is a Protobuf3 definition of the gRPC communications between Jet and C++, for the Java side.
 
 ### 2. `custom-classes`
 
@@ -452,6 +452,18 @@ There will be a line for each of the 20 counterparties. The risk value derived w
 trades in the input, and may be zero if the counterparty has no trades or no credit risk (all debit values, we
 owe the counterparty). The calculation is deterministic, so repeating for the same input will give the same
 output.
+
+## Protobuf
+
+Protobuf is used between Java and C++, and the versions need to be compatible, ideally identical.
+
+The Java version is in the top-level `pom.xml` file:
+```
+<protobuf.version>3.22.1</protobuf.version>
+```
+
+If this changes, regenerate the C++ protobuf files.
+Use [this](./src/main/scripts/regenerate-cpp-protobuf.sh) script and then recompile C++.
 
 ## Summary
 

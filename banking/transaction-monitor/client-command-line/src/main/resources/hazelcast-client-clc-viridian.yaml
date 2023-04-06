@@ -1,6 +1,5 @@
 cluster:
   name: "@my.viridian.cluster1.id@"
-  # Instance name and labels go here - https://github.com/hazelcast/hazelcast-commandline-client/issues/185
   discovery-token: "@my.viridian.cluster1.discovery.token@"
 ssl:
   ca-path: "/tmp/ca.pem"

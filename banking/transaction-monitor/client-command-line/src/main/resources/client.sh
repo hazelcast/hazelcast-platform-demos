@@ -25,12 +25,15 @@ CLC_DIR=$1
 CONFIG_NON_VIRIDIAN=$2
 CONFIG_VIRIDIAN=$3
 
+export CLC_CLIENT_NAME='@project.artifactId@'
+export CLC_CLIENT_LABELS=`basename $HOME`","`date +"%Y-%m-%dT%H:%M:%S"`
+
 USER=`echo $HOME | cut -c2-`
 HOST_IP="${HOST_IP}"
 KUBERNETES="${MY_KUBERNETES_ENABLED}"
 
-CONTROL_FILE = "/tmp/control.file"
-USE_VIRIDIAN_KEY = "use.viridian"
+CONTROL_FILE="/tmp/control.file"
+USE_VIRIDIAN_KEY="use.viridian"
 VIRIDIAN=`grep "${USE_VIRIDIAN_KEY}" $CONTROL_FILE | tail -1 | cut -d= -f1 `
 if [ `echo "$VIRIDIAN" | tr '[:upper:]' '[:lower:]'` == "true" ]
 then 
