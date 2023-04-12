@@ -6,10 +6,6 @@
 # and for Docker compiles the version used by Ubuntu.
 #  You only need run this script if the version has to change.
 #######################################################################################
-# Localhost needs for this script:
-# Install https://github.com/protocolbuffers/protobuf.git including submodules
-# Install https://github.com/grpc/grpc.git including submodules
-#######################################################################################
 
 BASEDIR=`dirname $0`
 cd $BASEDIR
@@ -22,20 +18,34 @@ mkdir $TMPDIR
 
 cp ${PROJECT_BASE}/protobuf/src/main/proto/*.proto $TMPDIR
 cd $TMPDIR
-ls $TMPDIR
+#ls $TMPDIR
 
+# Protobuf
 PROTOS="curve.proto fixing.proto swap.proto exchange.proto mtms.proto"
 for PROTO in $PROTOS
 do
+   echo Processing: $PROTO
    FILE=`echo $PROTO | cut -d. -f1`
    protoc --cpp_out=. $PROTO
-   #perl -pi -e 's/#include "/#include "..\/include\//g' $filename.pb.cc
+   mv ${FILE}.pb.cc tmp
+   sed 's/#include "/#include "..\/include\//g' < tmp > ${FILE}.pb.cc
    cp ${FILE}.pb.h ${TARGET}/include
    cp ${FILE}.pb.cc ${TARGET}/src
+   rm ${FILE}.* tmp
 done
 
-echo protoc --grpc_out=. --plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin JetToCpp.proto
-echo cp JetToCpp.grpc.pb.cc ${TARGET}/src
-echo cp JetToCpp.grpc.pb.h ${TARGET}/include
+# GRPC
+PROTOS="JetToCpp.proto"
+for PROTO in $PROTOS
+do
+   echo Processing: $PROTO
+   FILE=`echo $PROTO | cut -d. -f1`
+   protoc --grpc_out=. --plugin=protoc-gen-grpc=${HOME}/git/grpc/cmake/build/grpc_cpp_plugin $PROTO
+   mv ${FILE}.grpc.pb.cc tmp
+   sed 's/#include "/#include "..\/include\//g' < tmp > ${FILE}.grpc.pb.cc
+   cp ${FILE}.grpc.pb.h ${TARGET}/include
+   cp ${FILE}.grpc.pb.cc ${TARGET}/src
+   rm ${FILE}.* tmp
+done
 
 /bin/rm -rf $TMPDIR

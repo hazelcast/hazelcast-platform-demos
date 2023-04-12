@@ -91,17 +91,17 @@ public class IMapLogger implements Logger {
                 .build();
                 */
         GenericRecord value = GenericRecordBuilder.compact(MyConstants.IMAP_NAME_MYSQL_SLF4J + ".value")
-                .setString(MyConstants.MYSQL_DATASTORE_TABLE_COLUMN0,
+                .setString(MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN0,
                         nullSafeTruncate(this.socketAddress, FORTY_EIGHT))
-                .setTimestamp(MyConstants.MYSQL_DATASTORE_TABLE_COLUMN1,
+                .setTimestamp(MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN1,
                         LocalDateTime.now())
-                .setString(MyConstants.MYSQL_DATASTORE_TABLE_COLUMN2,
+                .setString(MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN2,
                         nullSafeTruncate(arg0, EIGHT))
-                .setString(MyConstants.MYSQL_DATASTORE_TABLE_COLUMN3,
+                .setString(MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN3,
                         nullSafeTruncate(arg1, TWO_HUNDRED_AND_FIFTY_SIX))
-                .setString(MyConstants.MYSQL_DATASTORE_TABLE_COLUMN4,
+                .setString(MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN4,
                         nullSafeTruncate(Thread.currentThread().getName(), FORTY_EIGHT))
-                .setString(MyConstants.MYSQL_DATASTORE_TABLE_COLUMN5,
+                .setString(MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN5,
                         nullSafeTruncate(this.name, FORTY_EIGHT))
                 .build();
 

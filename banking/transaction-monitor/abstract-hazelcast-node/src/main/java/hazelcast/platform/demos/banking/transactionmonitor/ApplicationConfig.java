@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import com.hazelcast.config.ClasspathYamlConfig;
 import com.hazelcast.config.Config;
-import com.hazelcast.config.DataLinkConfig;
+import com.hazelcast.config.DataConnectionConfig;
 import com.hazelcast.config.DataPersistenceConfig;
 import com.hazelcast.config.DiscoveryConfig;
 import com.hazelcast.config.DiscoveryStrategyConfig;
@@ -340,15 +340,15 @@ public class ApplicationConfig {
             LOGGER.trace("MySql connection: User: '{}'", username);
             LOGGER.trace("MySql connection: Pass: '{}'", password);
 
-            DataLinkConfig dataLinkConfig =
-                    new DataLinkConfig(MyConstants.MYSQL_DATASTORE_CONFIG_NAME)
+            DataConnectionConfig dataConnectionConfig =
+                    new DataConnectionConfig(MyConstants.MYSQL_DATACONNECTION_CONFIG_NAME)
                     .setType("jdbc")
                     .setProperty("jdbcUrl", jdbcUrl)
                     .setProperty("username", username)
                     .setProperty("password", password)
                     .setShared(true);
 
-            config.addDataLinkConfig(dataLinkConfig);
+            config.addDataConnectionConfig(dataConnectionConfig);
 
         } catch (Exception e) {
             LOGGER.error("temporaryDefineDataLink()", e);

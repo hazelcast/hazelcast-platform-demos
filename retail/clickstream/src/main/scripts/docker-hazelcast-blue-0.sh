@@ -33,7 +33,10 @@ PORT=$(($CLONE + 5701))
 
 CMD="docker run \
  -e LOCAL_CLUSTER_NAME=blue \
+ -e LOCAL_NODE_NAME=${MODULE}$CLONE \
  -e MY_CASSANDRA_CONTACT_POINTS=${HOST_IP}:9042 \
+ -e MC_CLUSTER1_PORTLIST=5701 \
+ -e MC_CLUSTER2_PORTLIST=6701 \
  -e MY_KUBERNETES_ENABLED=false \
  -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP}:${PORT} \
  -p ${PORT}:${PORT} ${VOLUMES} --name=${MODULE}${CLONE} --rm --network=${PROJECT} ${DOCKER_IMAGE}"

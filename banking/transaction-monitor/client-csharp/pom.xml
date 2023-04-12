@@ -25,6 +25,18 @@
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
+				<includes>
+					<include>**/*.cs</include>
+					<include>**/*.file</include>
+				</includes>	
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>**/*.cs</exclude>
+					<exclude>**/*.file</exclude>
+				</excludes>	
 			</resource>
 		</resources>
 

@@ -197,22 +197,22 @@ public class TransactionMonitorIdempotentInitialization {
             MapConfig mySqlMapConfig = new MapConfig(MyConstants.IMAP_NAME_MYSQL_SLF4J);
 
             Properties mySqlProperties = new Properties();
-            mySqlProperties.setProperty("data-link-ref", MyConstants.MYSQL_DATASTORE_CONFIG_NAME);
+            mySqlProperties.setProperty("data-connection-ref", MyConstants.MYSQL_DATACONNECTION_CONFIG_NAME);
             mySqlProperties.setProperty("mapping-type", "JDBC");
-            mySqlProperties.setProperty("table-name", MyConstants.MYSQL_DATASTORE_TABLE_NAME);
-            mySqlProperties.setProperty("id-column",
-                    //FIXME Once MySql compound key supported by Data Link
-                    //MyConstants.MYSQL_DATASTORE_TABLE_COLUMN0 + "," + MyConstants.MYSQL_DATASTORE_TABLE_COLUMN1);
-                    "hash");
-            mySqlProperties.setProperty("column",
-                    MyConstants.MYSQL_DATASTORE_TABLE_COLUMN0 + "," + MyConstants.MYSQL_DATASTORE_TABLE_COLUMN1
-                    + "," + MyConstants.MYSQL_DATASTORE_TABLE_COLUMN2 + "," + MyConstants.MYSQL_DATASTORE_TABLE_COLUMN3
-                    + "," + MyConstants.MYSQL_DATASTORE_TABLE_COLUMN4 + "," + MyConstants.MYSQL_DATASTORE_TABLE_COLUMN5);
+            mySqlProperties.setProperty("table-name", MyConstants.MYSQL_DATACONNECTION_TABLE_NAME);
+            //FIXME Once MySql compound key supported by Data Link
+            //MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN0 + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN1);
+            mySqlProperties.setProperty("id-column", "hash");
+            mySqlProperties.setProperty("column", MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN0
+                    + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN1
+                    + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN2
+                    + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN3
+                    + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN4
+                    + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN5);
 
-            MapStoreConfig mySqlStoreConfig = new MapStoreConfig().setEnabled(true);
-            mySqlStoreConfig.setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER);
-            mySqlStoreConfig.setClassName(GenericMapStore.class.getName());
-            mySqlStoreConfig.setProperties(mySqlProperties);
+            MapStoreConfig mySqlStoreConfig = new MapStoreConfig().setEnabled(true)
+            .setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER)
+            .setClassName(GenericMapStore.class.getName()).setProperties(mySqlProperties);
 
             if (localhost) {
                 LOGGER.info("localhost=={}, no map store for MySql", localhost);
@@ -1274,7 +1274,7 @@ public class TransactionMonitorIdempotentInitialization {
                 + " SELECT * FROM \"" + topic + "\"";
 
         String concatenation;
-        String xxx = "UNMERGED_INTO_5.3_";
+        String xxx = "5.4?_";
         LOGGER.error("Reminder to remove job prefix {}", xxx);
         // Same for all currently
         switch (transactionMonitorFlavor) {
@@ -1296,8 +1296,9 @@ public class TransactionMonitorIdempotentInitialization {
                 + " SELECT __key, " + concatenation + " || ',' || provenance || ',' || whence || ',' || volume"
                 + " FROM \"" + MyConstants.IMAP_NAME_ALERTS_LOG + "\"";
 
-        //FIXME 5.2 Style, to be removed once "sqlJobMapToKafka" runs as streaming in 5.3
+        //FIXME 5.2 Style, to be removed once "sqlJobMapToKafka" runs as streaming in 5.4
         //FIXME https://docs.hazelcast.com/hazelcast/5.3-snapshot/sql/querying-maps-sql#streaming-map-changes
+        //FIXME See https://github.com/hazelcast/hazelcast-platform-demos/issues/131
         try {
             Pipeline pipelineAlertingToKafka = AlertingToKafka.buildPipeline(bootstrapServers);
 

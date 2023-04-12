@@ -38,6 +38,7 @@
 		<spotbugs.skip>true</spotbugs.skip>
 		<!-- Configure the build for HZ Viridian or all Kubernetes -->
 		<use.viridian>true</use.viridian>
+		<use.viridian>false</use.viridian>
 
 		<!-- Variations for the Transaction Monitor, TransactionMonitorFlavor.java ENUM -->
 		<!-- "ecommerce" is last, hence is the value used, as most generally applicable -->
@@ -107,12 +108,12 @@
 		<hazelcast-cloud-maven-plugin.version>0.0.6</hazelcast-cloud-maven-plugin.version>
 		<maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
 		<maven-assembly-plugin.version>3.5.0</maven-assembly-plugin.version>
-		<maven-checkstyle-plugin.version>3.1.0</maven-checkstyle-plugin.version>
-		<maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
-		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+		<maven-checkstyle-plugin.version>3.2.1</maven-checkstyle-plugin.version>
+		<maven-clean-plugin.version>3.2.0</maven-clean-plugin.version>
+		<maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
 		<maven-failsafe-plugin.version>3.0.0</maven-failsafe-plugin.version>
-		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
-		<maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
+		<maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
+		<maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
 		<maven-shade-plugin.version>3.4.1</maven-shade-plugin.version>
 		<maven-surefire-plugin.version>3.0.0</maven-surefire-plugin.version>
 		<os-maven-plugin.version>1.6.2</os-maven-plugin.version>
@@ -121,7 +122,13 @@
 
 		<!-- Javascript -->
 		<node.version>v19.8.1</node.version>
-		<npm.version>9.6.2</npm.version>
+		<npm.version>9.6.3</npm.version>
+
+                <!-- Checkstyle -->
+                <checkstyle.version>8.38</checkstyle.version>
+                <checkstyle.configLocation>${main.basedir}/checkstyle/checkstyle.xml</checkstyle.configLocation>
+                <checkstyle.supressionsLocation>${main.basedir}/checkstyle/suppressions.xml</checkstyle.supressionsLocation>
+                <checkstyle.headerLocation>${main.basedir}/checkstyle/ClassHeader.txt</checkstyle.headerLocation>
 	</properties>
 
 	<dependencies>
@@ -458,6 +465,12 @@
 					<configuration>
 						<filesets>
 							<fileset>
+								<directory>src/main/app</directory>
+                                                                <includes>
+                                                                	<include>package-lock.json</include>
+                                                                </includes>
+							</fileset>
+							<fileset>
 								<directory>src/main/app/build</directory>
 							</fileset>
 							<fileset>
@@ -465,6 +478,13 @@
 							</fileset>
 							<fileset>
 								<directory>src/main/app/static</directory>
+							</fileset>
+							<fileset>
+								<directory>src/main/resources</directory>
+                                                                <includes>
+                                                                	<include>bin</include>
+                                                                	<include>obj</include>
+                                                                </includes>
 							</fileset>
 						</filesets>
 					</configuration>
