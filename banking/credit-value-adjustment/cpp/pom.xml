@@ -30,6 +30,7 @@
 		features enabled -->
 	<build>
 		<plugins>
+		<!--
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <configuration>
@@ -40,6 +41,7 @@
                     </target>
                 </configuration>
             </plugin>
+		-->
 			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>

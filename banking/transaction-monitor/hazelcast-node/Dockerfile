@@ -1,6 +1,4 @@
-# Use Python 3.7 as Grppcio:1.26.0 is incompatible with Python 3.8.
-# Use Buster (Debian) as Alpine does not work well with wheel packages.
-FROM --platform=linux/amd64 library/python:3.7-buster
+FROM --platform=linux/amd64 library/python:3.8-buster
 
 # Add Java
 RUN apt update

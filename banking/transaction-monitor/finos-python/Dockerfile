@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 library/python:3.7-buster
+FROM --platform=linux/amd64 library/python:3.8-buster
 
 ARG MC_CLUSTER1_NAME
 ARG MC_CLUSTER1_ADDRESSLIST
