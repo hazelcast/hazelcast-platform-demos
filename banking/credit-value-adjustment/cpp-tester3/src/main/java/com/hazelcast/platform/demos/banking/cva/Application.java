@@ -67,6 +67,8 @@ public class Application {
 
         Config config = new Config();
         config.getJetConfig().setEnabled(true);
+        config.getNetworkConfig().getJoin().getAutoDetectionConfig().setEnabled(false);
+        config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
         HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance(config);
 
         Pipeline pipeline = build(host, datum);

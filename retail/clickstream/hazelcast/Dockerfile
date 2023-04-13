@@ -8,9 +8,9 @@ RUN cd /tmp ; \
 RUN update-alternatives --install /usr/bin/java java /tmp/jdk-17/bin/java 1
 
 # Download requirements into image makes start up faster when growing cluster
-#COPY target/classes/requirements.txt /
-#RUN pip install --upgrade pip
-#RUN pip install -r ./requirements.txt
+COPY target/classes/python/requirements.txt /
+RUN pip install --upgrade pip
+RUN pip install -r ./requirements.txt
 
 # From pom.xml
 ARG MC_CLUSTER1_NAME
