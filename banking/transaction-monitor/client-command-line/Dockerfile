@@ -9,7 +9,7 @@ RUN cd /tmp \
   && git clone https://github.com/hazelcast/hazelcast-commandline-client.git \
   && cd hazelcast-commandline-client \
   && make \
-  && ./build/clc
+  && ./build/clc version
   
 COPY target/classes/client.sh /tmp/
 COPY target/classes/hazelcast-client-clc.yaml /tmp/
