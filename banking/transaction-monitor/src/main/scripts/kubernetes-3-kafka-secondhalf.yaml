@@ -40,6 +40,10 @@ spec:
             value: "EXTERNAL_PLAINTEXT:PLAINTEXT,INTERNAL_PLAINTEXT:PLAINTEXT,PLAINTEXT:PLAINTEXT"
           - name: KAFKA_CFG_LISTENERS
             value: "EXTERNAL_PLAINTEXT://:9092,INTERNAL_PLAINTEXT://:19092"
+          - name: "KAFKA_ENABLE_KRAFT"
+            value: "no"
+          - name: "KAFKA_KRAFT_CLUSTER_ID"
+            value: "FLAVOR"
           - name: "MY_POD_IP"
             valueFrom:
               fieldRef:

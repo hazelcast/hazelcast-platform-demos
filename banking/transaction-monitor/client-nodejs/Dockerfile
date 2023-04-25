@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 library/node:18.14
+FROM --platform=linux/amd64 library/node:18.16.0
 
 ARG CONTROL_FILE
 
