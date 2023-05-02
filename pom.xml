@@ -122,8 +122,8 @@
 		<spotbugs-maven-plugin.version>4.7.3.0</spotbugs-maven-plugin.version>
 
 		<!-- Javascript -->
-		<node.version>v19.8.1</node.version>
-		<npm.version>9.6.3</npm.version>
+		<node.version>v20.0.0</node.version>
+		<npm.version>9.6.5</npm.version>
 
                 <!-- Checkstyle -->
                 <checkstyle.version>8.38</checkstyle.version>
