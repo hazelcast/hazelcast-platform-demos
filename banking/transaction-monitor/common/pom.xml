@@ -40,6 +40,11 @@
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
 
+                <dependency>
+                        <groupId>com.google.api.grpc</groupId>
+                        <artifactId>proto-google-common-protos</artifactId>
+                </dependency>
+
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast</artifactId>

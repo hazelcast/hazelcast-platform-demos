@@ -18,6 +18,7 @@
 	<description>Uses ML to predict customer churn</description>
 
 	<properties>
+                <kafka-clients.version>3.4.0</kafka-clients.version>
 		<my.docker.image.prefix>churn</my.docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
 

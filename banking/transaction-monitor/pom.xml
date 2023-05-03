@@ -30,8 +30,6 @@
 
 		<!-- Project specific versions -->
 		<javalin.version>3.13.0</javalin.version>
-		<!--  Kafka Clients must match cloud target -->
-		<kafka-clients.version>2.2.2</kafka-clients.version>
 
 		<!-- So Grafana can find Prometheus service, must match K8S YAML -->
 		<my.prometheus.name>${my.docker.image.prefix}-prometheus</my.prometheus.name>
@@ -59,7 +57,7 @@
 		<module>kafka-broker</module>
 		<module>kafdrop</module>
 		<module>topic-create</module>
-		<!-- Remove until complete
+		<!-- Remove until completed - https://github.com/hazelcast/hazelcast-platform-demos/issues/135
 		<module>finos-nodejs</module>
 		<module>finos-python</module>
 		-->
@@ -74,33 +72,9 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>com.hazelcast.jet.contrib</groupId>
-				<artifactId>pulsar</artifactId>
-				<version>${hazelcast-jet-pulsar.version}</version>
-			</dependency>
-
-			<dependency>
 				<groupId>io.javalin</groupId>
 				<artifactId>javalin</artifactId>
 				<version>${javalin.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.apache.kafka</groupId>
-				<artifactId>kafka-clients</artifactId>
-				<version>${kafka-clients.version}</version>
-			</dependency>
-
-            <dependency>
-                <groupId>org.apache.pulsar</groupId>
-                <artifactId>pulsar-client</artifactId>
-                <version>${pulsar.version}</version>
-            </dependency>
-                
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-web</artifactId>
-				<version>${spring-boot.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
