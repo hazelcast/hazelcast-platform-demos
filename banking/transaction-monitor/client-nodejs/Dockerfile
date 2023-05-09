@@ -1,11 +1,11 @@
-FROM --platform=linux/amd64 library/node:18.16.0
+FROM --platform=linux/amd64 library/node:20.1.0
 
 ARG CONTROL_FILE
 
 COPY target/classes/package.json ./
 COPY target/classes/client.js ./
 
-RUN npm install -g npm@9.5.0
+RUN npm install -g npm@9.6.6
 RUN npm install hazelcast-client
 
 # Control file stops Docker copy failing if no PFX/PEM files found. Put in target by maven-antrun-plugin

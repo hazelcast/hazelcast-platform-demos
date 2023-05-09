@@ -40,11 +40,6 @@
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
 
-                <dependency>
-                        <groupId>com.google.api.grpc</groupId>
-                        <artifactId>proto-google-common-protos</artifactId>
-                </dependency>
-
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast</artifactId>
@@ -63,21 +58,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet-grpc</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet-kafka</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet-python</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>com.hazelcast.jet</groupId>
-					<artifactId>hazelcast-jet-grpc</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet.contrib</groupId>

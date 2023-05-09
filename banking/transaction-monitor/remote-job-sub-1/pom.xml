@@ -32,21 +32,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet-grpc</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet-kafka</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet-python</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>com.hazelcast.jet</groupId>
-					<artifactId>hazelcast-jet-grpc</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 	</dependencies>
 
