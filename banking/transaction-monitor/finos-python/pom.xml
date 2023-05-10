@@ -15,12 +15,9 @@
 	<description>Transaction Monitor - Finos Python</description>
 
 	<properties>
+		<my.docker.control.file>control.file</my.docker.control.file>
 		<my.docker.image.name>finos-python</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
-
-		<!-- Pre-configure the build image -->
-		<my.mc.cluster1.name>${my.cluster1.name}</my.mc.cluster1.name>
-		<my.mc.cluster1.addresslist>${my.docker.image.prefix}-${my.cluster1.name}-hazelcast.default.svc.cluster.local</my.mc.cluster1.addresslist>
 	</properties>
 
 	<build>
@@ -32,6 +29,15 @@
 		</resources>
 
 		<plugins>
+			<!-- Copy keystore/truststore if found -->
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<configuration>
+					<target>
+						<ant antfile="../../../ant/build.xml" target="conditionalcopy"/>
+					</target>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>

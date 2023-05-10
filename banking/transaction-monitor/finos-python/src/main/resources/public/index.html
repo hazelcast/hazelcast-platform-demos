@@ -5,17 +5,9 @@
     <link rel="shortcut icon" href="./favicon.ico">
     <link rel="stylesheet" type="text/css" href="./main.css" />
     <script defer src="https://pyscript.net/latest/pyscript.js"></script>
-    <py-config>
-		packages = [
-        	"hazelcast-python-client"
-      	]    
-      	[[fetch]]
-    </py-config>    
     <py-env>
     - paths:
-      - ./custom_entrypoint.py
       - ./cli.py
-      - ./cli2.py
     </py-env>    
     <title>@my.docker.image.name@</title>
   </head>
@@ -28,7 +20,7 @@
       </div>
       <hr class="headerfooterline"/>
     </div>
- 
+ 	
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div class="major_pane">
       <div id="root">
@@ -44,13 +36,22 @@
           document.getElementById("when").textContent = now; 
         </script>
 
+		<div id="hideme" style="display: none;">
+			<py-env>
+			- hazelcast-python-client==5.2.0
+			</py-env>
+			<py-config>
+    		[[fetch]]
+    		files = ['custom_entrypoint.py']
+			</py-config>
+		</div>
 		<py-script src="./cli.py"></py-script>
       </div>
     </div>
 
     <div class="headerfooter">
       <hr class="headerfooterline"/>
-      <p>&copy; Hazelcast <span id="copyrightyear">2022</span></p>
+      <p>&copy; Hazelcast <span id="copyrightyear">2023</span></p>
     </div>
   </body> 
 </html>

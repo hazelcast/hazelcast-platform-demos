@@ -1,23 +1,14 @@
 const PerspectivePlugin = require("@finos/perspective-webpack-plugin");
+const HtmlWebPackPlugin = require("html-webpack-plugin");
 const path = require('path');
 
 module.exports = {
-    entry: './src/index.tsx',
+    entry: './src/index.js',
     mode: 'production',
-    externals: [
-        "dns",
-    ],
-    resolve: {
-        extensions: [".ts", ".tsx", ".js"],
-        fallback: {
-            "dns": false,
-            "fs": false,
-            https: require.resolve('https-browserify'),
-            os: require.resolve('os-browserify/browser'),
-            zlib: require.resolve('browserify-zlib')
-        }
-    },
     plugins: [
+        new HtmlWebPackPlugin({
+            title: "@project.artifactId@",
+        }),		
         new PerspectivePlugin(),
     ],        
     output: {
@@ -30,7 +21,10 @@ module.exports = {
                         test: path.join(__dirname, '.'),
                         exclude: /(node_modules)/,
                         use: [{
-                                loader: 'ts-loader'
+                                        loader: 'babel-loader',
+                                        options: {
+                                                presets: ["@babel/preset-env", "@babel/preset-react"]
+                                        }
                         }]
                 }
         ]

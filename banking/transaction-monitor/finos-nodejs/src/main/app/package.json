@@ -10,42 +10,17 @@
     "@finos/perspective-viewer": "2.1.1",
     "@finos/perspective-viewer-d3fc": "2.1.1",
     "@finos/perspective-viewer-datagrid": "2.1.1",
-    "assert": "2.0.0",
-    "async": "^3.2.4",
-    "browserify-zlib": "0.2.0",
-    "buffer": "6.0.3",
     "hazelcast-client": "^5.2.0",
-    "html-webpack-plugin": "^5.5.1",
-    "https-browserify": "1.0.0",
-    "net": "1.0.2",
-    "os-browserify": "0.3.0",
-    "path": "0.12.7",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-error-overlay": "6.0.11",
-    "react-scripts": "5.0.1",
-    "stream": "0.0.2",
-    "stream-browserify": "3.0.0",
-    "tls": "0.0.1",
-    "url": "0.11.0",
-    "zlib": "1.0.5"
+    "react-scripts": "5.0.1"
   },
   "devDependencies": {
+	"babel-loader": "^9.1.2",
     "@finos/perspective-webpack-plugin": "^2.1.1",
-    "@types/node": "^20.1.1",
-    "@types/react": "^18.2.6",
-    "@types/react-dom": "^18.2.4",
-    "react-error-overlay": "6.0.11",
-    "source-map-loader": "4.0.1",
-    "ts-loader": "^9.4.2",
-    "typescript": "Don't use 5 for typescript",
-    "typescript": "^4.7.4",
+    "html-webpack-plugin": "^5.5.1",
     "webpack": "5.82.0",
     "webpack-cli": "5.0.1",
     "webpack-dev-server": "^4.15.0"
-  },
-  "browser": {
-    "fs": false,
-    "os": false
   }
 }

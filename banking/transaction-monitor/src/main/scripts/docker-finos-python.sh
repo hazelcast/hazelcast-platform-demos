@@ -30,7 +30,7 @@ docker container prune --force > /dev/null 2>&1
 
 # External port 8082
 CMD="docker run \
- -e MC_CLUSTER1_ADDRESSLIST_OVERRIDE=$MC_CLUSTER1_ADDRESSLIST_OVERRIDE \
+ -e HOST_IP=${HOST_IP} \
  -e MY_KUBERNETES_ENABLED=false \
  -p 8082:8080 --rm ${DOCKER_IMAGE}"
 echo $CMD

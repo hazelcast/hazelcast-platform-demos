@@ -1,5 +1,2 @@
-#
 hazelcast-python-client==5.2.0
-#TODO - causes build error
-#perspective-python
 psutil
