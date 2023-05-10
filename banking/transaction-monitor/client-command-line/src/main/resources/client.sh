@@ -34,7 +34,7 @@ KUBERNETES="${MY_KUBERNETES_ENABLED}"
 
 CONTROL_FILE="/tmp/control.file"
 USE_VIRIDIAN_KEY="use.viridian"
-VIRIDIAN=`grep "${USE_VIRIDIAN_KEY}" $CONTROL_FILE | tail -1 | cut -d= -f1 `
+VIRIDIAN=`grep "${USE_VIRIDIAN_KEY}" $CONTROL_FILE | tail -1 | cut -d= -f2`
 if [ `echo "$VIRIDIAN" | tr '[:upper:]' '[:lower:]'` == "true" ]
 then 
  VIRIDIAN=true

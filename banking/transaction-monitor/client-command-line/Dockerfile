@@ -13,6 +13,7 @@ RUN cd /tmp \
   
 COPY target/classes/client.sh /tmp/
 COPY target/classes/hazelcast-client-clc.yaml /tmp/
+COPY target/classes/hazelcast-client-clc-viridian.yaml /tmp/
 
 RUN chmod 755 /tmp/*.sh
 
