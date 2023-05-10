@@ -37,12 +37,13 @@
         </script>
 
 		<div id="hideme" style="display: none;">
-			<py-env>
-			- hazelcast-python-client==5.2.0
-			</py-env>
 			<py-config>
+			packages = [
+        		"hazelcast-python-client==5.2.0",
+        		"ssl"
+      		]  				
     		[[fetch]]
-    		files = ['custom_entrypoint.py']
+    		files = ['custom_entrypoint.py', 'cli_hz.py']
 			</py-config>
 		</div>
 		<py-script src="./cli.py"></py-script>
