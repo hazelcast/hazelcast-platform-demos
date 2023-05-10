@@ -18,45 +18,36 @@ import asyncio
 from js import console
 import datetime
 import logging
+import sys
 
 # From py-env paths
-import custom_entrypoint
-import cli2
+import cli_hz
+
+# Don't change, IMAP on cluster to poll
+MAP_NAME = "perspective"
+
+console.log("cli.py", "--------------")
+console.log("cli.py", "sys.version", sys.version)
+console.log("cli.py", datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S"))
+console.log("cli.py", "--------------")
+
+#https://github.com/pyscript/pyscript/issues/1137
+def handler(loop, context):
+    console.log("ERROR", context.message)
+    raise(context.exception)
+
+pyscript.loop.set_exception_handler(handler)
 
 ########################################################################
 # Main code, doIt() is run asychronously
 ########################################################################
 
-MAP_NAME = "perspective"
-
-# Kubernetes assumed if blank or explicitly configured
-def kubernetes_enabled():
-    if not custom_entrypoint.MY_KUBERNETES_ENABLED:
-        return True
-    if custom_entrypoint.MY_KUBERNETES_ENABLED.casefold() != "false":
-        return True
-    return False
-
-console.log("cli.py", "--------------")
-console.log("cli.py", datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S"))
-console.log("cli.py", "MC_CLUSTER1_NAME", custom_entrypoint.MC_CLUSTER1_NAME)
-console.log("cli.py", "MC_CLUSTER1_LIST", custom_entrypoint.MC_CLUSTER1_LIST)
-kubernetes = "@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local"
-
-cluster_name= custom_entrypoint.MC_CLUSTER1_NAME
-cluster_member = kubernetes
-if not kubernetes_enabled():
-    cluster_member = custom_entrypoint.MC_CLUSTER1_LIST
-
-console.log("cli.py", "Will use '" + cluster_member + "' for connection.")
-console.log("cli.py", "--------------")
-
 logging.basicConfig(level=logging.INFO)
 
-async def doit():
-  console.log("cli.py", "doIt()", "BEFORE ---------------", cluster_name)
-  client = cli2.client()
-  console.log("cli.py", "doIt()", "AFTER  ---------------", cluster_name)
+async def doIt():
+  console.log("cli.py", "doIt()", "cli_hz.client()", "BEFORE")
+  client = await cli_hz.get_client()
+  console.log("cli.py", "doIt()", "cli_hz.client()", "AFTER")
   # Change DIV
   Element("loading").clear()
   # FIXME FIXME FIXME
@@ -66,6 +57,10 @@ async def doit():
     await asyncio.sleep(30)
     console.log("cli.py", "doIt()", "AFTER SLEEP LOOP")
 
-pyscript_loader.close()
-# Never completes, infinite loop
-pyscript.run_until_complete(doit())
+async def main():
+   console.log("cly.py", "main()", "START")
+   # Never completes, infinite loop
+   await doIt()
+   console.log("cly.py", "main()", "END")
+
+asyncio.ensure_future(main()) 
