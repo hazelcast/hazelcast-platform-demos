@@ -150,7 +150,7 @@ class Querying extends Component {
 
                         var i = 0;
                         // Lines provided
-                        if (error_message.length == 0) {
+                        if (error_message.length === 0) {
                             for (; i < rows_message.length; i++) {
         						text1.push(rows_message[i]);
 							}
