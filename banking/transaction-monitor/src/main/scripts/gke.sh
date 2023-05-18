@@ -1,34 +1,70 @@
 #!/bin/bash
 
+DIRNAME=`dirname $0`
+cd $DIRNAME
+TOP_LEVEL_DIR=`cd ../../../../.. ; pwd`
+TOP_LEVEL_POM=$TOP_LEVEL_DIR/pom.xml
+POM_FLAVOR=`grep '<my.transaction-monitor.flavor>' ../../../../../pom.xml | tail -1 | cut -d'>' -f2 | cut -d'<' -f1`
+POM_USE_VIRIDIAN=`grep '<use.viridian>' $TOP_LEVEL_POM | tail -1 | cut -d'>' -f2 | cut -d'<' -f1 | tr '[:upper:]' '[:lower:]'`
+
 ARG1=`echo $1 | awk '{print tolower($0)}'`
 ARG2=`echo $2 | awk '{print tolower($0)}'`
 
-if [ "${ARG1}" == "ecommerce" ]
+# Use top level pom.xml values if no args
+if [ "${ARG1}" == "" ]
 then
- FLAVOR=ecommerce
-fi
-if [ "${ARG1}" == "payments" ]
-then
- FLAVOR=payments
-fi
-if [ "${ARG1}" == "trade" ]
-then
- FLAVOR=trade
+ FLAVOR=$POM_FLAVOR
+ USE_VIRIDIAN=$POM_USE_VIRIDIAN
+else
+ if [ "${ARG1}" == "ecommerce" ]
+ then
+  FLAVOR=ecommerce
+ fi
+ if [ "${ARG1}" == "payments" ]
+ then
+  FLAVOR=payments
+ fi
+ if [ "${ARG1}" == "trade" ]
+ then
+  FLAVOR=trade
+ fi
+
+ # False if absent
+ if [ "${ARG2}" == "true" ]
+ then
+  USE_VIRIDIAN=true
+ else
+  USE_VIRIDIAN=false
+ fi
 fi
 
 if [ "${FLAVOR}" == "" ]
 then
+ echo $0: usage: `basename $0`
  echo $0: usage: `basename $0` '<flavor>' '<viridian>'
+ echo $0: eg: `basename $0`
+ echo $0: ' ' to use top-level pom.xml values
  echo $0: eg: `basename $0` ecommerce true
+ echo $0: ' ' to use specific values
  exit 1
 fi
 
-# False if absent
-if [ "${ARG2}" == "true" ]
+if [ "${FLAVOR}" != "${POM_FLAVOR}" ] || [ "${USE_VIRIDIAN}" != "${POM_USE_VIRIDIAN}" ]
 then
- USE_VIRIDIAN=true
-else
- USE_VIRIDIAN=false
+ echo '************************************************************'
+ echo '************************************************************'
+ echo $TOP_LEVEL_POM is configured with FLAVOR=$POM_FLAVOR and USE_VIRIDIAN=$POM_USE_VIRIDIAN
+ echo '************************************************************'
+ echo '************************************************************'
+ echo -n Proceeding in 10 seconds
+ COUNTDOWN=10
+ while [ $COUNTDOWN -gt 0 ]
+ do
+  echo -n .
+  sleep 1
+  COUNTDOWN=$(($COUNTDOWN - 1))
+ done
+ echo ""
 fi
 
 echo ============================================================
@@ -44,8 +80,6 @@ PROJECT=transaction-monitor
 MAX_COUNT=20
 SLEEPTIME=30
 TMPFILE=/tmp/`basename $0`.$$
-DIRNAME=`dirname $0`
-cd $DIRNAME
 
 # Waits until POD is in the required state
 wait_for_pod() {
@@ -172,7 +206,7 @@ do
  if [ $IS_YAML -eq 1 ]
  then
   # Assumed naming standard to find image
-  sed "s#image: \"hazelcast-platform-demos#image: \"eu.gcr.io/hazelcast-33/${USER}#" < $INPUT_FILE | \
+  sed "s#image: \"hazelcast-platform-demos#image: \"europe-west1-docker.pkg.dev/hazelcast-33/${USER}#" < $INPUT_FILE | \
   sed "s#FLAVOR#${FLAVOR}#g" | \
   sed 's#imagePullPolicy: Never#imagePullPolicy: Always#' > ${OUTPUT_FILE}
   CMD="kubectl create -f $OUTPUT_FILE"

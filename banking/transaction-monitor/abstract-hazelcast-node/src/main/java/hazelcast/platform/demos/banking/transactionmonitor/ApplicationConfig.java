@@ -56,6 +56,7 @@ import com.hazelcast.memory.MemoryUnit;
  */
 public class ApplicationConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
+    private static final int MERKLE_TREE_DEPTH = 2;
 
     /**
      * <p>Create the configuration for Jet, using any default files found on the classpath.
@@ -178,6 +179,7 @@ public class ApplicationConfig {
 
             MapConfig mapConfig = new MapConfig();
             mapConfig.setName(mapName);
+            mapConfig.getMerkleTreeConfig().setDepth(MERKLE_TREE_DEPTH).setEnabled(true);
             mapConfig.setWanReplicationRef(wanReplicationRef);
 
             config.addMapConfig(mapConfig);

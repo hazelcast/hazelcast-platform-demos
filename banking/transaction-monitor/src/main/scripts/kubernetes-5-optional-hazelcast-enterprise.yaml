@@ -74,7 +74,7 @@ metadata:
     type: local
 spec:
   capacity:
-    storage: 48Gi
+    storage: 96Gi
   accessModes:
     - ReadWriteMany
   hostPath:
@@ -90,7 +90,7 @@ metadata:
     type: local
 spec:
   capacity:
-    storage: 48Gi
+    storage: 96Gi
   accessModes:
     - ReadWriteMany
   hostPath:
@@ -111,7 +111,7 @@ spec:
     - ReadWriteMany
   resources:
     requests:
-      storage: 8Gi
+      storage: 12Gi
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -123,7 +123,7 @@ spec:
     - ReadWriteMany
   resources:
     requests:
-      storage: 8Gi
+      storage: 12Gi
 ---
 ---
 # Creates 3 pods, bigger than DR
