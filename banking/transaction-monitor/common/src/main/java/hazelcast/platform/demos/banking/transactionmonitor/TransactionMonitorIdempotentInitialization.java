@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package hazelcast.platform.demos.banking.trademonitor;
+package hazelcast.platform.demos.banking.transactionmonitor;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -38,15 +37,19 @@ import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MapStoreConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
+import com.hazelcast.jet.Job;
 import com.hazelcast.jet.config.JobConfig;
-import com.hazelcast.jet.config.JobConfigArguments;
 import com.hazelcast.jet.config.ProcessingGuarantee;
 import com.hazelcast.jet.datamodel.Tuple3;
+import com.hazelcast.jet.datamodel.Tuple4;
 import com.hazelcast.jet.pipeline.Pipeline;
+import com.hazelcast.jet.pipeline.StreamStage;
 import com.hazelcast.map.IMap;
+import com.hazelcast.mapstore.GenericMapStore;
 import com.hazelcast.platform.demos.utils.UtilsConstants;
 import com.hazelcast.platform.demos.utils.UtilsFormatter;
 import com.hazelcast.platform.demos.utils.UtilsJobs;
+import com.hazelcast.platform.demos.utils.UtilsSlack;
 import com.hazelcast.platform.demos.utils.UtilsSlackSQLJob;
 import com.hazelcast.platform.demos.utils.UtilsSlackSink;
 
@@ -57,15 +60,24 @@ import com.hazelcast.platform.demos.utils.UtilsSlackSink;
  * having to test if another client has already run it.
  * </p>
  */
-public class CommonIdempotentInitialization {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommonIdempotentInitialization.class);
+@SuppressWarnings("checkstyle:MethodCount")
+public class TransactionMonitorIdempotentInitialization {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TransactionMonitorIdempotentInitialization.class);
+    private static final Logger LOGGER_TO_IMAP =
+            IMapLoggerFactory.getLogger(TransactionMonitorIdempotentInitialization.class);
+    private static final int POS4 = 4;
+    private static final int POS6 = 6;
 
     /**
-     * <p>Mappings needed for WAN, rather than replicate "{@code __sql.catalog}"
+     * <p>Maps and mappings needed for WAN, rather than replicate "{@code __sql.catalog}"
      * </p>
      */
-    public static boolean createMinimalMappings(HazelcastInstance hazelcastInstance) {
-        return defineWANIMaps(hazelcastInstance);
+    public static boolean createMinimal(HazelcastInstance hazelcastInstance,
+            TransactionMonitorFlavor transactionMonitorFlavor) {
+        boolean ok = defineWANIMaps(hazelcastInstance, transactionMonitorFlavor);
+        MyUtils.logStuff(hazelcastInstance);
+        MyUtils.showMappingsAndViews(hazelcastInstance);
+        return ok;
     }
 
     /**
@@ -80,7 +92,8 @@ public class CommonIdempotentInitialization {
      * </p>
      */
     public static boolean createNeededObjects(HazelcastInstance hazelcastInstance,
-            Properties postgresProperties, String ourProjectProvenance) {
+            Properties postgresProperties, String ourProjectProvenance,
+            TransactionMonitorFlavor transactionMonitorFlavor, boolean localhost, boolean useViridian) {
         // Capture what was present before
         Set<String> existingIMapNames = hazelcastInstance.getDistributedObjects()
                 .stream()
@@ -91,10 +104,23 @@ public class CommonIdempotentInitialization {
 
         // Add journals and map stores to maps before they are created
         boolean ok = dynamicMapConfig(hazelcastInstance, existingIMapNames,
-                postgresProperties, ourProjectProvenance);
+                postgresProperties, ourProjectProvenance, localhost, useViridian);
 
         // Accessing non-existing maps does not return any failures
-        for (String iMapName : MyConstants.IMAP_NAMES) {
+        List<String> iMapNames;
+        switch (transactionMonitorFlavor) {
+            case ECOMMERCE:
+                iMapNames = MyConstants.IMAP_NAMES_ECOMMERCE;
+                break;
+            case PAYMENTS:
+                iMapNames = MyConstants.IMAP_NAMES_PAYMENTS;
+                break;
+            case TRADE:
+            default:
+                iMapNames = MyConstants.IMAP_NAMES_TRADES;
+                break;
+        }
+        for (String iMapName :iMapNames) {
             if (!existingIMapNames.contains(iMapName)) {
                 hazelcastInstance.getMap(iMapName);
             }
@@ -102,7 +128,7 @@ public class CommonIdempotentInitialization {
 
         // Add index to maps after they are created, if created in this method's run.
         if (ok) {
-            ok = defineIndexes(hazelcastInstance, existingIMapNames);
+            ok = defineIndexes(hazelcastInstance, existingIMapNames, transactionMonitorFlavor);
         }
 
         return ok;
@@ -116,7 +142,7 @@ public class CommonIdempotentInitialization {
      *         enabled: true
      *       map-store:
      *         enabled: true
-     *         class-name: hazelcast.platform.demos.banking.trademonitor.AlertingToPostgresStore
+     *         class-name: hazelcast.platform.demos.banking.transactionmonitor.AlertingToPostgresStore
      *       properties:
      *         address: '12.34.56.78'
      *         user: 'admin'
@@ -129,21 +155,19 @@ public class CommonIdempotentInitialization {
      * @return true, always, either added or not needed
      */
     private static boolean dynamicMapConfig(HazelcastInstance hazelcastInstance,
-            Set<String> existingIMapNames, Properties postgresProperties, String ourProjectProvenance) {
+            Set<String> existingIMapNames, Properties postgresProperties, String ourProjectProvenance,
+            boolean localhost, boolean useViridian) {
         final String alertsWildcard = "alerts*";
 
-        EventJournalConfig eventJournalConfig = new EventJournalConfig();
-        eventJournalConfig.setEnabled(true);
+        EventJournalConfig eventJournalConfig = new EventJournalConfig().setEnabled(true);
 
-        if (!existingIMapNames.contains(MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME)) {
+        if (!existingIMapNames.contains(MyConstants.IMAP_NAME_ALERTS_LOG)) {
             MapConfig alertsMapConfig = new MapConfig(alertsWildcard);
             alertsMapConfig.setEventJournalConfig(eventJournalConfig);
 
-            AlertingToPostgresMapStore alertingToPostgresMapStore
-                = new AlertingToPostgresMapStore();
+            AlertingToPostgresMapStore alertingToPostgresMapStore = new AlertingToPostgresMapStore();
 
-            MapStoreConfig mapStoreConfig = new MapStoreConfig();
-            mapStoreConfig.setEnabled(true);
+            MapStoreConfig mapStoreConfig = new MapStoreConfig().setEnabled(true);
             mapStoreConfig.setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER);
             mapStoreConfig.setImplementation(alertingToPostgresMapStore);
             Properties properties = new Properties();
@@ -151,21 +175,70 @@ public class CommonIdempotentInitialization {
             properties.put(MyConstants.PROJECT_PROVENANCE, ourProjectProvenance);
             mapStoreConfig.setProperties(properties);
 
-            alertsMapConfig.setMapStoreConfig(mapStoreConfig);
+            if (localhost) {
+                LOGGER.info("localhost=={}, no map store for Postgres", localhost);
+            } else {
+                if (useViridian) {
+                    //FIXME Not yet available on Viridian @ March 2023.
+                    LOGGER.warn("use.virian={}, no map store for Postgres", useViridian);
+                } else {
+                    alertsMapConfig.setMapStoreConfig(mapStoreConfig);
+                    LOGGER.info("Postgres configured using: {}", alertsMapConfig.getMapStoreConfig().getProperties());
+                }
+            }
 
             hazelcastInstance.getConfig().addMapConfig(alertsMapConfig);
         } else {
-            LOGGER.trace("Don't add journal to '{}', map already exists", MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME);
+            LOGGER.info("Don't add journal to '{}', map already exists", MyConstants.IMAP_NAME_ALERTS_LOG);
+        }
+
+        // Generic config, MapStore implementation is derived
+        if (!existingIMapNames.contains(MyConstants.IMAP_NAME_MYSQL_SLF4J)) {
+            MapConfig mySqlMapConfig = new MapConfig(MyConstants.IMAP_NAME_MYSQL_SLF4J);
+
+            Properties mySqlProperties = new Properties();
+            mySqlProperties.setProperty("data-connection-ref", MyConstants.MYSQL_DATACONNECTION_CONFIG_NAME);
+            mySqlProperties.setProperty("mapping-type", "JDBC");
+            mySqlProperties.setProperty("table-name", MyConstants.MYSQL_DATACONNECTION_TABLE_NAME);
+            //FIXME Once MySql compound key supported by Data Link
+            //MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN0 + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN1);
+            mySqlProperties.setProperty("id-column", "hash");
+            mySqlProperties.setProperty("column", MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN0
+                    + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN1
+                    + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN2
+                    + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN3
+                    + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN4
+                    + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN5);
+
+            MapStoreConfig mySqlStoreConfig = new MapStoreConfig().setEnabled(true)
+            .setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER)
+            .setClassName(GenericMapStore.class.getName()).setProperties(mySqlProperties);
+
+            if (localhost) {
+                LOGGER.info("localhost=={}, no map store for MySql", localhost);
+            } else {
+                if (useViridian) {
+                    //FIXME Not yet available on Viridian @ March 2023.
+                    LOGGER.warn("use.virian={}, no data link for MySql", useViridian);
+                } else {
+                    mySqlMapConfig.setMapStoreConfig(mySqlStoreConfig);
+                    LOGGER.info("MySql configured using: {}", mySqlMapConfig.getMapStoreConfig().getProperties());
+                }
+            }
+
+            hazelcastInstance.getConfig().addMapConfig(mySqlMapConfig);
+        } else {
+            LOGGER.info("Don't add generic mapstore to '{}', map already exists", MyConstants.IMAP_NAME_MYSQL_SLF4J);
         }
 
         return true;
     }
 
     /**
-     * <p>Maps that have indexes, currently just the Trades made for
+     * <p>Maps that have indexes, currently just the transactions are made for
      * faster searching. When created manually it would be:
      * <pre>
-     *     'trades':
+     *     'transactions':
      *       indexes:
      *         - type: HASH
      *           attributes:
@@ -181,21 +254,36 @@ public class CommonIdempotentInitialization {
      * @param existingIMapNames - maps that this run of the initializer didn't create
      * @return true - Always.
      */
-    private static boolean defineIndexes(HazelcastInstance hazelcastInstance, Set<String> existingIMapNames) {
+    private static boolean defineIndexes(HazelcastInstance hazelcastInstance, Set<String> existingIMapNames,
+            TransactionMonitorFlavor transactionMonitorFlavor) {
 
         // Only add if map hadn't previously existed and so has just been created
-        if (!existingIMapNames.contains(MyConstants.IMAP_NAME_TRADES)) {
-            IMap<?, ?> tradesMap = hazelcastInstance.getMap(MyConstants.IMAP_NAME_TRADES);
+        if (!existingIMapNames.contains(MyConstants.IMAP_NAME_TRANSACTIONS)) {
+            IMap<?, ?> transactionsMap = hazelcastInstance.getMap(MyConstants.IMAP_NAME_TRANSACTIONS);
+
+            String indexColumn1;
+            switch (transactionMonitorFlavor) {
+            case ECOMMERCE:
+                indexColumn1 = "itemCode";
+                break;
+            case PAYMENTS:
+                indexColumn1 = "bicCreditor";
+                break;
+            case TRADE:
+            default:
+                indexColumn1 = "symbol";
+                break;
+            }
 
             IndexConfig indexConfig = new IndexConfig();
-            indexConfig.setName(MyConstants.IMAP_NAME_TRADES + "_idx");
+            indexConfig.setName(MyConstants.IMAP_NAME_TRANSACTIONS + "_idx");
             indexConfig.setType(IndexType.HASH);
-            indexConfig.setAttributes(Arrays.asList("symbol"));
+            indexConfig.setAttributes(Arrays.asList(indexColumn1));
 
             // Void method, hence returning true
-            tradesMap.addIndex(indexConfig);
+            transactionsMap.addIndex(indexConfig);
         } else {
-            LOGGER.trace("Don't add index to '{}', map already exists", MyConstants.IMAP_NAME_TRADES);
+            LOGGER.trace("Don't add index to '{}', map already exists", MyConstants.IMAP_NAME_TRANSACTIONS);
         }
 
         return true;
@@ -204,19 +292,17 @@ public class CommonIdempotentInitialization {
     /**
      * <p>Kafka properties can be stashed for ad-hoc jobs to use.
      * </p>
-     * <p>Stock symbols are needed for trade look-up enrichment,
+     * <p>Stock symbols are needed for transaction look-up enrichment,
      * the first member to start loads them from a file into
      * a {@link com.hazelcast.map.IMap}.
      * </p>
      */
     public static boolean loadNeededData(HazelcastInstance hazelcastInstance, String bootstrapServers,
-            String pulsarList, boolean usePulsar, boolean useHzCloud) {
+            String pulsarList, boolean usePulsar, boolean useViridian, TransactionMonitorFlavor transactionMonitorFlavor) {
         boolean ok = true;
         try {
             IMap<String, String> jobConfigMap =
                     hazelcastInstance.getMap(MyConstants.IMAP_NAME_JOB_CONFIG);
-            IMap<String, SymbolInfo> symbolsMap =
-                    hazelcastInstance.getMap(MyConstants.IMAP_NAME_SYMBOLS);
 
             if (!jobConfigMap.isEmpty()) {
                 LOGGER.trace("Skip loading '{}', not empty", jobConfigMap.getName());
@@ -235,32 +321,14 @@ public class CommonIdempotentInitialization {
                 } else {
                     jobConfigMap.put(MyConstants.PULSAR_OR_KAFKA_KEY, "kafka");
                 }
-                jobConfigMap.put(MyConstants.USE_HZ_CLOUD, Boolean.valueOf(useHzCloud).toString());
+                jobConfigMap.put(MyConstants.TRANSACTION_MONITOR_FLAVOR, transactionMonitorFlavor.toString());
+                jobConfigMap.put(MyConstants.USE_VIRIDIAN, Boolean.valueOf(useViridian).toString());
 
                 LOGGER.trace("Loaded {} into '{}'", jobConfigMap.size(), jobConfigMap.getName());
             }
 
-            if (!symbolsMap.isEmpty()) {
-                LOGGER.trace("Skip loading '{}', not empty", symbolsMap.getName());
-            } else {
-                Map<String, SymbolInfo> localMap =
-                        MyUtils.nasdaqListed().entrySet().stream()
-                        .collect(Collectors.<Entry<String, Tuple3<String, NasdaqMarketCategory, NasdaqFinancialStatus>>,
-                                String, SymbolInfo>
-                                toUnmodifiableMap(
-                                entry -> entry.getKey(),
-                                entry -> {
-                                    SymbolInfo symbolInfo = new SymbolInfo();
-                                    symbolInfo.setSecurityName(entry.getValue().f0());
-                                    symbolInfo.setMarketCategory(entry.getValue().f1());
-                                    symbolInfo.setFinancialStatus(entry.getValue().f2());
-                                    return symbolInfo;
-                                }));
+            loadNeededDataForFlavor(hazelcastInstance, transactionMonitorFlavor);
 
-                symbolsMap.putAll(localMap);
-
-                LOGGER.trace("Loaded {} into '{}'", localMap.size(), symbolsMap.getName());
-            }
         } catch (Exception e) {
             LOGGER.error("loadNeededData()", e);
             ok = false;
@@ -269,16 +337,139 @@ public class CommonIdempotentInitialization {
     }
 
     /**
+     * <p>Load reference data appropriate to the flavor
+     * </p>
+     *
+     * @param hazelcastInstance
+     * @param transactionMonitorFlavor
+     * @throws Exception
+     */
+    private static void loadNeededDataForFlavor(HazelcastInstance hazelcastInstance,
+            TransactionMonitorFlavor transactionMonitorFlavor) throws Exception {
+        IMap<String, BicInfo> bicsMap = null;
+        IMap<String, ProductInfo> productsMap = null;
+        IMap<String, SymbolInfo> symbolsMap = null;
+
+        switch (transactionMonitorFlavor) {
+        case ECOMMERCE:
+            productsMap = hazelcastInstance.getMap(MyConstants.IMAP_NAME_PRODUCTS);
+            if (!productsMap.isEmpty()) {
+                LOGGER.trace("Skip loading '{}', not empty", productsMap.getName());
+            } else {
+                Map<String, ProductInfo> localMap = getProductInfoLocalMap();
+                productsMap.putAll(localMap);
+
+                LOGGER.trace("Loaded {} into '{}'", localMap.size(), productsMap.getName());
+            }
+            break;
+        case PAYMENTS:
+            bicsMap = hazelcastInstance.getMap(MyConstants.IMAP_NAME_BICS);
+            if (!bicsMap.isEmpty()) {
+                LOGGER.trace("Skip loading '{}', not empty", bicsMap.getName());
+            } else {
+                Map<String, BicInfo> localMap = getBicInfoLocalMap();
+                bicsMap.putAll(localMap);
+
+                LOGGER.trace("Loaded {} into '{}'", localMap.size(), bicsMap.getName());
+            }
+            break;
+        case TRADE:
+        default:
+            symbolsMap = hazelcastInstance.getMap(MyConstants.IMAP_NAME_SYMBOLS);
+            if (!symbolsMap.isEmpty()) {
+                LOGGER.trace("Skip loading '{}', not empty", symbolsMap.getName());
+            } else {
+                Map<String, SymbolInfo> localMap = getSymbolInfoLocalMap();
+                symbolsMap.putAll(localMap);
+
+                LOGGER.trace("Loaded {} into '{}'", localMap.size(), symbolsMap.getName());
+            }
+            break;
+        }
+    }
+
+    /**
+     * <p>Format file "{@code productcatalog.txt}" for bulk insert.
+     * </p>
+     * @return
+     * @throws Exception
+     */
+    private static Map<String, ProductInfo> getProductInfoLocalMap() throws Exception {
+        return MyUtils.productCatalog().entrySet().stream()
+                .collect(Collectors.<Entry<String, Tuple3<String, String, Double>>,
+                        String, ProductInfo>
+                        toUnmodifiableMap(
+                        entry -> entry.getKey(),
+                        entry -> {
+                            ProductInfo productInfo = new ProductInfo();
+                            productInfo.setItemName(entry.getValue().f0());
+                            productInfo.setCategory(entry.getValue().f1());
+                            productInfo.setPrice(entry.getValue().f2());
+                            return productInfo;
+                        }));
+    }
+
+    /**
+     * <p>Format file "{@code biclist.txt}" for bulk insert.
+     * </p>
+     * @return
+     * @throws Exception
+     */
+    private static Map<String, BicInfo> getBicInfoLocalMap() throws Exception {
+        return MyUtils.bicList().entrySet().stream()
+                .collect(Collectors.<Entry<String, Tuple4<String, Double, String, String>>,
+                        String, BicInfo>
+                        toUnmodifiableMap(
+                        entry -> entry.getKey(),
+                        entry -> {
+                            String key = entry.getKey();
+                            BicInfo bicInfo = new BicInfo();
+                            bicInfo.setBankCode(key.substring(0, POS4));
+                            bicInfo.setCountry(key.substring(POS4, POS6));
+                            bicInfo.setCurrency(entry.getValue().f0());
+                            bicInfo.setName(entry.getValue().f2());
+                            bicInfo.setLocation(entry.getValue().f3());
+                            bicInfo.setLocationCode(key.substring(POS6));
+                            bicInfo.setExchangeRate(entry.getValue().f1());
+                            return bicInfo;
+                        }));
+    }
+
+    /**
+     * <p>Format file "{@code nasdaqlisted.txt}" for bulk insert.
+     * </p>
+     * @return
+     * @throws Exception
+     */
+    private static Map<String, SymbolInfo> getSymbolInfoLocalMap() throws Exception {
+        return MyUtils.nasdaqListed().entrySet().stream()
+                .collect(Collectors.<Entry<String, Tuple3<String, NasdaqMarketCategory, NasdaqFinancialStatus>>,
+                        String, SymbolInfo>
+                        toUnmodifiableMap(
+                        entry -> entry.getKey(),
+                        entry -> {
+                            SymbolInfo symbolInfo = new SymbolInfo();
+                            symbolInfo.setSecurityName(entry.getValue().f0());
+                            symbolInfo.setMarketCategory(entry.getValue().f1());
+                            symbolInfo.setFinancialStatus(entry.getValue().f2());
+                            return symbolInfo;
+                        }));
+    }
+
+    /**
      * <p>Define Hazelcast maps &amp; Kafka topics for later SQL querying.
      * </p>
      */
-    public static boolean defineQueryableObjects(HazelcastInstance hazelcastInstance, String bootstrapServers) {
+    public static boolean defineQueryableObjects(HazelcastInstance hazelcastInstance, String bootstrapServers,
+            TransactionMonitorFlavor transactionMonitorFlavor) {
         boolean ok = true;
-        ok &= defineKafka(hazelcastInstance, bootstrapServers);
-        ok &= defineWANIMaps(hazelcastInstance);
-        ok &= defineIMaps1(hazelcastInstance);
-        ok &= defineIMaps2(hazelcastInstance);
-        ok &= defineIMaps3(hazelcastInstance);
+        ok &= defineKafka1(hazelcastInstance, bootstrapServers, transactionMonitorFlavor);
+        ok &= defineKafka2(hazelcastInstance, bootstrapServers);
+        ok &= defineWANIMaps(hazelcastInstance, transactionMonitorFlavor);
+        ok &= defineIMaps1(hazelcastInstance, transactionMonitorFlavor);
+        ok &= defineIMaps2(hazelcastInstance, transactionMonitorFlavor);
+        ok &= defineIMaps3(hazelcastInstance, transactionMonitorFlavor);
+        ok &= defineIMaps4(hazelcastInstance, transactionMonitorFlavor);
         return ok;
     }
 
@@ -290,12 +481,61 @@ public class CommonIdempotentInitialization {
      *
      * @param bootstrapServers
      */
-    static boolean defineKafka(HazelcastInstance hazelcastInstance, String bootstrapServers) {
-        String definition1 = "CREATE EXTERNAL MAPPING IF NOT EXISTS "
+    @SuppressWarnings("checkstyle:MethodLength")
+    static boolean defineKafka1(HazelcastInstance hazelcastInstance, String bootstrapServers,
+            TransactionMonitorFlavor transactionMonitorFlavor) {
+        String definition1a = "CREATE EXTERNAL MAPPING IF NOT EXISTS "
                 // Name for our SQL
-                + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRADES
+                + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS
                 // Name of the remote object
-                + " EXTERNAL NAME " + MyConstants.KAFKA_TOPIC_NAME_TRADES
+                + " EXTERNAL NAME " + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS
+                + " ( "
+                + " id             VARCHAR, "
+                + " price          DECIMAL, "
+                + " quantity       BIGINT, "
+                + " itemCode       VARCHAR, "
+                // Timestamp is a reserved word, need to escape. Adjust the mapping name so avoiding clash with IMap
+                + " \"timestamp\"  BIGINT "
+                + " ) "
+                + " TYPE Kafka "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'json-flat',"
+                + " 'auto.offset.reset' = 'earliest',"
+                + " 'bootstrap.servers' = '" + bootstrapServers + "'"
+                + " )";
+
+        String definition1b = "CREATE EXTERNAL MAPPING IF NOT EXISTS "
+                // Name for our SQL
+                + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS
+                // Name of the remote object
+                + " EXTERNAL NAME " + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS
+                + " ( "
+                + " id             VARCHAR, "
+                // Timestamp is a reserved word, need to escape. Adjust the mapping name so avoiding clash with IMap
+                + " \"timestamp\"  BIGINT, "
+                + " kind           VARCHAR, "
+                + " bicCreditor    VARCHAR, "
+                + " bicDebtor      VARCHAR, "
+                + " ccy            VARCHAR, "
+                + " amtFloor       DECIMAL, "
+                + " xml            VARCHAR "
+                + " ) "
+                + " TYPE Kafka "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'json-flat',"
+                + " 'auto.offset.reset' = 'earliest',"
+                + " 'bootstrap.servers' = '" + bootstrapServers + "'"
+                + " )";
+
+        String definition1c = "CREATE EXTERNAL MAPPING IF NOT EXISTS "
+                // Name for our SQL
+                + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS
+                // Name of the remote object
+                + " EXTERNAL NAME " + MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS
                 + " ( "
                 + " id             VARCHAR, "
                 + " price          BIGINT, "
@@ -313,6 +553,29 @@ public class CommonIdempotentInitialization {
                 + " 'bootstrap.servers' = '" + bootstrapServers + "'"
                 + " )";
 
+        boolean ok = true;
+        switch (transactionMonitorFlavor) {
+        case ECOMMERCE:
+            ok = define(definition1a, hazelcastInstance);
+            break;
+        case PAYMENTS:
+            ok = define(definition1b, hazelcastInstance);
+            break;
+        case TRADE:
+        default:
+            ok = define(definition1c, hazelcastInstance);
+            break;
+        }
+        return ok;
+    }
+    /**
+     * <p>Define more Kafka streams so can be directly used as a
+     * querying source by SQL.
+     * </p>
+     *
+     * @param bootstrapServers
+     */
+    static boolean defineKafka2(HazelcastInstance hazelcastInstance, String bootstrapServers) {
         String definition2 = "CREATE EXTERNAL MAPPING IF NOT EXISTS "
                 // Name for our SQL
                 + MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_ALERTS
@@ -333,7 +596,6 @@ public class CommonIdempotentInitialization {
                 + " )";
 
         boolean ok = true;
-        ok = define(definition1, hazelcastInstance);
         ok = ok & define(definition2, hazelcastInstance);
         return ok;
     }
@@ -345,7 +607,7 @@ public class CommonIdempotentInitialization {
      * @param hazelcastInstance
      * @return
      */
-    static boolean defineWANIMaps(HazelcastInstance hazelcastInstance) {
+    static boolean defineWANIMaps(HazelcastInstance hazelcastInstance, TransactionMonitorFlavor transactionMonitorFlavor) {
         String definition3 = "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_AUDIT_LOG
                 + " TYPE IMap "
@@ -366,28 +628,101 @@ public class CommonIdempotentInitialization {
                 + " 'valueJavaClass' = '" + String.class.getName() + "'"
                 + " )";
 
-        String definition5 = "CREATE MAPPING IF NOT EXISTS "
-                 + MyConstants.IMAP_NAME_SYMBOLS
-                 + " TYPE IMap "
-                 + " OPTIONS ( "
-                 + " 'keyFormat' = 'java',"
-                 + " 'keyJavaClass' = 'java.lang.String',"
-                 + " 'valueFormat' = 'java',"
-                 + " 'valueJavaClass' = '" + SymbolInfo.class.getName() + "'"
-                 + " )";
+        String[] definition5Arr = getDefinition5();
 
-        boolean ok = true;
-        List<String> definitions = List.of(definition3, definition4, definition5);
-        for (String definition : definitions) {
-            ok &= define(definition, hazelcastInstance);
+        List<String> definitions;
+        List<String> mapNames;
+        switch (transactionMonitorFlavor) {
+        case ECOMMERCE:
+            definitions = List.of(definition3, definition4,
+                    definition5Arr[TransactionMonitorFlavor.ECOMMERCE.ordinal()]);
+            mapNames = MyConstants.WAN_IMAP_NAMES_ECOMMERCE;
+            break;
+        case PAYMENTS:
+            definitions = List.of(definition3, definition4,
+                    definition5Arr[TransactionMonitorFlavor.PAYMENTS.ordinal()]);
+            mapNames = MyConstants.WAN_IMAP_NAMES_PAYMENTS;
+            break;
+        case TRADE:
+        default:
+            definitions = List.of(definition3, definition4,
+                    definition5Arr[TransactionMonitorFlavor.TRADE.ordinal()]);
+            mapNames = MyConstants.WAN_IMAP_NAMES_TRADE;
+            break;
         }
-        if (definitions.size() != MyConstants.WAN_IMAP_NAMES.size()) {
+        boolean ok = runDefine(definitions, hazelcastInstance);
+        mapNames.forEach(mapName -> hazelcastInstance.getMap(mapName));
+        if (definitions.size() != mapNames.size()) {
             LOGGER.error("Not all WAN maps defined");
             return false;
         }
         return ok;
     }
 
+    /**
+     * <p>The various styles of definition 5, depending on the required flavor.
+     * </p>
+     * @return
+     */
+    private static String[] getDefinition5() {
+        String[] result = new String[TransactionMonitorFlavor.values().length];
+
+        result[TransactionMonitorFlavor.ECOMMERCE.ordinal()] =
+                "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_PRODUCTS
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = '" + ProductInfo.class.getName() + "'"
+                + " )";
+
+        result[TransactionMonitorFlavor.PAYMENTS.ordinal()] =
+                "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_BICS
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = '" + BicInfo.class.getName() + "'"
+                + " )";
+
+        result[TransactionMonitorFlavor.TRADE.ordinal()] =
+                "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_SYMBOLS
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = '" + SymbolInfo.class.getName() + "'"
+                + " )";
+
+        for (int i = 0; i < result.length; i++) {
+            if (result[i] == null) {
+                LOGGER.error("Definition 5 is missing for ordinal {}", i);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * <p>Apply some definitions.
+     * </p>
+     *
+     * @param definitions
+     * @param hazelcastInstance
+     * @return
+     */
+    private static boolean runDefine(List<String> definitions, HazelcastInstance hazelcastInstance) {
+        boolean ok = true;
+        for (String definition : definitions) {
+            ok &= define(definition, hazelcastInstance);
+        }
+        return ok;
+    }
 
     /**
      * <p>Without this metadata, cannot query an empty
@@ -396,7 +731,7 @@ public class CommonIdempotentInitialization {
      *
      * @param hazelcastInstance
      */
-    static boolean defineIMaps1(HazelcastInstance hazelcastInstance) {
+    static boolean defineIMaps1(HazelcastInstance hazelcastInstance, TransactionMonitorFlavor transactionMonitorFlavor) {
         String definition6 = "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS
                 + " TYPE IMap "
@@ -409,10 +744,10 @@ public class CommonIdempotentInitialization {
 
         // See also AggregateQuery writing to map, and Postgres table definition for MapStore
         String definition7 = "CREATE MAPPING IF NOT EXISTS "
-                + MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME
+                + MyConstants.IMAP_NAME_ALERTS_LOG
                 + " ("
                 + "    __key BIGINT,"
-                + "    symbol VARCHAR,"
+                + "    code VARCHAR,"
                 + "    provenance VARCHAR,"
                 + "    whence VARCHAR,"
                 + "    volume BIGINT"
@@ -435,44 +770,246 @@ public class CommonIdempotentInitialization {
      * </p>
      * @param hazelcastInstance
      */
-    static boolean defineIMaps2(HazelcastInstance hazelcastInstance) {
-        String definition8 = "CREATE MAPPING IF NOT EXISTS "
-                + MyConstants.IMAP_NAME_PORTFOLIOS
+    static boolean defineIMaps2(HazelcastInstance hazelcastInstance, TransactionMonitorFlavor transactionMonitorFlavor) {
+        String[] definition8Arr = getDefinition8();
+
+        boolean ok = true;
+        List<String> definitions
+        = List.of(definition8Arr[transactionMonitorFlavor.ordinal()]);
+
+        for (String definition : definitions) {
+            ok &= define(definition, hazelcastInstance);
+        }
+        return ok;
+    }
+
+    /**
+     * <p>The various styles of definition 8, depending on the required flavor.
+     * </p>
+     * @return
+     */
+    @SuppressWarnings("checkstyle:MethodLength")
+    private static String[] getDefinition8() {
+        String[] result = new String[TransactionMonitorFlavor.values().length];
+
+        result[TransactionMonitorFlavor.ECOMMERCE.ordinal()] =
+                "CREATE MAPPING IF NOT EXISTS "
+                        + MyConstants.IMAP_NAME_PERSPECTIVE
+                        + " ("
+                        + "    __key VARCHAR,"
+                        + "    code VARCHAR,"
+                        + "    \"count\" BIGINT,"
+                        + "    \"sum\" DOUBLE,"
+                        + "    average DOUBLE,"
+                        + "    seconds INTEGER,"
+                        + "    random INTEGER"
+                        + ")"
+                        + " TYPE IMap "
+                        + " OPTIONS ( "
+                        + " 'keyFormat' = 'java',"
+                        + " 'keyJavaClass' = '" + String.class.getName() + "',"
+                        + " 'valueFormat' = 'compact',"
+                        + " 'valueCompactTypeName' = '" + PerspectiveEcommerce.class.getSimpleName() + "'"
+                        + " )";
+
+        result[TransactionMonitorFlavor.PAYMENTS.ordinal()] =
+                "CREATE MAPPING IF NOT EXISTS "
+                        + MyConstants.IMAP_NAME_PERSPECTIVE
+                        + " ("
+                        + "    __key VARCHAR,"
+                        + "    bic VARCHAR,"
+                        + "    \"count\" BIGINT,"
+                        + "    \"sum\" DOUBLE,"
+                        + "    average DOUBLE,"
+                        + "    seconds INTEGER,"
+                        + "    random INTEGER"
+                        + ")"
+                        + " TYPE IMap "
+                        + " OPTIONS ( "
+                        + " 'keyFormat' = 'java',"
+                        + " 'keyJavaClass' = '" + String.class.getName() + "',"
+                        + " 'valueFormat' = 'compact',"
+                        + " 'valueCompactTypeName' = '" + PerspectivePayments.class.getSimpleName() + "'"
+                        + " )";
+
+        result[TransactionMonitorFlavor.TRADE.ordinal()] =
+                "CREATE MAPPING IF NOT EXISTS "
+                        + MyConstants.IMAP_NAME_PERSPECTIVE
+                        + " ("
+                        + "    __key VARCHAR,"
+                        + "    symbol VARCHAR,"
+                        + "    \"count\" BIGINT,"
+                        + "    \"sum\" DOUBLE,"
+                        + "    latest DOUBLE,"
+                        + "    seconds INTEGER,"
+                        + "    random INTEGER"
+                        + ")"
+                        + " TYPE IMap "
+                        + " OPTIONS ( "
+                        + " 'keyFormat' = 'java',"
+                        + " 'keyJavaClass' = '" + String.class.getName() + "',"
+                        + " 'valueFormat' = 'compact',"
+                        + " 'valueCompactTypeName' = '" + PerspectiveTrade.class.getSimpleName() + "'"
+                        + " )";
+
+        for (int i = 0; i < result.length; i++) {
+            if (result[i] == null) {
+                LOGGER.error("Definition 8 is missing for ordinal {}", i);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * <p>Even more map definitions
+     * </p>
+     * @param hazelcastInstance
+     */
+    static boolean defineIMaps3(HazelcastInstance hazelcastInstance, TransactionMonitorFlavor transactionMonitorFlavor) {
+       String[] definition9Arr = getDefinition9();
+       String definition9 = definition9Arr[transactionMonitorFlavor.ordinal()];
+
+       String[] definition9ExtraArr = getDefinition9Extra();
+       String definition9Extra = definition9ExtraArr[transactionMonitorFlavor.ordinal()];
+
+       String definition10 = "CREATE MAPPING IF NOT EXISTS "
+               + MyConstants.IMAP_NAME_PYTHON_SENTIMENT
+               + " TYPE IMap "
+               + " OPTIONS ( "
+               + " 'keyFormat' = 'java',"
+               + " 'keyJavaClass' = 'java.lang.String',"
+               + " 'valueFormat' = 'java',"
+               + " 'valueJavaClass' = 'java.lang.String'"
+               + " )";
+
+       boolean ok = true;
+       List<String> definitions;
+       if (definition9Extra == null || definition9Extra.isBlank()) {
+           definitions = List.of(definition9, definition10);
+       } else {
+           definitions = List.of(definition9, definition9Extra, definition10);
+       }
+
+       for (String definition : definitions) {
+           ok &= define(definition, hazelcastInstance);
+       }
+       return ok;
+    }
+
+    /**
+     * <p>The various styles of definition 9, depending on the required flavor.
+     * </p>
+     * @return
+     */
+    @SuppressWarnings("checkstyle:MethodLength")
+    private static String[] getDefinition9() {
+        String[] result = new String[TransactionMonitorFlavor.values().length];
+
+        result[TransactionMonitorFlavor.ECOMMERCE.ordinal()] =
+                "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_TRANSACTIONS
                 + " ("
                 + "    __key VARCHAR,"
-                + "    stock VARCHAR,"
-                + "    sold INTEGER,"
-                + "    bought INTEGER,"
-                + "    change INTEGER"
+                + "    id VARCHAR,"
+                + "    \"timestamp\" BIGINT,"
+                + "    itemCode VARCHAR,"
+                + "    price DECIMAL,"
+                + "    quantity BIGINT"
                 + ")"
                 + " TYPE IMap "
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = '" + String.class.getName() + "',"
-                + " 'valueFormat' = 'compact',"
-                + " 'valueCompactTypeName' = '" + Portfolio.class.getSimpleName() + "'"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'json-flat',"
+                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getName() + "'"
                 + " )";
 
-        String definition9 = "CREATE MAPPING IF NOT EXISTS "
-                 + MyConstants.IMAP_NAME_TRADES
-                 + " TYPE IMap "
-                 + " OPTIONS ( "
-                 + " 'keyFormat' = 'java',"
-                 + " 'keyJavaClass' = 'java.lang.String',"
-                 + " 'valueFormat' = 'java',"
-                 + " 'valueJavaClass' = '" + Trade.class.getName() + "'"
-                 + " )";
-
-        String definition10 = "CREATE MAPPING IF NOT EXISTS "
-                + MyConstants.IMAP_NAME_PYTHON_SENTIMENT
+        result[TransactionMonitorFlavor.PAYMENTS.ordinal()] =
+                "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_TRANSACTIONS
+                + " ("
+                + "    __key VARCHAR,"
+                + "    id VARCHAR,"
+                + "    \"timestamp\" BIGINT,"
+                + "    kind VARCHAR,"
+                + "    bicCreditor VARCHAR,"
+                + "    bicDebitor VARCHAR,"
+                + "    ccy VARCHAR,"
+                + "    amtFloor DECIMAL"
+                + ")"
                 + " TYPE IMap "
                 + " OPTIONS ( "
                 + " 'keyFormat' = 'java',"
                 + " 'keyJavaClass' = 'java.lang.String',"
-                + " 'valueFormat' = 'java',"
-                + " 'valueJavaClass' = 'java.lang.String'"
+                + " 'valueFormat' = 'json-flat',"
+                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getName() + "'"
                 + " )";
 
+        result[TransactionMonitorFlavor.TRADE.ordinal()] =
+                "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_TRANSACTIONS
+                + " ("
+                + "    __key VARCHAR,"
+                + "    id VARCHAR,"
+                + "    \"timestamp\" BIGINT,"
+                + "    symbol VARCHAR,"
+                + "    price DECIMAL,"
+                + "    quantity BIGINT"
+                + ")"
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'valueFormat' = 'json-flat',"
+                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getName() + "'"
+                + " )";
+
+        for (int i = 0; i < result.length; i++) {
+            if (result[i] == null) {
+                LOGGER.error("Definition 9 is missing for ordinal {}", i);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * <p>Bonus definitions for transactions, may not be needed depending
+     * on the type of transaction.
+     * </p>
+     * @return
+     */
+    private static String[] getDefinition9Extra() {
+        String[] result = new String[TransactionMonitorFlavor.values().length];
+
+        result[TransactionMonitorFlavor.ECOMMERCE.ordinal()] = "";
+
+        result[TransactionMonitorFlavor.PAYMENTS.ordinal()] =
+                "CREATE MAPPING IF NOT EXISTS "
+                + MyConstants.IMAP_NAME_TRANSACTIONS_XML
+                + " TYPE IMap "
+                + " OPTIONS ( "
+                + " 'keyFormat' = 'java',"
+                + " 'keyJavaClass' = '" + String.class.getName() + "',"
+                + " 'valueFormat' = 'java',"
+                + " 'valueJavaClass' = '" + String.class.getName() + "'"
+                + " )";
+
+        result[TransactionMonitorFlavor.TRADE.ordinal()] = "";
+
+        for (int i = 0; i < result.length; i++) {
+            if (result[i] == null) {
+                LOGGER.error("Definition 9 is missing for ordinal {}", i);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * <p>Even more map definitions
+     * </p>
+     * @param hazelcastInstance
+     */
+    static boolean defineIMaps4(HazelcastInstance hazelcastInstance, TransactionMonitorFlavor transactionMonitorFlavor) {
         String definition11 = "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_JOB_CONTROL
                 + " TYPE IMap "
@@ -483,29 +1020,33 @@ public class CommonIdempotentInitialization {
                 + " 'valueJavaClass' = 'java.lang.String'"
                 + " )";
 
-        boolean ok = define(definition8, hazelcastInstance);
-        ok &= define(definition9, hazelcastInstance);
-        ok &= define(definition10, hazelcastInstance);
-        ok &= define(definition11, hazelcastInstance);
-        return ok;
-    }
-
-    /**
-     * <p>Even more map definitions
-     * </p>
-     * @param hazelcastInstance
-     */
-    static boolean defineIMaps3(HazelcastInstance hazelcastInstance) {
         // Not much of view, but shows the concept
         String definition12 =  "CREATE OR REPLACE VIEW "
-                + MyConstants.IMAP_NAME_TRADES + MyConstants.VIEW_SUFFIX
+                + MyConstants.IMAP_NAME_TRANSACTIONS + MyConstants.VIEW_SUFFIX
                 + " AS SELECT "
                 + "    __key"
                 + "      AS \"primary_key\""
-                + " FROM " + MyConstants.IMAP_NAME_TRADES;
+                + " FROM " + MyConstants.IMAP_NAME_TRANSACTIONS;
 
         boolean ok = true;
-        ok &= define(definition12, hazelcastInstance);
+        List<String> definitions;
+
+        // Same for all currently
+        switch (transactionMonitorFlavor) {
+        //case ECOMMERCE:
+        //    definitions = List.of(definition11, definition12);
+        //    break;
+        //case PAYMENTS:
+        //    definitions = List.of(definition11, definition12);
+        //    break;
+        //case TRADE:
+        default:
+            definitions = List.of(definition11, definition12);
+            break;
+        }
+        for (String definition : definitions) {
+            ok &= define(definition, hazelcastInstance);
+        }
         return ok;
     }
 
@@ -518,6 +1059,10 @@ public class CommonIdempotentInitialization {
      */
     static boolean define(String definition, HazelcastInstance hazelcastInstance) {
         LOGGER.debug("Definition '{}'", definition);
+        if (definition == null || definition.isBlank()) {
+            LOGGER.error("Empty definition");
+            return false;
+        }
         try {
             hazelcastInstance.getSql().execute(definition);
             return true;
@@ -528,10 +1073,10 @@ public class CommonIdempotentInitialization {
     }
 
     /**
-     * <p><i>1</i> Launch a job to read trades from Kafka and place them in a map,
+     * <p><i>1</i> Launch a job to read transactions from Kafka and place them in a map,
      * a simple upload.
      * </p>
-     * <p><i>2</i> Launch a job to read the same trades from Kafka and to aggregate
+     * <p><i>2</i> Launch a job to read the same transactions from Kafka and to aggregate
      * them, placing the results into another map.
      * </p>
      * <p>As we launch them at the same time, the 2nd job could be merged into the
@@ -542,63 +1087,43 @@ public class CommonIdempotentInitialization {
      * @param properties
      */
     public static boolean launchNeededJobs(HazelcastInstance hazelcastInstance, String bootstrapServers,
-            String pulsarList, Properties postgresProperties, Properties properties, String clusterName) {
+            String pulsarList, Properties postgresProperties, Properties properties, String clusterName,
+            TransactionMonitorFlavor transactionMonitorFlavor) {
+        boolean ok = true;
         String projectName = properties.getOrDefault(UtilsConstants.SLACK_PROJECT_NAME,
-                CommonIdempotentInitialization.class.getSimpleName()).toString();
+                TransactionMonitorIdempotentInitialization.class.getSimpleName()).toString();
 
         String pulsarOrKafka = hazelcastInstance
                 .getMap(MyConstants.IMAP_NAME_JOB_CONFIG).get(MyConstants.PULSAR_OR_KAFKA_KEY).toString();
         boolean usePulsar = MyUtils.usePulsar(pulsarOrKafka);
         logUsePulsar(usePulsar, pulsarOrKafka);
 
-        String cloudOrHzCloud = hazelcastInstance
-                .getMap(MyConstants.IMAP_NAME_JOB_CONFIG).get(MyConstants.USE_HZ_CLOUD).toString();
-        boolean useHzCloud = MyUtils.useHzCloud(cloudOrHzCloud);
-        logUseHzCloud(useHzCloud, cloudOrHzCloud);
+        String kubernetesOrViridian = hazelcastInstance
+                .getMap(MyConstants.IMAP_NAME_JOB_CONFIG).get(MyConstants.USE_VIRIDIAN).toString();
+        boolean useViridian = MyUtils.useViridian(kubernetesOrViridian);
+        logUseViridian(useViridian, kubernetesOrViridian);
 
         if (System.getProperty("my.autostart.enabled", "").equalsIgnoreCase("false")) {
-            LOGGER.info("Not launching Kafka jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",
+            LOGGER.info("Not launching transaction input jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",
                     System.getProperty("my.autostart.enabled"));
         } else {
-            LOGGER.info("Launching Kafka jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",
+            LOGGER.info("Launching transaction input jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",
                     System.getProperty("my.autostart.enabled"));
-
-            // Trade ingest
-            Pipeline pipelineIngestTrades = IngestTrades.buildPipeline(bootstrapServers, pulsarList, usePulsar);
-
-            JobConfig jobConfigIngestTrades = new JobConfig();
-            jobConfigIngestTrades.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
-            jobConfigIngestTrades.setName(IngestTrades.class.getSimpleName());
-            jobConfigIngestTrades.addClass(IngestTrades.class);
-
-            if (usePulsar && useHzCloud) {
-                //TODO Fix once supported by HZ Cloud
-                LOGGER.error("Pulsar is not currently supported on Hazelcast Cloud");
-            } else {
-                UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineIngestTrades, jobConfigIngestTrades);
+            try {
+                ok = launchTransactionJobs(hazelcastInstance, bootstrapServers, pulsarList,
+                        usePulsar, useViridian, projectName, clusterName, transactionMonitorFlavor);
+                if (!ok) {
+                    return ok;
+                }
+            } catch (Exception e) {
+                LOGGER.error("launchNeededJobs(): launchTransactionJobs()", e);
+                return false;
             }
+        }
 
-            // Trade aggregation
-            JobConfig jobConfigAggregateQuery = new JobConfig();
-            jobConfigAggregateQuery.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
-            jobConfigAggregateQuery.setName(AggregateQuery.class.getSimpleName());
-            jobConfigAggregateQuery.addClass(AggregateQuery.class);
-            jobConfigAggregateQuery.addClass(MaxVolumeAggregator.class);
-            jobConfigAggregateQuery.addClass(UtilsFormatter.class);
-
-            Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(bootstrapServers,
-                    pulsarList, usePulsar, projectName, jobConfigAggregateQuery.getName(),
-                    clusterName);
-
-            if (usePulsar && useHzCloud) {
-                //TODO Fix once supported by HZ Cloud
-                LOGGER.error("Pulsar is not currently supported on Hazelcast Cloud");
-            } else {
-                UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAggregateQuery, jobConfigAggregateQuery);
-                // Aggregate query creates alerts to an IMap. Use a separate rather than same job to copy to Kafka.
-                launchAlertsToKafkaAndToLog(hazelcastInstance, bootstrapServers);
-            }
-
+        if (!usePulsar && ok) {
+            // Aggregate query creates alerts to an IMap. Use a separate rather than same job to copy to Kafka.
+            ok &=  launchAlertsToKafkaAndToLog(hazelcastInstance, bootstrapServers, transactionMonitorFlavor);
         }
 
         // Remaining jobs need properties
@@ -607,13 +1132,99 @@ public class CommonIdempotentInitialization {
             return false;
         }
 
-        // Slack SQL integration (reading/writing) from common utils
-        launchSlackReadWrite(useHzCloud, projectName, hazelcastInstance, properties);
+        if (ok) {
+            // Slack SQL integration (reading/writing) from common utils
+            ok &= launchSlackReadWrite(useViridian, projectName, hazelcastInstance, properties, transactionMonitorFlavor);
+        }
 
-        launchPostgresCDC(hazelcastInstance, postgresProperties,
-                Objects.toString(properties.get(MyConstants.PROJECT_PROVENANCE)));
+        if (ok) {
+            // Feed changes from Postgres directly into Hazelcast
+            ok &= launchPostgresCDC(hazelcastInstance, postgresProperties,
+                    Objects.toString(properties.get(MyConstants.PROJECT_PROVENANCE)), useViridian);
+        }
 
-        logStuff(hazelcastInstance);
+        // Optional
+        MyUtils.logStuff(hazelcastInstance);
+        return ok;
+    }
+
+    /**
+     * <p>The main two jobs upload and aggregate the transaction input feed.
+     * This is done as two jobs for simplicity, but would be more efficient to have one reader on the
+     * input feed sending data to two legs of processing.
+     * </p>
+     *
+     * @param hazelcastInstance
+     * @param bootstrapServers
+     * @param pulsarList
+     * @param clusterName
+     * @param usePulsar
+     * @param useViridian
+     * @param projectName
+     * @param clusterName
+     * @param transactionMonitorFlavor
+     * @return
+     */
+    public static boolean launchTransactionJobs(HazelcastInstance hazelcastInstance, String bootstrapServers,
+            String pulsarList, boolean usePulsar, boolean useViridian, String projectName, String clusterName,
+            TransactionMonitorFlavor transactionMonitorFlavor) {
+
+        /* Transaction ingest
+         */
+        JobConfig jobConfigIngestTransactions = new JobConfig();
+        jobConfigIngestTransactions.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
+        jobConfigIngestTransactions.setName(IngestTransactions.class.getSimpleName());
+        jobConfigIngestTransactions.addClass(IngestTransactions.class);
+
+        StreamStage<Entry<String, HazelcastJsonValue>> pulsarInputSource1 = null;
+        if (usePulsar) {
+            // Attach Pulsar classes only if needed
+            pulsarInputSource1 = MyPulsarSource.inputSourceKeyAndJson(pulsarList);
+            jobConfigIngestTransactions.addClass(MyPulsarSource.class);
+        }
+
+        Pipeline pipelineIngestTransactions = IngestTransactions.buildPipeline(bootstrapServers,
+                pulsarInputSource1, transactionMonitorFlavor);
+
+        if (usePulsar && useViridian) {
+            //FIXME Not yet available on Viridian @ March 2023.
+            LOGGER_TO_IMAP.error("Pulsar is not currently supported on Viridian");
+            return false;
+        } else {
+            Job job = UtilsJobs.myNewJobIfAbsent(LOGGER,
+                    hazelcastInstance, pipelineIngestTransactions, jobConfigIngestTransactions);
+            LOGGER_TO_IMAP.info(Objects.toString(job));
+        }
+
+        /* Transaction aggregation
+         */
+        JobConfig jobConfigAggregateQuery = new JobConfig();
+        jobConfigAggregateQuery.setProcessingGuarantee(ProcessingGuarantee.EXACTLY_ONCE);
+        jobConfigAggregateQuery.setName(AggregateQuery.class.getSimpleName());
+        jobConfigAggregateQuery.addClass(AggregateQuery.class);
+        jobConfigAggregateQuery.addClass(MaxAggregator.class);
+        jobConfigAggregateQuery.addClass(UtilsFormatter.class);
+
+        StreamStage<?> pulsarInputSource2 = null;
+        if (usePulsar) {
+            // Attach Pulsar classes only if needed
+            pulsarInputSource2 = MyPulsarSource.inputSourceTransaction(pulsarList, transactionMonitorFlavor);
+            jobConfigAggregateQuery.addClass(MyPulsarSource.class);
+        }
+
+        Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(bootstrapServers,
+                pulsarInputSource2, projectName, jobConfigAggregateQuery.getName(),
+                clusterName, transactionMonitorFlavor);
+
+        if (usePulsar && useViridian) {
+            //FIXME Not yet available on Viridian @ March 2023.
+            LOGGER_TO_IMAP.error("Pulsar is not currently supported on Viridian");
+            return false;
+        } else {
+            Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAggregateQuery, jobConfigAggregateQuery);
+            LOGGER_TO_IMAP.info(Objects.toString(job));
+        }
+
         return true;
     }
 
@@ -634,14 +1245,14 @@ public class CommonIdempotentInitialization {
     /**
      * <p>Helper for logging.
      * </p>
-     * @param useHzCloud
-     * @param cloudOrHzCloud
+     * @param useViridian
+     * @param kubernetesOrViridian
      */
-    private static void logUseHzCloud(boolean useHzCloud, String cloudOrHzCloud) {
-        if (useHzCloud) {
-            LOGGER.info("Using Hazelcast Cloud = '{}'=='{}'", MyConstants.USE_HZ_CLOUD, cloudOrHzCloud);
+    private static void logUseViridian(boolean useViridian, String kubernetesOrViridian) {
+        if (useViridian) {
+            LOGGER.info("Using Viridian => '{}'=='{}'", MyConstants.USE_VIRIDIAN, kubernetesOrViridian);
         } else {
-            LOGGER.info("Using Non-Hazelcast Cloud = '{}'=='{}'", MyConstants.USE_HZ_CLOUD, cloudOrHzCloud);
+            LOGGER.info("Not using Viridian => '{}'=='{}'", MyConstants.USE_VIRIDIAN, kubernetesOrViridian);
         }
     }
 
@@ -652,23 +1263,42 @@ public class CommonIdempotentInitialization {
      * @param hazelcastInstance
      * @param bootstrapServers
      */
-    private static void launchAlertsToKafkaAndToLog(HazelcastInstance hazelcastInstance, String bootstrapServers) {
+    private static boolean launchAlertsToKafkaAndToLog(HazelcastInstance hazelcastInstance, String bootstrapServers,
+            TransactionMonitorFlavor transactionMonitorFlavor) {
         String topic = MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_ALERTS;
 
-        /*FIXME 5.3. Make both jobs streaming SQL
-        String sqlJobMapToKafka = "SINK INTO "
-                + MyConstants.KAFKA_TOPIC_NAME_ALERTS
-                + " SELECT __key, symbol || ',' || provenance || ',' || whence || ',' || volume FROM "
-                + MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME;
-                */
-
         String sqlJobKafkaToMap =
-                "CREATE JOB IF NOT EXISTS " + MyConstants.SQL_JOB_NAME_KAFKA_TO_IMAP
+                "CREATE JOB IF NOT EXISTS \"" + MyConstants.SQL_JOB_NAME_KAFKA_TO_IMAP + "\""
                 + " AS "
-                + " SINK INTO " + MyConstants.IMAP_NAME_AUDIT_LOG
-                + " SELECT * FROM " + topic;
+                + " SINK INTO \"" + MyConstants.IMAP_NAME_AUDIT_LOG + "\""
+                + " SELECT * FROM \"" + topic + "\"";
 
-        // 5.2 Style, to be removed in favor of SQL for both.
+        String concatenation;
+        String xxx = "5.4?_";
+        LOGGER.error("Reminder to remove job prefix {}", xxx);
+        // Same for all currently
+        switch (transactionMonitorFlavor) {
+        //case ECOMMERCE:
+        //    concatenation = "code";
+        //    break;
+        //case PAYMENTS:
+        //    concatenation = "code";
+        //    break;
+        //case TRADE:
+        default:
+            concatenation = "code";
+            break;
+        }
+        String sqlJobMapToKafka =
+                "CREATE JOB IF NOT EXISTS \"" + xxx + MyConstants.SQL_JOB_NAME_IMAP_TO_KAFKA + "\""
+                + " AS "
+                + " SINK INTO \"" + MyConstants.KAFKA_TOPIC_NAME_ALERTS + "\""
+                + " SELECT __key, " + concatenation + " || ',' || provenance || ',' || whence || ',' || volume"
+                + " FROM \"" + MyConstants.IMAP_NAME_ALERTS_LOG + "\"";
+
+        //FIXME 5.2 Style, to be removed once "sqlJobMapToKafka" runs as streaming in 5.4
+        //FIXME https://docs.hazelcast.com/hazelcast/5.3-snapshot/sql/querying-maps-sql#streaming-map-changes
+        //FIXME See https://github.com/hazelcast/hazelcast-platform-demos/issues/131
         try {
             Pipeline pipelineAlertingToKafka = AlertingToKafka.buildPipeline(bootstrapServers);
 
@@ -676,48 +1306,72 @@ public class CommonIdempotentInitialization {
             jobConfigAlertingToKafka.setName(AlertingToKafka.class.getSimpleName());
             jobConfigAlertingToKafka.addClass(HazelcastJsonValueSerializer.class);
 
-            UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToKafka, jobConfigAlertingToKafka);
+            //FIXME Fails on Viridian, issue 4241 ??
+            Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToKafka, jobConfigAlertingToKafka);
+            LOGGER_TO_IMAP.info(Objects.toString(job));
         } catch (Exception e) {
             LOGGER.error("launchAlertsSqlToKafka:", e);
+            return false;
         }
 
-        for (String sql : List.of(sqlJobKafkaToMap)) {
+        //FIXME Submit "sqlJobMapToKafka", will complete until ready for streaming as reminder
+        for (String sql : List.of(sqlJobKafkaToMap, sqlJobMapToKafka)) {
             try {
                 hazelcastInstance.getSql().execute(sql);
                 LOGGER.info("SQL running: '{}'", sql);
             } catch (Exception e) {
                 LOGGER.error("launchAlertsSqlToKafka:" + sql, e);
+                return false;
             }
         }
+        return true;
     }
 
     /**
      * <p>Launch Slack jobs for SQL (read/write) and alerting (write)
      * </p>
      *
-     * @param useHzCloud
+     * @param useViridian
      * @param projectName
      * @param hazelcastInstance
      * @param properties
      */
-    private static void launchSlackReadWrite(boolean useHzCloud, Object projectName,
-            HazelcastInstance hazelcastInstance, Properties properties) {
+    private static boolean launchSlackReadWrite(boolean useViridian, Object projectName,
+            HazelcastInstance hazelcastInstance, Properties properties,
+            TransactionMonitorFlavor transactionMonitorFlavor) {
 
-        try {
-            UtilsSlackSQLJob.submitJob(hazelcastInstance,
-                    projectName == null ? "" : projectName.toString());
-        } catch (Exception e) {
-            LOGGER.error("launchNeededJobs:" + UtilsSlackSQLJob.class.getSimpleName(), e);
+        String slackAccessToken = Objects.toString(properties.get(UtilsConstants.SLACK_ACCESS_TOKEN));
+        String slackChannelId = Objects.toString(properties.get(UtilsConstants.SLACK_CHANNEL_ID));
+        String slackChannelName = Objects.toString(properties.get(UtilsConstants.SLACK_CHANNEL_NAME));
+
+        if (slackAccessToken.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY) {
+            LOGGER.warn("No Slack jobs, '{}' too short: '{}'", UtilsConstants.SLACK_ACCESS_TOKEN, slackAccessToken);
+            return false;
+        }
+        if (slackChannelId.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY) {
+            LOGGER.warn("No Slack jobs, '{}' too short: '{}'", UtilsConstants.SLACK_CHANNEL_ID, slackChannelId);
+            return false;
+        }
+        if (slackChannelName.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY) {
+            LOGGER.warn("No Slack jobs, '{}' too short: '{}'", UtilsConstants.SLACK_CHANNEL_NAME, slackChannelName);
+            return false;
         }
 
         // Slack alerting (writing), indirectly uses common utils
-        if (useHzCloud) {
-            //TODO Fix once supported by HZ Cloud
-            LOGGER.error("Slack is not currently supported on Hazelcast Cloud");
+        if (useViridian) {
+            //FIXME Not yet available on Viridian @ March 2023.
+            LOGGER.error("Slack is not currently supported on Viridian");
         } else {
-            launchSlackJob(hazelcastInstance, properties);
+            try {
+                UtilsSlackSQLJob.submitJob(hazelcastInstance,
+                        projectName == null ? "" : projectName.toString());
+            } catch (Exception e) {
+                LOGGER.error("launchNeededJobs:" + UtilsSlackSQLJob.class.getSimpleName(), e);
+                return false;
+            }
+            launchSlackJob(hazelcastInstance, properties, transactionMonitorFlavor);
         }
-
+        return true;
     }
 
     /**
@@ -726,13 +1380,15 @@ public class CommonIdempotentInitialization {
      * @param hazelcastInstance
      * @param properties
      */
-    private static void launchSlackJob(HazelcastInstance hazelcastInstance, Properties properties) {
+    private static boolean launchSlackJob(HazelcastInstance hazelcastInstance, Properties properties,
+            TransactionMonitorFlavor transactionMonitorFlavor) {
         try {
             Pipeline pipelineAlertingToSlack = AlertingToSlack.buildPipeline(
                     properties.get(UtilsConstants.SLACK_ACCESS_TOKEN),
                     properties.get(UtilsConstants.SLACK_CHANNEL_NAME),
                     properties.get(UtilsConstants.SLACK_PROJECT_NAME),
-                    properties.get(UtilsConstants.SLACK_BUILD_USER)
+                    properties.get(UtilsConstants.SLACK_BUILD_USER),
+                    transactionMonitorFlavor
                     );
 
             JobConfig jobConfigAlertingToSlack = new JobConfig();
@@ -741,12 +1397,13 @@ public class CommonIdempotentInitialization {
             jobConfigAlertingToSlack.addClass(AlertingToSlack.class);
             jobConfigAlertingToSlack.addClass(UtilsSlackSink.class);
 
-            LOGGER.info("Job - {}",
-                UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToSlack, jobConfigAlertingToSlack)
-            );
+            Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToSlack, jobConfigAlertingToSlack);
+            LOGGER_TO_IMAP.info(Objects.toString(job));
         } catch (Exception e) {
             LOGGER.error("launchNeededJobs:" + AlertingToSlack.class.getSimpleName(), e);
+            return false;
         }
+        return true;
     }
 
     /**
@@ -757,8 +1414,9 @@ public class CommonIdempotentInitialization {
      * @param hazelcastInstance
      * @param properties
      */
-    private static void launchPostgresCDC(HazelcastInstance hazelcastInstance,
-            Properties properties, String ourProjectProvenance) {
+    private static boolean launchPostgresCDC(HazelcastInstance hazelcastInstance,
+            Properties properties, String ourProjectProvenance, boolean useViridian) {
+
         try {
             Pipeline pipelinePostgresCDC = PostgresCDC.buildPipeline(
                     Objects.toString(properties.get(MyConstants.POSTGRES_ADDRESS)),
@@ -767,75 +1425,22 @@ public class CommonIdempotentInitialization {
                     Objects.toString(properties.get(MyConstants.POSTGRES_USER)),
                     Objects.toString(properties.get(MyConstants.POSTGRES_PASSWORD)),
                     hazelcastInstance.getConfig().getClusterName(),
-                    MyConstants.IMAP_NAME_ALERTS_MAX_VOLUME,
-                    ourProjectProvenance
+                    MyConstants.IMAP_NAME_ALERTS_LOG,
+                    ourProjectProvenance,
+                    useViridian
                     );
 
             JobConfig jobConfigPostgresCDC = new JobConfig();
             jobConfigPostgresCDC.setName(PostgresCDC.class.getSimpleName());
             jobConfigPostgresCDC.addClass(PostgresCDC.class);
 
-            LOGGER.info("Job - {}",
-                UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelinePostgresCDC, jobConfigPostgresCDC)
-            );
+            Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelinePostgresCDC, jobConfigPostgresCDC);
+            LOGGER_TO_IMAP.info(Objects.toString(job));
         } catch (Exception e) {
             LOGGER.error("launchNeededJobs:" + PostgresCDC.class.getSimpleName(), e);
+            return false;
         }
-
+        return true;
     }
 
-    private static void logStuff(HazelcastInstance hazelcastInstance) {
-        logJobs(hazelcastInstance);
-        logMaps(hazelcastInstance);
-    }
-
-    /**
-     * <p>Confirm the running jobs to the console.
-     * </p>
-     */
-    private static void logJobs(HazelcastInstance hazelcastInstance) {
-        LOGGER.info("~_~_~_~_~");
-        LOGGER.info("logJobs()");
-        LOGGER.info("---------");
-        hazelcastInstance.getJet().getJobs().forEach(job -> {
-            LOGGER.info("Job name '{}', id {}, status {}, submission {} ({})",
-                    Objects.toString(job.getName()), job.getId(), job.getStatus(),
-                    job.getSubmissionTime(), new Date(job.getSubmissionTime()));
-            try {
-                JobConfig jobConfig = job.getConfig();
-                Object originalSql =
-                        jobConfig.getArgument(JobConfigArguments.KEY_SQL_QUERY_TEXT);
-                if (originalSql != null) {
-                    LOGGER.info(" Original SQL: {}", originalSql);
-                }
-            } catch (Exception e) {
-                LOGGER.info("JobConfig", e);
-            }
-        });
-        LOGGER.info("---------");
-        LOGGER.info("~_~_~_~_~");
-    }
-
-    /**
-     * <p>Confirm the maps sizes to the console.
-     * </p>
-     */
-    private static void logMaps(HazelcastInstance hazelcastInstance) {
-        Set<String> iMapNames = hazelcastInstance.getDistributedObjects()
-                .stream()
-                .filter(distributedObject -> distributedObject instanceof IMap)
-                .filter(distributedObject -> !distributedObject.getName().startsWith("__"))
-                .map(distributedObject -> distributedObject.getName())
-                .collect(Collectors.toCollection(TreeSet::new));
-
-        LOGGER.info("~_~_~_~_~");
-        LOGGER.info("logMaps()");
-        LOGGER.info("---------");
-        for (String iMapName : iMapNames) {
-            LOGGER.info("IMap: name '{}', size {}",
-                    iMapName, hazelcastInstance.getMap(iMapName).size());
-        }
-        LOGGER.info("---------");
-        LOGGER.info("~_~_~_~_~");
-    }
 }

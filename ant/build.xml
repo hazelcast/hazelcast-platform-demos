@@ -1,0 +1,33 @@
+<project name="transaction-monitor">
+	<target name="myecho">
+		<echo message="====================================" />
+		<echo message="$my.viridian.cluster1.id=${my.viridian.cluster1.id}" />
+		<echo message="$my.viridian.cluster1.discovery.token=${my.viridian.cluster1.discovery.token}" />
+		<echo message="$my.viridian.cluster1.keys.location=${my.viridian.cluster1.keys.location}" />
+		<echo message="$my.viridian.cluster1.key.password=${my.viridian.cluster1.key.password}" />
+		<echo message="====================================" />
+	</target>
+
+	<target name="mytestdir" depends="myecho">
+						<available file="${my.viridian.cluster1.keys.location}" type="dir"
+							property="keys.directory.exists"/>
+	</target>
+
+	<target name="mycopy" depends="mytestdir" if="keys.directory.exists">
+		<echo message="====================================" />
+		<echo message="Copy from ${my.viridian.cluster1.keys.location}" />
+		<echo message="====================================" />
+       		<copy todir="${project.build.directory}">
+       			<fileset dir="${my.viridian.cluster1.keys.location}" includes="client.*"/>
+       			<fileset dir="${my.viridian.cluster1.keys.location}" includes="*pem"/>
+        	</copy>
+	</target>
+	<target name="mydontcopy" depends="mytestdir" unless="keys.directory.exists">
+		<echo message="====================================" />
+		<echo message="${my.viridian.cluster1.keys.location} not a directory. No copy" />
+		<echo message="====================================" />
+	</target>
+
+	<target name="conditionalcopy" depends="mycopy,mydontcopy">
+	</target>
+</project>
