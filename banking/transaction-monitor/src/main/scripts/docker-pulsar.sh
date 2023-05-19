@@ -1,10 +1,11 @@
 #!/bin/bash
 
-PROJECT=trade-monitor
+PROJECT=transaction-monitor
 MODULE=pulsar
 
 BASEDIR=`dirname $0`
 cd $BASEDIR/../../../$MODULE
+. ../src/main/scripts/check-flavor.sh
 
 HOST_IP=`ifconfig | grep -w inet | grep -v 127.0.0.1 | cut -d" " -f2`
 if [ "$HOST_IP" == "" ]
@@ -18,7 +19,7 @@ then
  exit 1
 fi
 
-DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
+DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${FLAVOR}-${MODULE}
 
 # Private network so can use container names
 docker network create $PROJECT --driver bridge > /dev/null 2>&1

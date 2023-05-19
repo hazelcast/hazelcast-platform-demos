@@ -4,17 +4,18 @@
 	<modelVersion>4.0.0</modelVersion>
 
         <parent>
-                <groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
-                <artifactId>trade-monitor-root</artifactId>
-                <version>5.2</version>
+                <groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
+                <artifactId>transaction-monitor-root</artifactId>
+                <version>5.3</version>
         </parent>
 
-        <artifactId>trade-monitor-prometheus</artifactId>
+        <artifactId>transaction-monitor-prometheus</artifactId>
 
-        <name>Hazelcast Platform - Trade Monitor - Prometheus</name>
-        <description>Trade Monitor - Prometheus</description>
+        <name>Hazelcast Platform - Transaction Monitor - Prometheus</name>
+        <description>Transaction Monitor - Prometheus</description>
 
 	<properties>
+                <dockerfile.skip>${skip.when.viridian}</dockerfile.skip>
 		<my.docker.image.name>prometheus</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>

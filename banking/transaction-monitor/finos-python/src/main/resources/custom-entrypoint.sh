@@ -12,10 +12,15 @@ else
 fi
 echo "$0: - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 
-# Configure address for Kubernetes or Docker
-MC_EMPTY=''
-MC_CLUSTER1_LIST=`echo ${MC_CLUSTER1_ADDRESSLIST_OVERRIDE:-${MC_EMPTY}} $MC_CLUSTER1_ADDRESSLIST |awk '{print $1}'`
+USE_VIRIDIAN=`grep use.viridian /tmp/control.file | cut -d= -f2`
 
-# Run Python
-echo python cli.py $MC_CLUSTER1_NAME $MC_CLUSTER1_LIST
-python cli.py $MC_CLUSTER1_NAME $MC_CLUSTER1_LIST
+# index.html imports custom-entrypoint.py
+DIR=/finos
+FILE=$DIR/custom_entrypoint.py
+echo MY_KUBERNETES_ENABLED = \'$MY_KUBERNETES_ENABLED\' >> $FILE
+echo HOST_IP = \'$HOST_IP\' >> $FILE
+echo HOME = \'$HOME\' >> $FILE
+echo USE_VIRIDIAN = \'$USE_VIRIDIAN\' >> $FILE
+cat $FILE
+
+python -m http.server --directory $DIR 8080

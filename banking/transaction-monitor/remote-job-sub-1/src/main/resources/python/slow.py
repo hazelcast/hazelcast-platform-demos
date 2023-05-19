@@ -15,11 +15,11 @@
 #
 ########################################################################
 # Simplist assessment of whether current trading in a stock is due to
-# institutional investor making few large trades or multiple individual
-# investors making small trades with a similar cumulative effect.
+# institutional investor making few large transactions or multiple individual
+# investors making small transactions with a similar cumulative effect.
 # ----------------------------------------------------------------------
 # Input:
-# A series of trades in JSON format:
+# A series of transactions in JSON format:
 # {"id": "c6dcc88c-5f1c-4c0d-ae7f-6518e5bb187a","timestamp": 1617797114225,"symbol": "GEVO","price": 2499,"quantity": 5913}
 # ----------------------------------------------------------------------
 # Output:
@@ -27,7 +27,7 @@
 # GEVO,WHALE
 # ----------------------------------------------------------------------
 # Note:
-# (1) The same stock may feature more than once in the input item list,
+# (1) The same item may feature more than once in the input item list,
 # but this isn't considered. Each item is assessed in isolation,
 # missing the chance for added value.
 # (2) The code has a "sleep()" to simulate complex processing that
@@ -37,19 +37,48 @@
 import json
 import time 
 
+flavor = "@my.transaction-monitor.flavor@"
+
 def processFn(items):
     results = []
 
-    for item in items:
-      trade = json.loads(item)
-      symbol = trade["symbol"]
+    keyField = ""
+    thresholdField = ""
+    threshold = 0
+    thresholdAbove = ""
+    thresholdBelow = ""
+    # Not Python 3.10 necessarily 
+    if flavor == "ecommerce":
+      keyField = "itemCode"
+      thresholdField = "quantity"
+      threshold = 1
+      thresholdAbove = "Hot"
+      thresholdBelow = "Cold"
+    if flavor == "payments":
+      thresholdField = "amtFloor"
+      keyField = "bicCreditor"
+      threshold = 500000
+      thresholdAbove = "Whale"
+      thresholdBelow = "Minnow"
+    if flavor == "trade":
+      thresholdField = "quantity"
+      keyField = "symbol"
+      threshold = 5000
+      thresholdAbove = "Whale"
+      thresholdBelow = "Minnow"
+    if keyField == "":
+      return results
 
-      if trade["quantity"] > 5000:
-        assessment = "WHALE"
+    for item in items:
+      transaction = json.loads(item)
+      key = transaction[keyField]
+
+      if transaction[thresholdField] > threshold:
+        assessment = thresholdAbove
       else:
-        assessment = "MINNOW"
+        assessment = thresholdBelow
       
       time.sleep(0.05)
 
-      results.append("".join((symbol, ",", assessment)))
+      results.append("".join((key, ",", assessment, ",", flavor)))
     return results    

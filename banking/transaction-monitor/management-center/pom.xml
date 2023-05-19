@@ -4,17 +4,18 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
-		<artifactId>trade-monitor-root</artifactId>
-		<version>5.2</version>
+		<groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
+		<artifactId>transaction-monitor-root</artifactId>
+		<version>5.3</version>
 	</parent>
 
-	<artifactId>trade-monitor-management-center</artifactId>
+	<artifactId>transaction-monitor-management-center</artifactId>
 
-	<name>Hazelcast Platform - Trade Monitor - Management Center</name>
-	<description>Trade Monitor - Management Center</description>
+	<name>Hazelcast Platform - Transaction Monitor - Management Center</name>
+	<description>Transaction Monitor - Management Center</description>
 
 	<properties>
+                <dockerfile.skip>${skip.when.viridian}</dockerfile.skip>
 		<my.docker.image.name>management-center</my.docker.image.name>
 		<my.docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
@@ -29,7 +30,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>trade-monitor-custom-classes</artifactId>
+			<artifactId>transaction-monitor-custom-classes</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

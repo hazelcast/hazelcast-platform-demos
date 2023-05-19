@@ -6,7 +6,7 @@
         <parent>
                 <groupId>com.hazelcast.platform.demos.banking.cva</groupId>
                 <artifactId>cva-root</artifactId>
-                <version>5.2</version>
+                <version>5.3</version>
         </parent>
 
         <artifactId>cva-prometheus</artifactId>
@@ -14,6 +14,7 @@
         <description>Credit Value Adjustment - Prometheus</description>
 
 	<properties>
+                <dockerfile.skip>${skip.when.viridian}</dockerfile.skip>
 		<my.docker.image.name>prometheus</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>

@@ -41,7 +41,7 @@ public class MyMapStoreFactory implements MapStoreFactory {
 
     @Autowired
     private ApplicationContext applicationContext;
-    @Value("${spring.data.cassandra.contact-points}")
+    @Value("${spring.cassandra.contact-points}")
     private String contactPoints;
 
     @Override

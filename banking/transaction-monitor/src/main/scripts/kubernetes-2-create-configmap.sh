@@ -1,8 +1,28 @@
 #!/bin/bash
 
-STATEFULSET_NAME=trade-monitor-kafka-broker
-POSTGRES_NAME=trade-monitor-postgres
-PULSAR_NAME=trade-monitor-pulsar
+ARG1=`echo $1 | awk '{print tolower($0)}'`
+if [ "${ARG1}" == "ecommerce" ]
+then
+ FLAVOR=ecommerce
+fi
+if [ "${ARG1}" == "payments" ]
+then
+ FLAVOR=payments
+fi
+if [ "${ARG1}" == "trade" ]
+then
+ FLAVOR=trade
+fi
+
+if [ "${FLAVOR}" == "" ]
+then
+ echo $0: usage: `basename $0` '<flavor>'
+ exit 1
+fi
+
+STATEFULSET_NAME=transaction-monitor-${FLAVOR}-kafka-broker
+POSTGRES_NAME=transaction-monitor-${FLAVOR}-postgres
+PULSAR_NAME=transaction-monitor-${FLAVOR}-pulsar
 IPLIST=""
 POSTGRESADDRESS=""
 PULSARLIST=""
@@ -100,7 +120,7 @@ fi
 POSTGRESCOUNT=`echo $POSTGRESADDRESS | sed 's/,/ /g' | wc -w`
 if [ $POSTGRESCOUNT -ne 1 ]
 then
- echo `basename $0`: ERROR: Need 1 IPs in Postgres IP list: \"$POSTGRESADDRES\"
+ echo `basename $0`: ERROR: Need 1 IPs in Postgres IP list: \"$POSTGRESADDRESS\"
  exit 1
 fi
 PULSARCOUNT=`echo $PULSARLIST | sed 's/,/ /g' | wc -w`
@@ -116,7 +136,7 @@ echo "---" >> $TMPFILE
 echo "apiVersion: v1" >> $TMPFILE
 echo "kind: ConfigMap" >> $TMPFILE
 echo "metadata:" >> $TMPFILE
-echo "  name: trade-monitor-configmap" >> $TMPFILE
+echo "  name: transaction-monitor-${FLAVOR}-configmap" >> $TMPFILE
 echo "data:" >> $TMPFILE
 echo "  # Creates 'my-env.sh' mounted in /customize in pod" >> $TMPFILE
 echo "  my-env.sh: |-" >> $TMPFILE
@@ -128,7 +148,7 @@ echo "    echo MY_POD_IP \"\$MY_POD_IP\"" >> $TMPFILE
 echo "    echo MY_POD_NAME \"\$MY_POD_NAME\"" >> $TMPFILE
 echo "    echo @@@@@@@@@@@@@@@@" >> $TMPFILE
 # $ID should be numeric - 0, 1 or 2
-echo "    ID=\`echo \$MY_POD_NAME | sed s/trade-monitor-kafka-broker-//\`" >> $TMPFILE
+echo "    ID=\`echo \$MY_POD_NAME | sed s/transaction-monitor-${FLAVOR}-kafka-broker-//\`" >> $TMPFILE
 echo "    EXTERNAL_PORT=9092" >> $TMPFILE
 echo "    INTERNAL_PORT=19092" >> $TMPFILE
 echo "    echo ID \"\$ID\"" >> $TMPFILE
@@ -143,7 +163,7 @@ echo "    IP1=\`echo \$IPLIST | cut -d, -f2\`:\${EXTERNAL_PORT}" >> $TMPFILE
 echo "    IP2=\`echo \$IPLIST | cut -d, -f3\`:\${EXTERNAL_PORT}" >> $TMPFILE
 echo "    export KAFKA_CFG_BROKER_ID=\${ID}" >> $TMPFILE
 echo "    INTERNAL=\${MY_POD_IP}:\${INTERNAL_PORT}" >> $TMPFILE
-#echo "    INTERNAL=\${MY_POD_NAME}.trade-monitor-kafka-broker.default.svc.cluster.local:\${INTERNAL_PORT}" >> $TMPFILE
+#echo "    INTERNAL=\${MY_POD_NAME}.transaction-monitor-${FLAVOR}-kafka-broker.default.svc.cluster.local:\${INTERNAL_PORT}" >> $TMPFILE
 echo "    if [ \"\$ID\" == 0 ]" >> $TMPFILE
 echo "    then" >> $TMPFILE
 echo "     EXTERNAL=\${IP0}" >> $TMPFILE

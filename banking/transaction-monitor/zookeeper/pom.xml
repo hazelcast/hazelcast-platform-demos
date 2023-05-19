@@ -4,15 +4,15 @@
         <modelVersion>4.0.0</modelVersion>
 
         <parent>
-		<groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
-        	<artifactId>trade-monitor-root</artifactId>
-                <version>5.2</version>
+		<groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
+        	<artifactId>transaction-monitor-root</artifactId>
+                <version>5.3</version>
         </parent>
 
-        <artifactId>trade-monitor-zookeeper</artifactId>
+        <artifactId>transaction-monitor-zookeeper</artifactId>
 
-        <name>Hazelcast Platform - Trade Monitor - Zookeeper</name>
-        <description>Trade Monitor - Re-package Zookeeper</description>
+        <name>Hazelcast Platform - Transaction Monitor - Zookeeper</name>
+        <description>Transaction Monitor - Re-package Zookeeper</description>
 
 	<properties>
 		<my.docker.image.name>zookeeper</my.docker.image.name>

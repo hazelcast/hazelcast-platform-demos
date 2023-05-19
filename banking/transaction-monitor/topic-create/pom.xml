@@ -4,15 +4,15 @@
         <modelVersion>4.0.0</modelVersion>
 
         <parent>
-		<groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
-        	<artifactId>trade-monitor-root</artifactId>
-                <version>5.2</version>
+		<groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
+        	<artifactId>transaction-monitor-root</artifactId>
+                <version>5.3</version>
         </parent>
 
-        <artifactId>trade-monitor-topic-create</artifactId>
+        <artifactId>transaction-monitor-topic-create</artifactId>
 
-        <name>Hazelcast Platform - Trade Monitor - Topic Create</name>
-        <description>Trade Monitor - Topic Creation Script</description>
+        <name>Hazelcast Platform - Transaction Monitor - Topic Create</name>
+        <description>Transaction Monitor - Topic Creation Script</description>
 
 	<properties>
 		<my.docker.image.name>topic-create</my.docker.image.name>

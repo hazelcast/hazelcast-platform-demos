@@ -7,7 +7,7 @@
         <parent>
                 <groupId>com.hazelcast.platform.demos</groupId>
                 <artifactId>hazelcast-platform-demos-root</artifactId>
-                <version>5.2</version>
+                <version>5.3</version>
         </parent>
 
  		<groupId>com.hazelcast.platform.demos.banking</groupId>
@@ -23,7 +23,7 @@
 
         <modules>
         	<module>credit-value-adjustment</module>
-        	<module>trade-monitor</module>
+        	<module>transaction-monitor</module>
         </modules>
 
 </project>

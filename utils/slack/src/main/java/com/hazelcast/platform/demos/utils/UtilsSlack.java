@@ -23,6 +23,9 @@ import java.util.Properties;
  * </p>
  */
 public class UtilsSlack {
+    // For validation of properties.
+    public static final int REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY = 8;
+
     // Local constant, never needed outside this class
     private static final String SLACK_PROPERTIES = "platform-utils-slack.properties";
 

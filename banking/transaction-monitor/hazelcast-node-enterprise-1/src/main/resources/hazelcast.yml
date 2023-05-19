@@ -25,5 +25,8 @@ hazelcast:
           discovery-strategies:
             # See https://github.com/hazelcast/hazelcast/issues/16792
             discovery-strategies:
-              - class: hazelcast.platform.demos.banking.trademonitor.MyWANDiscoveryStrategyFactory
+              - class: hazelcast.platform.demos.banking.transactionmonitor.MyWANDiscoveryStrategyFactory
                 enabled: true         
+  # For Tiered-Storage
+  native-memory:
+    enabled: true

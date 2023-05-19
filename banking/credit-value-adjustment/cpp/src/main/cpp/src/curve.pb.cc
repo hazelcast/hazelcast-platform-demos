@@ -14,55 +14,70 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
+
+PROTOBUF_PRAGMA_INIT_SEG
+
+namespace _pb = ::PROTOBUF_NAMESPACE_ID;
+namespace _pbi = _pb::internal;
+
 namespace FlumaionQL {
-class CurveDefaultTypeInternal {
- public:
-  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Curve> _instance;
-} _Curve_default_instance_;
+PROTOBUF_CONSTEXPR Curve::Curve(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.maturity_period_value_)*/{}
+  , /*decltype(_impl_._maturity_period_value_cached_byte_size_)*/{0}
+  , /*decltype(_impl_.maturity_period_type_)*/{}
+  , /*decltype(_impl_._maturity_period_type_cached_byte_size_)*/{0}
+  , /*decltype(_impl_.rates_)*/{}
+  , /*decltype(_impl_.curvename_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.index_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.calendar_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.dcc_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.index_frequency_type_)*/int64_t{0}
+  , /*decltype(_impl_.index_frequency_)*/0
+  , /*decltype(_impl_.bussiness_convention_)*/0
+  , /*decltype(_impl_.end_of_month_flag_)*/false
+  , /*decltype(_impl_.settlement_days_)*/0
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct CurveDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR CurveDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~CurveDefaultTypeInternal() {}
+  union {
+    Curve _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 CurveDefaultTypeInternal _Curve_default_instance_;
 }  // namespace FlumaionQL
-static void InitDefaultsscc_info_Curve_curve_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
+static ::_pb::Metadata file_level_metadata_curve_2eproto[1];
+static constexpr ::_pb::EnumDescriptor const** file_level_enum_descriptors_curve_2eproto = nullptr;
+static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_curve_2eproto = nullptr;
 
-  {
-    void* ptr = &::FlumaionQL::_Curve_default_instance_;
-    new (ptr) ::FlumaionQL::Curve();
-    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::FlumaionQL::Curve::InitAsDefaultInstance();
-}
-
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Curve_curve_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Curve_curve_2eproto}, {}};
-
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_curve_2eproto[1];
-static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_curve_2eproto = nullptr;
-static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_curve_2eproto = nullptr;
-
-const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_curve_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+const uint32_t TableStruct_curve_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, curvename_),
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, index_),
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, index_frequency_),
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, index_frequency_type_),
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, calendar_),
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, bussiness_convention_),
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, dcc_),
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, end_of_month_flag_),
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, settlement_days_),
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, maturity_period_value_),
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, maturity_period_type_),
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, rates_),
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, _impl_.curvename_),
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, _impl_.index_),
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, _impl_.index_frequency_),
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, _impl_.index_frequency_type_),
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, _impl_.calendar_),
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, _impl_.bussiness_convention_),
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, _impl_.dcc_),
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, _impl_.end_of_month_flag_),
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, _impl_.settlement_days_),
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, _impl_.maturity_period_value_),
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, _impl_.maturity_period_type_),
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::Curve, _impl_.rates_),
 };
-static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, sizeof(::FlumaionQL::Curve)},
+static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+  { 0, -1, -1, sizeof(::FlumaionQL::Curve)},
 };
 
-static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::FlumaionQL::_Curve_default_instance_),
+static const ::_pb::Message* const file_default_instances[] = {
+  &::FlumaionQL::_Curve_default_instance_._instance,
 };
 
 const char descriptor_table_protodef_curve_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
@@ -76,270 +91,326 @@ const char descriptor_table_protodef_curve_2eproto[] PROTOBUF_SECTION_VARIABLE(p
   "_period_type\030\013 \003(\005\022\r\n\005rates\030\014 \003(\002b\006proto"
   "3"
   ;
-static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_curve_2eproto_deps[1] = {
+static ::_pbi::once_flag descriptor_table_curve_2eproto_once;
+const ::_pbi::DescriptorTable descriptor_table_curve_2eproto = {
+    false, false, 321, descriptor_table_protodef_curve_2eproto,
+    "curve.proto",
+    &descriptor_table_curve_2eproto_once, nullptr, 0, 1,
+    schemas, file_default_instances, TableStruct_curve_2eproto::offsets,
+    file_level_metadata_curve_2eproto, file_level_enum_descriptors_curve_2eproto,
+    file_level_service_descriptors_curve_2eproto,
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_curve_2eproto_sccs[1] = {
-  &scc_info_Curve_curve_2eproto.base,
-};
-static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_curve_2eproto_once;
-const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_curve_2eproto = {
-  false, false, descriptor_table_protodef_curve_2eproto, "curve.proto", 321,
-  &descriptor_table_curve_2eproto_once, descriptor_table_curve_2eproto_sccs, descriptor_table_curve_2eproto_deps, 1, 0,
-  schemas, file_default_instances, TableStruct_curve_2eproto::offsets,
-  file_level_metadata_curve_2eproto, 1, file_level_enum_descriptors_curve_2eproto, file_level_service_descriptors_curve_2eproto,
-};
+PROTOBUF_ATTRIBUTE_WEAK const ::_pbi::DescriptorTable* descriptor_table_curve_2eproto_getter() {
+  return &descriptor_table_curve_2eproto;
+}
 
 // Force running AddDescriptors() at dynamic initialization time.
-static bool dynamic_init_dummy_curve_2eproto = (static_cast<void>(::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_curve_2eproto)), true);
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_init_dummy_curve_2eproto(&descriptor_table_curve_2eproto);
 namespace FlumaionQL {
 
 // ===================================================================
 
-void Curve::InitAsDefaultInstance() {
-}
 class Curve::_Internal {
  public:
 };
 
-Curve::Curve(::PROTOBUF_NAMESPACE_ID::Arena* arena)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
-  maturity_period_value_(arena),
-  maturity_period_type_(arena),
-  rates_(arena) {
-  SharedCtor();
-  RegisterArenaDtor(arena);
+Curve::Curve(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
   // @@protoc_insertion_point(arena_constructor:FlumaionQL.Curve)
 }
 Curve::Curve(const Curve& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message(),
-      maturity_period_value_(from.maturity_period_value_),
-      maturity_period_type_(from.maturity_period_type_),
-      rates_(from.rates_) {
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  Curve* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.maturity_period_value_){from._impl_.maturity_period_value_}
+    , /*decltype(_impl_._maturity_period_value_cached_byte_size_)*/{0}
+    , decltype(_impl_.maturity_period_type_){from._impl_.maturity_period_type_}
+    , /*decltype(_impl_._maturity_period_type_cached_byte_size_)*/{0}
+    , decltype(_impl_.rates_){from._impl_.rates_}
+    , decltype(_impl_.curvename_){}
+    , decltype(_impl_.index_){}
+    , decltype(_impl_.calendar_){}
+    , decltype(_impl_.dcc_){}
+    , decltype(_impl_.index_frequency_type_){}
+    , decltype(_impl_.index_frequency_){}
+    , decltype(_impl_.bussiness_convention_){}
+    , decltype(_impl_.end_of_month_flag_){}
+    , decltype(_impl_.settlement_days_){}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  curvename_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _impl_.curvename_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.curvename_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (!from._internal_curvename().empty()) {
-    curvename_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_curvename(),
-      GetArena());
+    _this->_impl_.curvename_.Set(from._internal_curvename(), 
+      _this->GetArenaForAllocation());
   }
-  index_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _impl_.index_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.index_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (!from._internal_index().empty()) {
-    index_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_index(),
-      GetArena());
+    _this->_impl_.index_.Set(from._internal_index(), 
+      _this->GetArenaForAllocation());
   }
-  calendar_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _impl_.calendar_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.calendar_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (!from._internal_calendar().empty()) {
-    calendar_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_calendar(),
-      GetArena());
+    _this->_impl_.calendar_.Set(from._internal_calendar(), 
+      _this->GetArenaForAllocation());
   }
-  dcc_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _impl_.dcc_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.dcc_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (!from._internal_dcc().empty()) {
-    dcc_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_dcc(),
-      GetArena());
+    _this->_impl_.dcc_.Set(from._internal_dcc(), 
+      _this->GetArenaForAllocation());
   }
-  ::memcpy(&index_frequency_type_, &from.index_frequency_type_,
-    static_cast<size_t>(reinterpret_cast<char*>(&settlement_days_) -
-    reinterpret_cast<char*>(&index_frequency_type_)) + sizeof(settlement_days_));
+  ::memcpy(&_impl_.index_frequency_type_, &from._impl_.index_frequency_type_,
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.settlement_days_) -
+    reinterpret_cast<char*>(&_impl_.index_frequency_type_)) + sizeof(_impl_.settlement_days_));
   // @@protoc_insertion_point(copy_constructor:FlumaionQL.Curve)
 }
 
-void Curve::SharedCtor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_Curve_curve_2eproto.base);
-  curvename_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  index_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  calendar_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  dcc_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  ::memset(&index_frequency_type_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&settlement_days_) -
-      reinterpret_cast<char*>(&index_frequency_type_)) + sizeof(settlement_days_));
+inline void Curve::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.maturity_period_value_){arena}
+    , /*decltype(_impl_._maturity_period_value_cached_byte_size_)*/{0}
+    , decltype(_impl_.maturity_period_type_){arena}
+    , /*decltype(_impl_._maturity_period_type_cached_byte_size_)*/{0}
+    , decltype(_impl_.rates_){arena}
+    , decltype(_impl_.curvename_){}
+    , decltype(_impl_.index_){}
+    , decltype(_impl_.calendar_){}
+    , decltype(_impl_.dcc_){}
+    , decltype(_impl_.index_frequency_type_){int64_t{0}}
+    , decltype(_impl_.index_frequency_){0}
+    , decltype(_impl_.bussiness_convention_){0}
+    , decltype(_impl_.end_of_month_flag_){false}
+    , decltype(_impl_.settlement_days_){0}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+  _impl_.curvename_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.curvename_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.index_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.index_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.calendar_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.calendar_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.dcc_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.dcc_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 }
 
 Curve::~Curve() {
   // @@protoc_insertion_point(destructor:FlumaionQL.Curve)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
   SharedDtor();
-  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void Curve::SharedDtor() {
-  GOOGLE_DCHECK(GetArena() == nullptr);
-  curvename_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  index_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  calendar_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  dcc_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+inline void Curve::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.maturity_period_value_.~RepeatedField();
+  _impl_.maturity_period_type_.~RepeatedField();
+  _impl_.rates_.~RepeatedField();
+  _impl_.curvename_.Destroy();
+  _impl_.index_.Destroy();
+  _impl_.calendar_.Destroy();
+  _impl_.dcc_.Destroy();
 }
 
-void Curve::ArenaDtor(void* object) {
-  Curve* _this = reinterpret_cast< Curve* >(object);
-  (void)_this;
-}
-void Curve::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
-}
 void Curve::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
+  _impl_._cached_size_.Set(size);
 }
-const Curve& Curve::default_instance() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_Curve_curve_2eproto.base);
-  return *internal_default_instance();
-}
-
 
 void Curve::Clear() {
 // @@protoc_insertion_point(message_clear_start:FlumaionQL.Curve)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  maturity_period_value_.Clear();
-  maturity_period_type_.Clear();
-  rates_.Clear();
-  curvename_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  index_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  calendar_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  dcc_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  ::memset(&index_frequency_type_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&settlement_days_) -
-      reinterpret_cast<char*>(&index_frequency_type_)) + sizeof(settlement_days_));
+  _impl_.maturity_period_value_.Clear();
+  _impl_.maturity_period_type_.Clear();
+  _impl_.rates_.Clear();
+  _impl_.curvename_.ClearToEmpty();
+  _impl_.index_.ClearToEmpty();
+  _impl_.calendar_.ClearToEmpty();
+  _impl_.dcc_.ClearToEmpty();
+  ::memset(&_impl_.index_frequency_type_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&_impl_.settlement_days_) -
+      reinterpret_cast<char*>(&_impl_.index_frequency_type_)) + sizeof(_impl_.settlement_days_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* Curve::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* Curve::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
-    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
-    CHK_(ptr);
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // string curvename = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           auto str = _internal_mutable_curvename();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "FlumaionQL.Curve.curvename"));
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-        } else goto handle_unusual;
+          CHK_(::_pbi::VerifyUTF8(str, "FlumaionQL.Curve.curvename"));
+        } else
+          goto handle_unusual;
         continue;
       // string index = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
           auto str = _internal_mutable_index();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "FlumaionQL.Curve.index"));
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-        } else goto handle_unusual;
+          CHK_(::_pbi::VerifyUTF8(str, "FlumaionQL.Curve.index"));
+        } else
+          goto handle_unusual;
         continue;
       // int32 index_frequency = 3;
       case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
-          index_frequency_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
+          _impl_.index_frequency_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // int64 index_frequency_type = 4;
       case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
-          index_frequency_type_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
+          _impl_.index_frequency_type_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // string calendar = 5;
       case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
           auto str = _internal_mutable_calendar();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "FlumaionQL.Curve.calendar"));
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-        } else goto handle_unusual;
+          CHK_(::_pbi::VerifyUTF8(str, "FlumaionQL.Curve.calendar"));
+        } else
+          goto handle_unusual;
         continue;
       // int32 bussiness_convention = 6;
       case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 48)) {
-          bussiness_convention_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 48)) {
+          _impl_.bussiness_convention_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // string dcc = 7;
       case 7:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 58)) {
           auto str = _internal_mutable_dcc();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "FlumaionQL.Curve.dcc"));
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-        } else goto handle_unusual;
+          CHK_(::_pbi::VerifyUTF8(str, "FlumaionQL.Curve.dcc"));
+        } else
+          goto handle_unusual;
         continue;
       // bool end_of_month_flag = 8;
       case 8:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 64)) {
-          end_of_month_flag_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 64)) {
+          _impl_.end_of_month_flag_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // int32 settlement_days = 9;
       case 9:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 72)) {
-          settlement_days_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 72)) {
+          _impl_.settlement_days_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // repeated int32 maturity_period_value = 10;
       case 10:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 82)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 82)) {
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedInt32Parser(_internal_mutable_maturity_period_value(), ptr, ctx);
           CHK_(ptr);
-        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 80) {
-          _internal_add_maturity_period_value(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr));
+        } else if (static_cast<uint8_t>(tag) == 80) {
+          _internal_add_maturity_period_value(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr));
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // repeated int32 maturity_period_type = 11;
       case 11:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 90)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 90)) {
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedInt32Parser(_internal_mutable_maturity_period_type(), ptr, ctx);
           CHK_(ptr);
-        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 88) {
-          _internal_add_maturity_period_type(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr));
+        } else if (static_cast<uint8_t>(tag) == 88) {
+          _internal_add_maturity_period_type(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr));
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // repeated float rates = 12;
       case 12:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 98)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 98)) {
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedFloatParser(_internal_mutable_rates(), ptr, ctx);
           CHK_(ptr);
-        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 101) {
+        } else if (static_cast<uint8_t>(tag) == 101) {
           _internal_add_rates(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr));
           ptr += sizeof(float);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
-      default: {
-      handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->SetLastTag(tag);
-          goto success;
-        }
-        ptr = UnknownFieldParse(tag,
-            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-            ptr, ctx);
-        CHK_(ptr != nullptr);
-        continue;
-      }
+      default:
+        goto handle_unusual;
     }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
   }  // while
-success:
+message_done:
   return ptr;
 failure:
   ptr = nullptr;
-  goto success;
+  goto message_done;
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* Curve::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* Curve::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:FlumaionQL.Curve)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // string curvename = 1;
-  if (this->curvename().size() > 0) {
+  if (!this->_internal_curvename().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_curvename().data(), static_cast<int>(this->_internal_curvename().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
@@ -349,7 +420,7 @@ failure:
   }
 
   // string index = 2;
-  if (this->index().size() > 0) {
+  if (!this->_internal_index().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_index().data(), static_cast<int>(this->_internal_index().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
@@ -359,19 +430,19 @@ failure:
   }
 
   // int32 index_frequency = 3;
-  if (this->index_frequency() != 0) {
+  if (this->_internal_index_frequency() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(3, this->_internal_index_frequency(), target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(3, this->_internal_index_frequency(), target);
   }
 
   // int64 index_frequency_type = 4;
-  if (this->index_frequency_type() != 0) {
+  if (this->_internal_index_frequency_type() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(4, this->_internal_index_frequency_type(), target);
+    target = ::_pbi::WireFormatLite::WriteInt64ToArray(4, this->_internal_index_frequency_type(), target);
   }
 
   // string calendar = 5;
-  if (this->calendar().size() > 0) {
+  if (!this->_internal_calendar().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_calendar().data(), static_cast<int>(this->_internal_calendar().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
@@ -381,13 +452,13 @@ failure:
   }
 
   // int32 bussiness_convention = 6;
-  if (this->bussiness_convention() != 0) {
+  if (this->_internal_bussiness_convention() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(6, this->_internal_bussiness_convention(), target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(6, this->_internal_bussiness_convention(), target);
   }
 
   // string dcc = 7;
-  if (this->dcc().size() > 0) {
+  if (!this->_internal_dcc().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_dcc().data(), static_cast<int>(this->_internal_dcc().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
@@ -397,20 +468,20 @@ failure:
   }
 
   // bool end_of_month_flag = 8;
-  if (this->end_of_month_flag() != 0) {
+  if (this->_internal_end_of_month_flag() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(8, this->_internal_end_of_month_flag(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(8, this->_internal_end_of_month_flag(), target);
   }
 
   // int32 settlement_days = 9;
-  if (this->settlement_days() != 0) {
+  if (this->_internal_settlement_days() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(9, this->_internal_settlement_days(), target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(9, this->_internal_settlement_days(), target);
   }
 
   // repeated int32 maturity_period_value = 10;
   {
-    int byte_size = _maturity_period_value_cached_byte_size_.load(std::memory_order_relaxed);
+    int byte_size = _impl_._maturity_period_value_cached_byte_size_.load(std::memory_order_relaxed);
     if (byte_size > 0) {
       target = stream->WriteInt32Packed(
           10, _internal_maturity_period_value(), byte_size, target);
@@ -419,7 +490,7 @@ failure:
 
   // repeated int32 maturity_period_type = 11;
   {
-    int byte_size = _maturity_period_type_cached_byte_size_.load(std::memory_order_relaxed);
+    int byte_size = _impl_._maturity_period_type_cached_byte_size_.load(std::memory_order_relaxed);
     if (byte_size > 0) {
       target = stream->WriteInt32Packed(
           11, _internal_maturity_period_type(), byte_size, target);
@@ -432,7 +503,7 @@ failure:
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:FlumaionQL.Curve)
@@ -443,36 +514,34 @@ size_t Curve::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:FlumaionQL.Curve)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // repeated int32 maturity_period_value = 10;
   {
-    size_t data_size = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      Int32Size(this->maturity_period_value_);
+    size_t data_size = ::_pbi::WireFormatLite::
+      Int32Size(this->_impl_.maturity_period_value_);
     if (data_size > 0) {
       total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
     }
-    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
-    _maturity_period_value_cached_byte_size_.store(cached_size,
+    int cached_size = ::_pbi::ToCachedSize(data_size);
+    _impl_._maturity_period_value_cached_byte_size_.store(cached_size,
                                     std::memory_order_relaxed);
     total_size += data_size;
   }
 
   // repeated int32 maturity_period_type = 11;
   {
-    size_t data_size = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      Int32Size(this->maturity_period_type_);
+    size_t data_size = ::_pbi::WireFormatLite::
+      Int32Size(this->_impl_.maturity_period_type_);
     if (data_size > 0) {
       total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
     }
-    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
-    _maturity_period_type_cached_byte_size_.store(cached_size,
+    int cached_size = ::_pbi::ToCachedSize(data_size);
+    _impl_._maturity_period_type_cached_byte_size_.store(cached_size,
                                     std::memory_order_relaxed);
     total_size += data_size;
   }
@@ -483,144 +552,113 @@ size_t Curve::ByteSizeLong() const {
     size_t data_size = 4UL * count;
     if (data_size > 0) {
       total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
     }
-    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
-    _rates_cached_byte_size_.store(cached_size,
-                                    std::memory_order_relaxed);
     total_size += data_size;
   }
 
   // string curvename = 1;
-  if (this->curvename().size() > 0) {
+  if (!this->_internal_curvename().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_curvename());
   }
 
   // string index = 2;
-  if (this->index().size() > 0) {
+  if (!this->_internal_index().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_index());
   }
 
   // string calendar = 5;
-  if (this->calendar().size() > 0) {
+  if (!this->_internal_calendar().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_calendar());
   }
 
   // string dcc = 7;
-  if (this->dcc().size() > 0) {
+  if (!this->_internal_dcc().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_dcc());
   }
 
   // int64 index_frequency_type = 4;
-  if (this->index_frequency_type() != 0) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int64Size(
-        this->_internal_index_frequency_type());
+  if (this->_internal_index_frequency_type() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(this->_internal_index_frequency_type());
   }
 
   // int32 index_frequency = 3;
-  if (this->index_frequency() != 0) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-        this->_internal_index_frequency());
+  if (this->_internal_index_frequency() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_index_frequency());
   }
 
   // int32 bussiness_convention = 6;
-  if (this->bussiness_convention() != 0) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-        this->_internal_bussiness_convention());
+  if (this->_internal_bussiness_convention() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_bussiness_convention());
   }
 
   // bool end_of_month_flag = 8;
-  if (this->end_of_month_flag() != 0) {
+  if (this->_internal_end_of_month_flag() != 0) {
     total_size += 1 + 1;
   }
 
   // int32 settlement_days = 9;
-  if (this->settlement_days() != 0) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-        this->_internal_settlement_days());
+  if (this->_internal_settlement_days() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_settlement_days());
   }
 
-  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
-        _internal_metadata_, total_size, &_cached_size_);
-  }
-  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-void Curve::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:FlumaionQL.Curve)
-  GOOGLE_DCHECK_NE(&from, this);
-  const Curve* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<Curve>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:FlumaionQL.Curve)
-    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:FlumaionQL.Curve)
-    MergeFrom(*source);
-  }
-}
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData Curve::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    Curve::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*Curve::GetClassData() const { return &_class_data_; }
 
-void Curve::MergeFrom(const Curve& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:FlumaionQL.Curve)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+
+void Curve::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<Curve*>(&to_msg);
+  auto& from = static_cast<const Curve&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:FlumaionQL.Curve)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  maturity_period_value_.MergeFrom(from.maturity_period_value_);
-  maturity_period_type_.MergeFrom(from.maturity_period_type_);
-  rates_.MergeFrom(from.rates_);
-  if (from.curvename().size() > 0) {
-    _internal_set_curvename(from._internal_curvename());
+  _this->_impl_.maturity_period_value_.MergeFrom(from._impl_.maturity_period_value_);
+  _this->_impl_.maturity_period_type_.MergeFrom(from._impl_.maturity_period_type_);
+  _this->_impl_.rates_.MergeFrom(from._impl_.rates_);
+  if (!from._internal_curvename().empty()) {
+    _this->_internal_set_curvename(from._internal_curvename());
   }
-  if (from.index().size() > 0) {
-    _internal_set_index(from._internal_index());
+  if (!from._internal_index().empty()) {
+    _this->_internal_set_index(from._internal_index());
   }
-  if (from.calendar().size() > 0) {
-    _internal_set_calendar(from._internal_calendar());
+  if (!from._internal_calendar().empty()) {
+    _this->_internal_set_calendar(from._internal_calendar());
   }
-  if (from.dcc().size() > 0) {
-    _internal_set_dcc(from._internal_dcc());
+  if (!from._internal_dcc().empty()) {
+    _this->_internal_set_dcc(from._internal_dcc());
   }
-  if (from.index_frequency_type() != 0) {
-    _internal_set_index_frequency_type(from._internal_index_frequency_type());
+  if (from._internal_index_frequency_type() != 0) {
+    _this->_internal_set_index_frequency_type(from._internal_index_frequency_type());
   }
-  if (from.index_frequency() != 0) {
-    _internal_set_index_frequency(from._internal_index_frequency());
+  if (from._internal_index_frequency() != 0) {
+    _this->_internal_set_index_frequency(from._internal_index_frequency());
   }
-  if (from.bussiness_convention() != 0) {
-    _internal_set_bussiness_convention(from._internal_bussiness_convention());
+  if (from._internal_bussiness_convention() != 0) {
+    _this->_internal_set_bussiness_convention(from._internal_bussiness_convention());
   }
-  if (from.end_of_month_flag() != 0) {
-    _internal_set_end_of_month_flag(from._internal_end_of_month_flag());
+  if (from._internal_end_of_month_flag() != 0) {
+    _this->_internal_set_end_of_month_flag(from._internal_end_of_month_flag());
   }
-  if (from.settlement_days() != 0) {
-    _internal_set_settlement_days(from._internal_settlement_days());
+  if (from._internal_settlement_days() != 0) {
+    _this->_internal_set_settlement_days(from._internal_settlement_days());
   }
-}
-
-void Curve::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:FlumaionQL.Curve)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void Curve::CopyFrom(const Curve& from) {
@@ -636,31 +674,47 @@ bool Curve::IsInitialized() const {
 
 void Curve::InternalSwap(Curve* other) {
   using std::swap;
-  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
-  maturity_period_value_.InternalSwap(&other->maturity_period_value_);
-  maturity_period_type_.InternalSwap(&other->maturity_period_type_);
-  rates_.InternalSwap(&other->rates_);
-  curvename_.Swap(&other->curvename_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  index_.Swap(&other->index_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  calendar_.Swap(&other->calendar_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  dcc_.Swap(&other->dcc_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.maturity_period_value_.InternalSwap(&other->_impl_.maturity_period_value_);
+  _impl_.maturity_period_type_.InternalSwap(&other->_impl_.maturity_period_type_);
+  _impl_.rates_.InternalSwap(&other->_impl_.rates_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.curvename_, lhs_arena,
+      &other->_impl_.curvename_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.index_, lhs_arena,
+      &other->_impl_.index_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.calendar_, lhs_arena,
+      &other->_impl_.calendar_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.dcc_, lhs_arena,
+      &other->_impl_.dcc_, rhs_arena
+  );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(Curve, settlement_days_)
-      + sizeof(Curve::settlement_days_)
-      - PROTOBUF_FIELD_OFFSET(Curve, index_frequency_type_)>(
-          reinterpret_cast<char*>(&index_frequency_type_),
-          reinterpret_cast<char*>(&other->index_frequency_type_));
+      PROTOBUF_FIELD_OFFSET(Curve, _impl_.settlement_days_)
+      + sizeof(Curve::_impl_.settlement_days_)
+      - PROTOBUF_FIELD_OFFSET(Curve, _impl_.index_frequency_type_)>(
+          reinterpret_cast<char*>(&_impl_.index_frequency_type_),
+          reinterpret_cast<char*>(&other->_impl_.index_frequency_type_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata Curve::GetMetadata() const {
-  return GetMetadataStatic();
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_curve_2eproto_getter, &descriptor_table_curve_2eproto_once,
+      file_level_metadata_curve_2eproto[0]);
 }
-
 
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace FlumaionQL
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::FlumaionQL::Curve* Arena::CreateMaybeMessage< ::FlumaionQL::Curve >(Arena* arena) {
+template<> PROTOBUF_NOINLINE ::FlumaionQL::Curve*
+Arena::CreateMaybeMessage< ::FlumaionQL::Curve >(Arena* arena) {
   return Arena::CreateMessageInternal< ::FlumaionQL::Curve >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE

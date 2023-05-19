@@ -6,17 +6,17 @@
 # Services
 ############################################################################
 ---
-# Kafka Broker : DNS will be "trade-monitor-kafka-broker.default.svc.cluster.local".
+# Kafka Broker : DNS will be "transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local".
 # FOR INTERNAL ACCESS: Eg. topic-create job
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: trade-monitor-kafka-broker
+  name: transaction-monitor-FLAVOR-kafka-broker
 spec:
   clusterIP: None
   selector:
-    app: trade-monitor-kafka-broker
+    app: transaction-monitor-FLAVOR-kafka-broker
   ports:
   - port: 19092
 ---
@@ -26,10 +26,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: trade-monitor-kafka-broker-0
+  name: transaction-monitor-FLAVOR-kafka-broker-0
 spec:
   selector:
-    statefulset.kubernetes.io/pod-name: trade-monitor-kafka-broker-0
+    statefulset.kubernetes.io/pod-name: transaction-monitor-FLAVOR-kafka-broker-0
   ports:
   - port: 9092
   type: LoadBalancer
@@ -37,10 +37,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: trade-monitor-kafka-broker-1
+  name: transaction-monitor-FLAVOR-kafka-broker-1
 spec:
   selector:
-    statefulset.kubernetes.io/pod-name: trade-monitor-kafka-broker-1
+    statefulset.kubernetes.io/pod-name: transaction-monitor-FLAVOR-kafka-broker-1
   ports:
   - port: 9092
   type: LoadBalancer
@@ -48,23 +48,37 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: trade-monitor-kafka-broker-2
+  name: transaction-monitor-FLAVOR-kafka-broker-2
 spec:
   selector:
-    statefulset.kubernetes.io/pod-name: trade-monitor-kafka-broker-2
+    statefulset.kubernetes.io/pod-name: transaction-monitor-FLAVOR-kafka-broker-2
   ports:
   - port: 9092
   type: LoadBalancer
 ---
-# Postgres : DNS will be "trade-monitor-postgres.default.svc.cluster.local".
+# MySql : DNS will be "transaction-monitor-FLAVOR-mysql.default.svc.cluster.local".
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: trade-monitor-postgres
+  name: transaction-monitor-FLAVOR-mysql
 spec:
   selector:
-    app: trade-monitor-postgres
+    app: transaction-monitor-FLAVOR-mysql
+  ports:
+  - port: 3306
+    targetPort: 3306
+  type: LoadBalancer
+---
+# Postgres : DNS will be "transaction-monitor-FLAVOR-postgres.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-FLAVOR-postgres
+spec:
+  selector:
+    app: transaction-monitor-FLAVOR-postgres
   ports:
   - port: 5432
     targetPort: 5432
@@ -75,10 +89,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: trade-monitor-pulsar
+  name: transaction-monitor-FLAVOR-pulsar
 spec:
   selector:
-    app: trade-monitor-pulsar
+    app: transaction-monitor-FLAVOR-pulsar
   ports:
     - name: pulsar-scheme
       port: 6650
@@ -88,15 +102,15 @@ spec:
       targetPort: 8080
   type: LoadBalancer
 ---
-# Zookeeper : DNS will be "trade-monitor-zookeeper.default.svc.cluster.local".
+# Zookeeper : DNS will be "transaction-monitor-FLAVOR-zookeeper.default.svc.cluster.local".
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: trade-monitor-zookeeper
+  name: transaction-monitor-FLAVOR-zookeeper
 spec:
   selector:
-    app: trade-monitor-zookeeper
+    app: transaction-monitor-FLAVOR-zookeeper
   ports:
   - port: 2181
   type: ClusterIP
@@ -110,20 +124,20 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: trade-monitor-pulsar
+  name: transaction-monitor-FLAVOR-pulsar
 spec:
   selector:
     matchLabels:
-      app: trade-monitor-pulsar
+      app: transaction-monitor-FLAVOR-pulsar
   template:
     metadata:
       labels:
-        app: trade-monitor-pulsar
+        app: transaction-monitor-FLAVOR-pulsar
     spec:
       containers:
-        - image: "hazelcast-platform-demos/trade-monitor-pulsar"
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-pulsar"
           imagePullPolicy: Never
-          name: trade-monitor-pulsar-container
+          name: transaction-monitor-FLAVOR-pulsar-container
 ---
 # Zookeeper
 ---
@@ -132,23 +146,23 @@ kind: Deployment
 metadata:
   labels:
     app.kubernetes.io/component: zookeeper
-  name: trade-monitor-zookeeper
+  name: transaction-monitor-FLAVOR-zookeeper
 spec:
   selector:
     matchLabels:
-      app: trade-monitor-zookeeper
+      app: transaction-monitor-FLAVOR-zookeeper
       app.kubernetes.io/component: zookeeper
   template:
     metadata:
       labels:
-        app: trade-monitor-zookeeper
+        app: transaction-monitor-FLAVOR-zookeeper
         app.kubernetes.io/component: zookeeper
     spec:
       containers:
         - env:
           - name: "ALLOW_ANONYMOUS_LOGIN"
             value: "true"
-          image: "hazelcast-platform-demos/trade-monitor-zookeeper"
+          image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-zookeeper"
           imagePullPolicy: Never
           name: zookeeper-container
           livenessProbe:
@@ -156,7 +170,7 @@ spec:
             periodSeconds: 10
             tcpSocket:
               port: 2181
-          name: trade-monitor-zookeeper-container
+          name: transaction-monitor-FLAVOR-zookeeper-container
           ports:
             - containerPort: 2181
           readinessProbe:

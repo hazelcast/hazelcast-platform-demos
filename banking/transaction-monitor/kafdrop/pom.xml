@@ -4,15 +4,15 @@
         <modelVersion>4.0.0</modelVersion>
 
         <parent>
-		<groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
-        	<artifactId>trade-monitor-root</artifactId>
-                <version>5.2</version>
+		<groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
+        	<artifactId>transaction-monitor-root</artifactId>
+                <version>5.3</version>
         </parent>
 
-        <artifactId>trade-monitor-kafdrop</artifactId>
+        <artifactId>transaction-monitor-kafdrop</artifactId>
 
-        <name>Hazelcast Platform - Trade Monitor - Kafdrop</name>
-        <description>Trade Monitor - Re-package Kafdrop</description>
+        <name>Hazelcast Platform - Transaction Monitor - Kafdrop</name>
+        <description>Transaction Monitor - Re-package Kafdrop</description>
 
 	<properties>
 		<my.docker.image.name>kafdrop</my.docker.image.name>

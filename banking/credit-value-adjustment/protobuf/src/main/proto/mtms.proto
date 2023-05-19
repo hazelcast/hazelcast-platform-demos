@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package FlumaionQL;
+
+message MTM {
+    string tradeid = 1;
+    string curvename = 2;
+    repeated int64 fixlegdates = 3;
+    repeated float fixlegamount = 4;
+    repeated int64 fltlegdates = 5;
+    repeated float fltlegamount = 6;
+    repeated float discountvalues = 7;
+    repeated float legfractions = 8;
+    bool haserrored = 9;
+    string error = 10;
+    int64 computetimemicros = 11;
+}

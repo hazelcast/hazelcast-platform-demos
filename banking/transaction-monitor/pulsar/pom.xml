@@ -4,14 +4,14 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
-		<artifactId>trade-monitor-root</artifactId>
-		<version>5.2</version>
+		<groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
+		<artifactId>transaction-monitor-root</artifactId>
+		<version>5.3</version>
 	</parent>
 
-	<artifactId>trade-monitor-pulsar</artifactId>
+	<artifactId>transaction-monitor-pulsar</artifactId>
 
-	<name>Hazelcast Platform - Trade Monitor - Pulsar</name>
+	<name>Hazelcast Platform - Transaction Monitor - Pulsar</name>
 	<description>Pulsar node</description>
 
 	<properties>

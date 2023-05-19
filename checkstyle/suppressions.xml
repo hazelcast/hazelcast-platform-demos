@@ -25,6 +25,9 @@
     <suppress checks="JavadocVariable" files=".*"/>
     <suppress checks="JavadocPackage" files=".*"/>
 
+    <!-- Remove? -->
+    <suppress checks="HideUtilityClassConstructor" files=".*"/>
+
     <!-- Suppress strict duplicate code checking -->
     <suppress checks="StrictDuplicateCode" files="\.java" lines="1-15"/>
 

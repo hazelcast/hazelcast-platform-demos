@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package FlumaionQL;
+
+message DataExchange {
+    string curvefile = 1;
+    string fixingfile = 2;
+    string tradefile = 3;
+    string evaldate = 4;
+    string resultsfile = 5;
+    string scenarioid = 6;
+    string tradeid = 7;
+}

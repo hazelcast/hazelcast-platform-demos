@@ -4,21 +4,21 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
-		<artifactId>trade-monitor-root</artifactId>
-		<version>5.2</version>
+		<groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
+		<artifactId>transaction-monitor-root</artifactId>
+		<version>5.3</version>
 	</parent>
 
-	<artifactId>trade-monitor-webapp</artifactId>
+	<artifactId>transaction-monitor-webapp</artifactId>
 
-	<name>Hazelcast Platform - Trade Monitor - Webapp</name>
-	<description>Trade Monitor - Web Application</description>
+	<name>Hazelcast Platform - Transaction Monitor - Webapp</name>
+	<description>Transaction Monitor - Web Application</description>
 
 	<properties>
 		<my.docker.image.name>webapp</my.docker.image.name>
 		<my.docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
-		<main.class>hazelcast.platform.demos.banking.trademonitor.Application</main.class>
+		<main.class>hazelcast.platform.demos.banking.transactionmonitor.Application</main.class>
 
 		<!-- See comment on maven-resources-plugin -->
 		<frontend.app.dir>${project.basedir}/src/main/app</frontend.app.dir>
@@ -31,7 +31,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>trade-monitor-common</artifactId>
+			<artifactId>transaction-monitor-common</artifactId>
 			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
@@ -56,7 +56,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- Need this for SSL for HZ Cloud -->
+		<!-- Need this for SSL for HZ Viridian -->
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-enterprise</artifactId>
@@ -86,7 +86,7 @@
 				<artifactId>maven-antrun-plugin</artifactId>
 				<configuration>
 					<target>
-						<ant antfile="src/main/scripts/build.xml" target="conditionalcopy"/>
+						<ant antfile="../../../ant/build.xml" target="conditionalcopy"/>
 					</target>
 				</configuration>
 			</plugin>
@@ -141,6 +141,24 @@
 								<resource>
 									<directory>${frontend.app.dir}/build</directory>
 									<filtering>true</filtering>
+									<excludes>
+										<exclude>**/*.eot</exclude>
+										<exclude>**/*.svg</exclude>
+										<exclude>**/*.ttf</exclude>
+										<exclude>**/*.woff</exclude>
+										<exclude>**/*.woff2</exclude>
+									</excludes>
+								</resource>
+								<resource>
+									<directory>${frontend.app.dir}/build</directory>
+									<filtering>false</filtering>
+									<includes>
+										<include>**/*.eot</include>
+										<include>**/*.svg</include>
+										<include>**/*.ttf</include>
+										<include>**/*.woff</include>
+										<include>**/*.woff2</include>
+									</includes>
 								</resource>
 							</resources>
 						</configuration>

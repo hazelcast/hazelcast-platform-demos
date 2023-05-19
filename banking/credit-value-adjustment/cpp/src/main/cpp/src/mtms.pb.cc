@@ -14,54 +14,68 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
+
+PROTOBUF_PRAGMA_INIT_SEG
+
+namespace _pb = ::PROTOBUF_NAMESPACE_ID;
+namespace _pbi = _pb::internal;
+
 namespace FlumaionQL {
-class MTMDefaultTypeInternal {
- public:
-  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<MTM> _instance;
-} _MTM_default_instance_;
+PROTOBUF_CONSTEXPR MTM::MTM(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.fixlegdates_)*/{}
+  , /*decltype(_impl_._fixlegdates_cached_byte_size_)*/{0}
+  , /*decltype(_impl_.fixlegamount_)*/{}
+  , /*decltype(_impl_.fltlegdates_)*/{}
+  , /*decltype(_impl_._fltlegdates_cached_byte_size_)*/{0}
+  , /*decltype(_impl_.fltlegamount_)*/{}
+  , /*decltype(_impl_.discountvalues_)*/{}
+  , /*decltype(_impl_.legfractions_)*/{}
+  , /*decltype(_impl_.tradeid_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.curvename_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.error_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.computetimemicros_)*/int64_t{0}
+  , /*decltype(_impl_.haserrored_)*/false
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct MTMDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR MTMDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~MTMDefaultTypeInternal() {}
+  union {
+    MTM _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 MTMDefaultTypeInternal _MTM_default_instance_;
 }  // namespace FlumaionQL
-static void InitDefaultsscc_info_MTM_mtms_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
+static ::_pb::Metadata file_level_metadata_mtms_2eproto[1];
+static constexpr ::_pb::EnumDescriptor const** file_level_enum_descriptors_mtms_2eproto = nullptr;
+static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_mtms_2eproto = nullptr;
 
-  {
-    void* ptr = &::FlumaionQL::_MTM_default_instance_;
-    new (ptr) ::FlumaionQL::MTM();
-    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::FlumaionQL::MTM::InitAsDefaultInstance();
-}
-
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_MTM_mtms_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_MTM_mtms_2eproto}, {}};
-
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_mtms_2eproto[1];
-static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_mtms_2eproto = nullptr;
-static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_mtms_2eproto = nullptr;
-
-const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mtms_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+const uint32_t TableStruct_mtms_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, tradeid_),
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, curvename_),
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, fixlegdates_),
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, fixlegamount_),
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, fltlegdates_),
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, fltlegamount_),
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, discountvalues_),
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, legfractions_),
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, haserrored_),
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, error_),
-  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, computetimemicros_),
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, _impl_.tradeid_),
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, _impl_.curvename_),
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, _impl_.fixlegdates_),
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, _impl_.fixlegamount_),
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, _impl_.fltlegdates_),
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, _impl_.fltlegamount_),
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, _impl_.discountvalues_),
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, _impl_.legfractions_),
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, _impl_.haserrored_),
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, _impl_.error_),
+  PROTOBUF_FIELD_OFFSET(::FlumaionQL::MTM, _impl_.computetimemicros_),
 };
-static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, sizeof(::FlumaionQL::MTM)},
+static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+  { 0, -1, -1, sizeof(::FlumaionQL::MTM)},
 };
 
-static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::FlumaionQL::_MTM_default_instance_),
+static const ::_pb::Message* const file_default_instances[] = {
+  &::FlumaionQL::_MTM_default_instance_._instance,
 };
 
 const char descriptor_table_protodef_mtms_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
@@ -73,271 +87,315 @@ const char descriptor_table_protodef_mtms_2eproto[] PROTOBUF_SECTION_VARIABLE(pr
   "\022\022\n\nhaserrored\030\t \001(\010\022\r\n\005error\030\n \001(\t\022\031\n\021c"
   "omputetimemicros\030\013 \001(\003b\006proto3"
   ;
-static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mtms_2eproto_deps[1] = {
+static ::_pbi::once_flag descriptor_table_mtms_2eproto_once;
+const ::_pbi::DescriptorTable descriptor_table_mtms_2eproto = {
+    false, false, 270, descriptor_table_protodef_mtms_2eproto,
+    "mtms.proto",
+    &descriptor_table_mtms_2eproto_once, nullptr, 0, 1,
+    schemas, file_default_instances, TableStruct_mtms_2eproto::offsets,
+    file_level_metadata_mtms_2eproto, file_level_enum_descriptors_mtms_2eproto,
+    file_level_service_descriptors_mtms_2eproto,
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_mtms_2eproto_sccs[1] = {
-  &scc_info_MTM_mtms_2eproto.base,
-};
-static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mtms_2eproto_once;
-const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mtms_2eproto = {
-  false, false, descriptor_table_protodef_mtms_2eproto, "mtms.proto", 270,
-  &descriptor_table_mtms_2eproto_once, descriptor_table_mtms_2eproto_sccs, descriptor_table_mtms_2eproto_deps, 1, 0,
-  schemas, file_default_instances, TableStruct_mtms_2eproto::offsets,
-  file_level_metadata_mtms_2eproto, 1, file_level_enum_descriptors_mtms_2eproto, file_level_service_descriptors_mtms_2eproto,
-};
+PROTOBUF_ATTRIBUTE_WEAK const ::_pbi::DescriptorTable* descriptor_table_mtms_2eproto_getter() {
+  return &descriptor_table_mtms_2eproto;
+}
 
 // Force running AddDescriptors() at dynamic initialization time.
-static bool dynamic_init_dummy_mtms_2eproto = (static_cast<void>(::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_mtms_2eproto)), true);
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_init_dummy_mtms_2eproto(&descriptor_table_mtms_2eproto);
 namespace FlumaionQL {
 
 // ===================================================================
 
-void MTM::InitAsDefaultInstance() {
-}
 class MTM::_Internal {
  public:
 };
 
-MTM::MTM(::PROTOBUF_NAMESPACE_ID::Arena* arena)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
-  fixlegdates_(arena),
-  fixlegamount_(arena),
-  fltlegdates_(arena),
-  fltlegamount_(arena),
-  discountvalues_(arena),
-  legfractions_(arena) {
-  SharedCtor();
-  RegisterArenaDtor(arena);
+MTM::MTM(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
   // @@protoc_insertion_point(arena_constructor:FlumaionQL.MTM)
 }
 MTM::MTM(const MTM& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message(),
-      fixlegdates_(from.fixlegdates_),
-      fixlegamount_(from.fixlegamount_),
-      fltlegdates_(from.fltlegdates_),
-      fltlegamount_(from.fltlegamount_),
-      discountvalues_(from.discountvalues_),
-      legfractions_(from.legfractions_) {
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  MTM* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.fixlegdates_){from._impl_.fixlegdates_}
+    , /*decltype(_impl_._fixlegdates_cached_byte_size_)*/{0}
+    , decltype(_impl_.fixlegamount_){from._impl_.fixlegamount_}
+    , decltype(_impl_.fltlegdates_){from._impl_.fltlegdates_}
+    , /*decltype(_impl_._fltlegdates_cached_byte_size_)*/{0}
+    , decltype(_impl_.fltlegamount_){from._impl_.fltlegamount_}
+    , decltype(_impl_.discountvalues_){from._impl_.discountvalues_}
+    , decltype(_impl_.legfractions_){from._impl_.legfractions_}
+    , decltype(_impl_.tradeid_){}
+    , decltype(_impl_.curvename_){}
+    , decltype(_impl_.error_){}
+    , decltype(_impl_.computetimemicros_){}
+    , decltype(_impl_.haserrored_){}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  tradeid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _impl_.tradeid_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.tradeid_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (!from._internal_tradeid().empty()) {
-    tradeid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_tradeid(),
-      GetArena());
+    _this->_impl_.tradeid_.Set(from._internal_tradeid(), 
+      _this->GetArenaForAllocation());
   }
-  curvename_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _impl_.curvename_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.curvename_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (!from._internal_curvename().empty()) {
-    curvename_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_curvename(),
-      GetArena());
+    _this->_impl_.curvename_.Set(from._internal_curvename(), 
+      _this->GetArenaForAllocation());
   }
-  error_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _impl_.error_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.error_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (!from._internal_error().empty()) {
-    error_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_error(),
-      GetArena());
+    _this->_impl_.error_.Set(from._internal_error(), 
+      _this->GetArenaForAllocation());
   }
-  ::memcpy(&computetimemicros_, &from.computetimemicros_,
-    static_cast<size_t>(reinterpret_cast<char*>(&haserrored_) -
-    reinterpret_cast<char*>(&computetimemicros_)) + sizeof(haserrored_));
+  ::memcpy(&_impl_.computetimemicros_, &from._impl_.computetimemicros_,
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.haserrored_) -
+    reinterpret_cast<char*>(&_impl_.computetimemicros_)) + sizeof(_impl_.haserrored_));
   // @@protoc_insertion_point(copy_constructor:FlumaionQL.MTM)
 }
 
-void MTM::SharedCtor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_MTM_mtms_2eproto.base);
-  tradeid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  curvename_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  error_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  ::memset(&computetimemicros_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&haserrored_) -
-      reinterpret_cast<char*>(&computetimemicros_)) + sizeof(haserrored_));
+inline void MTM::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.fixlegdates_){arena}
+    , /*decltype(_impl_._fixlegdates_cached_byte_size_)*/{0}
+    , decltype(_impl_.fixlegamount_){arena}
+    , decltype(_impl_.fltlegdates_){arena}
+    , /*decltype(_impl_._fltlegdates_cached_byte_size_)*/{0}
+    , decltype(_impl_.fltlegamount_){arena}
+    , decltype(_impl_.discountvalues_){arena}
+    , decltype(_impl_.legfractions_){arena}
+    , decltype(_impl_.tradeid_){}
+    , decltype(_impl_.curvename_){}
+    , decltype(_impl_.error_){}
+    , decltype(_impl_.computetimemicros_){int64_t{0}}
+    , decltype(_impl_.haserrored_){false}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+  _impl_.tradeid_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.tradeid_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.curvename_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.curvename_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.error_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.error_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 }
 
 MTM::~MTM() {
   // @@protoc_insertion_point(destructor:FlumaionQL.MTM)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
   SharedDtor();
-  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void MTM::SharedDtor() {
-  GOOGLE_DCHECK(GetArena() == nullptr);
-  tradeid_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  curvename_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  error_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+inline void MTM::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.fixlegdates_.~RepeatedField();
+  _impl_.fixlegamount_.~RepeatedField();
+  _impl_.fltlegdates_.~RepeatedField();
+  _impl_.fltlegamount_.~RepeatedField();
+  _impl_.discountvalues_.~RepeatedField();
+  _impl_.legfractions_.~RepeatedField();
+  _impl_.tradeid_.Destroy();
+  _impl_.curvename_.Destroy();
+  _impl_.error_.Destroy();
 }
 
-void MTM::ArenaDtor(void* object) {
-  MTM* _this = reinterpret_cast< MTM* >(object);
-  (void)_this;
-}
-void MTM::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
-}
 void MTM::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
+  _impl_._cached_size_.Set(size);
 }
-const MTM& MTM::default_instance() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_MTM_mtms_2eproto.base);
-  return *internal_default_instance();
-}
-
 
 void MTM::Clear() {
 // @@protoc_insertion_point(message_clear_start:FlumaionQL.MTM)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  fixlegdates_.Clear();
-  fixlegamount_.Clear();
-  fltlegdates_.Clear();
-  fltlegamount_.Clear();
-  discountvalues_.Clear();
-  legfractions_.Clear();
-  tradeid_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  curvename_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  error_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  ::memset(&computetimemicros_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&haserrored_) -
-      reinterpret_cast<char*>(&computetimemicros_)) + sizeof(haserrored_));
+  _impl_.fixlegdates_.Clear();
+  _impl_.fixlegamount_.Clear();
+  _impl_.fltlegdates_.Clear();
+  _impl_.fltlegamount_.Clear();
+  _impl_.discountvalues_.Clear();
+  _impl_.legfractions_.Clear();
+  _impl_.tradeid_.ClearToEmpty();
+  _impl_.curvename_.ClearToEmpty();
+  _impl_.error_.ClearToEmpty();
+  ::memset(&_impl_.computetimemicros_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&_impl_.haserrored_) -
+      reinterpret_cast<char*>(&_impl_.computetimemicros_)) + sizeof(_impl_.haserrored_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* MTM::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* MTM::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
-    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
-    CHK_(ptr);
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // string tradeid = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           auto str = _internal_mutable_tradeid();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "FlumaionQL.MTM.tradeid"));
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-        } else goto handle_unusual;
+          CHK_(::_pbi::VerifyUTF8(str, "FlumaionQL.MTM.tradeid"));
+        } else
+          goto handle_unusual;
         continue;
       // string curvename = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
           auto str = _internal_mutable_curvename();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "FlumaionQL.MTM.curvename"));
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-        } else goto handle_unusual;
+          CHK_(::_pbi::VerifyUTF8(str, "FlumaionQL.MTM.curvename"));
+        } else
+          goto handle_unusual;
         continue;
       // repeated int64 fixlegdates = 3;
       case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedInt64Parser(_internal_mutable_fixlegdates(), ptr, ctx);
           CHK_(ptr);
-        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24) {
+        } else if (static_cast<uint8_t>(tag) == 24) {
           _internal_add_fixlegdates(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr));
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // repeated float fixlegamount = 4;
       case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedFloatParser(_internal_mutable_fixlegamount(), ptr, ctx);
           CHK_(ptr);
-        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 37) {
+        } else if (static_cast<uint8_t>(tag) == 37) {
           _internal_add_fixlegamount(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr));
           ptr += sizeof(float);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // repeated int64 fltlegdates = 5;
       case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedInt64Parser(_internal_mutable_fltlegdates(), ptr, ctx);
           CHK_(ptr);
-        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40) {
+        } else if (static_cast<uint8_t>(tag) == 40) {
           _internal_add_fltlegdates(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr));
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // repeated float fltlegamount = 6;
       case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 50)) {
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedFloatParser(_internal_mutable_fltlegamount(), ptr, ctx);
           CHK_(ptr);
-        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 53) {
+        } else if (static_cast<uint8_t>(tag) == 53) {
           _internal_add_fltlegamount(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr));
           ptr += sizeof(float);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // repeated float discountvalues = 7;
       case 7:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 58)) {
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedFloatParser(_internal_mutable_discountvalues(), ptr, ctx);
           CHK_(ptr);
-        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 61) {
+        } else if (static_cast<uint8_t>(tag) == 61) {
           _internal_add_discountvalues(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr));
           ptr += sizeof(float);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // repeated float legfractions = 8;
       case 8:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 66)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 66)) {
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedFloatParser(_internal_mutable_legfractions(), ptr, ctx);
           CHK_(ptr);
-        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 69) {
+        } else if (static_cast<uint8_t>(tag) == 69) {
           _internal_add_legfractions(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr));
           ptr += sizeof(float);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // bool haserrored = 9;
       case 9:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 72)) {
-          haserrored_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 72)) {
+          _impl_.haserrored_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // string error = 10;
       case 10:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 82)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 82)) {
           auto str = _internal_mutable_error();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "FlumaionQL.MTM.error"));
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-        } else goto handle_unusual;
+          CHK_(::_pbi::VerifyUTF8(str, "FlumaionQL.MTM.error"));
+        } else
+          goto handle_unusual;
         continue;
       // int64 computetimemicros = 11;
       case 11:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 88)) {
-          computetimemicros_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 88)) {
+          _impl_.computetimemicros_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
-      default: {
-      handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->SetLastTag(tag);
-          goto success;
-        }
-        ptr = UnknownFieldParse(tag,
-            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-            ptr, ctx);
-        CHK_(ptr != nullptr);
-        continue;
-      }
+      default:
+        goto handle_unusual;
     }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
   }  // while
-success:
+message_done:
   return ptr;
 failure:
   ptr = nullptr;
-  goto success;
+  goto message_done;
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* MTM::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* MTM::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:FlumaionQL.MTM)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // string tradeid = 1;
-  if (this->tradeid().size() > 0) {
+  if (!this->_internal_tradeid().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_tradeid().data(), static_cast<int>(this->_internal_tradeid().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
@@ -347,7 +405,7 @@ failure:
   }
 
   // string curvename = 2;
-  if (this->curvename().size() > 0) {
+  if (!this->_internal_curvename().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_curvename().data(), static_cast<int>(this->_internal_curvename().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
@@ -358,7 +416,7 @@ failure:
 
   // repeated int64 fixlegdates = 3;
   {
-    int byte_size = _fixlegdates_cached_byte_size_.load(std::memory_order_relaxed);
+    int byte_size = _impl_._fixlegdates_cached_byte_size_.load(std::memory_order_relaxed);
     if (byte_size > 0) {
       target = stream->WriteInt64Packed(
           3, _internal_fixlegdates(), byte_size, target);
@@ -372,7 +430,7 @@ failure:
 
   // repeated int64 fltlegdates = 5;
   {
-    int byte_size = _fltlegdates_cached_byte_size_.load(std::memory_order_relaxed);
+    int byte_size = _impl_._fltlegdates_cached_byte_size_.load(std::memory_order_relaxed);
     if (byte_size > 0) {
       target = stream->WriteInt64Packed(
           5, _internal_fltlegdates(), byte_size, target);
@@ -395,13 +453,13 @@ failure:
   }
 
   // bool haserrored = 9;
-  if (this->haserrored() != 0) {
+  if (this->_internal_haserrored() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(9, this->_internal_haserrored(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(9, this->_internal_haserrored(), target);
   }
 
   // string error = 10;
-  if (this->error().size() > 0) {
+  if (!this->_internal_error().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_error().data(), static_cast<int>(this->_internal_error().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
@@ -411,13 +469,13 @@ failure:
   }
 
   // int64 computetimemicros = 11;
-  if (this->computetimemicros() != 0) {
+  if (this->_internal_computetimemicros() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(11, this->_internal_computetimemicros(), target);
+    target = ::_pbi::WireFormatLite::WriteInt64ToArray(11, this->_internal_computetimemicros(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:FlumaionQL.MTM)
@@ -428,21 +486,20 @@ size_t MTM::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:FlumaionQL.MTM)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // repeated int64 fixlegdates = 3;
   {
-    size_t data_size = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      Int64Size(this->fixlegdates_);
+    size_t data_size = ::_pbi::WireFormatLite::
+      Int64Size(this->_impl_.fixlegdates_);
     if (data_size > 0) {
       total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
     }
-    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
-    _fixlegdates_cached_byte_size_.store(cached_size,
+    int cached_size = ::_pbi::ToCachedSize(data_size);
+    _impl_._fixlegdates_cached_byte_size_.store(cached_size,
                                     std::memory_order_relaxed);
     total_size += data_size;
   }
@@ -453,26 +510,21 @@ size_t MTM::ByteSizeLong() const {
     size_t data_size = 4UL * count;
     if (data_size > 0) {
       total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
     }
-    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
-    _fixlegamount_cached_byte_size_.store(cached_size,
-                                    std::memory_order_relaxed);
     total_size += data_size;
   }
 
   // repeated int64 fltlegdates = 5;
   {
-    size_t data_size = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      Int64Size(this->fltlegdates_);
+    size_t data_size = ::_pbi::WireFormatLite::
+      Int64Size(this->_impl_.fltlegdates_);
     if (data_size > 0) {
       total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
     }
-    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
-    _fltlegdates_cached_byte_size_.store(cached_size,
+    int cached_size = ::_pbi::ToCachedSize(data_size);
+    _impl_._fltlegdates_cached_byte_size_.store(cached_size,
                                     std::memory_order_relaxed);
     total_size += data_size;
   }
@@ -483,12 +535,8 @@ size_t MTM::ByteSizeLong() const {
     size_t data_size = 4UL * count;
     if (data_size > 0) {
       total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
     }
-    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
-    _fltlegamount_cached_byte_size_.store(cached_size,
-                                    std::memory_order_relaxed);
     total_size += data_size;
   }
 
@@ -498,12 +546,8 @@ size_t MTM::ByteSizeLong() const {
     size_t data_size = 4UL * count;
     if (data_size > 0) {
       total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
     }
-    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
-    _discountvalues_cached_byte_size_.store(cached_size,
-                                    std::memory_order_relaxed);
     total_size += data_size;
   }
 
@@ -513,107 +557,82 @@ size_t MTM::ByteSizeLong() const {
     size_t data_size = 4UL * count;
     if (data_size > 0) {
       total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
     }
-    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
-    _legfractions_cached_byte_size_.store(cached_size,
-                                    std::memory_order_relaxed);
     total_size += data_size;
   }
 
   // string tradeid = 1;
-  if (this->tradeid().size() > 0) {
+  if (!this->_internal_tradeid().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_tradeid());
   }
 
   // string curvename = 2;
-  if (this->curvename().size() > 0) {
+  if (!this->_internal_curvename().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_curvename());
   }
 
   // string error = 10;
-  if (this->error().size() > 0) {
+  if (!this->_internal_error().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_error());
   }
 
   // int64 computetimemicros = 11;
-  if (this->computetimemicros() != 0) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int64Size(
-        this->_internal_computetimemicros());
+  if (this->_internal_computetimemicros() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(this->_internal_computetimemicros());
   }
 
   // bool haserrored = 9;
-  if (this->haserrored() != 0) {
+  if (this->_internal_haserrored() != 0) {
     total_size += 1 + 1;
   }
 
-  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
-        _internal_metadata_, total_size, &_cached_size_);
-  }
-  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-void MTM::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:FlumaionQL.MTM)
-  GOOGLE_DCHECK_NE(&from, this);
-  const MTM* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<MTM>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:FlumaionQL.MTM)
-    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:FlumaionQL.MTM)
-    MergeFrom(*source);
-  }
-}
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData MTM::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    MTM::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*MTM::GetClassData() const { return &_class_data_; }
 
-void MTM::MergeFrom(const MTM& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:FlumaionQL.MTM)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+
+void MTM::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<MTM*>(&to_msg);
+  auto& from = static_cast<const MTM&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:FlumaionQL.MTM)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  fixlegdates_.MergeFrom(from.fixlegdates_);
-  fixlegamount_.MergeFrom(from.fixlegamount_);
-  fltlegdates_.MergeFrom(from.fltlegdates_);
-  fltlegamount_.MergeFrom(from.fltlegamount_);
-  discountvalues_.MergeFrom(from.discountvalues_);
-  legfractions_.MergeFrom(from.legfractions_);
-  if (from.tradeid().size() > 0) {
-    _internal_set_tradeid(from._internal_tradeid());
+  _this->_impl_.fixlegdates_.MergeFrom(from._impl_.fixlegdates_);
+  _this->_impl_.fixlegamount_.MergeFrom(from._impl_.fixlegamount_);
+  _this->_impl_.fltlegdates_.MergeFrom(from._impl_.fltlegdates_);
+  _this->_impl_.fltlegamount_.MergeFrom(from._impl_.fltlegamount_);
+  _this->_impl_.discountvalues_.MergeFrom(from._impl_.discountvalues_);
+  _this->_impl_.legfractions_.MergeFrom(from._impl_.legfractions_);
+  if (!from._internal_tradeid().empty()) {
+    _this->_internal_set_tradeid(from._internal_tradeid());
   }
-  if (from.curvename().size() > 0) {
-    _internal_set_curvename(from._internal_curvename());
+  if (!from._internal_curvename().empty()) {
+    _this->_internal_set_curvename(from._internal_curvename());
   }
-  if (from.error().size() > 0) {
-    _internal_set_error(from._internal_error());
+  if (!from._internal_error().empty()) {
+    _this->_internal_set_error(from._internal_error());
   }
-  if (from.computetimemicros() != 0) {
-    _internal_set_computetimemicros(from._internal_computetimemicros());
+  if (from._internal_computetimemicros() != 0) {
+    _this->_internal_set_computetimemicros(from._internal_computetimemicros());
   }
-  if (from.haserrored() != 0) {
-    _internal_set_haserrored(from._internal_haserrored());
+  if (from._internal_haserrored() != 0) {
+    _this->_internal_set_haserrored(from._internal_haserrored());
   }
-}
-
-void MTM::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:FlumaionQL.MTM)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void MTM::CopyFrom(const MTM& from) {
@@ -629,33 +648,46 @@ bool MTM::IsInitialized() const {
 
 void MTM::InternalSwap(MTM* other) {
   using std::swap;
-  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
-  fixlegdates_.InternalSwap(&other->fixlegdates_);
-  fixlegamount_.InternalSwap(&other->fixlegamount_);
-  fltlegdates_.InternalSwap(&other->fltlegdates_);
-  fltlegamount_.InternalSwap(&other->fltlegamount_);
-  discountvalues_.InternalSwap(&other->discountvalues_);
-  legfractions_.InternalSwap(&other->legfractions_);
-  tradeid_.Swap(&other->tradeid_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  curvename_.Swap(&other->curvename_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  error_.Swap(&other->error_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.fixlegdates_.InternalSwap(&other->_impl_.fixlegdates_);
+  _impl_.fixlegamount_.InternalSwap(&other->_impl_.fixlegamount_);
+  _impl_.fltlegdates_.InternalSwap(&other->_impl_.fltlegdates_);
+  _impl_.fltlegamount_.InternalSwap(&other->_impl_.fltlegamount_);
+  _impl_.discountvalues_.InternalSwap(&other->_impl_.discountvalues_);
+  _impl_.legfractions_.InternalSwap(&other->_impl_.legfractions_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.tradeid_, lhs_arena,
+      &other->_impl_.tradeid_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.curvename_, lhs_arena,
+      &other->_impl_.curvename_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.error_, lhs_arena,
+      &other->_impl_.error_, rhs_arena
+  );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(MTM, haserrored_)
-      + sizeof(MTM::haserrored_)
-      - PROTOBUF_FIELD_OFFSET(MTM, computetimemicros_)>(
-          reinterpret_cast<char*>(&computetimemicros_),
-          reinterpret_cast<char*>(&other->computetimemicros_));
+      PROTOBUF_FIELD_OFFSET(MTM, _impl_.haserrored_)
+      + sizeof(MTM::_impl_.haserrored_)
+      - PROTOBUF_FIELD_OFFSET(MTM, _impl_.computetimemicros_)>(
+          reinterpret_cast<char*>(&_impl_.computetimemicros_),
+          reinterpret_cast<char*>(&other->_impl_.computetimemicros_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata MTM::GetMetadata() const {
-  return GetMetadataStatic();
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_mtms_2eproto_getter, &descriptor_table_mtms_2eproto_once,
+      file_level_metadata_mtms_2eproto[0]);
 }
-
 
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace FlumaionQL
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::FlumaionQL::MTM* Arena::CreateMaybeMessage< ::FlumaionQL::MTM >(Arena* arena) {
+template<> PROTOBUF_NOINLINE ::FlumaionQL::MTM*
+Arena::CreateMaybeMessage< ::FlumaionQL::MTM >(Arena* arena) {
   return Arena::CreateMessageInternal< ::FlumaionQL::MTM >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE

@@ -43,7 +43,7 @@ class Querying extends Component {
         super(props);
         this.state = {
 	            browserLanguage: "en",
-				query: 'SELECT k.id, k.symbol, k."timestamp", s.* FROM kf_trades AS k LEFT JOIN symbols AS s ON k.symbol = s.__key',
+				query: 'SELECT * FROM transactions LIMIT 3',
                 message0: '',
                 message0_style: {
                 	color: 'green',
@@ -56,6 +56,20 @@ class Querying extends Component {
                     'font-weight': 'bold'
                 }
             };
+        let transactionMonitorFlavor = "@my.transaction-monitor.flavor@".toUpperCase();
+        switch (transactionMonitorFlavor) {
+			case "ECOMMERCE":
+			    this.state.query = 'SELECT k.id, k.itemCode, k."timestamp", s.itemName, s.category FROM kf_transactions AS k LEFT JOIN products AS s ON k.itemCode = s.__key';
+			    break;
+			case "PAYMENTS":
+			    this.state.query = 'SELECT k.id, k.bicCreditor, k.ccy, k.amtFloor, s.name, s.country FROM kf_transactions AS k LEFT JOIN bics AS s ON k.bicCreditor = s.__key';
+			    break;
+			case "TRADE":
+			    this.state.query = 'SELECT k.id, k.symbol, k."timestamp", s.* FROM kf_transactions AS k LEFT JOIN symbols AS s ON k.symbol = s.__key';
+			    break;
+			default:
+                            console.log("Querying.js", "Unexpected value transactionMonitorFlavor", transactionMonitorFlavor);
+		}
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }

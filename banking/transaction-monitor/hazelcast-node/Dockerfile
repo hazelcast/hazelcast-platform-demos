@@ -1,6 +1,4 @@
-# Use Python 3.7 as Grppcio:1.26.0 is incompatible with Python 3.8.
-# Use Buster (Debian) as Alpine does not work well with wheel packages.
-FROM --platform=linux/amd64 library/python:3.7-buster
+FROM --platform=linux/amd64 library/python:3.8-buster
 
 # Add Java
 RUN apt update
@@ -39,14 +37,18 @@ CMD ["bash", "-c", "set -euo pipefail \
  -Dmy.autostart.enabled=$MY_AUTOSTART_ENABLED \
  -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS \
  -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+ -Dmy.mysql.address=$MY_MYSQL_ADDRESS \
  -Dmy.pulsar.list=$MY_PULSAR_LIST \
  -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
+ -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
  -jar application.jar \
       && java $JAVA_ARGS $JAVA_OPTS \
  -Dmy.autostart.enabled=$MY_AUTOSTART_ENABLED \
  -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS \
  -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+ -Dmy.mysql.address=$MY_MYSQL_ADDRESS \
  -Dmy.pulsar.list=$MY_PULSAR_LIST \
  -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
+ -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
  -jar application.jar \
      "]

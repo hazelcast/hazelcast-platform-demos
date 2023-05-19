@@ -4,25 +4,38 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
-		<artifactId>trade-monitor-root</artifactId>
-		<version>5.2</version>
+		<groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
+		<artifactId>transaction-monitor-root</artifactId>
+		<version>5.3</version>
 	</parent>
 
-	<artifactId>trade-monitor-custom-classes</artifactId>
+	<artifactId>transaction-monitor-custom-classes</artifactId>
 
-	<name>Hazelcast Platform - Trade Monitor - Custom Classes</name>
-	<description>Trade Monitor - Custom Classes</description>
+	<name>Hazelcast Platform - Transaction Monitor - Custom Classes</name>
+	<description>Transaction Monitor - Custom Classes</description>
 
 	<properties>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 
 	<dependencies>
-		<!-- For TradeJsonDeserializer -->
+		<!-- Generic utils for Viridian clusterside -->
+		<dependency>
+			<groupId>com.hazelcast.platform.demos.utils</groupId>
+			<artifactId>utils-viridian-clusterside</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<!-- For JSON Deserializers -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
+		</dependency>
+		
+		<!-- For JSON Deserializers -->
+		<dependency>
+			<groupId>org.apache.kafka</groupId>
+			<artifactId>kafka-clients</artifactId>
 		</dependency>
 		
 		<!-- For Slack integration -->
@@ -56,10 +69,9 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-
+		
 		<plugins>
 			<plugin>
-				<!-- No main class -->
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
 					<archive>
@@ -67,7 +79,18 @@
 							<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
 						</manifestEntries>
 					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
 				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

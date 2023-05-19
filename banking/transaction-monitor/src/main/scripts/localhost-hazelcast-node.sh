@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROJECT=trade-monitor
+PROJECT=transaction-monitor
 MODULE=hazelcast-node
 
 BASEDIR=`dirname $0`
@@ -18,11 +18,13 @@ then
  exit 1
 fi
 
-JAR_FILE=${PROJECT}-${MODULE}-5.2-jar-with-dependencies.jar
+JAR_FILE=${PROJECT}-${MODULE}-5.3-jar-with-dependencies.jar
 
 JAVA_ARGS="-Dmy.kubernetes.enabled=false"
 JAVA_ARGS="${JAVA_ARGS} -Dmy.autostart.enabled=true"
 JAVA_ARGS="${JAVA_ARGS} -Dhazelcast.local.publicAddress=${HOST_IP}:5701"
+JAVA_ARGS="${JAVA_ARGS} -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener"
+JAVA_ARGS="${JAVA_ARGS} -Dmy.mysql.address=${HOST_IP}:3306"
 
 JAVA_OPTS="--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
 

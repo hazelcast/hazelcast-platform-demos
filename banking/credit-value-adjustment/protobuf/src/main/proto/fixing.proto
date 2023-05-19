@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package FlumaionQL;
+
+message Fixing {
+    string curvename = 1;
+    repeated int64 fixing_dates = 2;
+    repeated float fixing_rates = 3;
+}

@@ -3,7 +3,7 @@
 	xmlns="http://www.hazelcast.com/schema/client-config"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.hazelcast.com/schema/client-config
-                  http://www.hazelcast.com/schema/client-config/hazelcast-client-config-5.2.xsd">
+                  http://www.hazelcast.com/schema/client-config/hazelcast-client-config-5.3.xsd">
 
 	<cluster-name>@my.cluster1.name@</cluster-name>
 

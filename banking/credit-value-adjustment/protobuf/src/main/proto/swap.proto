@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package FlumaionQL;
+
+message SwapTrade {
+    string tradeid = 1;
+    string bookid = 2;
+    string counterparty = 3;
+    float notional = 4;
+    int32 payer_receiver_flag = 5;
+    int64 settlement_date = 6;
+    float fixed_rate = 7;
+    string fixed_leg_dcc = 8;
+    float float_spread = 9;
+    string float_leg_dcc = 10;
+    string ibor_index = 11;
+    int64 fixed_leg_start_date = 12;
+    int64 fixed_leg_end_date = 13;
+    int32 fixed_leg_tenor_frequency = 14;
+    int32 fixed_leg_tenor_period_enum = 15;
+    string fixed_leg_calendar_name = 16;
+    int32 fixed_leg_biz_day_conv = 17;
+    int32 fixed_leg_termination_day_conv = 18;
+    int32 fixed_leg_date_gen_rule = 19;
+    bool fixed_leg_end_of_month_flag = 20;
+    int64 float_leg_start_date = 21;
+    int64 float_leg_end_date = 22;
+    int32 float_leg_tenor_frequency = 23;
+    int32 float_leg_tenor_period_enum = 24;
+    string float_leg_calendar_name = 25;
+    int32 float_leg_biz_day_conv = 26;
+    int32 float_leg_termination_day_conv = 27;
+    int32 float_leg_date_gen_rule = 28;
+    bool float_leg_end_of_month_flag = 29;
+}

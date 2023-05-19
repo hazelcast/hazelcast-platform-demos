@@ -1,14 +1,15 @@
 const PerspectivePlugin = require("@finos/perspective-webpack-plugin");
+const HtmlWebPackPlugin = require("html-webpack-plugin");
 const path = require('path');
 
 module.exports = {
-    entry: './src/index.tsx',
+    entry: './src/index.js',
     mode: 'production',
-    resolve: {
-        extensions: [".ts", ".tsx", ".js"],
-    },
     plugins: [
-        new PerspectivePlugin()
+        new HtmlWebPackPlugin({
+            title: "@project.artifactId@",
+        }),		
+        new PerspectivePlugin(),
     ],        
     output: {
         path: __dirname,
@@ -20,14 +21,21 @@ module.exports = {
                         test: path.join(__dirname, '.'),
                         exclude: /(node_modules)/,
                         use: [{
-                                loader: 'ts-loader'
+                                        loader: 'babel-loader',
+                                        options: {
+                                                presets: ["@babel/preset-env", "@babel/preset-react"]
+                                        }
                         }]
                 }
         ]
     },
+    ignoreWarnings: [/Failed to parse source map/],
     devServer: {
         contentBase: [
             path.join(__dirname, "dist"),
         ],
-    },        
+    },
+    target: 'node',
+node: {
+},
 };

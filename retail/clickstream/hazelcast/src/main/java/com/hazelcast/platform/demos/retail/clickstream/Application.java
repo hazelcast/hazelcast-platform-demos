@@ -22,14 +22,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * <p>Entry point. Spring will start Hazelcast and leave it running.</p>
  */
 @SpringBootApplication
 @EnableConfigurationProperties(MyProperties.class)
-@Slf4j
 public class Application {
 
     /**
@@ -44,17 +41,17 @@ public class Application {
         String cassandraContactPoints = System.getProperty("my.cassandra.contact.points", "");
         if (cassandraContactPoints.length() ==  0) {
             // Kubernetes
-            System.setProperty("spring.data.cassandra.contact-points", "clickstream-cassandra.default.svc.cluster.local");
+            System.setProperty("spring.cassandra.contact-points", "clickstream-cassandra.default.svc.cluster.local");
         } else {
             // Docker
-            System.setProperty("spring.data.cassandra.contact-points", cassandraContactPoints);
+            System.setProperty("spring.cassandra.contact-points", cassandraContactPoints);
         }
-        log.info("'spring.data.cassandra.contact-points'=='{}'",
-                System.getProperty("spring.data.cassandra.contact-points"));
+        System.out.printf("'spring.cassandra.contact-points'=='%s'%n",
+                System.getProperty("spring.cassandra.contact-points"));
         // Other props
         List<String> others = List.of("CLUSTER_NAME", "NODE_NAME");
         for (String other : others) {
-            log.info("'{}'=='{}'", other, System.getProperty(other));
+            System.out.printf("'%s'=='%s'%n", other, System.getProperty(other));
         }
     }
 

@@ -25,6 +25,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.jet.Job;
 import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.pipeline.Pipeline;
+import com.hazelcast.map.IMap;
 import com.hazelcast.platform.demos.banking.cva.MyConstants;
 import com.hazelcast.platform.demos.banking.cva.MyUtils;
 
@@ -34,10 +35,6 @@ import com.hazelcast.platform.demos.banking.cva.MyUtils;
  */
 public class CvaStpJobSubmitter {
     private static final Logger LOGGER = LoggerFactory.getLogger(CvaStpJobSubmitter.class);
-
-    private static final String CPP_DOCKER = "cva-cpp";
-    private static final String CPP_KUBERNETES = "cpp-service";
-    private static final String CPP_LOCALHOST = "127.0.0.1";
 
     /**
      * <p>Try to submit the {@link CvaStpJob}, allowing only one to be running
@@ -54,11 +51,13 @@ public class CvaStpJobSubmitter {
      * @return The job if submitted
      * @throws Exception If the job is rejected as a duplicate is still running
      */
-    public static Job submitCvaStpJob(HazelcastInstance hazelcastInstance, LocalDate calcDate) throws Exception {
+    public static Job submitCvaStpJob(HazelcastInstance hazelcastInstance, LocalDate calcDate,
+            boolean useViridian) throws Exception {
         boolean debug = false;
         int batchSize = MyConstants.DEFAULT_BATCH_SIZE;
         int parallelism = 1;
-        return CvaStpJobSubmitter.submitCvaStpJob(hazelcastInstance, calcDate, batchSize, parallelism, debug);
+        return CvaStpJobSubmitter.submitCvaStpJob(hazelcastInstance, calcDate, batchSize, parallelism,
+                debug, useViridian);
     }
 
     /**
@@ -80,21 +79,29 @@ public class CvaStpJobSubmitter {
      * @throws Exception If the job is rejected as a duplicate is still running
      */
     public static Job submitCvaStpJob(HazelcastInstance hazelcastInstance, LocalDate calcDate,
-            int batchSize, int parallelism, boolean debug) throws Exception {
+            int batchSize, int parallelism, boolean debug, boolean useViridian) throws Exception {
         long timestamp = System.currentTimeMillis();
         String timestampStr = MyUtils.timestampToISO8601(timestamp);
 
         String jobNamePrefix = CvaStpJob.JOB_NAME_PREFIX;
         String jobName = jobNamePrefix + "$" + calcDate + "@" + timestampStr;
-        String cppLoadBalancer = getLoadBalancer();
+        String cppLoadBalancer = getLoadBalancer(hazelcastInstance);
+        LOGGER.info("Using '{}' for C++ service", cppLoadBalancer);
 
         Pipeline pipeline = CvaStpJob.buildPipeline(jobName, timestamp, calcDate, cppLoadBalancer,
-                batchSize, parallelism, debug);
+                batchSize, parallelism, debug, useViridian);
 
         JobConfig jobConfig = new JobConfig();
         jobConfig.setName(jobName);
+        jobConfig.addClass(CounterpartyAggregator.class);
+        jobConfig.addClass(CsvFileAsByteArray.class);
         jobConfig.addClass(CvaStpJob.class);
         jobConfig.addClass(CvaStpUtils.class);
+        jobConfig.addClass(ExposureToCvaExposure.class);
+        jobConfig.addClass(MtmToExposure.class);
+        jobConfig.addClass(TradeExposureAggregator.class);
+        jobConfig.addClass(XlstDataAsObjectArrayArray.class);
+        jobConfig.addClass(XlstFileAsByteArray.class);
 
         Job job = MyUtils.findRunningJobsWithSamePrefix(jobNamePrefix, hazelcastInstance);
         if (job != null) {
@@ -108,61 +115,21 @@ public class CvaStpJobSubmitter {
 
 
     /**
-     * <p>Find the Load Balancer to use to access C++, based on
-     * system properties and derivation.
+     * <p>Find the Load Balancer to use to access C++.
      * </p>
      *
-     * @return Hostname, no port.
+     * @return Hostname.
      */
-    private static String getLoadBalancer() {
-        String cppService = System.getProperty("my.cpp.service", "");
-        boolean dockerEnabled =
-                System.getProperty("my.docker.enabled", "false").equalsIgnoreCase(Boolean.TRUE.toString());
-        boolean kubernetesEnabled =
-                System.getProperty("my.kubernetes.enabled", "false").equalsIgnoreCase(Boolean.TRUE.toString());
-        LOGGER.info("dockerEnabled=={}", dockerEnabled);
-        LOGGER.info("kubernetesEnabled=={}", kubernetesEnabled);
+    private static String getLoadBalancer(HazelcastInstance hazelcastInstance) throws Exception {
+        IMap<String, String> cvaConfigMap = hazelcastInstance.getMap(MyConstants.IMAP_NAME_CVA_CONFIG);
 
-        // If set, validate but don't reject
-        if (cppService.length() > 0) {
-            validate(dockerEnabled, kubernetesEnabled, cppService);
-        } else {
-            // Unset, so guess
-            if (!dockerEnabled && !kubernetesEnabled) {
-                cppService = CPP_LOCALHOST;
-            }
-            if (dockerEnabled && !kubernetesEnabled) {
-                cppService = CPP_DOCKER;
-            }
-            if (kubernetesEnabled) {
-                cppService = CPP_KUBERNETES;
-            }
-        }
-        LOGGER.info("cppService=={}", cppService);
+        String value = cvaConfigMap.get(MyConstants.CONFIG_CPP_SERVICE_KEY);
 
-        return cppService;
-    }
-
-
-    /**
-     * <p>Validate how the C++ service is set, compared to localhost,
-     * Docker or Kubernetes running.
-     * </p>
-     *
-     * @param dockerEnabled False means localhost
-     * @param kubernetesEnabled False means Docker or localhost
-     * @param cppService The service URL
-     */
-    private static void validate(boolean dockerEnabled, boolean kubernetesEnabled, String cppService) {
-        if (!dockerEnabled && !kubernetesEnabled && !cppService.equals(CPP_LOCALHOST)) {
-            LOGGER.warn("localhost, but 'my.cpp.service'=='{}'", cppService);
+        if (value == null || value.isBlank()) {
+            String message = "No config for " + MyConstants.CONFIG_CPP_SERVICE_KEY;
+            throw new RuntimeException(message);
         }
-        if (dockerEnabled && !kubernetesEnabled && !cppService.equals(CPP_DOCKER)) {
-            LOGGER.warn("Docker, but 'my.cpp.service'=='{}'", cppService);
-        }
-        if (kubernetesEnabled && !cppService.startsWith(CPP_KUBERNETES)) {
-            LOGGER.warn("Kubernetes, but 'my.cpp.service'=='{}'", cppService);
-        }
+        return value;
     }
 
 }

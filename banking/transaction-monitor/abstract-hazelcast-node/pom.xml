@@ -4,15 +4,15 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
-		<artifactId>trade-monitor-root</artifactId>
-		<version>5.2</version>
+		<groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
+		<artifactId>transaction-monitor-root</artifactId>
+		<version>5.3</version>
 	</parent>
 
-	<artifactId>trade-monitor-abstract-hazelcast-node</artifactId>
+	<artifactId>transaction-monitor-abstract-hazelcast-node</artifactId>
 
-	<name>Hazelcast Platform - Trade Monitor - Abstract Hazelcast Node</name>
-	<description>Trade Monitor - Abstract Hazelcast Node</description>
+	<name>Hazelcast Platform - Transaction Monitor - Abstract Hazelcast Node</name>
+	<description>Transaction Monitor - Abstract Hazelcast Node</description>
 
 	<properties>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
@@ -21,8 +21,13 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>trade-monitor-common</artifactId>
+			<artifactId>transaction-monitor-common</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
 		</dependency>
 	</dependencies>
 

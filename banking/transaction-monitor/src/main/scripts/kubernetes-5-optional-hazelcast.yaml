@@ -5,16 +5,16 @@
 # OPTIONAL
 # OPTIONAL
 ---
-# Service DNS will be "trade-monitor-grid1-hazelcast.default.svc.cluster.local".
+# Service DNS will be "transaction-monitor-FLAVOR-grid1-hazelcast.default.svc.cluster.local".
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: trade-monitor-grid1-hazelcast
+  name: transaction-monitor-FLAVOR-grid1-hazelcast
 spec:
   clusterIP: None
   selector:
-    app: trade-monitor-grid1-hazelcast
+    app: transaction-monitor-FLAVOR-grid1-hazelcast
   ports:
   - port: 5701
 ---
@@ -23,27 +23,27 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: trade-monitor-grid1-hazelcast-extra
+  name: transaction-monitor-FLAVOR-grid1-hazelcast-extra
 spec:
   selector:
-    app: trade-monitor-grid1-hazelcast
+    app: transaction-monitor-FLAVOR-grid1-hazelcast
   ports:
   - port: 5701
   type: LoadBalancer
 ---
-# Service DNS will be "trade-monitor-mancenter.default.svc.cluster.local".
+# Service DNS will be "transaction-monitor-FLAVOR-mancenter.default.svc.cluster.local".
 ---
 # Management Center
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: trade-monitor-management-center
+  name: transaction-monitor-FLAVOR-management-center
 spec:
   selector:
-    app: trade-monitor-management-center
+    app: transaction-monitor-FLAVOR-management-center
   ports:
-    - name: trade-monitor-management-center
+    - name: transaction-monitor-FLAVOR-management-center
       port: 8080
       targetPort: 8080
   type: LoadBalancer
@@ -54,33 +54,35 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: trade-monitor-grid1-hazelcast
+  name: transaction-monitor-FLAVOR-grid1-hazelcast
 spec:
   replicas: 2
-  serviceName: trade-monitor-grid1-hazelcast
+  serviceName: transaction-monitor-FLAVOR-grid1-hazelcast
   selector:
     matchLabels:
-      app: trade-monitor-grid1-hazelcast
+      app: transaction-monitor-FLAVOR-grid1-hazelcast
   template:
     metadata:
       labels:
-        app: trade-monitor-grid1-hazelcast
+        app: transaction-monitor-FLAVOR-grid1-hazelcast
     spec:
       containers:
         - env:
           - name: "MY_BOOTSTRAP_SERVERS"
-            value: "trade-monitor-kafka-broker-0.trade-monitor-kafka-broker.default.svc.cluster.local:9092,trade-monitor-kafka-broker-1.trade-monitor-kafka-broker.default.svc.cluster.local:9092,trade-monitor-kafka-broker-2.trade-monitor-kafka-broker.default.svc.cluster.local:9092"
+            value: "transaction-monitor-FLAVOR-kafka-broker-0.transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-FLAVOR-kafka-broker-1.transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-FLAVOR-kafka-broker-2.transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local:9092"
+          - name: "MY_MYSQL_ADDRESS"
+            value: "transaction-monitor-FLAVOR-mysql.default.svc.cluster.local:3306"
           - name: "MY_POSTGRES_ADDRESS"
-            value: "trade-monitor-postgres.default.svc.cluster.local:5432"
+            value: "transaction-monitor-FLAVOR-postgres.default.svc.cluster.local:5432"
           - name: "MY_PULSAR_LIST"
-            value: "trade-monitor-pulsar.default.svc.cluster.local:6650"
-          image: "hazelcast-platform-demos/trade-monitor-hazelcast-node"
+            value: "transaction-monitor-FLAVOR-pulsar.default.svc.cluster.local:6650"
+          image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-hazelcast-node"
           imagePullPolicy: Never
           livenessProbe:
             httpGet:
               path: /hazelcast/health/node-state
               port: 5701
-          name: trade-monitor-grid1-hazelcast-container
+          name: transaction-monitor-FLAVOR-grid1-hazelcast-container
           readinessProbe:
             httpGet:
               path: /hazelcast/health/ready
@@ -97,24 +99,24 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: trade-monitor-management-center
+  name: transaction-monitor-FLAVOR-management-center
 spec:
   selector:
     matchLabels:
-      app: trade-monitor-management-center
+      app: transaction-monitor-FLAVOR-management-center
   template:
     metadata:
       labels:
-        app: trade-monitor-management-center
+        app: transaction-monitor-FLAVOR-management-center
     spec:
       containers:
-        - image: "hazelcast-platform-demos/trade-monitor-management-center"
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-management-center"
           imagePullPolicy: Never
           livenessProbe:
             httpGet:
               path: /health
               port: 8081
-          name: trade-monitor-management-center-container
+          name: transaction-monitor-FLAVOR-management-center-container
           readinessProbe:
             httpGet:
               path: /health

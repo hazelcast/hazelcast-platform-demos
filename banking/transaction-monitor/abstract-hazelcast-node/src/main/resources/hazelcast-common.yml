@@ -4,8 +4,10 @@ hazelcast:
     console-enabled: true
   #
   properties:
-    # Graceful shutdown is helpful for Kubernetes scale-down.
+    # Using DNS in Kubernetes
+    hazelcast.persistence.auto.cluster.state: false
     hazelcast.member.naming.moby.enabled: true
+    # Graceful shutdown is helpful for Kubernetes scale-down.
     hazelcast.shutdownhook.policy: GRACEFUL
   #
   # Assuming Kubernetes, but override from Java code if we detect otherwise
@@ -22,10 +24,10 @@ hazelcast:
 #    'alerts*':
 #      event-journal:
 #        enabled: true
-#     # 'trades' map needs defined as non-default configuration.
-#    'trades':
+#     # 'transactions' map needs defined as non-default configuration.
+#    'transactions':
 #      indexes:
-#        # Unordered index on Trade.getSymbol().
+#        # Unordered index on Transaction.getSymbol().
 #        - type: HASH
 #          attributes:
 #            - 'symbol'
@@ -39,4 +41,6 @@ hazelcast:
   serialization:
     compact-serialization:
       serializers:
-        - serializer: hazelcast.platform.demos.banking.trademonitor.PortfolioSerializer
+        - serializer: hazelcast.platform.demos.banking.transactionmonitor.PerspectiveEcommerceSerializer
+        - serializer: hazelcast.platform.demos.banking.transactionmonitor.PerspectivePaymentsSerializer
+        - serializer: hazelcast.platform.demos.banking.transactionmonitor.PerspectiveTradeSerializer

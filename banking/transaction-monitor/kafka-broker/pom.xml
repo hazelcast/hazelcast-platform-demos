@@ -4,15 +4,15 @@
         <modelVersion>4.0.0</modelVersion>
 
         <parent>
-		<groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
-        	<artifactId>trade-monitor-root</artifactId>
-                <version>5.2</version>
+		<groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
+        	<artifactId>transaction-monitor-root</artifactId>
+                <version>5.3</version>
         </parent>
 
-        <artifactId>trade-monitor-kafka-broker</artifactId>
+        <artifactId>transaction-monitor-kafka-broker</artifactId>
 
-        <name>Hazelcast Platform - Trade Monitor - Kafka Broker</name>
-        <description>Trade Monitor - Re-package Kafka Broker</description>
+        <name>Hazelcast Platform - Transaction Monitor - Kafka Broker</name>
+        <description>Transaction Monitor - Re-package Kafka Broker</description>
 
 	<properties>
 		<my.docker.image.name>kafka-broker</my.docker.image.name>

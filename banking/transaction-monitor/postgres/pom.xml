@@ -4,15 +4,15 @@
 	<modelVersion>4.0.0</modelVersion>
 
         <parent>
-                <groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
-                <artifactId>trade-monitor-root</artifactId>
-                <version>5.2</version>
+                <groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
+                <artifactId>transaction-monitor-root</artifactId>
+                <version>5.3</version>
         </parent>
 
-        <artifactId>trade-monitor-postgres</artifactId>
+        <artifactId>transaction-monitor-postgres</artifactId>
 
-        <name>Hazelcast Platform - Trade Monitor - Postgres</name>
-        <description>Trade Monitor - Postgres</description>
+        <name>Hazelcast Platform - Transaction Monitor - Postgres</name>
+        <description>Transaction Monitor - Postgres</description>
 
 	<properties>
 		<my.docker.image.name>postgres</my.docker.image.name>

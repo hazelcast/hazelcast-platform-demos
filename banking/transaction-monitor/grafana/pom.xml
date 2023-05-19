@@ -4,17 +4,18 @@
 	<modelVersion>4.0.0</modelVersion>
 
         <parent>
-                <groupId>com.hazelcast.platform.demos.banking.trade.monitor</groupId>
-                <artifactId>trade-monitor-root</artifactId>
-                <version>5.2</version>
+                <groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
+                <artifactId>transaction-monitor-root</artifactId>
+                <version>5.3</version>
         </parent>
 
-        <artifactId>trade-monitor-grafana</artifactId>
+        <artifactId>transaction-monitor-grafana</artifactId>
 
-        <name>Hazelcast Platform - Trade Monitor - Grafana</name>
-        <description>Trade Monitor - Grafana</description>
+        <name>Hazelcast Platform - Transaction Monitor - Grafana</name>
+        <description>Transaction Monitor - Grafana</description>
 
 	<properties>
+                <dockerfile.skip>${skip.when.viridian}</dockerfile.skip>
 		<my.docker.image.name>grafana</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>

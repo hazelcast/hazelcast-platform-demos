@@ -1,6 +1,4 @@
-# Use Python 3.7 as Grppcio:1.26.0 is incompatible with Python 3.8.
-# Use Buster (Debian) as Alpine does not work well with wheel packages.
-FROM --platform=linux/amd64 library/python:3.7-buster
+FROM --platform=linux/amd64 library/python:3.8-buster
 
 # Add Java
 RUN apt update
@@ -23,6 +21,7 @@ COPY target/${JAR_FILE} application.jar
 ENV MY_AUTOSTART_ENABLED "true"
 ENV MY_BOOTSTRAP_SERVERS "0.0.0.0:9092,0.0.0.0:9093,0.0.0.0:9094"
 ENV MY_KUBERNETES_ENABLED "true"
+ENV MY_NATIVE_MEGABYTES ""
 ENV MC_LICENSE=${MC_LICENSE}
 
 ENV JAVA_ARGS "-Dhazelcast.health.monitoring.level=OFF \
@@ -41,16 +40,22 @@ CMD ["bash", "-c", "set -euo pipefail \
  -Dmy.autostart.enabled=$MY_AUTOSTART_ENABLED \
  -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS \
  -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+ -Dmy.mysql.address=$MY_MYSQL_ADDRESS \
+ -Dmy.native.megabytes=$MY_NATIVE_MEGABYTES \
  -Dmy.pulsar.list=$MY_PULSAR_LIST \
  -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
  -Dhazelcast.enterprise.license.key=${MC_LICENSE} \
+ -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
  -jar application.jar \
       && java $JAVA_ARGS $JAVA_OPTS \
  -Dmy.autostart.enabled=$MY_AUTOSTART_ENABLED \
  -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS \
  -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+ -Dmy.mysql.address=$MY_MYSQL_ADDRESS \
+ -Dmy.native.megabytes=$MY_NATIVE_MEGABYTES \
  -Dmy.pulsar.list=$MY_PULSAR_LIST \
  -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
  -Dhazelcast.enterprise.license.key=${MC_LICENSE} \
+ -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
  -jar application.jar \
      "]

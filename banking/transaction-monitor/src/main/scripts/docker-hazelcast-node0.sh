@@ -1,11 +1,12 @@
 #!/bin/bash
 
-PROJECT=trade-monitor
+PROJECT=transaction-monitor
 MODULE=hazelcast-node
 CLONE=0
 
 BASEDIR=`dirname $0`
 cd $BASEDIR/../../../$MODULE
+. ../src/main/scripts/check-flavor.sh
 
 # Darwin vs Linux
 OS=`uname -s`
@@ -29,10 +30,11 @@ then
 fi
 
 MY_BOOTSTRAP_SERVERS=kafka-broker0:9092,kafka-broker1:9093,kafka-broker2:9094
+MY_MYSQL_ADDRESS=mysql:3306
 MY_POSTGRES_ADDRESS=postgres:5432
 MY_PULSAR_LIST=pulsar:6650
 
-DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
+DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${FLAVOR}-${MODULE}
 
 # Private network so can use container names
 docker network create $PROJECT --driver bridge > /dev/null 2>&1
@@ -43,6 +45,7 @@ PORT=$(($CLONE + 5701))
 
 CMD="docker run -e MY_BOOTSTRAP_SERVERS=$MY_BOOTSTRAP_SERVERS \
  -e MY_KUBERNETES_ENABLED=false \
+ -e MY_MYSQL_ADDRESS=$MY_MYSQL_ADDRESS \
  -e MY_POSTGRES_ADDRESS=$MY_POSTGRES_ADDRESS \
  -e MY_PULSAR_LIST=$MY_PULSAR_LIST \
  -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP}:${PORT} \
