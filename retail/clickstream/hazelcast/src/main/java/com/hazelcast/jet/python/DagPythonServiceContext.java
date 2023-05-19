@@ -16,13 +16,17 @@
 
 package com.hazelcast.jet.python;
 
+import com.hazelcast.function.BiFunctionEx;
 import com.hazelcast.internal.nio.IOUtil;
 import com.hazelcast.jet.JetException;
 import com.hazelcast.jet.core.ProcessorSupplier;
 import com.hazelcast.jet.impl.util.Util;
 import com.hazelcast.logging.ILogger;
 
+import io.grpc.ManagedChannelBuilder;
+
 import javax.annotation.Nonnull;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -78,11 +82,13 @@ class DagPythonServiceContext {
 
     private final ILogger logger;
     private final Path runtimeBaseDir;
+    private final BiFunctionEx<String, Integer, ? extends ManagedChannelBuilder<?>> channelFn;
 
     DagPythonServiceContext(ProcessorSupplier.Context context, PythonServiceConfig cfg) {
         logger = context.hazelcastInstance().getLoggingService()
                 .getLogger(getClass().getPackage().getName());
         checkIfPythonIsAvailable();
+        this.channelFn = cfg.channelFn();
         try {
             long start = System.nanoTime();
             runtimeBaseDir = recreateRuntimeBaseDir(context, cfg);
@@ -234,8 +240,7 @@ class DagPythonServiceContext {
     static Thread logStdOut(ILogger logger, Process process, String taskName) {
         Thread thread = new Thread(() -> {
             try (BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream(), UTF_8))) {
-                String line;
-                while ((line = in.readLine()) != null) {
+                for (String line; (line = in.readLine()) != null; ) {
                     logger.fine(line);
                 }
             } catch (IOException e) {
@@ -266,5 +271,9 @@ class DagPythonServiceContext {
                 }
             }
         }
+    }
+
+    public BiFunctionEx<String, Integer, ? extends ManagedChannelBuilder<?>>    channelFn() {
+        return channelFn;
     }
 }

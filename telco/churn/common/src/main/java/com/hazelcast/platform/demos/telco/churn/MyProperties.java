@@ -16,7 +16,7 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

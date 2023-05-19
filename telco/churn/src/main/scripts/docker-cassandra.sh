@@ -25,7 +25,7 @@ MY_BOOTSTRAP_SERVERS=kafka-broker0:9092,kafka-broker1:9093,kafka-broker2:9094
 
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
-CMD="docker run -e MY_BOOTSTRAP_SERVERS=$MY_BOOTSTRAP_SERVERS -p 9042:9042 --name=${MODULE} --network=${PROJECT} ${DOCKER_IMAGE}"
+CMD="docker run -e CASSANDRA_BROADCAST_ADDRESS=$HOST_IP -e MY_BOOTSTRAP_SERVERS=$MY_BOOTSTRAP_SERVERS -p 9042:9042 --name=${MODULE} --rm --network=${PROJECT} ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD

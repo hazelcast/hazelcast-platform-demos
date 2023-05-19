@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.banking.cva</groupId>
 		<artifactId>cva-root</artifactId>
-		<version>5.2</version>
+		<version>5.3</version>
 	</parent>
 
 	<artifactId>cva-data-loader</artifactId>
@@ -53,6 +53,15 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<!-- Copy keystore/truststore if found -->
+				<artifactId>maven-antrun-plugin</artifactId>
+				<configuration>
+					<target>
+						<ant antfile="../../../ant/build.xml" target="conditionalcopy"/>
+					</target>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>io.fabric8</groupId>

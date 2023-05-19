@@ -1,0 +1,47 @@
+---
+# Service DNS will be "cva-site1-webapp.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cva-site1-webapp
+spec:
+  selector:
+    app: cva-site1-webapp
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: LoadBalancer
+---
+# Only need 1 webapp
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cva-site1-webapp
+spec:
+  selector:
+    matchLabels:
+      app: cva-site1-webapp
+  template:
+    metadata:
+      labels:
+        app: cva-site1-webapp
+    spec:
+      containers:
+        - env:
+          - name: "MY_SITE"
+            value: "site1"
+          image: "hazelcast-platform-demos/cva-webapp"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /rest/k8s
+              port: 8080
+          name: cva-site1-webapp-container
+          readinessProbe:
+            httpGet:
+              path: /rest/k8s
+              port: 8080
+            initialDelaySeconds: 30

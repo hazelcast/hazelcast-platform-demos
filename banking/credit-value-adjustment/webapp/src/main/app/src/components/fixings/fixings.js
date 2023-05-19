@@ -136,7 +136,7 @@ class Fixings extends Component {
 	    	var client = rest.wrap(mime);
 	    	var self = this;
 	    	
-	    	var restURL = '/rest/cva/run/?batch_size=' + this.state.batch_size
+	    	var restURL = '/rest/cva/run?batch_size=' + this.state.batch_size
 	    		+ '&calc_date=' + this.state.calc_date
 	    		+ '&debug=' + this.state.debug
 	    		+ '&parallelism=' + this.state.parallelism;
