@@ -100,7 +100,7 @@ public class CheckConnectIdempotentCallable {
             if (clients.isEmpty()) {
                 message += "bad Maven dependency if classes not found?";
             } else {
-                message += "custom classes not uploaded to Viridian?";
+                message += "custom classes not uploaded to Viridian? Version mismatches?";
             }
 
             throw new RuntimeException(message);
@@ -131,8 +131,10 @@ public class CheckConnectIdempotentCallable {
         String propertyValue = "";
         String propertyName = BUILD_VERSION_PROPERTY + "=";
         for (String property : propertyList) {
-            if (property.startsWith(propertyName)) {
-                propertyValue = property.substring(propertyName.length());
+            property = property.replaceAll("'", "").replaceAll("==", "=");
+            int index = property.indexOf(propertyName);
+            if (index >= 0 && (index + propertyName.length()) < property.length()) {
+                propertyValue = property.substring(index + propertyName.length());
             }
         }
 

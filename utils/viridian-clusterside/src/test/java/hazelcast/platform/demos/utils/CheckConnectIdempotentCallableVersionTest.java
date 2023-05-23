@@ -98,4 +98,32 @@ public class CheckConnectIdempotentCallableVersionTest {
         assertEquals(actual, true);
     }
 
+    @Test
+    public void testGoodVersionWithPrefixSuffix(TestInfo testInfo) throws Exception {
+        Version clusterVersion = Version.of("1.3");
+        List<String> inputList = new ArrayList<>();
+        inputList.add("some text before '" + CheckConnectIdempotentCallable.BUILD_VERSION_PROPERTY + "'='1.3.0-SNAPSHOT'");
+
+        boolean actual = CheckConnectIdempotentCallable.versionCheck(clusterVersion, inputList);
+        LOGGER.info("{} :: input=='{}', '{}', output=='{}'", testInfo.getDisplayName(),
+                clusterVersion, inputList, actual);
+
+        assertEquals(actual, true);
+    }
+
+    @Test
+    public void testNextVersion(TestInfo testInfo) throws Exception {
+        int major = 5;
+        int minor = 4;
+        Version clusterVersion = Version.of(major, minor);
+        List<String> inputList = new ArrayList<>();
+        inputList.add("my.build-version=" + major + "." + (minor + 1) + ".0");
+
+        boolean actual = CheckConnectIdempotentCallable.versionCheck(clusterVersion, inputList);
+        LOGGER.info("{} :: input=='{}', '{}', output=='{}'", testInfo.getDisplayName(),
+                clusterVersion, inputList, actual);
+
+        assertEquals(actual, false);
+    }
+
 }
