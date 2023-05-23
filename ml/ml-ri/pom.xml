@@ -7,7 +7,7 @@
         <parent>
                 <groupId>com.hazelcast.platform.demos.ml</groupId>
                 <artifactId>ml-root</artifactId>
-                <version>5.3</version>
+                <version>5.4</version>
         </parent>
 
 	<groupId>com.hazelcast.platform.demos.ml.ri</groupId>

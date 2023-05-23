@@ -18,7 +18,7 @@ then
  exit 1
 fi
 
-JAR_FILE=${PROJECT}-${MODULE}-5.3-jar-with-dependencies.jar
+JAR_FILE=${PROJECT}-${MODULE}-5.4-jar-with-dependencies.jar
 
 JAVA_ARGS="-Dmy.kubernetes.enabled=false"
 JAVA_ARGS="${JAVA_ARGS} -Dmy.autostart.enabled=true"

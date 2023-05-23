@@ -7,9 +7,9 @@ Find the IP addresss assigned to `transaction-monitor-grid1-hazelcast-extra` in 
 Check and submit using the Jet command line:
 
 ```
-~/Downloads/hazelcast-enterprise-5.3.0/bin/hz-cli -t grid1@123.456.789.0 list-jobs
-~/Downloads/hazelcast-enterprise-5.3.0/bin/hz-cli -t grid1@123.456.789.0 submit target/transaction-monitor-remote-job-sub-1-5.0.jar
-~/Downloads/hazelcast-enterprise-5.3.0/bin/hz-cli -t grid1@123.456.789.0 list-jobs
+~/Downloads/hazelcast-enterprise-5.4.0/bin/hz-cli -t grid1@123.456.789.0 list-jobs
+~/Downloads/hazelcast-enterprise-5.4.0/bin/hz-cli -t grid1@123.456.789.0 submit target/transaction-monitor-remote-job-sub-1-5.0.jar
+~/Downloads/hazelcast-enterprise-5.4.0/bin/hz-cli -t grid1@123.456.789.0 list-jobs
 ```
 
 Connect to a pod and see what is running:
