@@ -1,12 +1,7 @@
 #!/bin/bash
 
-# Cassandra 3.11.4, set auto for 3.11.9
 CASSANDRA_CONF=/etc/cassandra
-CASSANDRA_HOME=/var/lib/cassandra
-
-# Config.
-# NOTE CDC REQUIRES A SMALL commitlog_segment_size_in_mb
-# BUT DEFAULT commitlog_segment_size_in_mb 32 IS BETTER FOR SAVING MODELS
+CASSANDRA_HOME=/opt/cassandra
 
 # BACKGROUND SCRIPT, will probe Cassandra until it's ready. Not clean, but seems to be the standard approach
 (
@@ -24,8 +19,6 @@ CASSANDRA_HOME=/var/lib/cassandra
  echo "$0: ========================================================"
  echo "$0 : background script, believe Cassandra to be useable"
  echo "$0: ========================================================"
-
- sleep 3
 
  # Run all CQL files in directory
  DIR=/cql
@@ -45,6 +38,4 @@ CASSANDRA_HOME=/var/lib/cassandra
 # Start Cassandra
 echo Starting Cassandra
 sleep 2
-# Cassandra 3 - /docker-entrypoint.sh
-# Cassandra 4 - /usr/local/bin/docker-entrypoint.sh
-exec /docker-entrypoint.sh "$@"
+exec /usr/local/bin/docker-entrypoint.sh "$@"

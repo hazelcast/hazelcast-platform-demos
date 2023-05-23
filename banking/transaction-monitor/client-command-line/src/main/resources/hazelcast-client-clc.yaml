@@ -1,0 +1,5 @@
+cluster:
+  name: "@my.cluster1.name@"
+  address: "@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local"
+log:
+ level: info

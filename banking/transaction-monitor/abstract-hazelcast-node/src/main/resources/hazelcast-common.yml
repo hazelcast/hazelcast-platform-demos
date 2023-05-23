@@ -1,0 +1,46 @@
+hazelcast:
+  #
+  management-center:
+    console-enabled: true
+  #
+  properties:
+    # Using DNS in Kubernetes
+    hazelcast.persistence.auto.cluster.state: false
+    hazelcast.member.naming.moby.enabled: true
+    # Graceful shutdown is helpful for Kubernetes scale-down.
+    hazelcast.shutdownhook.policy: GRACEFUL
+  #
+  # Assuming Kubernetes, but override from Java code if we detect otherwise
+  network:
+    rest-api:
+      enabled: true
+      endpoint-groups:
+        HEALTH_CHECK:
+          enabled: true
+  #
+# TURN THIS OFF, AS NOW ADDED BY `CommonIdempotentInitialization.java`  
+#  map:
+#     # Any map with a name matching this pattern has a journal
+#    'alerts*':
+#      event-journal:
+#        enabled: true
+#     # 'transactions' map needs defined as non-default configuration.
+#    'transactions':
+#      indexes:
+#        # Unordered index on Transaction.getSymbol().
+#        - type: HASH
+#          attributes:
+#            - 'symbol'
+  #
+  jet:
+    enabled: true
+    resource-upload-enabled: true
+    # 'true' requires Enterprise and persistence enabled
+    lossless-restart-enabled: false
+
+  serialization:
+    compact-serialization:
+      serializers:
+        - serializer: hazelcast.platform.demos.banking.transactionmonitor.PerspectiveEcommerceSerializer
+        - serializer: hazelcast.platform.demos.banking.transactionmonitor.PerspectivePaymentsSerializer
+        - serializer: hazelcast.platform.demos.banking.transactionmonitor.PerspectiveTradeSerializer

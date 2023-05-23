@@ -18,7 +18,7 @@ package com.hazelcast.platform.demos.banking.cva;
 
 import com.hazelcast.platform.demos.banking.cva.MyConstants.Site;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +54,14 @@ public class MyProperties {
     private int partitions;
     @NotNull
     private int initSize;
+    @NotNull
+    private boolean useViridian;
+    @NotNull
+    private String viridianCluster1DiscoveryToken;
+    @NotNull
+    private String viridianCluster1Id;
+    @NotNull
+    private String viridianCluster1KeyPassword;
 
     public String getBuildTimestamp() {
         return this.buildTimestamp;
@@ -98,6 +106,30 @@ public class MyProperties {
         }
         LOGGER.info("myProperties.site=='{}'", this.site);
         LOGGER.info("myProperties.remoteSite=='{}'", this.remoteSite);
+    }
+    public boolean isUseViridian() {
+        return useViridian;
+    }
+    public void setUseViridian(boolean useViridian) {
+        this.useViridian = useViridian;
+    }
+    public String getViridianCluster1DiscoveryToken() {
+        return viridianCluster1DiscoveryToken;
+    }
+    public void setViridianCluster1DiscoveryToken(String viridianCluster1DiscoveryToken) {
+        this.viridianCluster1DiscoveryToken = viridianCluster1DiscoveryToken;
+    }
+    public String getViridianCluster1Id() {
+        return viridianCluster1Id;
+    }
+    public void setViridianCluster1Id(String viridianCluster1Id) {
+        this.viridianCluster1Id = viridianCluster1Id;
+    }
+    public String getViridianCluster1KeyPassword() {
+        return viridianCluster1KeyPassword;
+    }
+    public void setViridianCluster1KeyPassword(String viridianCluster1KeyPassword) {
+        this.viridianCluster1KeyPassword = viridianCluster1KeyPassword;
     }
 
 }

@@ -1,0 +1,38 @@
+---
+# Data loader, set arg for threshold (make it at least 20)
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: cva-job-site1-data-loader
+  name: cva-job-site1-data-loader
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: cva-job-site1-data-loader
+    spec:
+      containers:
+        - env:
+          - name: "MY_CPP_SERVICE"
+            value: "cva-cpp.default.svc.cluster.local"
+          - name: "MY_SITE"
+            value: "site1"
+          - name: "MY_THRESHOLD"
+            value: "100"
+          image: "hazelcast-platform-demos/cva-data-loader"
+          imagePullPolicy: Never
+          name: cva-job-site1-data-loader-container
+          volumeMounts:
+            - name: configmap
+              mountPath: /customize/my-env.sh
+              subPath: my-env.sh
+      restartPolicy: Never
+      volumes:
+        - name: configmap
+          configMap:
+            name: cva-configmap
+            defaultMode: 0755
+---

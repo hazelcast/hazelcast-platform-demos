@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 hazelcast/management-center:5.2
+FROM --platform=linux/amd64 hazelcast/management-center:5.3.0
 
 # From pom.xml
 ARG MC_LICENSE

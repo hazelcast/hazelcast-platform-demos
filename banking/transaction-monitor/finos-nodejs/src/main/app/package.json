@@ -1,0 +1,26 @@
+{
+  "name": "finos-nodejs",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "PORT=8080 GENERATE_SOURCEMAP=false react-scripts start"
+  },
+  "dependencies": {
+    "@finos/perspective": "2.1.1",
+    "@finos/perspective-viewer": "2.1.1",
+    "@finos/perspective-viewer-d3fc": "2.1.1",
+    "@finos/perspective-viewer-datagrid": "2.1.1",
+    "hazelcast-client": "^5.2.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-scripts": "5.0.1"
+  },
+  "devDependencies": {
+	"babel-loader": "^9.1.2",
+    "@finos/perspective-webpack-plugin": "^2.1.1",
+    "html-webpack-plugin": "^5.5.1",
+    "webpack": "5.82.0",
+    "webpack-cli": "5.0.1",
+    "webpack-dev-server": "^4.15.0"
+  }
+}

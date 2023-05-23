@@ -31,7 +31,7 @@ import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -233,7 +233,8 @@ public class MyRestController {
         try {
             LocalDate calcDate = LocalDate.parse(calcDateStr);
             Job job = CvaStpJobSubmitter.submitCvaStpJob(this.hazelcastInstance,
-                    calcDate, batchSize, parallelism, debug);
+                    calcDate, batchSize, parallelism, debug, this.myProperties.isUseViridian());
+            LOGGER.info("Submitted job: {}", job);
 
             stringBuilder.append(", \"id\": \"" + job.getId() + "\"");
             stringBuilder.append(", \"name\": \"" + job.getName() + "\"");
@@ -244,6 +245,7 @@ public class MyRestController {
             stringBuilder.append(", \"name\": \"\"");
             stringBuilder.append(", \"error\": " + true + "");
             stringBuilder.append(", \"error_message\": \"" + e.getMessage() + "\"");
+            LOGGER.info("cvaRun()", e);
         }
 
         stringBuilder.append(" }");

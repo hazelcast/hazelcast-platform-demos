@@ -30,7 +30,7 @@ const JobSub: React.FunctionComponent = () => {
 	} else {
 		eventsPerSecond = eventsPerSecond * 1000000;
 	}
-	var restURL = '/rest/submit/?kind=' + params.kind
+	var restURL = '/rest/submit?kind=' + params.kind
                         + '&processing_guarantee=' + params.processingGuarantee
                         + '&events_per_second=' + eventsPerSecond
                         + '&num_distinct_keys=' + params.numDistinctKeys

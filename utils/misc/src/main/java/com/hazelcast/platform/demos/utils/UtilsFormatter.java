@@ -23,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,11 +72,11 @@ public class UtilsFormatter {
      */
     public static String safeForJsonStr(String input) {
         String[] tokens = input.replaceAll("\"", "'").split(System.getProperty("line.separator"));
-        String result = tokens[0];
+        StringBuffer result = new StringBuffer(tokens[0]);
         for (int i = 1; i < tokens.length; i++) {
-            result += "+" + tokens[i];
+            result.append("+").append(tokens[i]);
         }
-        return result;
+        return result.toString();
     }
 
     /**
@@ -175,7 +176,7 @@ public class UtilsFormatter {
                 if (j != 0) {
                     line.append(',');
                 }
-                line.append(String.format(format, sqlRow.getObject(j).toString()));
+                line.append(String.format(format, Objects.toString(sqlRow.getObject(j))));
             }
             rows.add(line.toString());
             if (count == UtilsConstants.SQL_RESULT_THRESHOLD) {
