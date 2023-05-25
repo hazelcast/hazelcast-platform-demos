@@ -79,9 +79,9 @@
 		<hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
 		<jackson.version>2.15.0</jackson.version>
 		<json.version>20230227</json.version>
-		<json-smart.version>2.4.9</json-smart.version>
-		<junit-jupiter.version>5.9.2</junit-jupiter.version>
-		<junit-vintage.version>5.9.2</junit-vintage.version>
+		<json-smart.version>2.4.11</json-smart.version>
+		<junit-jupiter.version>5.9.3</junit-jupiter.version>
+		<junit-vintage.version>5.9.3</junit-vintage.version>
 		<jython.version>2.7.2</jython.version>
 		<!--  Kafka Clients must match cloud target -->
 		<kafka-clients.version>2.2.2</kafka-clients.version>
@@ -97,7 +97,7 @@
 		<pulsar.version>2.8.0</pulsar.version>
 		<spotbugs-annotations.version>4.7.3</spotbugs-annotations.version>
 		<springdoc.version>2.0.0</springdoc.version>
-		<spring-boot.version>3.0.7</spring-boot.version>
+		<spring-boot.version>3.1.0</spring-boot.version>
 		<spring-cloud.version>2021.0.0</spring-cloud.version>
 		<spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
 		<zipkin.version>2.23.3-SNAPSHOT</zipkin.version>
@@ -596,6 +596,7 @@
 										<HZ_VIRIDIAN_CLUSTER1_KEY_PASSWORD>${my.viridian.cluster1.key.password}</HZ_VIRIDIAN_CLUSTER1_KEY_PASSWORD>
 										<!-- Dockerfile will use for our built modules -->
 										<CONTROL_FILE>${my.docker.control.file}</CONTROL_FILE>
+										<FLAVOR>${my.transaction-monitor.flavor}</FLAVOR>
 										<JAR_FILE>${my.docker.jar.file}</JAR_FILE>
 										<JAR_FILE2>${my.docker.jar.file2}</JAR_FILE2>
 										<MAIN_CLASS>${main.class}</MAIN_CLASS>
@@ -623,7 +624,6 @@
 										<platform>linux/x86_64</platform>
 									</createImageOptions>
 									<dockerFile>${project.basedir}/Dockerfile</dockerFile>
-									<squash>true</squash>
 								</build>
                                 <name>hazelcast-platform-demos/${my.docker.image.prefix}-${my.docker.image.name}</name>								
                             </image>

@@ -29,9 +29,9 @@ Shell script to create a YAML ConfigMap with external IPs of Kafka brokers.
 
 YAML to create Kafka brokers using above ConfigMap to configure.
 
-### 4. `kubernetes-4-kafdrop-topic-mysql.yaml`
+### 4. `kubernetes-4-kafdrop-topic-rdbms.yaml`
 
-YAML to create Kakfa topic with non-default partition count for optimal reading, Kafdrop for inspection, and MySql and Postgres databases.
+YAML to create Kakfa topic with non-default partition count for optimal reading, Kafdrop for inspection. Also MySql, Postgres, etc databases.
 
 ### 5
 

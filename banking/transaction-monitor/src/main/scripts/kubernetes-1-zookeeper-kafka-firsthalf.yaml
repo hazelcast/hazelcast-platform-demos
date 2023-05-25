@@ -56,6 +56,48 @@ spec:
   - port: 9092
   type: LoadBalancer
 ---
+# Cassandra : DNS will be "transaction-monitor-FLAVOR-cassandra.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-FLAVOR-cassandra
+spec:
+  selector:
+    app: transaction-monitor-FLAVOR-cassandra
+  ports:
+  - port: 9042
+    targetPort: 9042
+  type: LoadBalancer
+---
+# Maria : DNS will be "transaction-monitor-FLAVOR-maria.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-FLAVOR-maria
+spec:
+  selector:
+    app: transaction-monitor-FLAVOR-maria
+  ports:
+  - port: 3306
+    targetPort: 3306
+  type: LoadBalancer
+---
+# Mongo : DNS will be "transaction-monitor-FLAVOR-mongo.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-FLAVOR-mongo
+spec:
+  selector:
+    app: transaction-monitor-FLAVOR-mongo
+  ports:
+  - port: 27017
+    targetPort: 27017
+  type: LoadBalancer
+---
 # MySql : DNS will be "transaction-monitor-FLAVOR-mysql.default.svc.cluster.local".
 ---
 apiVersion: v1

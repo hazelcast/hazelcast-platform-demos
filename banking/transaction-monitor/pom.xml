@@ -61,7 +61,10 @@
 		<module>finos-nodejs</module>
 		<module>finos-python</module>
 		-->
+		<module>cassandra</module>
 		<module>management-center</module>
+		<module>maria</module>
+		<module>mongo</module>
 		<module>mysql</module>
 		<module>prometheus</module>
 		<module>postgres</module>
