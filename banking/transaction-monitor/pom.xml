@@ -93,6 +93,16 @@
                         <echo message="$my.pulsar.or.kafka=${my.pulsar.or.kafka}" />
                         <echo message="$my.transaction-monitor.flavor=${my.transaction-monitor.flavor}" />
                         <echo message="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" />
+                        <echo message="Cassandra:" />
+                        <echo message="Keyspace is 'transaction-monitor-${my.transaction-monitor.flavor}', just amend IP in:" />
+                        <echo message="jdbc:cassandra://127.0.0.1:9042/transaction-monitor-${my.transaction-monitor.flavor}" />
+                        <echo message="Maria:" />
+                        <echo message="Database is 'transaction-monitor-${my.transaction-monitor.flavor}', just amend IP in:" />
+                        <echo message="Port in Dockeris 4306 to avoid clash with MySql"
+                        <echo message="jdbc:mariadb://127.0.0.1:4306/transaction-monitor-${my.transaction-monitor.flavor}" />
+                        <echo message="Mongo:" />
+                        <echo message="Database is 'transaction-monitor-${my.transaction-monitor.flavor}', just amend IP in:" />
+                        <echo message="mongodb://${my.other.admin.user}:${my.other.admin.password}@127.0.0.1:27017/?authMechanism=DEFAULT&amp;tls=false" />
                         <echo message="MySql:" />
                         <echo message="Database is 'transaction-monitor-${my.transaction-monitor.flavor}', just amend IP in:" />
                         <echo message="jdbc:mysql://127.0.0.1:3306/transaction-monitor-${my.transaction-monitor.flavor}" />
