@@ -1,4 +1,4 @@
-FROM library/mariadb:10.11.3
+FROM --platform=linux/amd64 library/mariadb:10.11.3
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MY_OTHERUSER
