@@ -16,18 +16,11 @@ ENV MONGO_INITDB_DATABASE=$MY_OTHERDATABASE
 
 # Config
 COPY target/classes/mongod.conf /etc
-COPY target/classes/roles.sh /docker-entrypoint-initdb.d/
-RUN chmod 755 /docker-entrypoint-initdb.d/roles.sh
+COPY target/classes/*.sh /docker-entrypoint-initdb.d/
+RUN chmod 755 /docker-entrypoint-initdb.d/*.sh
 
-# Override /usr/local/bin/docker-
-COPY target/classes/custom-entrypoint.sh  /
-RUN chmod 755 /custom-entrypoint.sh
-#ENTRYPOINT ["/custom-entrypoint.sh" ]
-CMD ["bash", "-c", "set -euo pipefail \
-      && echo @@@@@@@@@@ \
-      && echo arch \
-      && arch \
-      && echo @@@@@@@@@@ \
-      && echo /custom-entrypoint.sh \
-      && /custom-entrypoint.sh \
-     "]
+# Helpful directories, scripts use shell which saves history
+RUN mkdir /home/mongodb
+RUN chmod 777 /home/mongodb
+RUN touch /home/mongodb/.dbshell
+RUN chmod 777 /home/mongodb/.dbshell

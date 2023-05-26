@@ -98,7 +98,7 @@
                         <echo message="jdbc:cassandra://127.0.0.1:9042/transaction-monitor-${my.transaction-monitor.flavor}" />
                         <echo message="Maria:" />
                         <echo message="Database is 'transaction-monitor-${my.transaction-monitor.flavor}', just amend IP in:" />
-                        <echo message="Port in Dockeris 4306 to avoid clash with MySql"
+                        <echo message="Port in Dockeris 4306 to avoid clash with MySql" />
                         <echo message="jdbc:mariadb://127.0.0.1:4306/transaction-monitor-${my.transaction-monitor.flavor}" />
                         <echo message="Mongo:" />
                         <echo message="Database is 'transaction-monitor-${my.transaction-monitor.flavor}', just amend IP in:" />
