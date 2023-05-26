@@ -106,12 +106,12 @@ public class ApplicationRunner {
         this.rate = arg0;
         this.max = arg1;
         String bootstrapServers = arg2;
-        String pulsarList = arg3;
+        String pulsarAddress = arg3;
         this.usePulsar = arg4;
         this.transactionMonitorFlavor = arg5;
 
         if (this.usePulsar) {
-            String serviceUrl = UtilsUrls.getPulsarServiceUrl(pulsarList);
+            String serviceUrl = UtilsUrls.getPulsarServiceUrl(pulsarAddress);
             LOGGER.info("serviceUrl='{}'", serviceUrl);
 
             PulsarClient pulsarClient =

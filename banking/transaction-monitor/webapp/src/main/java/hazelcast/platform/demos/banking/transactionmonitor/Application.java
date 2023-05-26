@@ -50,6 +50,11 @@ public class Application {
      */
     static {
         System.setProperty("hazelcast.logging.type", "slf4j");
+        System.getProperties().keySet().stream().forEach(key -> {
+            if (key.toString().startsWith("my")) {
+                LOGGER.info("{} {}", key, System.getProperty(key.toString()));
+            }
+        });
     }
 
     /**
@@ -73,7 +78,7 @@ public class Application {
         String propertyName5 = MyConstants.USE_VIRIDIAN;
         String bootstrapServers = System.getProperty(propertyName1, "");
         String moduleName = applicationProperties.getProperty(propertyName2, "");
-        String pulsarList = System.getProperty(propertyName3, "");
+        String pulsarAddress = System.getProperty(propertyName3, "");
         String postgresAddress = System.getProperty(propertyName4, "");
         String useViridianStr = applicationProperties.getProperty(propertyName5, "");
         TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(applicationProperties);
@@ -86,7 +91,7 @@ public class Application {
             LOGGER.error("No value for " + propertyName2);
             System.exit(1);
         }
-        if (pulsarList.isBlank()) {
+        if (pulsarAddress.isBlank()) {
             LOGGER.error("No value for " + propertyName3);
             System.exit(1);
         }
@@ -102,7 +107,7 @@ public class Application {
         }
         LOGGER.info("'bootstrapServers'=='{}'", bootstrapServers);
         LOGGER.info("'moduleName'=='{}'", moduleName);
-        LOGGER.info("'pulsarList'=='{}'", pulsarList);
+        LOGGER.info("'pulsarAddress'=='{}'", pulsarAddress);
         LOGGER.info("'postgresAddress'=='{}'", postgresAddress);
         LOGGER.info("TransactionMonitorFlavor=='{}'", transactionMonitorFlavor);
 

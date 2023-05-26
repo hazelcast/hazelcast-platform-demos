@@ -39,10 +39,13 @@ CMD ["bash", "-c", "set -euo pipefail \
       && echo java $JAVA_ARGS $JAVA_OPTS \
  -Dmy.autostart.enabled=$MY_AUTOSTART_ENABLED \
  -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS \
+ -Dmy.cassandra.address=$MY_CASSANDRA_ADDRESS \
  -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+ -Dmy.maria.address=$MY_MARIA_ADDRESS \
+ -Dmy.mongo.address=$MY_MONGO_ADDRESS \
  -Dmy.mysql.address=$MY_MYSQL_ADDRESS \
  -Dmy.native.megabytes=$MY_NATIVE_MEGABYTES \
- -Dmy.pulsar.list=$MY_PULSAR_LIST \
+ -Dmy.pulsar.address=$MY_PULSAR_ADDRESS \
  -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
  -Dhazelcast.enterprise.license.key=${MC_LICENSE} \
  -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
@@ -50,10 +53,13 @@ CMD ["bash", "-c", "set -euo pipefail \
       && java $JAVA_ARGS $JAVA_OPTS \
  -Dmy.autostart.enabled=$MY_AUTOSTART_ENABLED \
  -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS \
+ -Dmy.cassandra.address=$MY_CASSANDRA_ADDRESS \
  -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+ -Dmy.maria.address=$MY_MARIA_ADDRESS \
+ -Dmy.mongo.address=$MY_MONGO_ADDRESS \
  -Dmy.mysql.address=$MY_MYSQL_ADDRESS \
  -Dmy.native.megabytes=$MY_NATIVE_MEGABYTES \
- -Dmy.pulsar.list=$MY_PULSAR_LIST \
+ -Dmy.pulsar.address=$MY_PULSAR_ADDRESS \
  -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
  -Dhazelcast.enterprise.license.key=${MC_LICENSE} \
  -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \

@@ -568,14 +568,15 @@ public class ApplicationRunner {
     private boolean initialize(String clusterName) throws Exception {
         LOGGER.info("initialize(): -=-=-=-=- START -=-=-=-=-=-");
 
-        String propertyName1 = "my.bootstrap.servers";
-        String bootstrapServers = System.getProperty(propertyName1, "");
-        String pulsarList = System.getProperty(MyConstants.PULSAR_CONFIG_KEY, "");
+        String bootstrapServers = System.getProperty(MyConstants.BOOTSTRAP_SERVERS_CONFIG_KEY, "");
+        String pulsarAddress = System.getProperty(MyConstants.PULSAR_CONFIG_KEY, "");
         String postgresAddress = System.getProperty(MyConstants.POSTGRES_CONFIG_KEY, "");
-        for (String propertyName : List.of(propertyName1, MyConstants.PULSAR_CONFIG_KEY, MyConstants.POSTGRES_CONFIG_KEY)) {
+        for (String propertyName : List.of(MyConstants.BOOTSTRAP_SERVERS_CONFIG_KEY, MyConstants.CASSANDRA_CONFIG_KEY,
+                MyConstants.MARIA_CONFIG_KEY, MyConstants.MONGO_CONFIG_KEY, MyConstants.MYSQL_CONFIG_KEY,
+                MyConstants.POSTGRES_CONFIG_KEY, MyConstants.PULSAR_CONFIG_KEY)) {
             String propertyValue = System.getProperty(propertyName, "");
             if (propertyValue.isEmpty()) {
-                LOGGER.error("No value for '{}' " + propertyName);
+                LOGGER.error("No value for '{}' ", propertyName);
                 return false;
             } else {
                 LOGGER.debug("Using '{}'=='{}'", propertyName, propertyValue);
@@ -584,7 +585,6 @@ public class ApplicationRunner {
 
         CheckConnectIdempotentCallable.silentCheckCustomClasses(this.hazelcastInstance);
         boolean ok = true;
-
         if (ok) {
             Properties properties;
             try {
@@ -618,14 +618,14 @@ public class ApplicationRunner {
 
             ok &= TransactionMonitorIdempotentInitialization.createNeededObjects(hazelcastInstance,
                     postgresProperties, ourProjectProvenance, transactionMonitorFlavor, this.localhost, useViridian);
-            ok &= TransactionMonitorIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList,
-                    usePulsar, useViridian, transactionMonitorFlavor);
+            ok &= TransactionMonitorIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers,
+                    pulsarAddress, usePulsar, useViridian, transactionMonitorFlavor);
             ok &= TransactionMonitorIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers,
                     transactionMonitorFlavor);
             if (ok && !this.localhost) {
                 // Don't even try if broken by this point
                 ok = TransactionMonitorIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
-                        pulsarList, postgresProperties, properties, clusterName, transactionMonitorFlavor);
+                        pulsarAddress, postgresProperties, properties, clusterName, transactionMonitorFlavor);
             } else {
                 LOGGER.info("ok=={}, localhost=={} - no job submission", ok, this.localhost);
             }

@@ -42,7 +42,7 @@ public class JobControlListener implements EntryAddedListener<String, String>, E
 
     private transient Executor executor;
     private final String bootstrapServers;
-    private final String pulsarList;
+    private final String pulsarAddress;
     private final boolean usePulsar;
     private final String projectName;
     private final String clusterName;
@@ -52,7 +52,7 @@ public class JobControlListener implements EntryAddedListener<String, String>, E
             TransactionMonitorFlavor arg5) {
         this.executor = Executors.newSingleThreadExecutor();
         this.bootstrapServers = arg0;
-        this.pulsarList = arg1;
+        this.pulsarAddress = arg1;
         this.usePulsar = arg2;
         this.projectName = arg3;
         this.clusterName = arg4;
@@ -87,7 +87,7 @@ public class JobControlListener implements EntryAddedListener<String, String>, E
 
         if (verb.toUpperCase(Locale.ROOT).equals("START")) {
             JobControlStartRunnable jobControlStartRunnable =
-                    new JobControlStartRunnable(noun, this.bootstrapServers, this.pulsarList, this.usePulsar,
+                    new JobControlStartRunnable(noun, this.bootstrapServers, this.pulsarAddress, this.usePulsar,
                             this.projectName, this.clusterName, this.transactionMonitorFlavor);
             this.executor.execute(jobControlStartRunnable);
         } else {

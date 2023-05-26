@@ -22,7 +22,7 @@ spec:
           - name: "MY_BOOTSTRAP_SERVERS"
             value: "transaction-monitor-FLAVOR-kafka-broker-0.transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local:19092,transaction-monitor-FLAVOR-kafka-broker-1.transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local:19092,transaction-monitor-FLAVOR-kafka-broker-2.transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local:19092"
           # Default port
-          - name: "MY_PULSAR_LIST"
+          - name: "MY_PULSAR_ADDRESS"
             value: "transaction-monitor-FLAVOR-pulsar.default.svc.cluster.local"
           image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-transaction-producer"
           imagePullPolicy: Never

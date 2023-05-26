@@ -19,8 +19,8 @@ package hazelcast.platform.demos.banking.transactionmonitor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
@@ -298,7 +298,7 @@ public class TransactionMonitorIdempotentInitialization {
      * </p>
      */
     public static boolean loadNeededData(HazelcastInstance hazelcastInstance, String bootstrapServers,
-            String pulsarList, boolean usePulsar, boolean useViridian, TransactionMonitorFlavor transactionMonitorFlavor) {
+            String pulsarSource, boolean usePulsar, boolean useViridian, TransactionMonitorFlavor transactionMonitorFlavor) {
         boolean ok = true;
         try {
             IMap<String, String> jobConfigMap =
@@ -308,19 +308,21 @@ public class TransactionMonitorIdempotentInitialization {
                 LOGGER.trace("Skip loading '{}', not empty", jobConfigMap.getName());
             } else {
                 Properties properties = InitializerConfig.kafkaSourceProperties(bootstrapServers);
-
                 jobConfigMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
                         properties.getProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
                 jobConfigMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
                         properties.getProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG));
                 jobConfigMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
                         properties.getProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG));
-                jobConfigMap.put(MyConstants.PULSAR_CONFIG_KEY, pulsarList);
-                if (usePulsar) {
-                    jobConfigMap.put(MyConstants.PULSAR_OR_KAFKA_KEY, "pulsar");
-                } else {
-                    jobConfigMap.put(MyConstants.PULSAR_OR_KAFKA_KEY, "kafka");
-                }
+                jobConfigMap.put(MyConstants.CASSANDRA_CONFIG_KEY,
+                        System.getProperty(MyConstants.CASSANDRA_CONFIG_KEY, ""));
+                jobConfigMap.put(MyConstants.MARIA_CONFIG_KEY, System.getProperty(MyConstants.MARIA_CONFIG_KEY, ""));
+                jobConfigMap.put(MyConstants.MONGO_CONFIG_KEY, System.getProperty(MyConstants.MONGO_CONFIG_KEY, ""));
+                jobConfigMap.put(MyConstants.MYSQL_CONFIG_KEY, System.getProperty(MyConstants.MYSQL_CONFIG_KEY, ""));
+                jobConfigMap.put(MyConstants.POSTGRES_CONFIG_KEY,
+                        System.getProperty(MyConstants.POSTGRES_CONFIG_KEY, ""));
+                jobConfigMap.put(MyConstants.PULSAR_CONFIG_KEY, pulsarSource);
+                jobConfigMap.put(MyConstants.PULSAR_OR_KAFKA_KEY, (usePulsar ? "pulsar" : "kafka"));
                 jobConfigMap.put(MyConstants.TRANSACTION_MONITOR_FLAVOR, transactionMonitorFlavor.toString());
                 jobConfigMap.put(MyConstants.USE_VIRIDIAN, Boolean.valueOf(useViridian).toString());
 
@@ -328,7 +330,6 @@ public class TransactionMonitorIdempotentInitialization {
             }
 
             loadNeededDataForFlavor(hazelcastInstance, transactionMonitorFlavor);
-
         } catch (Exception e) {
             LOGGER.error("loadNeededData()", e);
             ok = false;
@@ -499,8 +500,7 @@ public class TransactionMonitorIdempotentInitialization {
                 + " ) "
                 + " TYPE Kafka "
                 + " OPTIONS ( "
-                + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'keyFormat' = 'java', 'keyJavaClass' = 'java.lang.String',"
                 + " 'valueFormat' = 'json-flat',"
                 + " 'auto.offset.reset' = 'earliest',"
                 + " 'bootstrap.servers' = '" + bootstrapServers + "'"
@@ -524,8 +524,7 @@ public class TransactionMonitorIdempotentInitialization {
                 + " ) "
                 + " TYPE Kafka "
                 + " OPTIONS ( "
-                + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'keyFormat' = 'java', 'keyJavaClass' = 'java.lang.String',"
                 + " 'valueFormat' = 'json-flat',"
                 + " 'auto.offset.reset' = 'earliest',"
                 + " 'bootstrap.servers' = '" + bootstrapServers + "'"
@@ -546,8 +545,7 @@ public class TransactionMonitorIdempotentInitialization {
                 + " ) "
                 + " TYPE Kafka "
                 + " OPTIONS ( "
-                + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = 'java.lang.String',"
+                + " 'keyFormat' = 'java', 'keyJavaClass' = 'java.lang.String',"
                 + " 'valueFormat' = 'json-flat',"
                 + " 'auto.offset.reset' = 'earliest',"
                 + " 'bootstrap.servers' = '" + bootstrapServers + "'"
@@ -1087,7 +1085,7 @@ public class TransactionMonitorIdempotentInitialization {
      * @param properties
      */
     public static boolean launchNeededJobs(HazelcastInstance hazelcastInstance, String bootstrapServers,
-            String pulsarList, Properties postgresProperties, Properties properties, String clusterName,
+            String pulsarAddress, Properties postgresProperties, Properties properties, String clusterName,
             TransactionMonitorFlavor transactionMonitorFlavor) {
         boolean ok = true;
         String projectName = properties.getOrDefault(UtilsConstants.SLACK_PROJECT_NAME,
@@ -1110,7 +1108,7 @@ public class TransactionMonitorIdempotentInitialization {
             LOGGER.info("Launching transaction input jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",
                     System.getProperty("my.autostart.enabled"));
             try {
-                ok = launchTransactionJobs(hazelcastInstance, bootstrapServers, pulsarList,
+                ok = launchTransactionJobs(hazelcastInstance, bootstrapServers, pulsarAddress,
                         usePulsar, useViridian, projectName, clusterName, transactionMonitorFlavor);
                 if (!ok) {
                     return ok;
@@ -1156,7 +1154,7 @@ public class TransactionMonitorIdempotentInitialization {
      *
      * @param hazelcastInstance
      * @param bootstrapServers
-     * @param pulsarList
+     * @param pulsarAddresss
      * @param clusterName
      * @param usePulsar
      * @param useViridian
@@ -1166,7 +1164,7 @@ public class TransactionMonitorIdempotentInitialization {
      * @return
      */
     public static boolean launchTransactionJobs(HazelcastInstance hazelcastInstance, String bootstrapServers,
-            String pulsarList, boolean usePulsar, boolean useViridian, String projectName, String clusterName,
+            String pulsarAddress, boolean usePulsar, boolean useViridian, String projectName, String clusterName,
             TransactionMonitorFlavor transactionMonitorFlavor) {
 
         /* Transaction ingest
@@ -1179,7 +1177,7 @@ public class TransactionMonitorIdempotentInitialization {
         StreamStage<Entry<String, HazelcastJsonValue>> pulsarInputSource1 = null;
         if (usePulsar) {
             // Attach Pulsar classes only if needed
-            pulsarInputSource1 = MyPulsarSource.inputSourceKeyAndJson(pulsarList);
+            pulsarInputSource1 = MyPulsarSource.inputSourceKeyAndJson(pulsarAddress);
             jobConfigIngestTransactions.addClass(MyPulsarSource.class);
         }
 
@@ -1208,7 +1206,7 @@ public class TransactionMonitorIdempotentInitialization {
         StreamStage<?> pulsarInputSource2 = null;
         if (usePulsar) {
             // Attach Pulsar classes only if needed
-            pulsarInputSource2 = MyPulsarSource.inputSourceTransaction(pulsarList, transactionMonitorFlavor);
+            pulsarInputSource2 = MyPulsarSource.inputSourceTransaction(pulsarAddress, transactionMonitorFlavor);
             jobConfigAggregateQuery.addClass(MyPulsarSource.class);
         }
 

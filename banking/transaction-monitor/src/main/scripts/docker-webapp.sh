@@ -30,7 +30,7 @@ fi
 
 MY_BOOTSTRAP_SERVERS=kafka-broker0:9092,kafka-broker1:9093,kafka-broker2:9094
 MY_POSTGRES_ADDRESS=postgres:5432
-MY_PULSAR_LIST=pulsar:6650
+MY_PULSAR_ADDRESS=pulsar:6650
 
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${FLAVOR}-${MODULE}
 
@@ -43,7 +43,7 @@ docker container prune --force > /dev/null 2>&1
 CMD="docker run -e MY_BOOTSTRAP_SERVERS=$MY_BOOTSTRAP_SERVERS \
  -e MY_KUBERNETES_ENABLED=false \
  -e MY_POSTGRES_ADDRESS=$MY_POSTGRES_ADDRESS \
- -e MY_PULSAR_LIST=$MY_PULSAR_LIST \
+ -e MY_PULSAR_ADDRESS=$MY_PULSAR_ADDRESS \
  -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP}:5701 \
  -p 8080:8080 --rm ${DOCKER_IMAGE}"
 #echo $CMD

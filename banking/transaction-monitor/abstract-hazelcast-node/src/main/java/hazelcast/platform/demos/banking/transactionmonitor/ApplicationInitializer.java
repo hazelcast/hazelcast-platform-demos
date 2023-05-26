@@ -58,25 +58,25 @@ public class ApplicationInitializer {
     @SuppressFBWarnings(value = "DM_EXIT", justification = "VM shutdown is fail-fast for bad arguments")
     public static void build(String[] args) throws Exception {
         String bootstrapServers = null;
-        String pulsarList = null;
+        String pulsarAddress = null;
         String postgresAddress = null;
 
         if (args.length == 3) {
             bootstrapServers = args[0];
-            pulsarList = args[1];
+            pulsarAddress = args[1];
             postgresAddress = args[2];
         } else {
             bootstrapServers = System.getProperty("my.bootstrap.servers", "");
-            pulsarList = System.getProperty(MyConstants.PULSAR_CONFIG_KEY, "");
+            pulsarAddress = System.getProperty(MyConstants.PULSAR_CONFIG_KEY, "");
             postgresAddress = System.getProperty(MyConstants.POSTGRES_CONFIG_KEY, "");
-            if (bootstrapServers.isBlank() || pulsarList.isBlank() || postgresAddress.isBlank()) {
-                LOGGER.error("Usage: 2 arg expected: bootstrapServers pulsarList postgresAddress");
+            if (bootstrapServers.isBlank() || pulsarAddress.isBlank() || postgresAddress.isBlank()) {
+                LOGGER.error("Usage: 2 arg expected: bootstrapServers pulsarAddress postgresAddress");
                 LOGGER.error("eg: 127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094 127.0.0.1:6650 127.0.0.1:5432");
                 System.exit(1);
             }
         }
         LOGGER.info("'bootstrapServers'=='{}'", bootstrapServers);
-        LOGGER.info("'pulsarList'=='{}'", pulsarList);
+        LOGGER.info("'pulsarAddress'=='{}'", pulsarAddress);
         LOGGER.info("'postgresAddress'=='{}'", postgresAddress);
 
         // Exit if properties not as expected
@@ -110,7 +110,7 @@ public class ApplicationInitializer {
 
         String initializerProperty = "my.initialize";
         if (System.getProperty(initializerProperty, "").equalsIgnoreCase(Boolean.TRUE.toString())) {
-            ApplicationInitializer.initialise(hazelcastInstance, bootstrapServers, pulsarList,
+            ApplicationInitializer.initialise(hazelcastInstance, bootstrapServers, pulsarAddress,
                     postgresAddress, properties, config.getClusterName(), localhost);
         } else {
             if (size == 1) {
@@ -139,7 +139,7 @@ public class ApplicationInitializer {
      * </p>
      */
     public static void initialise(HazelcastInstance hazelcastInstance, String bootstrapServers,
-            String pulsarList, String postgresAddress, Properties properties, String clusterName,
+            String pulsarAddress, String postgresAddress, Properties properties, String clusterName,
             boolean localhost)
                     throws Exception {
 
@@ -166,15 +166,15 @@ public class ApplicationInitializer {
         Properties postgresProperties = MyUtils.getPostgresProperties(properties);
         TransactionMonitorIdempotentInitialization.createNeededObjects(hazelcastInstance,
                 postgresProperties, ourProjectProvenance, transactionMonitorFlavor, localhost, useViridian);
-        addListeners(hazelcastInstance, bootstrapServers, pulsarList, usePulsar, projectName, clusterName,
+        addListeners(hazelcastInstance, bootstrapServers, pulsarAddress, usePulsar, projectName, clusterName,
                 transactionMonitorFlavor);
-        TransactionMonitorIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList, usePulsar,
+        TransactionMonitorIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarAddress, usePulsar,
                 useViridian, transactionMonitorFlavor);
         TransactionMonitorIdempotentInitialization.defineQueryableObjects(hazelcastInstance,
                 bootstrapServers, transactionMonitorFlavor);
 
         TransactionMonitorIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
-                pulsarList, postgresProperties, properties, clusterName, transactionMonitorFlavor);
+                pulsarAddress, postgresProperties, properties, clusterName, transactionMonitorFlavor);
     }
 
 
@@ -185,13 +185,13 @@ public class ApplicationInitializer {
      * @param hazelcastInstance
      */
     static void addListeners(HazelcastInstance hazelcastInstance, String bootstrapServers,
-            String pulsarList, boolean usePulsar, String projectName, String clusterName,
+            String pulsarAddress, boolean usePulsar, String projectName, String clusterName,
             TransactionMonitorFlavor transactionMonitorFlavor) {
         MyMembershipListener myMembershipListener = new MyMembershipListener(hazelcastInstance);
         hazelcastInstance.getCluster().addMembershipListener(myMembershipListener);
 
         JobControlListener jobControlListener =
-                new JobControlListener(bootstrapServers, pulsarList, usePulsar,
+                new JobControlListener(bootstrapServers, pulsarAddress, usePulsar,
                         projectName, clusterName, transactionMonitorFlavor);
         hazelcastInstance.getMap(MyConstants.IMAP_NAME_JOB_CONTROL)
             .addLocalEntryListener(jobControlListener);

@@ -25,9 +25,14 @@ import java.util.List;
 public class MyConstants {
     public static final String APPLICATION_PROPERTIES_FILE = "application.properties";
 
+    public static final String CASSANDRA_CONFIG_KEY = "my.cassandra.address";
+    public static final String BOOTSTRAP_SERVERS_CONFIG_KEY = "my.bootstrap.servers";
     public static final String KAFKA_TOPIC_MAPPING_PREFIX = "";
     public static final String KAFKA_TOPIC_NAME_ALERTS = "kf_alerts";
     public static final String KAFKA_TOPIC_NAME_TRANSACTIONS = "kf_transactions";
+    public static final String MARIA_CONFIG_KEY = "my.maria.address";
+    public static final String MONGO_CONFIG_KEY = "my.mongo.address";
+    public static final String MYSQL_CONFIG_KEY = "my.mysql.address";
     public static final String MYSQL_ADDRESS = "my.mysql.address";
     public static final String MYSQL_DATACONNECTION_CONFIG_NAME = "mysql";
     public static final String MYSQL_DATACONNECTION_TABLE_NAME = "mysql_slf4j";
@@ -50,7 +55,7 @@ public class MyConstants {
     public static final String PROJECT_NAME = "my.project.name";
     // Label used on MapStore saved, so can later identify change source
     public static final String PROJECT_PROVENANCE = PROJECT_NAME;
-    public static final String PULSAR_CONFIG_KEY = "my.pulsar.list";
+    public static final String PULSAR_CONFIG_KEY = "my.pulsar.address";
     public static final String PULSAR_TOPIC_NAME_TRANSACTIONS = "pulsar_transactions";
     public static final String PULSAR_OR_KAFKA_KEY = "my.pulsar.or.kafka";
     public static final String TRANSACTION_MONITOR_FLAVOR = "my.transaction-monitor.flavor";
