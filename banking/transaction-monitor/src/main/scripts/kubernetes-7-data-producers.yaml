@@ -28,3 +28,26 @@ spec:
           imagePullPolicy: Never
           name: transaction-monitor-FLAVOR-job-trans-producer-container
       restartPolicy: Never
+---
+# Mongo Updated
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: transaction-monitor-FLAVOR-job-mongo-updater
+  name: transaction-monitor-FLAVOR-job-mongo-updater
+spec:
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-FLAVOR-job-mongo-updater
+    spec:
+      containers:
+        - env:
+          - name: "MY_MONGO_ADDRESS"
+            value: "transaction-monitor-FLAVOR-mongo.default.svc.cluster.local"
+          image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-mongo-updater"
+          imagePullPolicy: Never
+          name: transaction-monitor-FLAVOR-job-mongo-updater-container
+      restartPolicy: Never

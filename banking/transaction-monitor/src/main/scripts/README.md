@@ -56,10 +56,10 @@ Use an existing Viridian cluster, so don't run any YAML for step 5.
 
 YAML to create WebApp connecting to Hazelcast Cloud.
 
-Can be run before or after `kubernetes-7-transaction-producer.yaml`. Before would be usual, but there is no dependency
+Can be run before or after `kubernetes-7-data-producers.yaml`. Before would be usual, but there is no dependency
 between these two.
 
-### 6=. `kubernetes-6-transaction-producer.yaml`
+### 6=. `kubernetes-7-data-producers.yaml`
 
 YAML to create a stream of transactions.
 

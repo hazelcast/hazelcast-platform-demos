@@ -65,6 +65,7 @@
 		<module>management-center</module>
 		<module>maria</module>
 		<module>mongo</module>
+		<module>mongo-updater</module>
 		<module>mysql</module>
 		<module>prometheus</module>
 		<module>postgres</module>

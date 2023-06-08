@@ -62,6 +62,10 @@
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet-mongodb</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet-python</artifactId>
 		</dependency>
 		<dependency>

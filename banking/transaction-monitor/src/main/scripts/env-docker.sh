@@ -1,12 +1,6 @@
 #!/bin/bash
 # 
-cd `dirname $0`
-
-. ./check-flavor.sh $*
-if [ $? -ne 0 ]
-then
- exit
-fi
+BASEDIR=`dirname $0`
 
 GROUP=hazelcast-platform-demos
 PROJECT=transaction-monitor
@@ -18,6 +12,13 @@ MODULE=${FIRST}
 if [ "$FIRST" != "$SECOND" ] && [ $(expr `echo $SECOND | egrep -vw '0|1|2' | wc -l`) -gt 0 ]
 then
  MODULE=${FIRST}-${SECOND}
+fi
+
+cd $BASEDIR/../../../$MODULE
+. ../src/main/scripts/check-flavor.sh
+if [ $? -ne 0 ]
+then
+ exit
 fi
 
 # May need host machine IP for clustering
@@ -37,6 +38,10 @@ fi
 if [ "$FIRST" == "cassandra" ]
 then
  DOCKER_ARGS="-e CASSANDRA_BROADCAST_ADDRESS=${HOST_IP}"
+fi
+if [ "$FIRST" == "mongo" ] && [ "$SECOND" == "updater" ]
+then
+ DOCKER_ARGS="-e HOST_IP=${HOST_IP}"
 fi
 
 # Internal/external port mapping

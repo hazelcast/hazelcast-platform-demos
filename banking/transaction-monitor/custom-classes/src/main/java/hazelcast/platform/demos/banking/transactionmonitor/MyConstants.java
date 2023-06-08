@@ -25,13 +25,22 @@ import java.util.List;
 public class MyConstants {
     public static final String APPLICATION_PROPERTIES_FILE = "application.properties";
 
+    public static final String ARCHIVER_JOB_NAME = "archiver";
+    public static final String ARCHIVER_JOB_STATE_ON = "RUNNING";
+    public static final String ARCHIVER_JOB_STATE_OFF = "SUSPENDED";
     public static final String CASSANDRA_CONFIG_KEY = "my.cassandra.address";
     public static final String BOOTSTRAP_SERVERS_CONFIG_KEY = "my.bootstrap.servers";
+    public static final String HOST_IP = "HOST_IP";
     public static final String KAFKA_TOPIC_MAPPING_PREFIX = "";
     public static final String KAFKA_TOPIC_NAME_ALERTS = "kf_alerts";
     public static final String KAFKA_TOPIC_NAME_TRANSACTIONS = "kf_transactions";
     public static final String MARIA_CONFIG_KEY = "my.maria.address";
+    public static final String MONGO_COLLECTION = "jobControl";
+    public static final String MONGO_COLLECTION_FIELD1 = "jobName";
+    public static final String MONGO_COLLECTION_FIELD2 = "stateRequired";
     public static final String MONGO_CONFIG_KEY = "my.mongo.address";
+    public static final String MONGO_USER = "my.mongo.user";
+    public static final String MONGO_PASSWORD = "my.mongo.password";
     public static final String MYSQL_CONFIG_KEY = "my.mysql.address";
     public static final String MYSQL_ADDRESS = "my.mysql.address";
     public static final String MYSQL_DATACONNECTION_CONFIG_NAME = "mysql";

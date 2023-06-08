@@ -1,5 +1,5 @@
 # Script is sourced, can't use $0
-MYNAME=2-database.sh
+MYNAME=3-serviceHistory.sh
 if [ "${MONGO_MAJOR}" == "4.2" ]
 then
  MONGOSH=mongo
@@ -9,20 +9,10 @@ fi
 echo ${MYNAME} : 'START - - - - - - - - - - - - - - - - - - - - - - - - - - - -'
 $MONGOSH -u @my.other.admin.user@ -p @my.other.admin.password@ << EOF
 use @my.other.admin.database@
-db.createCollection("jobControl",
-{validator:
-  {\$jsonSchema:{
-     required: [ "jobName", "stateRequired" ],
-     properties: {
-        jobName: {
-           bsonType: "string"
-        },
-        stateRequired: {
-           bsonType: "string"
-        }
-     }
-  }
-})
-show dbs
+print("===================")
+db.jobControl.insert( 
+   [
+     { _id: "01", jobName: "archiver", stateRequired: "SUSPENDED" }
+   ] )   
 EOF
 echo ${MYNAME} : ' END - - - - - - - - - - - - - - - - - - - - - - - - - - - -'
