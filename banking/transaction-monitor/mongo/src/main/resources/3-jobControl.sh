@@ -1,6 +1,6 @@
 # Script is sourced, can't use $0
 MYNAME=3-serviceHistory.sh
-if [ "${MONGO_MAJOR}" == "4.2" ]
+if [ `echo ${MONGO_MAJOR} | cut -d. -f1` == "4" ]
 then
  MONGOSH=mongo
 else

@@ -1,6 +1,6 @@
 # Need AVX on x86_64 for Mongo 5 upwards
 #FROM --platform=linux/amd64 mongo:6.0.6
-FROM --platform=linux/amd64 mongo:4.2.0
+FROM --platform=linux/amd64 mongo:4.4.22
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG FLAVOR
