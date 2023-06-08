@@ -38,6 +38,7 @@ public class MyConstants {
     public static final String MONGO_COLLECTION = "jobControl";
     public static final String MONGO_COLLECTION_FIELD1 = "jobName";
     public static final String MONGO_COLLECTION_FIELD2 = "stateRequired";
+    public static final String MONGO_DATACONNECTION_CONFIG_NAME = "mongo";
     public static final String MONGO_CONFIG_KEY = "my.mongo.address";
     public static final String MONGO_USER = "my.mongo.user";
     public static final String MONGO_PASSWORD = "my.mongo.password";

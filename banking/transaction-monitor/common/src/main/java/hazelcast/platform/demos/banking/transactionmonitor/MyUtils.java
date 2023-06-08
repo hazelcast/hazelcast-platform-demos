@@ -69,6 +69,7 @@ public class MyUtils {
     private static final int CSV_THIRD = 2;
     private static final int CSV_FOURTH = 3;
     private static final int CSV_FIFTH = 4;
+    private static final int DEFAULT_MONGO_PORT = 27017;
     private static final int POS4 = 4;
     private static final int POS6 = 6;
 
@@ -664,4 +665,49 @@ public class MyUtils {
         LOGGER.info("~_~_~_~_~");
     }
 
+    /**
+     * <p>To connect...
+     * </p>
+     */
+    public static String buildMongoURI(Properties properties) throws Exception {
+        String myMongoAddress = System.getProperty(MyConstants.MONGO_CONFIG_KEY, "");
+        String hostIp = System.getProperty(MyConstants.HOST_IP, "");
+        String user = properties.getProperty(MyConstants.MONGO_USER, "");
+        String password = properties.getProperty(MyConstants.MONGO_PASSWORD, "");
+
+        LOGGER.debug("'{}'=='{}'", MyConstants.MONGO_CONFIG_KEY, myMongoAddress);
+        LOGGER.debug("'{}'=='{}'", MyConstants.HOST_IP, hostIp);
+        LOGGER.debug("'{}'=='{}'", MyConstants.MONGO_USER, user);
+        LOGGER.debug("'{}'=='{}'", MyConstants.MONGO_PASSWORD, password);
+
+        if (user.isBlank() || password.isBlank()) {
+            String message = String.format("Missing user/password pair, got '%s'/'%s'", user, password);
+            throw new RuntimeException(message);
+        }
+
+        int port = DEFAULT_MONGO_PORT;
+
+        String uri = "mongodb://" + user + ":" + password + "@";
+        if (!myMongoAddress.isBlank()) {
+            String[] tokens = myMongoAddress.split(":");
+            uri += tokens[0];
+            if (tokens.length > 1) {
+                port = Integer.parseInt(tokens[1]);
+            }
+        } else {
+            if (!hostIp.isBlank()) {
+                String[] tokens = hostIp.split(":");
+                uri += tokens[0];
+                if (tokens.length > 1) {
+                    port = Integer.parseInt(tokens[1]);
+                }
+            } else {
+                String message = String.format("Missing both '{}' and '{}', need one to connect",
+                        MyConstants.HOST_IP, MyConstants.MONGO_CONFIG_KEY);
+                throw new RuntimeException(message);
+            }
+        }
+        uri += ":" + port + "/?tls=false";
+        return uri;
+    }
 }

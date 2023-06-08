@@ -116,35 +116,8 @@ public class Application {
      * @param properties
      * @return
      */
-    private static MongoClient getMongoClient(Properties properties) {
-        String myMongoAddress = System.getProperty(MyConstants.MONGO_CONFIG_KEY, "");
-        String hostIp = System.getProperty(MyConstants.HOST_IP, "");
-        String user = properties.getProperty(MyConstants.MONGO_USER, "");
-        String password = properties.getProperty(MyConstants.MONGO_PASSWORD, "");
-
-        LOGGER.debug("'{}'=='{}'", MyConstants.MONGO_CONFIG_KEY, myMongoAddress);
-        LOGGER.debug("'{}'=='{}'", MyConstants.HOST_IP, hostIp);
-        LOGGER.debug("'{}'=='{}'", MyConstants.MONGO_USER, user);
-        LOGGER.debug("'{}'=='{}'", MyConstants.MONGO_PASSWORD, password);
-
-        if (user.isBlank() || password.isBlank()) {
-            String message = String.format("Missing user/password pair, got '%s'/'%s'", user, password);
-            throw new RuntimeException(message);
-        }
-
-        String uri = "mongodb://" + user + ":" + password + "@";
-        if (!myMongoAddress.isBlank()) {
-            uri += myMongoAddress;
-        } else {
-            if (!hostIp.isBlank()) {
-                uri += hostIp;
-            } else {
-                String message = String.format("Missing both '{}' and '{}', need one to connect",
-                        MyConstants.HOST_IP, MyConstants.MONGO_CONFIG_KEY);
-                throw new RuntimeException(message);
-            }
-        }
-        uri += ":27017/?tls=false";
+    private static MongoClient getMongoClient(Properties properties) throws Exception {
+        String uri = MyUtils.buildMongoURI(properties);
         LOGGER.info("Using URI: {}", uri);
         return MongoClients.create(uri);
     }

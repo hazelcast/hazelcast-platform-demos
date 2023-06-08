@@ -163,18 +163,17 @@ public class ApplicationInitializer {
         String projectName = properties.getOrDefault(UtilsConstants.SLACK_PROJECT_NAME,
                 ApplicationInitializer.class.getSimpleName()).toString();
 
-        Properties postgresProperties = MyUtils.getPostgresProperties(properties);
         TransactionMonitorIdempotentInitialization.createNeededObjects(hazelcastInstance,
-                postgresProperties, ourProjectProvenance, transactionMonitorFlavor, localhost, useViridian);
+                properties, ourProjectProvenance, transactionMonitorFlavor, localhost, useViridian);
         addListeners(hazelcastInstance, bootstrapServers, pulsarAddress, usePulsar, projectName, clusterName,
                 transactionMonitorFlavor);
         TransactionMonitorIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarAddress, usePulsar,
                 useViridian, transactionMonitorFlavor);
         TransactionMonitorIdempotentInitialization.defineQueryableObjects(hazelcastInstance,
-                bootstrapServers, transactionMonitorFlavor);
+                bootstrapServers, properties, transactionMonitorFlavor);
 
         TransactionMonitorIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
-                pulsarAddress, postgresProperties, properties, clusterName, transactionMonitorFlavor);
+                pulsarAddress, properties, clusterName, transactionMonitorFlavor);
     }
 
 

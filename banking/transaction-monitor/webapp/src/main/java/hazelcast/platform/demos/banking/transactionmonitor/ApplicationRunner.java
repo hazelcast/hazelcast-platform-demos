@@ -504,11 +504,13 @@ public class ApplicationRunner {
             //{ "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS + " LIMIT 5" },
             //{ "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_TRANSACTIONS + " LIMIT 5"},
             //{ "IMap",    "SELECT stock FROM " + MyConstants.IMAP_NAME_PORTFOLIOS + " ORDER BY 1 DESC LIMIT 3"},
+            { "IMap",    "SHOW DATA CONNECTIONS" },
+            { "IMap",    "SHOW JOBS" },
             { "IMap",    "SHOW MAPPINGS" },
             { "IMap",    "SHOW VIEWS" },
+            { "IMap",    "SELECT * FROM " + MyConstants.MONGO_COLLECTION + " ORDER BY 1 LIMIT 3"},
             //{ "IMap",    "SELECT * FROM \"" + MyConstants.IMAP_NAME_MYSQL_SLF4J + "\""},
         };
-
         int originalLen = queries.length;
         String[][] additionalQueries;
 
@@ -608,24 +610,16 @@ public class ApplicationRunner {
             properties.put(MyConstants.POSTGRES_ADDRESS, postgresAddress);
             String ourProjectProvenance = properties.getProperty(MyConstants.PROJECT_PROVENANCE);
 
-            Properties postgresProperties = null;
-            try {
-                postgresProperties = MyUtils.getPostgresProperties(properties);
-            } catch (Exception e) {
-                LOGGER.error("initialize()", e);
-                return false;
-            }
-
             ok &= TransactionMonitorIdempotentInitialization.createNeededObjects(hazelcastInstance,
-                    postgresProperties, ourProjectProvenance, transactionMonitorFlavor, this.localhost, useViridian);
+                    properties, ourProjectProvenance, transactionMonitorFlavor, this.localhost, useViridian);
             ok &= TransactionMonitorIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers,
                     pulsarAddress, usePulsar, useViridian, transactionMonitorFlavor);
             ok &= TransactionMonitorIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers,
-                    transactionMonitorFlavor);
+                    properties, transactionMonitorFlavor);
             if (ok && !this.localhost) {
                 // Don't even try if broken by this point
                 ok = TransactionMonitorIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
-                        pulsarAddress, postgresProperties, properties, clusterName, transactionMonitorFlavor);
+                        pulsarAddress, properties, clusterName, transactionMonitorFlavor);
             } else {
                 LOGGER.info("ok=={}, localhost=={} - no job submission", ok, this.localhost);
             }

@@ -92,7 +92,7 @@ public class TransactionMonitorIdempotentInitialization {
      * </p>
      */
     public static boolean createNeededObjects(HazelcastInstance hazelcastInstance,
-            Properties postgresProperties, String ourProjectProvenance,
+            Properties properties, String ourProjectProvenance,
             TransactionMonitorFlavor transactionMonitorFlavor, boolean localhost, boolean useViridian) {
         // Capture what was present before
         Set<String> existingIMapNames = hazelcastInstance.getDistributedObjects()
@@ -104,7 +104,7 @@ public class TransactionMonitorIdempotentInitialization {
 
         // Add journals and map stores to maps before they are created
         boolean ok = dynamicMapConfig(hazelcastInstance, existingIMapNames,
-                postgresProperties, ourProjectProvenance, localhost, useViridian);
+                properties, ourProjectProvenance, localhost, useViridian);
 
         // Accessing non-existing maps does not return any failures
         List<String> iMapNames;
@@ -155,7 +155,7 @@ public class TransactionMonitorIdempotentInitialization {
      * @return true, always, either added or not needed
      */
     private static boolean dynamicMapConfig(HazelcastInstance hazelcastInstance,
-            Set<String> existingIMapNames, Properties postgresProperties, String ourProjectProvenance,
+            Set<String> existingIMapNames, Properties properties, String ourProjectProvenance,
             boolean localhost, boolean useViridian) {
         final String alertsWildcard = "alerts*";
 
@@ -170,10 +170,15 @@ public class TransactionMonitorIdempotentInitialization {
             MapStoreConfig mapStoreConfig = new MapStoreConfig().setEnabled(true);
             mapStoreConfig.setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER);
             mapStoreConfig.setImplementation(alertingToPostgresMapStore);
-            Properties properties = new Properties();
-            properties.putAll(postgresProperties);
-            properties.put(MyConstants.PROJECT_PROVENANCE, ourProjectProvenance);
-            mapStoreConfig.setProperties(properties);
+            Properties postgresProperties = null;
+            try {
+                postgresProperties = MyUtils.getPostgresProperties(properties);
+            } catch (Exception e) {
+                LOGGER.error("dynamicMapConfig()", e);
+                return false;
+            }
+            postgresProperties.put(MyConstants.PROJECT_PROVENANCE, ourProjectProvenance);
+            mapStoreConfig.setProperties(postgresProperties);
 
             if (localhost) {
                 LOGGER.info("localhost=={}, no map store for Postgres", localhost);
@@ -196,19 +201,7 @@ public class TransactionMonitorIdempotentInitialization {
         if (!existingIMapNames.contains(MyConstants.IMAP_NAME_MYSQL_SLF4J)) {
             MapConfig mySqlMapConfig = new MapConfig(MyConstants.IMAP_NAME_MYSQL_SLF4J);
 
-            Properties mySqlProperties = new Properties();
-            mySqlProperties.setProperty("data-connection-ref", MyConstants.MYSQL_DATACONNECTION_CONFIG_NAME);
-            mySqlProperties.setProperty("mapping-type", "JDBC");
-            mySqlProperties.setProperty("table-name", MyConstants.MYSQL_DATACONNECTION_TABLE_NAME);
-            //FIXME Once MySql compound key supported by Data Link
-            //MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN0 + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN1);
-            mySqlProperties.setProperty("id-column", "hash");
-            mySqlProperties.setProperty("column", MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN0
-                    + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN1
-                    + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN2
-                    + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN3
-                    + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN4
-                    + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN5);
+            Properties mySqlProperties = getMySqlProperties();
 
             MapStoreConfig mySqlStoreConfig = new MapStoreConfig().setEnabled(true)
             .setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER)
@@ -232,6 +225,29 @@ public class TransactionMonitorIdempotentInitialization {
         }
 
         return true;
+    }
+
+    /**
+     * <p>For using MySql datalink, already set up serverside.
+     * </p>
+     *
+     * @return
+     */
+    private static Properties getMySqlProperties() {
+        Properties mySqlProperties = new Properties();
+        mySqlProperties.setProperty("data-connection-ref", MyConstants.MYSQL_DATACONNECTION_CONFIG_NAME);
+        mySqlProperties.setProperty("mapping-type", "JDBC");
+        mySqlProperties.setProperty("table-name", MyConstants.MYSQL_DATACONNECTION_TABLE_NAME);
+        //FIXME Once MySql compound key supported by Data Link
+        //MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN0 + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN1);
+        mySqlProperties.setProperty("id-column", "hash");
+        mySqlProperties.setProperty("column", MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN0
+                + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN1
+                + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN2
+                + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN3
+                + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN4
+                + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN5);
+        return mySqlProperties;
     }
 
     /**
@@ -462,10 +478,12 @@ public class TransactionMonitorIdempotentInitialization {
      * </p>
      */
     public static boolean defineQueryableObjects(HazelcastInstance hazelcastInstance, String bootstrapServers,
-            TransactionMonitorFlavor transactionMonitorFlavor) {
+            Properties properties, TransactionMonitorFlavor transactionMonitorFlavor) {
         boolean ok = true;
         ok &= defineKafka1(hazelcastInstance, bootstrapServers, transactionMonitorFlavor);
         ok &= defineKafka2(hazelcastInstance, bootstrapServers);
+        ok &= TransactionMonitorIdempotentInitializationMongo.defineMongo(hazelcastInstance,
+                properties, transactionMonitorFlavor);
         ok &= defineWANIMaps(hazelcastInstance, transactionMonitorFlavor);
         ok &= defineIMaps1(hazelcastInstance, transactionMonitorFlavor);
         ok &= defineIMaps2(hazelcastInstance, transactionMonitorFlavor);
@@ -1085,7 +1103,7 @@ public class TransactionMonitorIdempotentInitialization {
      * @param properties
      */
     public static boolean launchNeededJobs(HazelcastInstance hazelcastInstance, String bootstrapServers,
-            String pulsarAddress, Properties postgresProperties, Properties properties, String clusterName,
+            String pulsarAddress, Properties properties, String clusterName,
             TransactionMonitorFlavor transactionMonitorFlavor) {
         boolean ok = true;
         String projectName = properties.getOrDefault(UtilsConstants.SLACK_PROJECT_NAME,
@@ -1137,8 +1155,14 @@ public class TransactionMonitorIdempotentInitialization {
 
         if (ok) {
             // Feed changes from Postgres directly into Hazelcast
-            ok &= launchPostgresCDC(hazelcastInstance, postgresProperties,
-                    Objects.toString(properties.get(MyConstants.PROJECT_PROVENANCE)), useViridian);
+            try {
+                Properties postgresProperties = MyUtils.getPostgresProperties(properties);
+                ok &= launchPostgresCDC(hazelcastInstance, postgresProperties,
+                        Objects.toString(properties.get(MyConstants.PROJECT_PROVENANCE)), useViridian);
+            } catch (Exception e) {
+                LOGGER.error("launchNeededJobs: postgresProperties", e);
+                ok = false;
+            }
         }
 
         // Optional
@@ -1294,8 +1318,8 @@ public class TransactionMonitorIdempotentInitialization {
                 + " SELECT __key, " + concatenation + " || ',' || provenance || ',' || whence || ',' || volume"
                 + " FROM \"" + MyConstants.IMAP_NAME_ALERTS_LOG + "\"";
 
-        //FIXME 5.2 Style, to be removed once "sqlJobMapToKafka" runs as streaming in 5.4
-        //FIXME https://docs.hazelcast.com/hazelcast/5.3-snapshot/sql/querying-maps-sql#streaming-map-changes
+        //FIXME 5.3 Style, to be removed once "sqlJobMapToKafka" runs as streaming in 5.4
+        //FIXME https://docs.hazelcast.com/hazelcast/5.3/sql/querying-maps-sql#streaming-map-changes
         //FIXME See https://github.com/hazelcast/hazelcast-platform-demos/issues/131
         try {
             Pipeline pipelineAlertingToKafka = AlertingToKafka.buildPipeline(bootstrapServers);
