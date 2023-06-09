@@ -197,6 +197,8 @@ public class TransactionMonitorIdempotentInitialization {
             LOGGER.info("Don't add journal to '{}', map already exists", MyConstants.IMAP_NAME_ALERTS_LOG);
         }
 
+        dynamicMapConfigJournalOnly(hazelcastInstance, existingIMapNames);
+
         // Generic config, MapStore implementation is derived
         if (!existingIMapNames.contains(MyConstants.IMAP_NAME_MYSQL_SLF4J)) {
             MapConfig mySqlMapConfig = new MapConfig(MyConstants.IMAP_NAME_MYSQL_SLF4J);
@@ -225,6 +227,27 @@ public class TransactionMonitorIdempotentInitialization {
         }
 
         return true;
+    }
+
+    /**
+     * <p>Some maps only need event journals.
+     * </p>
+     * @param hazelcastInstance
+     * @param existingIMapNames
+     */
+    private static void dynamicMapConfigJournalOnly(HazelcastInstance hazelcastInstance, Set<String> existingIMapNames) {
+        for (String mapName : List.of(MyConstants.IMAP_NAME_MONGO_ACTIONS)) {
+            if (!existingIMapNames.contains(mapName)) {
+                EventJournalConfig eventJournalConfig = new EventJournalConfig().setEnabled(true);
+
+                MapConfig mapConfig = new MapConfig(mapName);
+                mapConfig.setEventJournalConfig(eventJournalConfig);
+
+                hazelcastInstance.getConfig().addMapConfig(mapConfig);
+            } else {
+                LOGGER.info("Don't add journal to '{}', map already exists", mapName);
+            }
+        }
     }
 
     /**
@@ -1294,6 +1317,13 @@ public class TransactionMonitorIdempotentInitialization {
                 + " AS "
                 + " SINK INTO \"" + MyConstants.IMAP_NAME_AUDIT_LOG + "\""
                 + " SELECT * FROM \"" + topic + "\"";
+        String sqlJobMongoToMap =
+                "CREATE JOB IF NOT EXISTS \"" + MyConstants.SQL_JOB_NAME_MONGO_TO_IMAP + "\""
+                + " AS "
+                + " SINK INTO \"" + MyConstants.IMAP_NAME_MONGO_ACTIONS + "\""
+                + " SELECT \"fullDocument._id\" AS _id,"
+                +          "\"fullDocument.jobName\" AS jobName,"
+                +          "\"fullDocument.stateRequired\" AS stateRequired FROM \"" + MyConstants.MONGO_COLLECTION + "\"";
 
         String concatenation;
         String xxx = "5.4?_";
@@ -1337,7 +1367,7 @@ public class TransactionMonitorIdempotentInitialization {
         }
 
         //FIXME Submit "sqlJobMapToKafka", will complete until ready for streaming as reminder
-        for (String sql : List.of(sqlJobKafkaToMap, sqlJobMapToKafka)) {
+        for (String sql : List.of(sqlJobKafkaToMap, sqlJobMongoToMap, sqlJobMapToKafka)) {
             try {
                 hazelcastInstance.getSql().execute(sql);
                 LOGGER.info("SQL running: '{}'", sql);

@@ -86,6 +86,10 @@
     <logger name="org.apache.kafka" level="error" additivity="false">
         <appender-ref ref="NORMAL"/>
     </logger>
+    <!-- Mongo connector -->
+    <logger name="org.mongodb.driver" level="error" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
     
     <root level="info">
         <appender-ref ref="NORMAL"/>

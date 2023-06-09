@@ -16,6 +16,7 @@
 
 package hazelcast.platform.demos.banking.transactionmonitor;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -23,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.HazelcastJsonValue;
 
 /**
  * <p>Mongo specific initialization
@@ -53,12 +55,29 @@ public class TransactionMonitorIdempotentInitializationMongo {
                 + " )";
 
             String definition2 = "CREATE MAPPING IF NOT EXISTS " + MyConstants.MONGO_COLLECTION
-                    + " DATA CONNECTION " + MyConstants.MONGO_DATACONNECTION_CONFIG_NAME;
+                    + " DATA CONNECTION " + MyConstants.MONGO_DATACONNECTION_CONFIG_NAME
+                    + " OBJECT TYPE ChangeStream"
+                    + " OPTIONS ("
+                    + "  'startAt' = 'now'"
+                    + ")";
+
+            String definition3 = "CREATE MAPPING IF NOT EXISTS "
+                    + MyConstants.IMAP_NAME_MONGO_ACTIONS
+                    + " ("
+                    + "    __key VARCHAR,"
+                    + "    jobName VARCHAR,"
+                    + "    stateRequired VARCHAR"
+                    + ")"
+                     + " TYPE IMap "
+                    + " OPTIONS ( "
+                    + " 'keyFormat' = 'varchar',"
+                    + " 'valueFormat' = 'json-flat',"
+                    + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getName() + "'"
+                    + " )";
 
             boolean ok = true;
-            ok = TransactionMonitorIdempotentInitialization.define(definition1, hazelcastInstance);
-            if (ok) {
-                ok &= TransactionMonitorIdempotentInitialization.define(definition2, hazelcastInstance);
+            for (String definition : List.of(definition1, definition2, definition3)) {
+                ok &= TransactionMonitorIdempotentInitialization.define(definition, hazelcastInstance);
             }
             return ok;
         } catch (Exception e) {

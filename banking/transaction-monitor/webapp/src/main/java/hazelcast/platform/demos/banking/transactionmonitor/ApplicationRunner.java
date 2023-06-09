@@ -508,7 +508,7 @@ public class ApplicationRunner {
             { "IMap",    "SHOW JOBS" },
             { "IMap",    "SHOW MAPPINGS" },
             { "IMap",    "SHOW VIEWS" },
-            { "IMap",    "SELECT * FROM " + MyConstants.MONGO_COLLECTION + " ORDER BY 1 LIMIT 3"},
+            { "IMap",    "SELECT * FROM " + MyConstants.MONGO_COLLECTION + " LIMIT 1"},
             //{ "IMap",    "SELECT * FROM \"" + MyConstants.IMAP_NAME_MYSQL_SLF4J + "\""},
         };
         int originalLen = queries.length;
