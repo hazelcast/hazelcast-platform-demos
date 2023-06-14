@@ -101,6 +101,7 @@ public class ApplicationInitializer {
         TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(properties);
         LOGGER.info("TransactionMonitorFlavor=='{}'", transactionMonitorFlavor);
         boolean localhost = System.getProperty("my.docker.enabled", "").equalsIgnoreCase("false");
+        boolean kubernetes = System.getProperty("my.kubernetes.enabled", "").equalsIgnoreCase("true");
 
         // Custom classes on classpath check, only likely to fail if Viridian and not uploaded
         CheckConnectIdempotentCallable.silentCheckCustomClasses(hazelcastInstance);
@@ -111,7 +112,7 @@ public class ApplicationInitializer {
         String initializerProperty = "my.initialize";
         if (System.getProperty(initializerProperty, "").equalsIgnoreCase(Boolean.TRUE.toString())) {
             ApplicationInitializer.initialise(hazelcastInstance, bootstrapServers, pulsarAddress,
-                    postgresAddress, properties, config.getClusterName(), localhost);
+                    postgresAddress, properties, config.getClusterName(), localhost, kubernetes);
         } else {
             if (size == 1) {
                 LOGGER.info("Mini initialize, only WAN maps as '{}'=='{}', assume client will do the rest",
@@ -140,7 +141,7 @@ public class ApplicationInitializer {
      */
     public static void initialise(HazelcastInstance hazelcastInstance, String bootstrapServers,
             String pulsarAddress, String postgresAddress, Properties properties, String clusterName,
-            boolean localhost)
+            boolean localhost, boolean kubernetes)
                     throws Exception {
 
         String pulsarOrKafka = properties.getProperty(MyConstants.PULSAR_OR_KAFKA_KEY);
@@ -170,7 +171,7 @@ public class ApplicationInitializer {
         TransactionMonitorIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarAddress, usePulsar,
                 useViridian, transactionMonitorFlavor);
         TransactionMonitorIdempotentInitialization.defineQueryableObjects(hazelcastInstance,
-                bootstrapServers, properties, transactionMonitorFlavor);
+                bootstrapServers, properties, transactionMonitorFlavor, localhost, kubernetes);
 
         TransactionMonitorIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
                 pulsarAddress, properties, clusterName, transactionMonitorFlavor);

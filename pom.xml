@@ -66,6 +66,7 @@
 
 		<!-- Version dependencies -->
 		<cassandra-driver.version>4.15.0</cassandra-driver.version>
+                <cassandra-jdbc-wrapper.version>4.9.0</cassandra-jdbc-wrapper.version>
 		<debezium-connector-cassandra-4.version>2.1.3.Final</debezium-connector-cassandra-4.version>
 		<debezium-connector-mongodb.version>1.3.1.Final</debezium-connector-mongodb.version>
 		<error_prone_annotations.version>2.18.0</error_prone_annotations.version>
@@ -86,6 +87,7 @@
 		<!--  Kafka Clients must match cloud target -->
 		<kafka-clients.version>2.2.2</kafka-clients.version>
 		<kafka-connect.version>2.6.0</kafka-connect.version>
+		<mariadb-java-client.version>3.1.4</mariadb-java-client.version>
 		<mongo-java-driver.version>3.12.8</mongo-java-driver.version>
 		<mysql-connector-j.version>8.0.32</mysql-connector-j.version>
 		<netty-tcnative.version>2.0.52.Final</netty-tcnative.version>
@@ -106,7 +108,7 @@
 		<build-helper-maven-plugin.version>3.1.0</build-helper-maven-plugin.version>
 		<!-- dockerfile-maven-plugin not being updated on Maven Central, fails 
 			on Mac M1 ARM chip -->
-		<docker-maven-plugin.version>0.42.1</docker-maven-plugin.version>
+		<docker-maven-plugin.version>0.43.0</docker-maven-plugin.version>
 		<exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
 		<frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
 		<hazelcast-cloud-maven-plugin.version>0.0.6</hazelcast-cloud-maven-plugin.version>
@@ -159,6 +161,12 @@
 				<groupId>com.datastax.oss</groupId>
 				<artifactId>java-driver-core</artifactId>
 				<version>${cassandra-driver.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.ing.data</groupId>
+				<artifactId>cassandra-jdbc-wrapper</artifactId>
+				<version>${cassandra-jdbc-wrapper.version}</version>
 			</dependency>
 
 			<dependency>
@@ -309,6 +317,12 @@
 					</exclusion>
 				</exclusions>
             </dependency>
+
+			<dependency>
+				<groupId>org.mariadb.jdbc</groupId>
+				<artifactId>mariadb-java-client </artifactId>
+				<version>${mariadb-java-client.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>org.springdoc</groupId>

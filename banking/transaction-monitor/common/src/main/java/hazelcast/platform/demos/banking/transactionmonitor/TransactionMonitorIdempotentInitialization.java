@@ -501,12 +501,19 @@ public class TransactionMonitorIdempotentInitialization {
      * </p>
      */
     public static boolean defineQueryableObjects(HazelcastInstance hazelcastInstance, String bootstrapServers,
-            Properties properties, TransactionMonitorFlavor transactionMonitorFlavor) {
+            Properties properties, TransactionMonitorFlavor transactionMonitorFlavor,
+            boolean isLocalhost, boolean isKubernetes) {
         boolean ok = true;
         ok &= defineKafka1(hazelcastInstance, bootstrapServers, transactionMonitorFlavor);
         ok &= defineKafka2(hazelcastInstance, bootstrapServers);
-        ok &= TransactionMonitorIdempotentInitializationMongo.defineMongo(hazelcastInstance,
-                properties, transactionMonitorFlavor);
+        if (!isLocalhost) {
+            ok &= TransactionMonitorIdempotentInitializationCassandra.defineCassandra(hazelcastInstance,
+                    properties, transactionMonitorFlavor);
+            ok &= TransactionMonitorIdempotentInitializationMaria.defineMaria(hazelcastInstance,
+                    properties, transactionMonitorFlavor, isKubernetes);
+            ok &= TransactionMonitorIdempotentInitializationMongo.defineMongo(hazelcastInstance,
+                    properties, transactionMonitorFlavor);
+        }
         ok &= defineWANIMaps(hazelcastInstance, transactionMonitorFlavor);
         ok &= defineIMaps1(hazelcastInstance, transactionMonitorFlavor);
         ok &= defineIMaps2(hazelcastInstance, transactionMonitorFlavor);
@@ -1160,9 +1167,8 @@ public class TransactionMonitorIdempotentInitialization {
             }
         }
 
-        if (!usePulsar && ok) {
-            // Aggregate query creates alerts to an IMap. Use a separate rather than same job to copy to Kafka.
-            ok &=  launchAlertsToKafkaAndToLog(hazelcastInstance, bootstrapServers, transactionMonitorFlavor);
+        if (ok) {
+            ok &= doSql(usePulsar, hazelcastInstance, bootstrapServers, transactionMonitorFlavor);
         }
 
         // Remaining jobs need properties
@@ -1177,8 +1183,8 @@ public class TransactionMonitorIdempotentInitialization {
         }
 
         if (ok) {
-            // Feed changes from Postgres directly into Hazelcast
             try {
+                // Feed changes from Postgres directly into Hazelcast
                 Properties postgresProperties = MyUtils.getPostgresProperties(properties);
                 ok &= launchPostgresCDC(hazelcastInstance, postgresProperties,
                         Objects.toString(properties.get(MyConstants.PROJECT_PROVENANCE)), useViridian);
@@ -1188,8 +1194,38 @@ public class TransactionMonitorIdempotentInitialization {
             }
         }
 
+        // Stop/start the archiver
+        ok &= launchArchiverStateController(hazelcastInstance, ok);
+
         // Optional
         MyUtils.logStuff(hazelcastInstance);
+        return ok;
+    }
+
+    /**
+     * <p>SQL style jobs, no pipelines!
+     * </p>
+     *
+     * @param usePulsar
+     * @param hazelcastInstance
+     * @param bootstrapServers
+     * @param transactionMonitorFlavor
+     * @return
+     */
+    private static boolean doSql(boolean usePulsar, HazelcastInstance hazelcastInstance, String bootstrapServers,
+            TransactionMonitorFlavor transactionMonitorFlavor) {
+        boolean ok = true;
+
+        if (!usePulsar) {
+            // SQL jobs that do use Kafka, so when Pulsar isn't being used
+            ok &=  TransactionMonitorIdempotentInitializationSql.launchKafkaSqlJobs(hazelcastInstance,
+                    bootstrapServers, transactionMonitorFlavor);
+        }
+        if (ok) {
+            // SQL jobs that don't use Kafka
+            ok &=  TransactionMonitorIdempotentInitializationSql.launchNonKafkaSqlJobs(hazelcastInstance);
+        }
+
         return ok;
     }
 
@@ -1299,84 +1335,6 @@ public class TransactionMonitorIdempotentInitialization {
         } else {
             LOGGER.info("Not using Viridian => '{}'=='{}'", MyConstants.USE_VIRIDIAN, kubernetesOrViridian);
         }
-    }
-
-    /**
-     * <p>Use SQL to copy alerts to Kafka outbound topic.
-     * </p>
-     *
-     * @param hazelcastInstance
-     * @param bootstrapServers
-     */
-    private static boolean launchAlertsToKafkaAndToLog(HazelcastInstance hazelcastInstance, String bootstrapServers,
-            TransactionMonitorFlavor transactionMonitorFlavor) {
-        String topic = MyConstants.KAFKA_TOPIC_MAPPING_PREFIX + MyConstants.KAFKA_TOPIC_NAME_ALERTS;
-
-        String sqlJobKafkaToMap =
-                "CREATE JOB IF NOT EXISTS \"" + MyConstants.SQL_JOB_NAME_KAFKA_TO_IMAP + "\""
-                + " AS "
-                + " SINK INTO \"" + MyConstants.IMAP_NAME_AUDIT_LOG + "\""
-                + " SELECT * FROM \"" + topic + "\"";
-        String sqlJobMongoToMap =
-                "CREATE JOB IF NOT EXISTS \"" + MyConstants.SQL_JOB_NAME_MONGO_TO_IMAP + "\""
-                + " AS "
-                + " SINK INTO \"" + MyConstants.IMAP_NAME_MONGO_ACTIONS + "\""
-                + " SELECT \"fullDocument._id\" AS _id,"
-                +          "\"fullDocument.jobName\" AS jobName,"
-                +          "\"fullDocument.stateRequired\" AS stateRequired FROM \"" + MyConstants.MONGO_COLLECTION + "\"";
-
-        String concatenation;
-        String xxx = "5.4?_";
-        LOGGER.error("Reminder to remove job prefix {}", xxx);
-        // Same for all currently
-        switch (transactionMonitorFlavor) {
-        //case ECOMMERCE:
-        //    concatenation = "code";
-        //    break;
-        //case PAYMENTS:
-        //    concatenation = "code";
-        //    break;
-        //case TRADE:
-        default:
-            concatenation = "code";
-            break;
-        }
-        String sqlJobMapToKafka =
-                "CREATE JOB IF NOT EXISTS \"" + xxx + MyConstants.SQL_JOB_NAME_IMAP_TO_KAFKA + "\""
-                + " AS "
-                + " SINK INTO \"" + MyConstants.KAFKA_TOPIC_NAME_ALERTS + "\""
-                + " SELECT __key, " + concatenation + " || ',' || provenance || ',' || whence || ',' || volume"
-                + " FROM \"" + MyConstants.IMAP_NAME_ALERTS_LOG + "\"";
-
-        //FIXME 5.3 Style, to be removed once "sqlJobMapToKafka" runs as streaming in 5.4
-        //FIXME https://docs.hazelcast.com/hazelcast/5.3/sql/querying-maps-sql#streaming-map-changes
-        //FIXME See https://github.com/hazelcast/hazelcast-platform-demos/issues/131
-        try {
-            Pipeline pipelineAlertingToKafka = AlertingToKafka.buildPipeline(bootstrapServers);
-
-            JobConfig jobConfigAlertingToKafka = new JobConfig();
-            jobConfigAlertingToKafka.setName(AlertingToKafka.class.getSimpleName());
-            jobConfigAlertingToKafka.addClass(HazelcastJsonValueSerializer.class);
-
-            //FIXME Fails on Viridian, issue 4241 ??
-            Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToKafka, jobConfigAlertingToKafka);
-            LOGGER_TO_IMAP.info(Objects.toString(job));
-        } catch (Exception e) {
-            LOGGER.error("launchAlertsSqlToKafka:", e);
-            return false;
-        }
-
-        //FIXME Submit "sqlJobMapToKafka", will complete until ready for streaming as reminder
-        for (String sql : List.of(sqlJobKafkaToMap, sqlJobMongoToMap, sqlJobMapToKafka)) {
-            try {
-                hazelcastInstance.getSql().execute(sql);
-                LOGGER.info("SQL running: '{}'", sql);
-            } catch (Exception e) {
-                LOGGER.error("launchAlertsSqlToKafka:" + sql, e);
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -1490,6 +1448,39 @@ public class TransactionMonitorIdempotentInitialization {
             LOGGER_TO_IMAP.info(Objects.toString(job));
         } catch (Exception e) {
             LOGGER.error("launchNeededJobs:" + PostgresCDC.class.getSimpleName(), e);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * <p>Listens on {@link MyConstants.IMAP_NAME_MONGO_ACTIONS} for actions
+     * fed from Mongo CDC
+     * </p>
+     *
+     * @param hazelcastInstance
+     * @param Have previous jobs been successfully submitted
+     * @return
+     */
+    private static boolean launchArchiverStateController(HazelcastInstance hazelcastInstance, boolean ok) {
+        if (!ok) {
+            // Already failed, do no more
+            return false;
+        }
+
+        try {
+            Pipeline pipelineArchiverStateController =
+                    ArchiverStateController.buildPipeline();
+
+            JobConfig jobConfigArchiverStateController = new JobConfig();
+            jobConfigArchiverStateController.setName(ArchiverStateController.class.getSimpleName());
+            jobConfigArchiverStateController.addClass(ArchiverStateController.class);
+
+            Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineArchiverStateController,
+                    jobConfigArchiverStateController);
+            LOGGER_TO_IMAP.info(Objects.toString(job));
+        } catch (Exception e) {
+            LOGGER.error("launchNeededJobs:" + ArchiverStateController.class.getSimpleName(), e);
             return false;
         }
         return true;

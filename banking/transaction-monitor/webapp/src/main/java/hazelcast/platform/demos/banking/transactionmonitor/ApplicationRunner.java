@@ -71,6 +71,7 @@ public class ApplicationRunner {
     private final TransactionMonitorFlavor transactionMonitorFlavor;
     private final String moduleName;
     private final boolean localhost;
+    private final boolean kubernetes;
     private final boolean useViridian;
     private IMap<String, Tuple3<Long, Long, Integer>> aggregateQueryResultsMap;
     private IMap<String, BicInfo> bicsMap;
@@ -89,9 +90,10 @@ public class ApplicationRunner {
         this.hazelcastInstance = arg0;
         this.transactionMonitorFlavor = arg1;
         this.moduleName = arg2;
-        // If specifically indicated as localhost, don't do some steps
         this.localhost =
            System.getProperty("my.docker.enabled", "").equalsIgnoreCase("false");
+        this.kubernetes =
+           System.getProperty("my.kubernetes.enabled", "").equalsIgnoreCase("true");
         this.useViridian = arg3;
     }
 
@@ -508,7 +510,6 @@ public class ApplicationRunner {
             { "IMap",    "SHOW JOBS" },
             { "IMap",    "SHOW MAPPINGS" },
             { "IMap",    "SHOW VIEWS" },
-            { "IMap",    "SELECT * FROM " + MyConstants.MONGO_COLLECTION + " LIMIT 1"},
             //{ "IMap",    "SELECT * FROM \"" + MyConstants.IMAP_NAME_MYSQL_SLF4J + "\""},
         };
         int originalLen = queries.length;
@@ -615,7 +616,7 @@ public class ApplicationRunner {
             ok &= TransactionMonitorIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers,
                     pulsarAddress, usePulsar, useViridian, transactionMonitorFlavor);
             ok &= TransactionMonitorIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers,
-                    properties, transactionMonitorFlavor);
+                    properties, transactionMonitorFlavor, this.localhost, this.kubernetes);
             if (ok && !this.localhost) {
                 // Don't even try if broken by this point
                 ok = TransactionMonitorIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,

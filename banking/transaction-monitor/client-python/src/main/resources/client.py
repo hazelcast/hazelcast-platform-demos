@@ -81,7 +81,10 @@ def run_sql_query(client: hazelcast.HazelcastClient, query: str):
                         timestamp_iso8601 = str(column).replace(" ", "T")
                         print(timestamp_iso8601, end = '')
                     else:
-                        print("Unhandled Type for Column '" + str(sqltype) + "'", end = '')
+                        if (sqltype == SqlColumnType.BIGINT):
+                            print(column, end = '')
+                        else:
+                            print("Unhandled Type for Column '" + str(sqltype) + "'", end = '')
                 i = i + 1
             print("", flush=True)
         print("[" + str(count) + " rows]", flush=True)

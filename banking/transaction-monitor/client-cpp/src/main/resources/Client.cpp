@@ -157,7 +157,11 @@ void run_sql_query(hazelcast::client::hazelcast_client hazelcast_client, std::st
 								row.get_object<hazelcast::client::local_date_time>(i).get();
 							std::cout << ts;
 						} else {
-							std::cout << "Unhandled Type for Column '" << row_metadata.column(i).name << "'";
+							if (sql_column_type == hazelcast::client::sql::sql_column_type::bigint) {
+								std::cout << row.get_object<int64_t>(i).get();
+							} else {
+								std::cout << "Unhandled Type for Column '" << row_metadata.column(i).name << "'";
+							}
 						}
 					}
 				}
@@ -183,13 +187,13 @@ void get_generic_record(hazelcast::client::hazelcast_client hazelcast_client) {
 	std::cout << "GenericRecord, map '" << genericRecordMap << "'" << std::endl;
 	auto map = hazelcast_client.get_map(genericRecordMap).get();
 	int count = 0;
-	//for (auto& key : map->key_set<typed_data>().get()) {
-	//TODO <generic_record> in 5.2
-		//auto& value = map->get<>(key).get();
-		//std::cout << key << "," << value << std::endl;
-        //std::cout << key << std::endl;
-        //count++;
-	//}
+	for (auto& key : map->key_set<hazelcast::client::typed_data>().get()) {
+    //  auto& value = map->get<>(key).get();
+	//	std::cout << key << "," << value << std::endl;
+	//TODO FIXME no known conversion for argument 2 from 'hazelcast::client::typed_data' to 'const hazelcast::client::member&'
+		//std::cout << key << "," << std::endl;
+        count++;
+	}
 	std::cout << "[" << count << " rows]" << std::endl;
 
 }

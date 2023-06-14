@@ -36,6 +36,20 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.datastax.oss</groupId>
+			<artifactId>java-driver-core</artifactId>
+		</dependency>
+                <dependency>
+                        <groupId>com.ing.data</groupId>
+                        <artifactId>cassandra-jdbc-wrapper</artifactId>
+                </dependency>
+
+		<dependency>
+			<groupId>org.mariadb.jdbc</groupId>
+			<artifactId>mariadb-java-client </artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>

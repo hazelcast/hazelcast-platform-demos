@@ -27,6 +27,8 @@ hazelcast:
             discovery-strategies:
               - class: hazelcast.platform.demos.banking.transactionmonitor.MyWANDiscoveryStrategyFactory
                 enabled: true         
+          sync:
+            consistency-check-strategy: MERKLE_TREES
   # For Tiered-Storage
   native-memory:
     enabled: true

@@ -69,6 +69,9 @@ public class MyUtils {
     private static final int CSV_THIRD = 2;
     private static final int CSV_FOURTH = 3;
     private static final int CSV_FIFTH = 4;
+    private static final int DEFAULT_CASSANDRA_PORT = 9042;
+    private static final int DEFAULT_MARIA_PORT = 3306;
+    private static final int ALTERNATIVE_MARIA_PORT = 4306;
     private static final int DEFAULT_MONGO_PORT = 27017;
     private static final int POS4 = 4;
     private static final int POS6 = 6;
@@ -666,7 +669,74 @@ public class MyUtils {
     }
 
     /**
-     * <p>To connect...
+     * <p>To connect...to Cassandra
+     * </p>
+     */
+    public static String buildCassandraURI(Properties properties, String keyspace) throws Exception {
+        String myCassandraAddress = System.getProperty(MyConstants.CASSANDRA_CONFIG_KEY, "");
+        String hostIp = System.getProperty(MyConstants.HOST_IP, "");
+        LOGGER.debug("'{}'=='{}'", MyConstants.CASSANDRA_CONFIG_KEY, myCassandraAddress);
+        LOGGER.debug("'{}'=='{}'", MyConstants.HOST_IP, hostIp);
+
+        String uri = "jdbc:cassandra://";
+        if (!myCassandraAddress.isBlank()) {
+            String[] tokens = myCassandraAddress.split(":");
+            uri += tokens[0];
+        } else {
+            if (!hostIp.isBlank()) {
+                String[] tokens = hostIp.split(":");
+                uri += tokens[0];
+            } else {
+                String message = String.format("Missing both '{}' and '{}', need one to connect",
+                        MyConstants.HOST_IP, MyConstants.CASSANDRA_CONFIG_KEY);
+                throw new RuntimeException(message);
+            }
+        }
+
+        uri += ":" + DEFAULT_CASSANDRA_PORT;
+        uri += "/" + keyspace + "?localdatacenter=datacenter1";
+
+        return uri;
+    }
+
+    /**
+     * <p>To connect...to MariaDB
+     * </p>
+     */
+    public static String buildMariaURI(Properties properties, String database, boolean isKubernetes) throws Exception {
+        String myMariaAddress = System.getProperty(MyConstants.MARIA_CONFIG_KEY, "");
+        String hostIp = System.getProperty(MyConstants.HOST_IP, "");
+        LOGGER.debug("'{}'=='{}'", MyConstants.MARIA_CONFIG_KEY, myMariaAddress);
+        LOGGER.debug("'{}'=='{}'", MyConstants.HOST_IP, hostIp);
+
+        String uri = "jdbc:mariadb://";
+        if (!myMariaAddress.isBlank()) {
+            String[] tokens = myMariaAddress.split(":");
+            uri += tokens[0];
+        } else {
+            if (!hostIp.isBlank()) {
+                String[] tokens = hostIp.split(":");
+                uri += tokens[0];
+            } else {
+                String message = String.format("Missing both '{}' and '{}', need one to connect",
+                        MyConstants.HOST_IP, MyConstants.MARIA_CONFIG_KEY);
+                throw new RuntimeException(message);
+            }
+        }
+
+        if (isKubernetes) {
+            uri += ":" + DEFAULT_MARIA_PORT;
+        } else {
+            // Localhost or Docker, Maria on different port so doesn't clash with MySql
+            uri += ":" + ALTERNATIVE_MARIA_PORT;
+        }
+        uri += "/" + database;
+
+        return uri;
+    }
+
+    /**
+     * <p>To connect...to MongoDB
      * </p>
      */
     public static String buildMongoURI(Properties properties) throws Exception {
@@ -710,4 +780,22 @@ public class MyUtils {
         uri += ":" + port + "/?tls=false";
         return uri;
     }
+
+    /**
+     * <p>Retrieve a property, exception if missing.
+     * </p>
+     *
+     * @param properties
+     * @param key
+     * @return
+     * @throws Exception
+     */
+    public static String ensureGet(Properties properties, String key) throws Exception {
+        String value = properties.getProperty(key, "");
+        if (value.isBlank()) {
+            throw new RuntimeException(String.format("Blank for '{}'", key));
+        }
+        return value;
+    }
+
 }
