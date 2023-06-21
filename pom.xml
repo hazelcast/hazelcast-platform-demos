@@ -79,7 +79,7 @@
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
 		<hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
 		<jackson.version>2.15.0</jackson.version>
-		<json.version>20230227</json.version>
+		<json.version>20230618</json.version>
 		<json-smart.version>2.4.11</json-smart.version>
 		<junit-jupiter.version>5.9.3</junit-jupiter.version>
 		<junit-vintage.version>5.9.3</junit-vintage.version>
@@ -115,7 +115,7 @@
 		<maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
 		<maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
 		<maven-checkstyle-plugin.version>3.2.1</maven-checkstyle-plugin.version>
-		<maven-clean-plugin.version>3.2.0</maven-clean-plugin.version>
+		<maven-clean-plugin.version>3.3.1</maven-clean-plugin.version>
 		<maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
 		<maven-failsafe-plugin.version>3.0.0</maven-failsafe-plugin.version>
 		<maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>

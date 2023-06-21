@@ -29,12 +29,19 @@ public class MyConstants {
     public static final String ARCHIVER_JOB_STATE_ON = "RUNNING";
     public static final String ARCHIVER_JOB_STATE_OFF = "SUSPENDED";
     public static final String CASSANDRA_CONFIG_KEY = "my.cassandra.address";
+    public static final String CASSANDRA_DATACONNECTION_CONFIG_NAME = "cassandra";
+    public static final String CASSANDRA_USER = "my.cassandra.user";
+    public static final String CASSANDRA_PASSWORD = "my.cassandra.password";
+    public static final String CASSANDRA_TABLE = "rates";
     public static final String BOOTSTRAP_SERVERS_CONFIG_KEY = "my.bootstrap.servers";
     public static final String HOST_IP = "HOST_IP";
     public static final String KAFKA_TOPIC_MAPPING_PREFIX = "";
     public static final String KAFKA_TOPIC_NAME_ALERTS = "kf_alerts";
     public static final String KAFKA_TOPIC_NAME_TRANSACTIONS = "kf_transactions";
     public static final String MARIA_CONFIG_KEY = "my.maria.address";
+    public static final String MARIA_DATACONNECTION_CONFIG_NAME = "maria";
+    public static final String MARIA_USER = "my.maria.user";
+    public static final String MARIA_PASSWORD = "my.maria.password";
     public static final String MONGO_COLLECTION = "externalControl";
     public static final String MONGO_COLLECTION_FIELD1 = "jobName";
     public static final String MONGO_COLLECTION_FIELD2 = "stateRequired";
@@ -144,7 +151,7 @@ public class MyConstants {
             List.of(IMAP_NAME_TRANSACTIONS, IMAP_NAME_TRANSACTIONS_XML);
     public static final List<String> TIERED_STORE_IMAP_NAMES_TRADE =
             List.of(IMAP_NAME_TRANSACTIONS);
-    public static final long TIERED_STORE_DISK_CAPACITY_GB = 6;
+    public static final long TIERED_STORE_DISK_CAPACITY_GB = 10;
     public static final long TIERED_STORE_MEMORY_CAPACITY_MB = 256;
 
     // For exponential loggers

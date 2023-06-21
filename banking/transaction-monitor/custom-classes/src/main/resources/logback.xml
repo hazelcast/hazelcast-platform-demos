@@ -3,37 +3,37 @@
 
     <appender name="NORMAL" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %thread %logger{40} - %msg %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %thread %logger{60} - %msg %n</pattern>
         </encoder>
     </appender>
     <appender name="HIGHLIGHT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level %thread %logger{40} - %msg) %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level %thread %logger{60} - %msg) %n</pattern>
         </encoder>
     </appender>
     <appender name="BLUE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldBlue(%logger{40} - %msg) %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldBlue(%logger{60} - %msg) %n</pattern>
         </encoder>
     </appender>
     <appender name="CYAN" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldCyan(%logger{40} - %msg) %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldCyan(%logger{60} - %msg) %n</pattern>
         </encoder>
     </appender>
     <appender name="MAGENTA" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldMagenta(%logger{40} - %msg) %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldMagenta(%logger{60} - %msg) %n</pattern>
         </encoder>
     </appender>
     <appender name="WHITE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldWhite(%logger{40} - %msg) %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldWhite(%logger{60} - %msg) %n</pattern>
         </encoder>
     </appender>
     <appender name="YELLOW" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldYellow(%logger{40} - %msg) %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldYellow(%logger{60} - %msg) %n</pattern>
         </encoder>
     </appender>
 
@@ -58,6 +58,10 @@
     </logger>
     <logger name="com.hazelcast.system.logo" level="trace" additivity="false">
         <appender-ref ref="MAGENTA"/>
+    </logger>
+    <!-- Cassandra connector -->
+    <logger name="com.ing.data.cassandra.jdbc.CassandraConnection" level="error" additivity="false">
+        <appender-ref ref="NORMAL"/>
     </logger>
     <logger name="io.debezium" level="error" additivity="false">
         <appender-ref ref="BLUE"/>
