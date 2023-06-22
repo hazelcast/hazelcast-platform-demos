@@ -156,4 +156,21 @@ public class MyConstants {
 
     // For exponential loggers
     public static final int MAX_LOGGING_INTERVAL = 3_000;
+
+    // Perspective fields, Generic Record
+    public static final String PERSPECTIVE_FIELD_AVERAGE = "average";
+    public static final String PERSPECTIVE_FIELD_BIC = "bic";
+    public static final String PERSPECTIVE_FIELD_CODE = "code";
+    public static final String PERSPECTIVE_FIELD_COUNT = "count";
+    public static final String PERSPECTIVE_FIELD_LATEST = "latest";
+    public static final String PERSPECTIVE_FIELD_RANDOM = "random";
+    public static final String PERSPECTIVE_FIELD_SECONDS = "seconds";
+    public static final String PERSPECTIVE_FIELD_SUM = "sum";
+    public static final String PERSPECTIVE_FIELD_SYMBOL = "symbol";
+    public static final String PERSPECTIVE_JSON_KEY = "key";
+    public static final String PERSPECTIVE_JSON_DERIVED = "derived";
+    // Web Sockets, for Finos module
+    public static final String WEBSOCKET_ENDPOINT = "hazelcast";
+    public static final String WEBSOCKET_FEED_PREFIX = "feed";
+    public static final String WEBSOCKET_DATA_SUFFIX = "data";
 }

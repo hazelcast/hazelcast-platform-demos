@@ -36,6 +36,10 @@
 					<groupId>com.hazelcast.jet</groupId>
 					<artifactId>hazelcast-jet-mongodb</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>com.hazelcast.jet.contrib</groupId>
+					<artifactId>pulsar</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
