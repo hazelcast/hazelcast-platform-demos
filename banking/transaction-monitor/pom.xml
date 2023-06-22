@@ -38,6 +38,7 @@
 	</properties>
 
 	<modules>
+		<module>abstract-hazelcast-client</module>
 		<module>abstract-hazelcast-node</module>
 		<module>client-command-line</module>
 		<module>client-csharp</module>
@@ -57,10 +58,7 @@
 		<module>kafka-broker</module>
 		<module>kafdrop</module>
 		<module>topic-create</module>
-		<!-- Remove until completed - https://github.com/hazelcast/hazelcast-platform-demos/issues/135
-		<module>finos-nodejs</module>
-		<module>finos-python</module>
-		-->
+		<module>finos</module>
 		<module>cassandra</module>
 		<module>management-center</module>
 		<module>maria</module>

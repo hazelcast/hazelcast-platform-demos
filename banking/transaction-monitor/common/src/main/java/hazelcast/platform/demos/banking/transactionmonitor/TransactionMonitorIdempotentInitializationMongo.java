@@ -48,7 +48,7 @@ public class TransactionMonitorIdempotentInitializationMongo {
 
             String definition1 = "CREATE DATA CONNECTION IF NOT EXISTS "
                 + MyConstants.MONGO_DATACONNECTION_CONFIG_NAME
-                + " TYPE Mongo SHARED "
+                + " TYPE Mongo SHARED"
                 + " OPTIONS ( "
                 + " 'connectionString' = '" + uri + "'"
                 + ",'database' = '" + database + "'"

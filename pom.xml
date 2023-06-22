@@ -87,6 +87,7 @@
 		<!--  Kafka Clients must match cloud target -->
 		<kafka-clients.version>2.2.2</kafka-clients.version>
 		<kafka-connect.version>2.6.0</kafka-connect.version>
+		<logback.version>1.4.8</logback.version>
 		<mariadb-java-client.version>3.1.4</mariadb-java-client.version>
 		<mongo-java-driver.version>3.12.8</mongo-java-driver.version>
 		<mysql-connector-j.version>8.0.32</mysql-connector-j.version>
@@ -97,6 +98,7 @@
 		<proto-google-common-protos.version>2.14.3</proto-google-common-protos.version>
 		<protobuf.version>3.22.1</protobuf.version>
 		<pulsar.version>2.8.0</pulsar.version>
+		<slf4j.version>2.0.7</slf4j.version>
 		<spotbugs-annotations.version>4.7.3</spotbugs-annotations.version>
 		<springdoc.version>2.0.0</springdoc.version>
 		<spring-boot.version>3.1.0</spring-boot.version>
@@ -127,8 +129,8 @@
 		<spotbugs-maven-plugin.version>4.7.3.4</spotbugs-maven-plugin.version>
 
 		<!-- Javascript -->
-		<node.version>v20.2.0</node.version>
-		<npm.version>9.6.6</npm.version>
+		<node.version>v20.3.1</node.version>
+		<npm.version>9.7.1</npm.version>
 
                 <!-- Checkstyle -->
                 <checkstyle.version>8.38</checkstyle.version>
@@ -550,7 +552,9 @@
 							<fileset>
 								<directory>src/main/app</directory>
                                                                 <includes>
-                                                                	<include>package-lock.json</include>
+                                                                        <include>*.wasm</include>
+                                                                        <include>package-lock.json</include>
+                                                                        <include>perspective-worker.js</include>
                                                                 </includes>
 							</fileset>
 							<fileset>

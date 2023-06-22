@@ -26,6 +26,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.platform.demos.utils</groupId>
+			<artifactId>utils-miscellaneous</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.platform.demos.utils</groupId>
 			<artifactId>utils-slack-integration</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -33,16 +38,17 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
+			<version>${logback.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.datastax.oss</groupId>
 			<artifactId>java-driver-core</artifactId>
 		</dependency>
-                <dependency>
-                        <groupId>com.ing.data</groupId>
-                        <artifactId>cassandra-jdbc-wrapper</artifactId>
-                </dependency>
+		<dependency>
+			<groupId>com.ing.data</groupId>
+			<artifactId>cassandra-jdbc-wrapper</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>
@@ -52,6 +58,7 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
 		</dependency>
 
 		<dependency>
@@ -101,18 +108,6 @@
 			<artifactId>hazelcast-sql</artifactId>
 		</dependency>
 	</dependencies>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-parent</artifactId>
-				<type>pom</type>
-				<scope>import</scope>
-				<version>${spring-boot.version}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 	<build>
 		<resources>

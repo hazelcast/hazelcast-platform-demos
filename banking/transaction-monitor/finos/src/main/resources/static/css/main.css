@@ -1,0 +1,58 @@
+:root {
+    --color-bg: #041A3B;
+    --color-midnight-blue: #142B4F;
+    --color-deep-blue: #CBDBFF;
+    --color-light-blue: #fafafa;
+    --color-dark-blue: #293574;
+    --color-hover-blue: #1E3659;
+    --color-mid-blue: #041A3B;
+    --color-body: #fafafa;
+}
+
+body {
+	background-color: var(--color-bg);
+	color: var(--color-body);
+}
+
+.headerfooter {
+	text-align: center;
+	color: var(--color-light-blue);
+	font-family: "Courier New", Courier, monospace;
+	font-size: 80%;
+}
+.headerfooterline {
+	color: var(--color-deep-blue);
+}
+
+.major_pane {
+    font-family: "Courier New", Courier, monospace;	
+}
+
+.finos_pane {
+    color: var(--color-body);
+}
+
+.finosInnerBox {
+    height: auto;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    left: 0px;
+}
+.finosOuterBox {
+    height: 80%;
+    overflow: scroll;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    left: 0px;
+}
+
+/* TODO: Fix sizing so not absolute */
+perspective-viewer {
+    position: absolute; 
+    top: 120px; 
+    left: 2px; 
+    right: 2px; 
+    bottom: 120px; 
+}
