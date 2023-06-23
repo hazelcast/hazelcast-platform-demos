@@ -76,6 +76,9 @@
     <logger name="hazelcast.platform.demos.banking.transactionmonitor.MyMembershipListener" level="trace" additivity="false">
         <appender-ref ref="CYAN"/>
     </logger>
+    <logger name="hazelcast.platform.demos.banking.transactionmonitor.MyWebSocketBridgeListener" level="debug" additivity="false">
+        <appender-ref ref="CYAN"/>
+    </logger>
     <logger name="hazelcast.platform.demos.banking.transactionmonitor.TransactionsMapListener" level="debug" additivity="false">
         <appender-ref ref="CYAN"/>
     </logger>

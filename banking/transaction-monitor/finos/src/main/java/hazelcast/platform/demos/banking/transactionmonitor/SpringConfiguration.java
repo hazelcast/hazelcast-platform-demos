@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 
-'use strict';
+package hazelcast.platform.demos.banking.transactionmonitor;
 
-import React, { Component } from 'react';
-import Finos from "./components/finos/Finos";
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-class App extends Component {
-        render() {
-                return (
-                                <div>
-                                        <div class="finos_pane">
-                                        	<Finos/>
-                                        </div>
-                                </div>
-                )
-        }
+import com.hazelcast.client.config.ClientConfig;
+
+/**
+ * <p>Create "{@link ClientConfig}" as a Spring {@code @Bean},
+ * and let Spring do the rest.
+ * </p>
+ */
+@Configuration
+public class SpringConfiguration {
+
+    @Bean
+    public ClientConfig clientConfig() throws Exception {
+        return ApplicationConfig.buildClientConfig();
+    }
+
 }
-
-export default App;
