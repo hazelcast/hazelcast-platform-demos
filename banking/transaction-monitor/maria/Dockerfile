@@ -11,4 +11,4 @@ ENV MARIADB_ROOT_PASSWORD=$MY_OTHERPASSWORD
 ENV MARIADB_DATABASE=$MY_OTHERDATABASE
 
 # Initialization scripts, applied in collating sequence
-COPY target/classes/0-permissions.sql       docker-entrypoint-initdb.d/
+COPY target/classes/*.sql       docker-entrypoint-initdb.d/
