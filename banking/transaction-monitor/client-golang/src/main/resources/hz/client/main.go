@@ -19,7 +19,6 @@ package main
 import (
 	"bufio"
 	"context"
-	"crypto/tls"
 	"fmt"
 	"log"
 	"os"
@@ -65,9 +64,7 @@ func getClient(ctx context.Context, kubernetes string, viridian bool) *hazelcast
 		config.Cluster.Cloud.Enabled = true
 		config.Cluster.Cloud.Token = viridianDiscoveryToken
 		config.Cluster.Network.SSL.Enabled = true
-		//FIXME Remove line before when 1.4.0 is out
-		fmt.Println("When 1.4.0 is out, cloudServerName defaults correctly")
-		config.Cluster.Network.SSL.SetTLSConfig(&tls.Config{ServerName: cloudServerName})
+		//config.Cluster.Network.SSL.SetTLSConfig(&tls.Config{ServerName: cloudServerName})
 
 		caFile, err := filepath.Abs(viridianCaFile)
 		if err != nil {
@@ -143,7 +140,15 @@ func runSqlQuery(ctx context.Context, hazelcastClient *hazelcast.Client, query s
 						str = fmt.Sprintf("%s %v", str, printDateTimeValue)
 					}
 				} else {
-					str = fmt.Sprintf("%s Unhandled Type for Column '%v'", str, metaData.Columns()[i].Name())
+					if metaData.Columns()[i].Type() == sql.ColumnTypeBigInt {
+						if i == 0 {
+							str = fmt.Sprintf("%v", col)
+						} else {
+							str = fmt.Sprintf("%s %v", str, col)
+						}
+					} else {
+						str = fmt.Sprintf("%s Unhandled Type for Column '%v'", str, metaData.Columns()[i].Name())
+					}
 				}
 			}
 		}
