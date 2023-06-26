@@ -27,6 +27,8 @@ import com.hazelcast.core.EntryEvent;
 import com.hazelcast.map.listener.EntryAddedListener;
 import com.hazelcast.map.listener.EntryUpdatedListener;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * <p>Listen for map updates and pass on to websocket.
  * </p>
@@ -63,6 +65,8 @@ public class MyWebSocketBridgeListener implements EntryAddedListener, EntryUpdat
      * </p>
      * @param entryEvent Key is String (ignored). Value is some sort of Perspective sub-type.
      */
+    @SuppressFBWarnings(value = {"UPM_UNCALLED_PRIVATE_METHOD", "UUF_UNUSED_FIELD"},
+            justification = "This is not unused, suppress warning to avoid SpotBugs bug")
     private void handle(EntryEvent entryEvent) {
         Object value = entryEvent.getValue();
 

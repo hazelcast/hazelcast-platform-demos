@@ -42,7 +42,7 @@ public class MyConstants {
     public static final String MARIA_DATACONNECTION_CONFIG_NAME = "maria";
     public static final String MARIA_USER = "my.maria.user";
     public static final String MARIA_PASSWORD = "my.maria.password";
-    public static final String MARIA_TABLE = "users";
+    public static final String MARIA_TABLE = "tariff";
     public static final String MONGO_COLLECTION = "externalControl";
     public static final String MONGO_COLLECTION_FIELD1 = "jobName";
     public static final String MONGO_COLLECTION_FIELD2 = "stateRequired";
