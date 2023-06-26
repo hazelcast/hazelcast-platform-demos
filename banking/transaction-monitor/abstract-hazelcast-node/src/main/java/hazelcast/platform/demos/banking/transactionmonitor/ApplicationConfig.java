@@ -22,9 +22,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Properties;
-
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,8 +99,7 @@ public class ApplicationConfig {
             LOGGER.info("Non-Kubernetes configuration: use port: {}", config.getNetworkConfig().getPort());
         }
 
-        //TODO Fix once supported by Viridian
-        temporaryDefineDataLink(config, properties);
+        defineDataLinks(config, properties);
 
         // If using Enterprise
         if (!config.getWanReplicationConfigs().isEmpty()) {
@@ -316,9 +314,9 @@ public class ApplicationConfig {
     }
 
     /**
-     * <p><b>Temporary coding</b></p>
-     * <p>Define an external store (MySql), for use by a map with generic
-     * map store.
+     * <p>Define external store for use by a map with generic map store.
+     * </p>
+     * <p>Currently only one link, to MySql.
      * </p>
      *
      * TODO Once supported by Viridian, move to {@link TransactionMonitorIdempotentInitialization}/
@@ -326,7 +324,7 @@ public class ApplicationConfig {
      * @param config To extend
      * @param properties For logon, password
      */
-    private static void temporaryDefineDataLink(Config config, Properties properties) {
+    private static void defineDataLinks(Config config, Properties properties) {
         LOGGER.warn("Add generic map-store only currently for self-hosted");
 
         try {

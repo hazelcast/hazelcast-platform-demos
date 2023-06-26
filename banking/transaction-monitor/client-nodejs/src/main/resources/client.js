@@ -31,7 +31,8 @@ const viridianKeyPassword = "@my.viridian.cluster1.key.password@";
 
 const controlFile = "/tmp/control.file";
 const cloudServerUrl = "https://api.viridian.hazelcast.com";
-const genericRecordMap = "__map-store.mysql_slf4j"
+const genericRecordMapPrefix = "__map-store."
+const genericRecordMap = "mysql_slf4j"
 const useViridianKey = "use.viridian"
 const viridianCaFile = "/tmp/ca.pem"
 const viridianCertFile = "/tmp/cert.pem"
@@ -222,7 +223,7 @@ async function getGenericRecord(hazelcastClient) {
     
         await getGenericRecord(hazelcastClient)
     
-        await runSqlQuery(hazelcastClient, "SELECT * FROM \"__map-store.mysql_slf4j\"")
+        await runSqlQuery(hazelcastClient, "SELECT * FROM \"" + genericRecordMapPrefix + genericRecordMap + "\"")
 
 		const endTime = myISO8601(new Date())
 		console.log('===================', endTime, '===================')

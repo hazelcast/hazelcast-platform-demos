@@ -36,7 +36,8 @@ namespace Client
         public const string viridianKeyPassword = "@my.viridian.cluster1.key.password@";
 
         public const string controlFile = "/tmp/control.file";
-        public const string genericRecordMap = "__map-store.mysql_slf4j";
+        public const string genericRecordMapPrefix = "__map-store.";
+        public const string genericRecordMap = "mysql_slf4j";
         public const string useViridianKey = "use.viridian";
         public const string viridianPfxFile = "/tmp/client.pfx";
 
@@ -223,7 +224,7 @@ namespace Client
 
 	        await GetGenericRecord(hazelcast_client);
 
-            await RunSqlQuery(hazelcast_client, "SELECT * FROM \"" + MyConstants.genericRecordMap + "\"");
+            await RunSqlQuery(hazelcast_client, "SELECT * FROM \"" + MyConstants.genericRecordMapPrefix + MyConstants.genericRecordMap + "\"");
 
             DateTime endTime = DateTime.Now;
             string endTimeStr = endTime.ToUniversalTime().ToString("u").Replace(" ", "T");

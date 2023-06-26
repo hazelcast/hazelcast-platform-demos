@@ -83,7 +83,7 @@ echo "Sleeping one minute, so cluster populated with data"
 echo sleep ${ONE_MINUTE}
 doIt 'SHOW MAPPINGS;'
 doIt 'SHOW VIEWS;'
-doIt '\map entry-set -n __map-store.mysql_slf4j'
+doIt '\map entry-set -n mysql_slf4j'
 doIt 'SELECT * FROM "__map-store.mysql_slf4j"'
 END_TIME=`date +"%Y-%m-%dT%H:%M:%S%z"`
 echo "=================== ${END_TIME} ==================="

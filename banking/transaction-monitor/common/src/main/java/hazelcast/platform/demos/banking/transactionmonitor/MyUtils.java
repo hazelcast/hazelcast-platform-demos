@@ -633,8 +633,9 @@ public class MyUtils {
         LOGGER.info("logMySqlSlf4j()");
         LOGGER.info("---------");
         if (mapMySqlSlf4j == null) {
-            LOGGER.info("Map does not currently exist");
+            LOGGER.info("Map '{}' does not currently exist", MyConstants.IMAP_NAME_MYSQL_SLF4J);
         } else {
+            LOGGER.info("Map '{}'", MyConstants.IMAP_NAME_MYSQL_SLF4J);
             Set<Entry<GenericRecord, GenericRecord>> entrySet = mapMySqlSlf4j.entrySet();
             for (Entry<GenericRecord, GenericRecord> entry : entrySet) {
                 LOGGER.info("Key '{}', Value '{}'", entry.getKey(), entry.getValue());

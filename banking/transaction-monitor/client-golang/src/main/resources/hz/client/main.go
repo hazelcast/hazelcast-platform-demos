@@ -42,7 +42,8 @@ const viridianKeyPassword = "@my.viridian.cluster1.key.password@"
 
 const controlFile = "/tmp/control.file"
 const cloudServerName = "hazelcast.cloud"
-const genericRecordMap = "__map-store.mysql_slf4j"
+const genericRecordMapPrefix = "__map-store."
+const genericRecordMap = "mysql_slf4j"
 const loggingLevel = logger.InfoLevel
 const useViridianKey = "use.viridian"
 const viridianCaFile = "/tmp/ca.pem"
@@ -218,7 +219,7 @@ func main() {
 
 	getGenericRecord(ctx, hazelcastClient)
 
-	runSqlQuery(ctx, hazelcastClient, "SELECT * FROM \""+genericRecordMap+"\"")
+	runSqlQuery(ctx, hazelcastClient, "SELECT * FROM \""+genericRecordMapPrefix+genericRecordMap+"\"")
 
 	endTime := time.Now().Format(time.RFC3339)
 	fmt.Printf("=================== %s ===================\n", endTime)

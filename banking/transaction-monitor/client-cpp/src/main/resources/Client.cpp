@@ -31,7 +31,8 @@ const char* viridianDiscoveryToken = "@my.viridian.cluster1.discovery.token@";
 const char* viridianKeyPassword = "@my.viridian.cluster1.key.password@";
 
 const char* controlFile = "/tmp/control.file";
-std::string genericRecordMap = "__map-store.mysql_slf4j";
+std::string genericRecordMapPrefix = "__map-store.";
+std::string genericRecordMap = "mysql_slf4j";
 std::string useViridianKey = "use.viridian";
 const char* viridianCaFile = "/tmp/ca.pem";
 const char* viridianCertFile = "/tmp/cert.pem";
@@ -220,7 +221,7 @@ int main (int argc, char *argv[]) {
 
 	get_generic_record(hazelcast_client);
 
-	run_sql_query(hazelcast_client, "SELECT * FROM \"" + genericRecordMap + "\"");
+	run_sql_query(hazelcast_client, "SELECT * FROM \"" + genericRecordMapPrefix + genericRecordMap + "\"");
 
 	const char* end_time = get_time_iso8601();
 	std::cout << "=================== " << end_time << " ===================" << std::endl;
