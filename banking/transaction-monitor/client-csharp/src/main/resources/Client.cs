@@ -148,7 +148,11 @@ namespace Client
                                     row.GetColumn<Hazelcast.Models.HLocalDateTime>(i);
                                 Console.Write(timestamp);
                            } else {
-                                Console.Write("Unhandled Type for Column '" + columns.ElementAt(i).Name + "'");
+                                if (type == Hazelcast.Sql.SqlColumnType.BigInt) {
+                                    Console.Write(row.GetColumn<long>(i));
+                                } else {
+                                    Console.Write("Unhandled Type " + type + " for Column '" + columns.ElementAt(i).Name + "'");
+                                }
                             }
                         }
                     }
@@ -164,8 +168,17 @@ namespace Client
         private static async Task ListDistributedObjects(IHazelcastClient client) {
 	        Console.WriteLine("--------------------------------------");
 	        Console.WriteLine("Distributed Objects (excluding system objects)");
-	        //TODO Needs API extension
-	        Console.WriteLine("See https://github.com/hazelcast/hazelcast-csharp-client/issues/799");
+            var distributedObjects = await client.GetDistributedObjectsAsync();
+            var count = 0;
+            foreach (var distributedObject in distributedObjects) {
+                var name = distributedObject.Name;
+                if (! name.StartsWith("__")) {
+                    var serviceName = distributedObject.ServiceName;
+        	        Console.WriteLine(serviceName + " => '" + name + "'");
+                    count = count + 1;
+                }
+            }
+            Console.WriteLine("[" + count + " rows]");
         }
 
         private static async Task GetGenericRecord(IHazelcastClient client) {
