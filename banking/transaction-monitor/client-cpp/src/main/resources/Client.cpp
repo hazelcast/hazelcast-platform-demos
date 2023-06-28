@@ -189,7 +189,8 @@ void get_generic_record(hazelcast::client::hazelcast_client hazelcast_client) {
 	auto map = hazelcast_client.get_map(genericRecordMap).get();
 	int count = 0;
 	for (auto& key : map->key_set<hazelcast::client::typed_data>().get()) {
-    //  auto& value = map->get<>(key).get();
+    	//auto& value = map->get<>(key).get();
+		//std::cout << "got value" << std::endl;
 	//	std::cout << key << "," << value << std::endl;
 	//TODO FIXME no known conversion for argument 2 from 'hazelcast::client::typed_data' to 'const hazelcast::client::member&'
 		//std::cout << key << "," << std::endl;

@@ -193,7 +193,8 @@ namespace Client
             {
                 var key = enumerator.Current;
                 var value = await map.GetAsync(key);
-                Console.WriteLine(key + "," + value);
+                //FIXME Need ToString() to work better than it does in 5.3.0
+                Console.WriteLine(key + "," + value.ToString());
                 count++;
         	}
             Console.WriteLine("[" + count + " rows]");

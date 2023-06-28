@@ -178,8 +178,26 @@ func listDistributedObjects(ctx context.Context, hazelcastClient *hazelcast.Clie
 func getGenericRecord(ctx context.Context, hazelcastClient *hazelcast.Client) {
 	fmt.Printf("--------------------------------------\n")
 	fmt.Printf("GenericRecord, map '%s'\n", genericRecordMap)
-	//TODO Needs 1.4.0 hazelcast-go-client
-	fmt.Printf("Coming in 1.4.0\n")
+	//TODO Allow to fail
+	fmt.Printf("TODO: Not yet available\n")
+	fmt.Printf("TODO: Not yet available\n")
+	fmt.Printf("TODO: Not yet available\n")
+	count := 0
+	m, err := hazelcastClient.GetMap(ctx, genericRecordMap)
+	if err != nil {
+		log.Print(err)
+	} else {
+		entries, err := m.GetEntrySet(ctx)
+		if err != nil {
+			log.Print(err)
+		} else {
+			for _, entry := range entries {
+				fmt.Printf("%v,%v\n", entry.Key, entry.Value)
+				count++
+			}
+			fmt.Printf("[%d rows]\n", count)
+		}
+	}
 }
 
 func main() {

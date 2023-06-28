@@ -101,7 +101,7 @@ public class MyWebSocketBridgeListener implements EntryAddedListener, EntryUpdat
             }
 
         } catch (Exception e) {
-            String message = String.format("handle('$s')", entryEvent);
+            String message = String.format("handle('%s')", value.toString());
             LOGGER.error(message, e);
         }
     }
@@ -139,7 +139,7 @@ public class MyWebSocketBridgeListener implements EntryAddedListener, EntryUpdat
     private JSONObject fromPerspectivePayments(PerspectivePayments value) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append("{")
+        stringBuilder
         .append("{ \"").append(MyConstants.PERSPECTIVE_JSON_KEY).append("\": \"").append(value.getBic()).append("\"")
         .append(", \"").append(MyConstants.PERSPECTIVE_FIELD_COUNT).append("\": ").append(value.getCount())
         .append(", \"").append(MyConstants.PERSPECTIVE_FIELD_SUM).append("\": ").append(value.getSum())
@@ -161,7 +161,7 @@ public class MyWebSocketBridgeListener implements EntryAddedListener, EntryUpdat
     private JSONObject fromPerspectiveTrade(PerspectiveTrade value) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append("{")
+        stringBuilder
         .append("{ \"").append(MyConstants.PERSPECTIVE_JSON_KEY).append("\": \"").append(value.getSymbol()).append("\"")
         .append(", \"").append(MyConstants.PERSPECTIVE_FIELD_COUNT).append("\": ").append(value.getCount())
         .append(", \"").append(MyConstants.PERSPECTIVE_FIELD_SUM).append("\": ").append(value.getSum())
