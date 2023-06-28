@@ -26,6 +26,52 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>transaction-monitor-common</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.datastax.oss</groupId>
+					<artifactId>java-driver-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.hazelcast</groupId>
+					<artifactId>hazelcast-enterprise</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.hazelcast</groupId>
+					<artifactId>hazelcast-mapstore</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.hazelcast</groupId>
+					<artifactId>hazelcast-sql</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.hazelcast.jet</groupId>
+					<artifactId>hazelcast-jet-cdc-debezium</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.hazelcast.jet</groupId>
+					<artifactId>hazelcast-jet-cdc-postgres</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.hazelcast.jet</groupId>
+					<artifactId>hazelcast-jet-kafka</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.hazelcast.jet</groupId>
+					<artifactId>hazelcast-jet-python</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.hazelcast.jet.contrib</groupId>
+					<artifactId>pulsar</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.mariadb.jdbc</groupId>
+					<artifactId>mariadb-java-client</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>jcl-over-slf4j</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- For Tuple3 utility class -->
@@ -33,14 +79,11 @@
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast</artifactId>
 		</dependency>
-
+		
 		<dependency>
-			<groupId>org.apache.kafka</groupId>
-			<artifactId>kafka-clients</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.pulsar</groupId>
-			<artifactId>pulsar-client</artifactId>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
 		</dependency>
 	</dependencies>
 

@@ -22,12 +22,10 @@ CMD ["bash", "-c", "set -euo pipefail \
       && echo java $JAVA_ARGS $JAVA_OPTS \
  -DHOST_IP=$HOST_IP \
  -Dmy.mongo.address=$MY_MONGO_ADDRESS \
- -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
  -jar application.jar \
       && java $JAVA_ARGS $JAVA_OPTS \
  -DHOST_IP=$HOST_IP \
  -Dmy.mongo.address=$MY_MONGO_ADDRESS \
- -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
  -jar application.jar \
      "]
 
