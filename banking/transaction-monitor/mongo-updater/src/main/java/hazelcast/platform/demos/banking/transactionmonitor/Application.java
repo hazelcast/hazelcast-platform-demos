@@ -58,11 +58,11 @@ public class Application {
                 TimeUnit.MINUTES.sleep(FIVE_MINUTES);
                 count = collection.countDocuments();
                 Document document = new Document();
-                document.append(MyConstants.MONGO_COLLECTION_FIELD1, MyConstants.ARCHIVER_JOB_NAME);
+                document.append(MyConstants.MONGO_COLLECTION_FIELD1, MyConstants.ALERT_LOGGER_JOB_NAME);
                 if (count % 2 == 0) {
-                    document.append(MyConstants.MONGO_COLLECTION_FIELD2, MyConstants.ARCHIVER_JOB_STATE_OFF);
+                    document.append(MyConstants.MONGO_COLLECTION_FIELD2, MyConstants.ALERT_LOGGER_JOB_STATE_OFF);
                 } else {
-                    document.append(MyConstants.MONGO_COLLECTION_FIELD2, MyConstants.ARCHIVER_JOB_STATE_ON);
+                    document.append(MyConstants.MONGO_COLLECTION_FIELD2, MyConstants.ALERT_LOGGER_JOB_STATE_ON);
                 }
                 LOGGER.info("insertOne('{}')", document);
                 collection.insertOne(document);

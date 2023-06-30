@@ -1,4 +1,4 @@
-FROM hazelcast/docker-grafana-graphite:latest
+FROM --platform=linux/amd64 hazelcast/docker-grafana-graphite:latest
 
 # Remove unwanted dashboards in original image
 RUN rm /src/dashboards/flight-telemetry.json

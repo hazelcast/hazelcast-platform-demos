@@ -25,9 +25,9 @@ import java.util.List;
 public class MyConstants {
     public static final String APPLICATION_PROPERTIES_FILE = "application.properties";
 
-    public static final String ARCHIVER_JOB_NAME = "archiver";
-    public static final String ARCHIVER_JOB_STATE_ON = "RUNNING";
-    public static final String ARCHIVER_JOB_STATE_OFF = "SUSPENDED";
+    public static final String ALERT_LOGGER_JOB_NAME = "AlertLogger";
+    public static final String ALERT_LOGGER_JOB_STATE_ON = "RUNNING";
+    public static final String ALERT_LOGGER_JOB_STATE_OFF = "SUSPENDED";
     public static final String CASSANDRA_CONFIG_KEY = "my.cassandra.address";
     public static final String CASSANDRA_DATACONNECTION_CONFIG_NAME = "cassandra";
     public static final String CASSANDRA_USER = "my.cassandra.user";
