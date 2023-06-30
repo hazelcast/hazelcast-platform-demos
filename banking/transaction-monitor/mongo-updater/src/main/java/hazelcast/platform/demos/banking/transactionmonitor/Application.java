@@ -35,7 +35,7 @@ import com.mongodb.client.MongoDatabase;
  */
 public class Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
-    private static final long TEN_MINUTES = 10L;
+    private static final long FIVE_MINUTES = 5L;
 
     /**
      * <p>Once every 10 minutes, update Mongo to indicate a job should be
@@ -54,8 +54,8 @@ public class Application {
 
         try {
             while (true) {
-                LOGGER.info("Sleeping {} minutes", TEN_MINUTES);
-                TimeUnit.MINUTES.sleep(TEN_MINUTES);
+                LOGGER.info("Sleeping {} minutes", FIVE_MINUTES);
+                TimeUnit.MINUTES.sleep(FIVE_MINUTES);
                 count = collection.countDocuments();
                 Document document = new Document();
                 document.append(MyConstants.MONGO_COLLECTION_FIELD1, MyConstants.ARCHIVER_JOB_NAME);

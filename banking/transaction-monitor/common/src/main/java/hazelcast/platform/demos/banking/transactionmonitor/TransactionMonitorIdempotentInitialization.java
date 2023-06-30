@@ -1470,17 +1470,17 @@ public class TransactionMonitorIdempotentInitialization {
 
         try {
             Pipeline pipelineArchiverStateController =
-                    ArchiverStateController.buildPipeline();
+                    AlertLoggerManager.buildPipeline();
 
             JobConfig jobConfigArchiverStateController = new JobConfig();
-            jobConfigArchiverStateController.setName(ArchiverStateController.class.getSimpleName());
-            jobConfigArchiverStateController.addClass(ArchiverStateController.class);
+            jobConfigArchiverStateController.setName(AlertLoggerManager.class.getSimpleName());
+            jobConfigArchiverStateController.addClass(AlertLoggerManager.class);
 
             Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineArchiverStateController,
                     jobConfigArchiverStateController);
             LOGGER_TO_IMAP.info(Objects.toString(job));
         } catch (Exception e) {
-            LOGGER.error("launchNeededJobs:" + ArchiverStateController.class.getSimpleName(), e);
+            LOGGER.error("launchNeededJobs:" + AlertLoggerManager.class.getSimpleName(), e);
             return false;
         }
         return true;

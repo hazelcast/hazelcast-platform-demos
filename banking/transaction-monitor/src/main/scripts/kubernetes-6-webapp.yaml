@@ -89,15 +89,7 @@ spec:
       containers:
         - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-finos"
           imagePullPolicy: Never
-#          livenessProbe:
-#            httpGet:
-#              path: /
-#              port: 8080
           name: transaction-monitor-FLAVOR-finos-container
-#          readinessProbe:
-#            httpGet:
-#              path: /
-#              port: 8080
           volumeMounts:
             - name: configmap
               mountPath: /customize/my-env.sh

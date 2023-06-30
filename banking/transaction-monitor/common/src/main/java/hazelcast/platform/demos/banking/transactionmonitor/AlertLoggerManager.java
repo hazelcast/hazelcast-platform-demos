@@ -29,21 +29,21 @@ import com.hazelcast.jet.pipeline.SinkBuilder;
 import com.hazelcast.jet.pipeline.Sources;
 
 /**
- * <p>A job to suspend/resume another job, {@link Archiver}
+ * <p>A job to suspend/resume another job, {@link AlertLogger}
  * </p>
  */
-public class ArchiverStateController {
+public class AlertLoggerManager {
 
     private final Executor executor;
     private final HazelcastInstance hazelcastInstance;
 
-    public ArchiverStateController(Context context) {
+    public AlertLoggerManager(Context context) {
         this.executor = Executors.newSingleThreadExecutor();
         this.hazelcastInstance = context.hazelcastInstance();
     }
 
     /**
-     * <p>A simple job that listens on a map and republishes to Slack.
+     * <p>A simple job that stops/starts another job.
      * </p>
      * <pre>
      *                +------( 1 )------+
@@ -104,10 +104,10 @@ public class ArchiverStateController {
     public static Sink<Object> mySink() {
         return SinkBuilder.sinkBuilder(
                     "mySink-",
-                    context -> new ArchiverStateController(context)
+                    context -> new AlertLoggerManager(context)
                 )
                 .receiveFn(
-                        (ArchiverStateController mySink, Object item) -> mySink.receiveFn(item)
+                        (AlertLoggerManager mySink, Object item) -> mySink.receiveFn(item)
                         )
                 .preferredLocalParallelism(1)
                 .build();
@@ -122,7 +122,7 @@ public class ArchiverStateController {
      * @return
      */
     public Object receiveFn(Object object) {
-        this.executor.execute(new ArchiverStateControllerRunnable(this.hazelcastInstance, object));
+        this.executor.execute(new AlertLoggerManagerRunnable(this.hazelcastInstance, object));
         return this;
     }
 }

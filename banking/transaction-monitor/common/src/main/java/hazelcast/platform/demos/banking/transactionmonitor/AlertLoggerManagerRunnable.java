@@ -32,22 +32,22 @@ import com.hazelcast.logging.ILogger;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
- * <p>Launched by {@link ArchiverStateController}, suspend/resume another job, {@link Archiver}
+ * <p>Launched by {@link AlertLoggerManager}, suspend/resume another job, {@link AlertLogger}
  * </p>
  */
-public class ArchiverStateControllerRunnable implements Runnable {
+public class AlertLoggerManagerRunnable implements Runnable {
 
     private static final Logger LOGGER_TO_IMAP =
-            IMapLoggerFactory.getLogger(ArchiverStateControllerRunnable.class);
+            IMapLoggerFactory.getLogger(AlertLoggerManagerRunnable.class);
 
     private final HazelcastInstance hazelcastInstance;
     private final ILogger iLogger;
     private final Object object;
 
     @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Need HazelcastInstance for job control")
-    public ArchiverStateControllerRunnable(HazelcastInstance arg0, Object arg1) {
+    public AlertLoggerManagerRunnable(HazelcastInstance arg0, Object arg1) {
         this.hazelcastInstance = arg0;
-        this.iLogger = this.hazelcastInstance.getLoggingService().getLogger(ArchiverStateControllerRunnable.class);
+        this.iLogger = this.hazelcastInstance.getLoggingService().getLogger(AlertLoggerManagerRunnable.class);
         this.object = arg1;
     }
 
@@ -91,11 +91,11 @@ public class ArchiverStateControllerRunnable implements Runnable {
                         this.iLogger.info(message);
                     }
 
-                    Pipeline pipeline = Archiver.buildPipeline();
+                    Pipeline pipeline = AlertLogger.buildPipeline();
 
                     JobConfig jobConfig = new JobConfig();
                     jobConfig.setName(jobName);
-                    jobConfig.addClass(Archiver.class);
+                    jobConfig.addClass(AlertLogger.class);
 
                     Job job = this.hazelcastInstance.getJet().newJobIfAbsent(pipeline, jobConfig);
                     LOGGER_TO_IMAP.info(Objects.toString(job));

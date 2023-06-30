@@ -74,7 +74,7 @@ metadata:
     type: local
 spec:
   capacity:
-    storage: 96Gi
+    storage: 196Gi
   accessModes:
     - ReadWriteMany
   hostPath:
@@ -90,7 +90,7 @@ metadata:
     type: local
 spec:
   capacity:
-    storage: 96Gi
+    storage: 196Gi
   accessModes:
     - ReadWriteMany
   hostPath:
@@ -126,14 +126,14 @@ spec:
       storage: 12Gi
 ---
 ---
-# Creates 3 pods, bigger than DR
+# Creates 4 pods, bigger than DR
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: transaction-monitor-FLAVOR-grid1-hazelcast
 spec:
-  replicas: 3
+  replicas: 4
   serviceName: transaction-monitor-FLAVOR-grid1-hazelcast
   selector:
     matchLabels:
@@ -201,14 +201,14 @@ spec:
             claimName: transaction-monitor-FLAVOR-grid1-hazelcast-pv-claim
 ---
 ---
-# Creates 2 pods, DR is smaller
+# Creates 3 pods, DR is smaller
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: transaction-monitor-FLAVOR-grid2-hazelcast
 spec:
-  replicas: 2
+  replicas: 3
   serviceName: transaction-monitor-FLAVOR-grid2-hazelcast
   selector:
     matchLabels:
