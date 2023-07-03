@@ -80,7 +80,7 @@ public class AlertLogger {
 
         return Pipeline.create()
                 .readFrom(
-                        Sources.mapJournal(MyConstants.IMAP_NAME_ALERTS_LOG, JournalInitialPosition.START_FROM_CURRENT))
+                        Sources.mapJournal(MyConstants.IMAP_NAME_ALERTS_LOG, JournalInitialPosition.START_FROM_OLDEST))
                 .withoutTimestamps().map(entry -> entry.getKey() + "==" + entry.getValue()).writeTo(Sinks.logger())
                 .getPipeline();
     }
