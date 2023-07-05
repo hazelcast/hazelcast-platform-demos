@@ -94,7 +94,9 @@ public class TransactionMonitorIdempotentInitializationSql {
 
             //FIXME Fails on Viridian, issue 4241 ??
             Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToKafka, jobConfigAlertingToKafka);
-            LOGGER_TO_IMAP.info(Objects.toString(job));
+            if (job != null) {
+                LOGGER_TO_IMAP.info(Objects.toString(job));
+            }
         } catch (Exception e) {
             LOGGER.error("launchAlertsSqlToKafka:", e);
             return false;

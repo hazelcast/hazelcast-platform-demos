@@ -619,13 +619,13 @@ public class MyUtils {
      */
     @SuppressWarnings("unchecked")
     private static void logMySqlSlf4j(HazelcastInstance hazelcastInstance) {
-        IMap<GenericRecord, GenericRecord> mapMySqlSlf4j = null;
+        IMap<Long, GenericRecord> mapMySqlSlf4j = null;
 
         // Do not look up by name, as that force creates
         for (DistributedObject distributedObject : hazelcastInstance.getDistributedObjects()) {
             if (distributedObject instanceof IMap
                     && distributedObject.getName().equals(MyConstants.IMAP_NAME_MYSQL_SLF4J)) {
-                mapMySqlSlf4j = (IMap<GenericRecord, GenericRecord>) distributedObject;
+                mapMySqlSlf4j = (IMap<Long, GenericRecord>) distributedObject;
             }
         }
 
@@ -636,8 +636,8 @@ public class MyUtils {
             LOGGER.info("Map '{}' does not currently exist", MyConstants.IMAP_NAME_MYSQL_SLF4J);
         } else {
             LOGGER.info("Map '{}'", MyConstants.IMAP_NAME_MYSQL_SLF4J);
-            Set<Entry<GenericRecord, GenericRecord>> entrySet = mapMySqlSlf4j.entrySet();
-            for (Entry<GenericRecord, GenericRecord> entry : entrySet) {
+            Set<Entry<Long, GenericRecord>> entrySet = mapMySqlSlf4j.entrySet();
+            for (Entry<Long, GenericRecord> entry : entrySet) {
                 LOGGER.info("Key '{}', Value '{}'", entry.getKey(), entry.getValue());
             }
             LOGGER.info("[{} entr{}]", entrySet.size(), entrySet.size() == 1 ? "y" : "ies");

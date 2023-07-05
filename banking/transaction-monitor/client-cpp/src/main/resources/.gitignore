@@ -1,2 +1,6 @@
 build
+cmake_install.cmake
 cpp_client
+CMakeCache.txt
+CMakeFiles
+Makefile
