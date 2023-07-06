@@ -184,16 +184,28 @@ void list_distributed_objects(hazelcast::client::hazelcast_client hazelcast_clie
 }
 
 void get_generic_record(hazelcast::client::hazelcast_client hazelcast_client) {
+	using namespace hazelcast::client::serialization::generic_record;
 	std::cout << "--------------------------------------" << std::endl;
 	std::cout << "GenericRecord, map '" << genericRecordMap << "'" << std::endl;
 	auto map = hazelcast_client.get_map(genericRecordMap).get();
 	int count = 0;
+
 	for (auto& key : map->key_set<hazelcast::client::typed_data>().get()) {
-    	//auto& value = map->get<>(key).get();
-		//std::cout << "got value" << std::endl;
-	//	std::cout << key << "," << value << std::endl;
-	//TODO FIXME no known conversion for argument 2 from 'hazelcast::client::typed_data' to 'const hazelcast::client::member&'
-		//std::cout << key << "," << std::endl;
+		boost::optional<hazelcast::client::typed_data> value =
+            map->get<hazelcast::client::typed_data, hazelcast::client::typed_data>(key).get();
+		hazelcast::client::serialization::pimpl::object_type keyType = key.get_type();
+		hazelcast::client::serialization::pimpl::object_type valueType = value->get_type();
+		if (keyType.type_id == hazelcast::client::serialization::pimpl::serialization_constants::CONSTANT_TYPE_LONG) {
+			if (valueType.type_id == hazelcast::client::serialization::pimpl::serialization_constants::CONSTANT_TYPE_COMPACT) {
+				auto keyRecord = key.get<int64_t>().value();
+				auto valueRecord = value->get<generic_record>().value();
+    			std::cout << keyRecord << " :: " << valueRecord << std::endl;
+			} else {
+				std::cout << "Row " << count << ": Unknown value type: " << valueType << std::endl;
+			}
+		} else {
+			std::cout << "Row " << count << ": Unknown key type: " << keyType << std::endl;
+		}
         count++;
 	}
 	std::cout << "[" << count << " rows]" << std::endl;

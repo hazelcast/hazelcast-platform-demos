@@ -5,18 +5,18 @@
 # OPTIONAL
 # OPTIONAL
 ---
-# Service DNS will be "transaction-monitor-FLAVOR-grid1-hazelcast.default.svc.cluster.local".
+# Service DNS will be "transaction-monitor-FLAVOR-live-hazelcast.default.svc.cluster.local".
 # Service DNS for Prometheus will be "transaction-monitor-FLAVOR-prometheus.default.svc.cluster.local".
 # Service DNS for Grafana will be "transaction-monitor-FLAVOR-grafana.default.svc.cluster.local".
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: transaction-monitor-FLAVOR-grid1-hazelcast
+  name: transaction-monitor-FLAVOR-live-hazelcast
 spec:
   clusterIP: None
   selector:
-    app: transaction-monitor-FLAVOR-grid1-hazelcast
+    app: transaction-monitor-FLAVOR-live-hazelcast
   ports:
   - port: 5701
 ---
@@ -25,24 +25,24 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: transaction-monitor-FLAVOR-grid1-hazelcast-extra
+  name: transaction-monitor-FLAVOR-live-hazelcast-extra
 spec:
   selector:
-    app: transaction-monitor-FLAVOR-grid1-hazelcast
+    app: transaction-monitor-FLAVOR-live-hazelcast
   ports:
   - port: 5701
   type: LoadBalancer
 ---
-# Service DNS will be "transaction-monitor-FLAVOR-grid2-hazelcast.default.svc.cluster.local".
+# Service DNS will be "transaction-monitor-FLAVOR-cqrs-hazelcast.default.svc.cluster.local".
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: transaction-monitor-FLAVOR-grid2-hazelcast
+  name: transaction-monitor-FLAVOR-cqrs-hazelcast
 spec:
   clusterIP: None
   selector:
-    app: transaction-monitor-FLAVOR-grid2-hazelcast
+    app: transaction-monitor-FLAVOR-cqrs-hazelcast
   ports:
   - port: 5701
 ---
@@ -69,7 +69,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: transaction-monitor-FLAVOR-grid1-hazelcast-pv
+  name: transaction-monitor-FLAVOR-live-hazelcast-pv
   labels:
     type: local
 spec:
@@ -78,14 +78,14 @@ spec:
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: "/var/lib/data/grid1"
+    path: "/var/lib/data/live"
   persistentVolumeReclaimPolicy: Delete
   storageClassName: manual
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: transaction-monitor-FLAVOR-grid2-hazelcast-pv
+  name: transaction-monitor-FLAVOR-cqrs-hazelcast-pv
   labels:
     type: local
 spec:
@@ -94,7 +94,7 @@ spec:
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: "/var/lib/data/grid2"
+    path: "/var/lib/data/dr"
   persistentVolumeReclaimPolicy: Delete
   storageClassName: manual
 ---
@@ -104,7 +104,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: transaction-monitor-FLAVOR-grid1-hazelcast-pv-claim
+  name: transaction-monitor-FLAVOR-live-hazelcast-pv-claim
 spec:
   storageClassName: manual
   accessModes:
@@ -116,7 +116,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: transaction-monitor-FLAVOR-grid2-hazelcast-pv-claim
+  name: transaction-monitor-FLAVOR-cqrs-hazelcast-pv-claim
 spec:
   storageClassName: manual
   accessModes:
@@ -131,17 +131,17 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: transaction-monitor-FLAVOR-grid1-hazelcast
+  name: transaction-monitor-FLAVOR-live-hazelcast
 spec:
   replicas: 4
-  serviceName: transaction-monitor-FLAVOR-grid1-hazelcast
+  serviceName: transaction-monitor-FLAVOR-live-hazelcast
   selector:
     matchLabels:
-      app: transaction-monitor-FLAVOR-grid1-hazelcast
+      app: transaction-monitor-FLAVOR-live-hazelcast
   template:
     metadata:
       labels:
-        app: transaction-monitor-FLAVOR-grid1-hazelcast
+        app: transaction-monitor-FLAVOR-live-hazelcast
     spec:
       containers:
         - env:
@@ -174,7 +174,7 @@ spec:
             httpGet:
               path: /hazelcast/health/node-state
               port: 5701
-          name: transaction-monitor-FLAVOR-grid1-hazelcast-container
+          name: transaction-monitor-FLAVOR-live-hazelcast-container
           readinessProbe:
             # Same as for livenessProbe
             initialDelaySeconds: 30
@@ -193,12 +193,12 @@ spec:
             requests:
               cpu: "2.0"
           volumeMounts:
-            - name: grid1-store
-              mountPath: /data/transaction-monitor-FLAVOR/grid1
+            - name: live-store
+              mountPath: /data/transaction-monitor-FLAVOR/live
       volumes:
-        - name: grid1-store
+        - name: live-store
           persistentVolumeClaim:
-            claimName: transaction-monitor-FLAVOR-grid1-hazelcast-pv-claim
+            claimName: transaction-monitor-FLAVOR-live-hazelcast-pv-claim
 ---
 ---
 # Creates 3 pods, DR is smaller
@@ -206,17 +206,17 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: transaction-monitor-FLAVOR-grid2-hazelcast
+  name: transaction-monitor-FLAVOR-cqrs-hazelcast
 spec:
   replicas: 3
-  serviceName: transaction-monitor-FLAVOR-grid2-hazelcast
+  serviceName: transaction-monitor-FLAVOR-cqrs-hazelcast
   selector:
     matchLabels:
-      app: transaction-monitor-FLAVOR-grid2-hazelcast
+      app: transaction-monitor-FLAVOR-cqrs-hazelcast
   template:
     metadata:
       labels:
-        app: transaction-monitor-FLAVOR-grid2-hazelcast
+        app: transaction-monitor-FLAVOR-cqrs-hazelcast
     spec:
       containers:
         - env:
@@ -242,7 +242,7 @@ spec:
             httpGet:
               path: /hazelcast/health/node-state
               port: 5701
-          name: transaction-monitor-FLAVOR-grid2-hazelcast-container
+          name: transaction-monitor-FLAVOR-cqrs-hazelcast-container
           readinessProbe:
             # Same as for livenessProbe
             initialDelaySeconds: 30
@@ -261,12 +261,12 @@ spec:
             requests:
               cpu: "2.0"
           volumeMounts:
-            - name: grid2-store
-              mountPath: /data/transaction-monitor-FLAVOR/grid2
+            - name: dr-store
+              mountPath: /data/transaction-monitor-FLAVOR/dr
       volumes:
-        - name: grid2-store
+        - name: dr-store
           persistentVolumeClaim:
-            claimName: transaction-monitor-FLAVOR-grid2-hazelcast-pv-claim
+            claimName: transaction-monitor-FLAVOR-cqrs-hazelcast-pv-claim
 ---
 ---
 # Only need 1 management-center

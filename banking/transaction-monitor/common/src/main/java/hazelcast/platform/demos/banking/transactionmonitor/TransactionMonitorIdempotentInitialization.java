@@ -1274,7 +1274,9 @@ public class TransactionMonitorIdempotentInitialization {
         } else {
             Job job = UtilsJobs.myNewJobIfAbsent(LOGGER,
                     hazelcastInstance, pipelineIngestTransactions, jobConfigIngestTransactions);
-            LOGGER_TO_IMAP.info(Objects.toString(job));
+            if (job != null) {
+                LOGGER_TO_IMAP.info(Objects.toString(job));
+            }
         }
 
         /* Transaction aggregation
@@ -1303,7 +1305,9 @@ public class TransactionMonitorIdempotentInitialization {
             return false;
         } else {
             Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAggregateQuery, jobConfigAggregateQuery);
-            LOGGER_TO_IMAP.info(Objects.toString(job));
+            if (job != null) {
+                LOGGER_TO_IMAP.info(Objects.toString(job));
+            }
         }
 
         return true;
@@ -1408,7 +1412,9 @@ public class TransactionMonitorIdempotentInitialization {
             jobConfigAlertingToSlack.addClass(UtilsSlackSink.class);
 
             Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToSlack, jobConfigAlertingToSlack);
-            LOGGER_TO_IMAP.info(Objects.toString(job));
+            if (job != null) {
+                LOGGER_TO_IMAP.info(Objects.toString(job));
+            }
         } catch (Exception e) {
             LOGGER.error("launchNeededJobs:" + AlertingToSlack.class.getSimpleName(), e);
             return false;
@@ -1445,7 +1451,9 @@ public class TransactionMonitorIdempotentInitialization {
             jobConfigPostgresCDC.addClass(PostgresCDC.class);
 
             Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelinePostgresCDC, jobConfigPostgresCDC);
-            LOGGER_TO_IMAP.info(Objects.toString(job));
+            if (job != null) {
+                LOGGER_TO_IMAP.info(Objects.toString(job));
+            }
         } catch (Exception e) {
             LOGGER.error("launchNeededJobs:" + PostgresCDC.class.getSimpleName(), e);
             return false;
@@ -1478,7 +1486,9 @@ public class TransactionMonitorIdempotentInitialization {
 
             Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineArchiverStateController,
                     jobConfigArchiverStateController);
-            LOGGER_TO_IMAP.info(Objects.toString(job));
+            if (job != null) {
+                LOGGER_TO_IMAP.info(Objects.toString(job));
+            }
         } catch (Exception e) {
             LOGGER.error("launchNeededJobs:" + AlertLoggerManager.class.getSimpleName(), e);
             return false;

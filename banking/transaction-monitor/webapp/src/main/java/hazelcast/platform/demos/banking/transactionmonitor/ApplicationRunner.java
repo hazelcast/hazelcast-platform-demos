@@ -133,7 +133,6 @@ public class ApplicationRunner {
 
         System.out.println("");
         System.out.println("");
-
         if (ok) {
             PNCounter updateCounter = this.hazelcastInstance.getPNCounter(MyConstants.PN_UPDATER);
             if (updateCounter.get() == 0L) {
@@ -510,7 +509,6 @@ public class ApplicationRunner {
             { "IMap",    "SHOW JOBS" },
             { "IMap",    "SHOW MAPPINGS" },
             { "IMap",    "SHOW VIEWS" },
-            //{ "IMap",    "SELECT * FROM \"" + MyConstants.IMAP_NAME_MYSQL_SLF4J + "\""},
         };
         int originalLen = queries.length;
         String[][] additionalQueries;
@@ -629,5 +627,4 @@ public class ApplicationRunner {
         LOGGER.info("initialize(): -=-=-=-=- END, success=={} -=-=-=-=-=-", ok);
         return ok;
     }
-
 }

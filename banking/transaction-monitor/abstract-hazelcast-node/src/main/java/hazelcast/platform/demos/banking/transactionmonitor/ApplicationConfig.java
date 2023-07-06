@@ -325,8 +325,6 @@ public class ApplicationConfig {
      * @param properties For logon, password
      */
     private static void defineDataLinks(Config config, Properties properties) {
-        LOGGER.warn("Add generic map-store only currently for self-hosted");
-
         try {
             TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(properties);
 

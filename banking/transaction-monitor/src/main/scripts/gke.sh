@@ -98,7 +98,7 @@ wait_for_pod() {
    REQUIRED_STATE=Completed
    ;;
   5)
-   WAIT_ON=grid1-hazelcast-3
+   WAIT_ON=live-hazelcast-3
    REQUIRED_STATE=Running
    ;;
   6)

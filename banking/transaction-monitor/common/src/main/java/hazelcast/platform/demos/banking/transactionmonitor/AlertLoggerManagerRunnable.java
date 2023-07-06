@@ -147,13 +147,15 @@ public class AlertLoggerManagerRunnable implements Runnable {
             this.iLogger.info(message);
             TimeUnit.MINUTES.sleep(1L);
             if (requiredState.equals(job.getStatus().toString())) {
-                message = String.format("run():amendState(): '%s' state change worked '%s'",
+                message = String.format("run():amendState(): '%s' state change success '%s'",
                         job.getName(), job.getStatus().toString());
                 this.iLogger.info(message);
+                LOGGER_TO_IMAP.info(message);
             } else {
-                message = String.format("run():amendState(): '%s' state change failed '%s'",
+                message = String.format("run():amendState(): '%s' state change failure '%s'",
                         job.getName(), job.getStatus().toString());
                 this.iLogger.severe(message);
+                LOGGER_TO_IMAP.info(message);
             }
         }
     }

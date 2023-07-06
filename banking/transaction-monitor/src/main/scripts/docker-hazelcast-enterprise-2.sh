@@ -2,7 +2,7 @@
 
 PROJECT=transaction-monitor
 MODULE=hazelcast-node-enterprise-2
-CLUSTER_NAME=grid2
+CLUSTER_NAME=dr
 CLONE=0
 
 BASEDIR=`dirname $0`

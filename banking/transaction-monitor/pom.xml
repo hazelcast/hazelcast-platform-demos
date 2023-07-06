@@ -23,8 +23,8 @@
 		
 		<my.docker.image.prefix>transaction-monitor-${my.transaction-monitor.flavor}</my.docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
-		<my.cluster1.name>grid1</my.cluster1.name>
-		<my.cluster2.name>grid2</my.cluster2.name>
+		<my.cluster1.name>live</my.cluster1.name>
+		<my.cluster2.name>cqrs</my.cluster2.name>
 		<my.pulsar.or.kafka>pulsar</my.pulsar.or.kafka>
 		<my.pulsar.or.kafka>kafka</my.pulsar.or.kafka>
 

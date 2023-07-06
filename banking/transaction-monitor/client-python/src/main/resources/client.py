@@ -88,6 +88,7 @@ def run_sql_query(client: hazelcast.HazelcastClient, query: str):
                             print("Unhandled Type for Column '" + str(sqltype) + "'", end = '')
                 i = i + 1
             print("", flush=True)
+            count = count + 1
         print("[" + str(count) + " rows]", flush=True)
     except Exception as e:
         print(str(e), flush=True)
@@ -129,6 +130,7 @@ if viridian:
         cluster_name=viridianId,
         cloud_discovery_token=viridianDiscoveryToken,
         labels=[user, launch_time],
+        default_int_type=hazelcast.config.IntType.LONG,
         statistics_enabled=True,
         ssl_enabled=True,
         ssl_cafile=os.path.abspath(viridianCaFile),
@@ -142,6 +144,7 @@ else:
         cluster_name=cluster_name,
         cluster_members=[member],
         labels=[user, launch_time],
+        default_int_type=hazelcast.config.IntType.LONG,
         statistics_enabled=True
     )
 print("--------------------------------------", flush=True) 
