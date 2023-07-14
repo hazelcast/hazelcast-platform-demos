@@ -126,14 +126,14 @@ spec:
       storage: 12Gi
 ---
 ---
-# Creates 4 pods, bigger than DR
+# Creates 3 pods, same size as "cqrs" cluster but doesn't need to be
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: transaction-monitor-FLAVOR-live-hazelcast
 spec:
-  replicas: 4
+  replicas: 3
   serviceName: transaction-monitor-FLAVOR-live-hazelcast
   selector:
     matchLabels:
