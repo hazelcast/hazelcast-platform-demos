@@ -201,7 +201,7 @@ spec:
             claimName: transaction-monitor-FLAVOR-live-hazelcast-pv-claim
 ---
 ---
-# Creates 3 pods, DR is smaller
+# Creates 3 pods, both clusters start at minimum recommended but can be scaled to different sizes
 ---
 apiVersion: apps/v1
 kind: StatefulSet
