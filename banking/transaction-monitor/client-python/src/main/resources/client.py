@@ -32,7 +32,8 @@ viridianDiscoveryToken = "@my.viridian.cluster1.discovery.token@"
 viridianKeyPassword = "@my.viridian.cluster1.key.password@"
 
 controlFile = "/tmp/control.file"
-generic_record_map = "__map-store.mysql_slf4j"
+generic_record_map_prefix = "__map-store."
+generic_record_map = "mysql_slf4j"
 useViridianKey = "use.viridian"
 viridianCaFile = "/tmp/ca.pem"
 viridianCertFile = "/tmp/cert.pem"
@@ -81,7 +82,10 @@ def run_sql_query(client: hazelcast.HazelcastClient, query: str):
                         timestamp_iso8601 = str(column).replace(" ", "T")
                         print(timestamp_iso8601, end = '')
                     else:
-                        print("Unhandled Type for Column '" + str(sqltype) + "'", end = '')
+                        if (sqltype == SqlColumnType.BIGINT):
+                            print(column, end = '')
+                        else:
+                            print("Unhandled Type for Column '" + str(sqltype) + "'", end = '')
                 i = i + 1
             print("", flush=True)
         print("[" + str(count) + " rows]", flush=True)
@@ -156,7 +160,7 @@ list_distributed_objects(client)
 
 get_generic_record(client)
 
-run_sql_query(client, "SELECT * FROM \"" + generic_record_map + "\"")
+run_sql_query(client, "SELECT * FROM \"" + generic_record_map_prefix + generic_record_map + "\"")
 
 current_date = datetime.now()
 end_time = current_date.strftime('%Y-%m-%dT%H:%M:%S')
