@@ -104,7 +104,7 @@ public class TransactionMonitorIdempotentInitialization {
 
         // Add journals and map stores to maps before they are created
         boolean ok = dynamicMapConfig(hazelcastInstance, existingIMapNames,
-                properties, ourProjectProvenance, localhost, useViridian);
+                properties, ourProjectProvenance, localhost, useViridian, transactionMonitorFlavor);
 
         // Accessing non-existing maps does not return any failures
         List<String> iMapNames;
@@ -156,7 +156,7 @@ public class TransactionMonitorIdempotentInitialization {
      */
     private static boolean dynamicMapConfig(HazelcastInstance hazelcastInstance,
             Set<String> existingIMapNames, Properties properties, String ourProjectProvenance,
-            boolean localhost, boolean useViridian) {
+            boolean localhost, boolean useViridian, TransactionMonitorFlavor transactionMonitorFlavor) {
         final String alertsWildcard = "alerts*";
 
         EventJournalConfig eventJournalConfig = new EventJournalConfig().setEnabled(true);
@@ -183,13 +183,8 @@ public class TransactionMonitorIdempotentInitialization {
             if (localhost) {
                 LOGGER.info("localhost=={}, no map store for Postgres", localhost);
             } else {
-                if (useViridian) {
-                    //FIXME Not yet available on Viridian @ March 2023.
-                    LOGGER.warn("use.virian={}, no map store for Postgres", useViridian);
-                } else {
-                    alertsMapConfig.setMapStoreConfig(mapStoreConfig);
-                    LOGGER.info("Postgres configured using: {}", alertsMapConfig.getMapStoreConfig().getProperties());
-                }
+                alertsMapConfig.setMapStoreConfig(mapStoreConfig);
+                LOGGER.info("Postgres configured using: {}", alertsMapConfig.getMapStoreConfig().getProperties());
             }
 
             hazelcastInstance.getConfig().addMapConfig(alertsMapConfig);
@@ -201,9 +196,11 @@ public class TransactionMonitorIdempotentInitialization {
 
         // Generic config, MapStore implementation is derived
         if (!existingIMapNames.contains(MyConstants.IMAP_NAME_MYSQL_SLF4J)) {
+            TransactionMonitorIdempotentInitializationMySql.defineMySql(hazelcastInstance, properties, transactionMonitorFlavor);
+
             MapConfig mySqlMapConfig = new MapConfig(MyConstants.IMAP_NAME_MYSQL_SLF4J);
 
-            Properties mySqlProperties = getMySqlProperties();
+            Properties mySqlProperties = TransactionMonitorIdempotentInitializationMySql.getMySqlProperties();
 
             MapStoreConfig mySqlStoreConfig = new MapStoreConfig().setEnabled(true)
             .setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER)
@@ -212,13 +209,8 @@ public class TransactionMonitorIdempotentInitialization {
             if (localhost) {
                 LOGGER.info("localhost=={}, no map store for MySql", localhost);
             } else {
-                if (useViridian) {
-                    //FIXME Not yet available on Viridian @ March 2023.
-                    LOGGER.warn("use.virian={}, no data link for MySql", useViridian);
-                } else {
-                    mySqlMapConfig.setMapStoreConfig(mySqlStoreConfig);
-                    LOGGER.info("MySql configured using: {}", mySqlMapConfig.getMapStoreConfig().getProperties());
-                }
+                mySqlMapConfig.setMapStoreConfig(mySqlStoreConfig);
+                LOGGER.info("MySql configured using: {}", mySqlMapConfig.getMapStoreConfig().getProperties());
             }
 
             hazelcastInstance.getConfig().addMapConfig(mySqlMapConfig);
@@ -248,29 +240,6 @@ public class TransactionMonitorIdempotentInitialization {
                 LOGGER.info("Don't add journal to '{}', map already exists", mapName);
             }
         }
-    }
-
-    /**
-     * <p>For using MySql datalink, already set up serverside.
-     * </p>
-     *
-     * @return
-     */
-    private static Properties getMySqlProperties() {
-        Properties mySqlProperties = new Properties();
-        mySqlProperties.setProperty("data-connection-ref", MyConstants.MYSQL_DATACONNECTION_CONFIG_NAME);
-        mySqlProperties.setProperty("mapping-type", "JDBC");
-        mySqlProperties.setProperty("table-name", MyConstants.MYSQL_DATACONNECTION_TABLE_NAME);
-        //FIXME Once MySql compound key supported by Data Link
-        //MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN0 + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN1);
-        mySqlProperties.setProperty("id-column", "hash");
-        mySqlProperties.setProperty("column", MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN0
-                + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN1
-                + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN2
-                + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN3
-                + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN4
-                + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN5);
-        return mySqlProperties;
     }
 
     /**

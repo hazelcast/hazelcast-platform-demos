@@ -92,7 +92,6 @@ public class TransactionMonitorIdempotentInitializationSql {
             jobConfigAlertingToKafka.setName(AlertingToKafka.class.getSimpleName());
             jobConfigAlertingToKafka.addClass(HazelcastJsonValueSerializer.class);
 
-            //FIXME Fails on Viridian, issue 4241 ??
             Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToKafka, jobConfigAlertingToKafka);
             if (job != null) {
                 LOGGER_TO_IMAP.info(Objects.toString(job));

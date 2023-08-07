@@ -17,7 +17,6 @@
 package hazelcast.platform.demos.banking.transactionmonitor;
 
 import java.util.Properties;
-import java.util.UUID;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 
@@ -120,7 +119,6 @@ public class Application {
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
                 configMap.get(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
-        properties.put(ConsumerConfig.GROUP_ID_CONFIG, UUID.randomUUID().toString());
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
                 configMap.get(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG));
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
