@@ -128,7 +128,7 @@ public class TransactionMonitorIdempotentInitialization {
 
         // Add index to maps after they are created, if created in this method's run.
         if (ok) {
-            ok = defineIndexes(hazelcastInstance, existingIMapNames, transactionMonitorFlavor);
+            ok = defineIndexes(hazelcastInstance, existingIMapNames, transactionMonitorFlavor, useViridian);
         }
 
         return ok;
@@ -190,9 +190,13 @@ public class TransactionMonitorIdempotentInitialization {
             hazelcastInstance.getConfig().addMapConfig(alertsMapConfig);
         } else {
             LOGGER.info("Don't add journal to '{}', map already exists", MyConstants.IMAP_NAME_ALERTS_LOG);
+            if (useViridian) {
+                deleteForRetry(hazelcastInstance, useViridian, MyConstants.IMAP_NAME_MYSQL_SLF4J);
+                return false;
+            }
         }
 
-        dynamicMapConfigJournalOnly(hazelcastInstance, existingIMapNames);
+        dynamicMapConfigJournalOnly(hazelcastInstance, existingIMapNames, useViridian);
 
         // Generic config, MapStore implementation is derived
         if (!existingIMapNames.contains(MyConstants.IMAP_NAME_MYSQL_SLF4J)) {
@@ -216,9 +220,26 @@ public class TransactionMonitorIdempotentInitialization {
             hazelcastInstance.getConfig().addMapConfig(mySqlMapConfig);
         } else {
             LOGGER.info("Don't add generic mapstore to '{}', map already exists", MyConstants.IMAP_NAME_MYSQL_SLF4J);
+            if (useViridian) {
+                deleteForRetry(hazelcastInstance, useViridian, MyConstants.IMAP_NAME_MYSQL_SLF4J);
+                return false;
+            }
         }
 
         return true;
+    }
+
+    /**
+     * <p>Delete so can recreate.
+     * </p>
+     *
+     * @param hazelcastInstance
+     * @param useViridian
+     * @param mapName
+     */
+    private static void deleteForRetry(HazelcastInstance hazelcastInstance, boolean useViridian, String mapName) {
+        LOGGER.info("'useViridian'=={}, destroying map '{}', bounce and try again", useViridian, mapName);
+        hazelcastInstance.getMap(mapName).destroy();
     }
 
     /**
@@ -226,8 +247,10 @@ public class TransactionMonitorIdempotentInitialization {
      * </p>
      * @param hazelcastInstance
      * @param existingIMapNames
+     * @param useViridian
      */
-    private static void dynamicMapConfigJournalOnly(HazelcastInstance hazelcastInstance, Set<String> existingIMapNames) {
+    private static void dynamicMapConfigJournalOnly(HazelcastInstance hazelcastInstance, Set<String> existingIMapNames,
+            boolean useViridian) {
         for (String mapName : List.of(MyConstants.IMAP_NAME_MONGO_ACTIONS)) {
             if (!existingIMapNames.contains(mapName)) {
                 EventJournalConfig eventJournalConfig = new EventJournalConfig().setEnabled(true);
@@ -238,6 +261,9 @@ public class TransactionMonitorIdempotentInitialization {
                 hazelcastInstance.getConfig().addMapConfig(mapConfig);
             } else {
                 LOGGER.info("Don't add journal to '{}', map already exists", mapName);
+                if (useViridian) {
+                    deleteForRetry(hazelcastInstance, useViridian, mapName);
+                }
             }
         }
     }
@@ -263,7 +289,7 @@ public class TransactionMonitorIdempotentInitialization {
      * @return true - Always.
      */
     private static boolean defineIndexes(HazelcastInstance hazelcastInstance, Set<String> existingIMapNames,
-            TransactionMonitorFlavor transactionMonitorFlavor) {
+            TransactionMonitorFlavor transactionMonitorFlavor, boolean useViridian) {
 
         // Only add if map hadn't previously existed and so has just been created
         if (!existingIMapNames.contains(MyConstants.IMAP_NAME_TRANSACTIONS)) {
@@ -292,6 +318,9 @@ public class TransactionMonitorIdempotentInitialization {
             transactionsMap.addIndex(indexConfig);
         } else {
             LOGGER.trace("Don't add index to '{}', map already exists", MyConstants.IMAP_NAME_TRANSACTIONS);
+            if (useViridian) {
+                deleteForRetry(hazelcastInstance, useViridian, MyConstants.IMAP_NAME_TRANSACTIONS);
+            }
         }
 
         return true;
