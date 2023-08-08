@@ -34,7 +34,10 @@ spec:
         app: transaction-monitor-FLAVOR-webapp
     spec:
       containers:
-        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-webapp"
+        - env:
+          - name: "MY_MYSQL_ADDRESS"
+            value: "transaction-monitor-FLAVOR-mysql.default.svc.cluster.local:3306"
+          image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-webapp"
           imagePullPolicy: Never
           livenessProbe:
             httpGet:
