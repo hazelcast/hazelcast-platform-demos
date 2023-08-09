@@ -21,9 +21,11 @@ then
 fi
 
 STATEFULSET_NAME=transaction-monitor-${FLAVOR}-kafka-broker
+MYSQL_NAME=transaction-monitor-${FLAVOR}-mysql
 POSTGRES_NAME=transaction-monitor-${FLAVOR}-postgres
 PULSAR_NAME=transaction-monitor-${FLAVOR}-pulsar
 IPLIST=""
+MYSQLADDRESS=""
 POSTGRESADDRESS=""
 PULSARLIST=""
 TMPFILE=/tmp/`basename $0`.$$
@@ -60,6 +62,31 @@ do
   fi
  fi
 done
+
+# One MYSQL
+SVC=${MYSQL_NAME}
+SVC_INFO=`kubectl get svc $SVC 2>&1`
+PENDING=`echo $SVC_INFO | egrep -c '<pending>'\|'<none>'`
+NOT_RUNNING=`echo $SVC_INFO | grep -c '(NotFound)'`
+if [ $PENDING -gt 0 ] || [ $NOT_RUNNING -gt 0 ]
+then
+ echo ""
+ echo `basename $0`: ERROR: Service \"$SVC\" not ready for IP capture: $SVC_INFO
+ echo ""
+ if [ $NOT_RUNNING -gt 0 ]
+ then
+  echo Was kubernetes-1-zookeeper-kafka-firsthalf.yaml run\?
+ else
+  echo Try again in 30 seconds\? '<pending>'/'<none>' will clear.
+ fi
+ echo ""
+else
+ IP=`kubectl get svc $SVC -o jsonpath='{.status.loadBalancer.ingress[0].ip}'`
+ if [ "$IP" != "" ]
+ then
+  MYSQLADDRESS="$IP"
+ fi
+fi
 
 # One POSTGRES
 SVC=${POSTGRES_NAME}
@@ -117,6 +144,12 @@ then
  echo `basename $0`: ERROR: Need 3 IPs in Kafka IP list: \"$IPLIST\"
  exit 1
 fi
+MYSQLCOUNT=`echo $MYSQLADDRESS | sed 's/,/ /g' | wc -w`
+if [ $MYSQLCOUNT -ne 1 ]
+then
+ echo `basename $0`: ERROR: Need 1 IPs in Postgres IP list: \"$MYSQLADDRESS\"
+ exit 1
+fi
 POSTGRESCOUNT=`echo $POSTGRESADDRESS | sed 's/,/ /g' | wc -w`
 if [ $POSTGRESCOUNT -ne 1 ]
 then
@@ -154,8 +187,10 @@ echo "    INTERNAL_PORT=19092" >> $TMPFILE
 echo "    echo ID \"\$ID\"" >> $TMPFILE
 echo "    IPLIST=$IPLIST" >> $TMPFILE
 echo "    echo IPLIST \"\$IPLIST\"" >> $TMPFILE
+echo "    MYSQLADDRESS=$MYSQLADDRESS" >> $TMPFILE
+echo "    echo MYSQLADDRESS \"\$MYSQLADDRESS\"" >> $TMPFILE
 echo "    POSTGRESADDRESS=$POSTGRESADDRESS" >> $TMPFILE
-echo "    echo POSSTGRESADDRESS \"\$POSTGRESADDRESS\"" >> $TMPFILE
+echo "    echo POSTGRESADDRESS \"\$POSTGRESADDRESS\"" >> $TMPFILE
 echo "    PULSARLIST=$PULSARLIST" >> $TMPFILE
 echo "    echo PULSARLIST \"\$PULSARLIST\"" >> $TMPFILE
 echo "    IP0=\`echo \$IPLIST | cut -d, -f1\`:\${EXTERNAL_PORT}" >> $TMPFILE
@@ -182,6 +217,7 @@ echo "    export KAFKA_CFG_ADVERTISED_LISTENERS=EXTERNAL_PLAINTEXT://\$EXTERNAL,
 # Use below to turn off external access
 #echo "    export KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL_PLAINTEXT://\$INTERNAL" >> $TMPFILE
 echo "    export MY_BOOTSTRAP_SERVERS=\${IP0},\${IP1},\${IP2}" >> $TMPFILE
+echo "    export MY_MYSQL_ADDRESS=\${MYSQLADDRESS}" >> $TMPFILE
 echo "    export MY_POSTGRES_ADDRESS=\${POSTGRESADDRESS}" >> $TMPFILE
 echo "    export MY_PULSAR_LIST=\${PULSARLIST}" >> $TMPFILE
 #

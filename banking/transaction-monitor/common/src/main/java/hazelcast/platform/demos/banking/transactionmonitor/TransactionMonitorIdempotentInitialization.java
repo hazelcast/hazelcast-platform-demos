@@ -102,6 +102,8 @@ public class TransactionMonitorIdempotentInitialization {
                 .filter(name -> !name.startsWith("__"))
                 .collect(Collectors.toCollection(TreeSet::new));
 
+        LOGGER.info("Existing maps: {}", existingIMapNames);
+
         // Add journals and map stores to maps before they are created
         boolean ok = dynamicMapConfig(hazelcastInstance, existingIMapNames,
                 properties, ourProjectProvenance, localhost, useViridian, transactionMonitorFlavor);
@@ -160,8 +162,10 @@ public class TransactionMonitorIdempotentInitialization {
         final String alertsWildcard = "alerts*";
 
         EventJournalConfig eventJournalConfig = new EventJournalConfig().setEnabled(true);
+        boolean ok = true;
 
-        if (!existingIMapNames.contains(MyConstants.IMAP_NAME_ALERTS_LOG)) {
+        //FIXME && !useViridian
+        if (!existingIMapNames.contains(MyConstants.IMAP_NAME_ALERTS_LOG) && !useViridian) {
             MapConfig alertsMapConfig = new MapConfig(alertsWildcard);
             alertsMapConfig.setEventJournalConfig(eventJournalConfig);
 
@@ -191,13 +195,14 @@ public class TransactionMonitorIdempotentInitialization {
         } else {
             LOGGER.info("Don't add journal to '{}', map already exists", MyConstants.IMAP_NAME_ALERTS_LOG);
             if (useViridian) {
-                deleteForRetry(hazelcastInstance, useViridian, MyConstants.IMAP_NAME_MYSQL_SLF4J);
-                return false;
+                deleteForRetry(hazelcastInstance, useViridian, MyConstants.IMAP_NAME_ALERTS_LOG);
+                //FIXME ok = false;
             }
         }
 
         // Generic config, MapStore implementation is derived
-        if (!existingIMapNames.contains(MyConstants.IMAP_NAME_MYSQL_SLF4J)) {
+        //FIXME && !useViridian
+        if (!existingIMapNames.contains(MyConstants.IMAP_NAME_MYSQL_SLF4J) && !useViridian) {
             TransactionMonitorIdempotentInitializationMySql.defineMySql(hazelcastInstance, properties, transactionMonitorFlavor);
 
             MapConfig mySqlMapConfig = new MapConfig(MyConstants.IMAP_NAME_MYSQL_SLF4J);
@@ -220,11 +225,11 @@ public class TransactionMonitorIdempotentInitialization {
             LOGGER.info("Don't add generic mapstore to '{}', map already exists", MyConstants.IMAP_NAME_MYSQL_SLF4J);
             if (useViridian) {
                 deleteForRetry(hazelcastInstance, useViridian, MyConstants.IMAP_NAME_MYSQL_SLF4J);
-                return false;
+                //FIXME ok = false;
             }
         }
 
-        return true;
+        return ok;
     }
 
     /**
@@ -239,6 +244,7 @@ public class TransactionMonitorIdempotentInitialization {
         LOGGER.info("'useViridian'=={}, destroying map '{}', bounce and try again", useViridian, mapName);
         hazelcastInstance.getMap(mapName).destroy();
     }
+
     /**
      * <p>Maps that have indexes, currently just the transactions are made for
      * faster searching. When created manually it would be:
