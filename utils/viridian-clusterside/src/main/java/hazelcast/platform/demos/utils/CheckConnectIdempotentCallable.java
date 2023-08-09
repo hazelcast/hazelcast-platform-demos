@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.cluster.Member;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.jet.datamodel.Tuple2;
+import com.hazelcast.version.Version;
 
 /**
  * <p>If this module is a dependency, it provides an easy check to confirm
@@ -34,6 +36,8 @@ import com.hazelcast.core.HazelcastInstance;
  * </p>
  */
 public class CheckConnectIdempotentCallable {
+    public static final String BUILD_VERSION_PROPERTY = "my.build-version";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckConnectIdempotentCallable.class);
 
     /**
@@ -52,11 +56,11 @@ public class CheckConnectIdempotentCallable {
         Member member = hazelcastInstance.getCluster().getMembers().iterator().next();
 
         LOGGER.debug("Send {} to {}", connectIdempotentCallable.getClass().getSimpleName(), member.getAddress());
-        Future<List<String>> future =
+        Future<Tuple2<Version, List<String>>> future =
                 hazelcastInstance.getExecutorService("default").submitToMember(connectIdempotentCallable, member);
 
         try {
-            List<String> list = future.get();
+            List<String> list = future.get().f1();
             if (list == null || list.isEmpty()) {
                 message = String.format("connectIdempotentCallable :: => :: '%s'", Objects.toString(list));
                 LOGGER.error(message);
@@ -66,6 +70,7 @@ public class CheckConnectIdempotentCallable {
                     message = String.format("connectIdempotentCallable :: => :: '%s'", item);
                     LOGGER.info(message);
                 }
+                ok &= versionCheck(future.get().f0(), list);
             }
         } catch (Exception e) {
             LOGGER.error("connectIdempotentCallable", e);
@@ -95,10 +100,54 @@ public class CheckConnectIdempotentCallable {
             if (clients.isEmpty()) {
                 message += "bad Maven dependency if classes not found?";
             } else {
-                message += "custom classes not uploaded to Viridian?";
+                message += "custom classes not uploaded to Viridian? Version mismatches?";
             }
 
             throw new RuntimeException(message);
         }
+    }
+
+    /**
+     * <p>Check the cluster version for compatibility. Done for every member
+     * although cluster version is for all members. However, property may
+     * be missing on some members.
+     * </p>
+     *
+     * @param clusterVersion
+     * @param propertyList
+     * @return
+     */
+    public static boolean versionCheck(Version clusterVersion, List<String> propertyList) {
+        if (clusterVersion == null || propertyList == null) {
+            if (clusterVersion == null) {
+                LOGGER.error(String.format("connectIdempotentCallable :: versionCheck => :: Null version"));
+            }
+            if (propertyList == null) {
+                LOGGER.error(String.format("connectIdempotentCallable :: versionCheck => :: Null list"));
+            }
+            return false;
+        }
+
+        String propertyValue = "";
+        String propertyName = BUILD_VERSION_PROPERTY + "=";
+        for (String property : propertyList) {
+            property = property.replaceAll("'", "").replaceAll("==", "=");
+            int index = property.indexOf(propertyName);
+            if (index >= 0 && (index + propertyName.length()) < property.length()) {
+                propertyValue = property.substring(index + propertyName.length());
+            }
+        }
+
+        String clusterStr = clusterVersion.toString();
+        if (propertyValue.length() < clusterStr.length()
+                || (!propertyValue.substring(0, clusterStr.length()).equals(clusterStr))) {
+            LOGGER.error(String.format("connectIdempotentCallable :: versionCheck => :: Cluster Version '%s', build '%s'",
+                    clusterStr, propertyValue));
+            return false;
+        }
+
+        LOGGER.info(String.format("connectIdempotentCallable :: versionCheck => :: Cluster Version '%s', build '%s'",
+                clusterStr, propertyValue));
+        return true;
     }
 }

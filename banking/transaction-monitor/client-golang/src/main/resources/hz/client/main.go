@@ -19,7 +19,6 @@ package main
 import (
 	"bufio"
 	"context"
-	"crypto/tls"
 	"fmt"
 	"log"
 	"os"
@@ -43,7 +42,8 @@ const viridianKeyPassword = "@my.viridian.cluster1.key.password@"
 
 const controlFile = "/tmp/control.file"
 const cloudServerName = "hazelcast.cloud"
-const genericRecordMap = "__map-store.mysql_slf4j"
+const genericRecordMapPrefix = "__map-store."
+const genericRecordMap = "mysql_slf4j"
 const loggingLevel = logger.InfoLevel
 const useViridianKey = "use.viridian"
 const viridianCaFile = "/tmp/ca.pem"
@@ -65,9 +65,7 @@ func getClient(ctx context.Context, kubernetes string, viridian bool) *hazelcast
 		config.Cluster.Cloud.Enabled = true
 		config.Cluster.Cloud.Token = viridianDiscoveryToken
 		config.Cluster.Network.SSL.Enabled = true
-		//FIXME Remove line before when 1.4.0 is out
-		fmt.Println("When 1.4.0 is out, cloudServerName defaults correctly")
-		config.Cluster.Network.SSL.SetTLSConfig(&tls.Config{ServerName: cloudServerName})
+		//config.Cluster.Network.SSL.SetTLSConfig(&tls.Config{ServerName: cloudServerName})
 
 		caFile, err := filepath.Abs(viridianCaFile)
 		if err != nil {
@@ -143,7 +141,15 @@ func runSqlQuery(ctx context.Context, hazelcastClient *hazelcast.Client, query s
 						str = fmt.Sprintf("%s %v", str, printDateTimeValue)
 					}
 				} else {
-					str = fmt.Sprintf("%s Unhandled Type for Column '%v'", str, metaData.Columns()[i].Name())
+					if metaData.Columns()[i].Type() == sql.ColumnTypeBigInt {
+						if i == 0 {
+							str = fmt.Sprintf("%v", col)
+						} else {
+							str = fmt.Sprintf("%s %v", str, col)
+						}
+					} else {
+						str = fmt.Sprintf("%s Unhandled Type for Column '%v'", str, metaData.Columns()[i].Name())
+					}
 				}
 			}
 		}
@@ -172,8 +178,26 @@ func listDistributedObjects(ctx context.Context, hazelcastClient *hazelcast.Clie
 func getGenericRecord(ctx context.Context, hazelcastClient *hazelcast.Client) {
 	fmt.Printf("--------------------------------------\n")
 	fmt.Printf("GenericRecord, map '%s'\n", genericRecordMap)
-	//TODO Needs 1.4.0 hazelcast-go-client
-	fmt.Printf("Coming in 1.4.0\n")
+	//TODO Allow to fail
+	fmt.Printf("TODO: Not yet available\n")
+	fmt.Printf("TODO: Not yet available\n")
+	fmt.Printf("TODO: Not yet available\n")
+	count := 0
+	m, err := hazelcastClient.GetMap(ctx, genericRecordMap)
+	if err != nil {
+		log.Print(err)
+	} else {
+		entries, err := m.GetEntrySet(ctx)
+		if err != nil {
+			log.Print(err)
+		} else {
+			for _, entry := range entries {
+				fmt.Printf("%v,%v\n", entry.Key, entry.Value)
+				count++
+			}
+			fmt.Printf("[%d rows]\n", count)
+		}
+	}
 }
 
 func main() {
@@ -213,7 +237,7 @@ func main() {
 
 	getGenericRecord(ctx, hazelcastClient)
 
-	runSqlQuery(ctx, hazelcastClient, "SELECT * FROM \""+genericRecordMap+"\"")
+	runSqlQuery(ctx, hazelcastClient, "SELECT * FROM \""+genericRecordMapPrefix+genericRecordMap+"\"")
 
 	endTime := time.Now().Format(time.RFC3339)
 	fmt.Printf("=================== %s ===================\n", endTime)

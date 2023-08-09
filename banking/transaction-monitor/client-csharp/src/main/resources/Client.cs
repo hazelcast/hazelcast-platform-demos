@@ -36,7 +36,8 @@ namespace Client
         public const string viridianKeyPassword = "@my.viridian.cluster1.key.password@";
 
         public const string controlFile = "/tmp/control.file";
-        public const string genericRecordMap = "__map-store.mysql_slf4j";
+        public const string genericRecordMapPrefix = "__map-store.";
+        public const string genericRecordMap = "mysql_slf4j";
         public const string useViridianKey = "use.viridian";
         public const string viridianPfxFile = "/tmp/client.pfx";
 
@@ -148,7 +149,11 @@ namespace Client
                                     row.GetColumn<Hazelcast.Models.HLocalDateTime>(i);
                                 Console.Write(timestamp);
                            } else {
-                                Console.Write("Unhandled Type for Column '" + columns.ElementAt(i).Name + "'");
+                                if (type == Hazelcast.Sql.SqlColumnType.BigInt) {
+                                    Console.Write(row.GetColumn<long>(i));
+                                } else {
+                                    Console.Write("Unhandled Type " + type + " for Column '" + columns.ElementAt(i).Name + "'");
+                                }
                             }
                         }
                     }
@@ -164,8 +169,17 @@ namespace Client
         private static async Task ListDistributedObjects(IHazelcastClient client) {
 	        Console.WriteLine("--------------------------------------");
 	        Console.WriteLine("Distributed Objects (excluding system objects)");
-	        //TODO Needs API extension
-	        Console.WriteLine("See https://github.com/hazelcast/hazelcast-csharp-client/issues/799");
+            var distributedObjects = await client.GetDistributedObjectsAsync();
+            var count = 0;
+            foreach (var distributedObject in distributedObjects) {
+                var name = distributedObject.Name;
+                if (! name.StartsWith("__")) {
+                    var serviceName = distributedObject.ServiceName;
+        	        Console.WriteLine(serviceName + " => '" + name + "'");
+                    count = count + 1;
+                }
+            }
+            Console.WriteLine("[" + count + " rows]");
         }
 
         private static async Task GetGenericRecord(IHazelcastClient client) {
@@ -179,7 +193,8 @@ namespace Client
             {
                 var key = enumerator.Current;
                 var value = await map.GetAsync(key);
-                Console.WriteLine(key + "," + value);
+                //FIXME Need ToString() to work better than it does in 5.3.0
+                Console.WriteLine(key + "," + value.ToString());
                 count++;
         	}
             Console.WriteLine("[" + count + " rows]");
@@ -210,7 +225,7 @@ namespace Client
 
 	        await GetGenericRecord(hazelcast_client);
 
-            await RunSqlQuery(hazelcast_client, "SELECT * FROM \"" + MyConstants.genericRecordMap + "\"");
+            await RunSqlQuery(hazelcast_client, "SELECT * FROM \"" + MyConstants.genericRecordMapPrefix + MyConstants.genericRecordMap + "\"");
 
             DateTime endTime = DateTime.Now;
             string endTimeStr = endTime.ToUniversalTime().ToString("u").Replace(" ", "T");

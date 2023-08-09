@@ -16,7 +16,7 @@
 
 'use strict';
 
-const { Client } = require('hazelcast-client');
+const { Client, LocalDateTime } = require('hazelcast-client');
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
@@ -31,7 +31,8 @@ const viridianKeyPassword = "@my.viridian.cluster1.key.password@";
 
 const controlFile = "/tmp/control.file";
 const cloudServerUrl = "https://api.viridian.hazelcast.com";
-const genericRecordMap = "__map-store.mysql_slf4j"
+const genericRecordMapPrefix = "__map-store."
+const genericRecordMap = "mysql_slf4j"
 const useViridianKey = "use.viridian"
 const viridianCaFile = "/tmp/ca.pem"
 const viridianCertFile = "/tmp/cert.pem"
@@ -97,10 +98,48 @@ async function runSqlQuery(hazelcastClient, query) {
 	console.log(query);
     try {
         const sqlService = await hazelcastClient.getSql();
-        const sqlResultAll = await sqlService.execute(query, [], {returnRawResult: true});
+        const sqlResult = await sqlService.execute(query, [], {returnRawResult: true});
+        const rowMetadata = await sqlResult.rowMetadata;
+        const columns = await rowMetadata.getColumns();
         var count = 0;
-        for await (const row of sqlResultAll) {
-            console.log(row);
+        let header = "";
+        for (let j = 0; j < columns.length; j++) {
+            if (j > 0) {
+                header = header + ", ";
+            }
+            header = header + columns[j].name.toUpperCase()
+        }
+        console.log(header);
+        for await (const row of sqlResult) {
+            const values = await row.values;
+            let line = "";
+            for (let i = 0; i < values.length; i++) {
+                if (i > 0) {
+                    line = line + ", ";
+                }
+                const kind = columns[i].type;
+                if (kind == 0) {
+                    // Varchar
+                    line = line + values[i];
+                } else {
+                    if (kind == 5) {
+                        // Bigint
+                        line = line + values[i];
+                    } else {
+                        if (kind == 11) {
+                            // Timestamp
+                            try {
+                                line = line + values[i].toString();
+                            } catch (e) {
+                                console.log("runSqlQuery()", kind, columns[i].name, e);
+                            }
+                        } else {
+                            console.log("Unhandled column type" + kind + " for + '" + columns[i].name + "'");
+                        }
+                    }
+                }
+            }
+            console.log(line);
             count++;
         }
         console.log('[' + count + ' rows]');
@@ -112,18 +151,20 @@ async function runSqlQuery(hazelcastClient, query) {
 async function listDistributedObjects(hazelcastClient) {
 	console.log('--------------------------------------');
 	console.log('Distributed Objects (excluding system objects)');
-    const distributedObjects = await hazelcastClient.getDistributedObjects();
+    //const distributedObjects = await hazelcastClient.getDistributedObjects();
 	var count = 0;
     //TODO Remove once fixed
-    console.log("MAY FAIL: https://github.com/hazelcast/hazelcast-nodejs-client/issues/1474");
-    for (var i = 0; i < distributedObjects.length; i++){
+    console.log("TODO: https://github.com/hazelcast/hazelcast-nodejs-client/issues/1474");
+    console.log("TODO: https://github.com/hazelcast/hazelcast-nodejs-client/issues/1474");
+    console.log("TODO: https://github.com/hazelcast/hazelcast-nodejs-client/issues/1474");
+    /*for (var i = 0; i < distributedObjects.length; i++){
         const name = distributedObjects[i].getName();
         if (!(name.startsWith("__"))) {
             const serviceName = distributedObjects[i].getServiceName();
             console.log(serviceName, "=>", "'" + name + "'");
             count++;
         }
-	}
+	}*/
     console.log('[' + count + ' rows]');
 }
 
@@ -182,7 +223,7 @@ async function getGenericRecord(hazelcastClient) {
     
         await getGenericRecord(hazelcastClient)
     
-        await runSqlQuery(hazelcastClient, "SELECT * FROM \"__map-store.mysql_slf4j\"")
+        await runSqlQuery(hazelcastClient, "SELECT * FROM \"" + genericRecordMapPrefix + genericRecordMap + "\"")
 
 		const endTime = myISO8601(new Date())
 		console.log('===================', endTime, '===================')

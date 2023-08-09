@@ -17,6 +17,7 @@ exec java $JAVA_ARGS $JAVA_OPTS \
  -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS \
  -Dmy.docker.enabled=$MY_DOCKER_ENABLED \
  -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+ -Dmy.mysql.address=$MY_MYSQL_ADDRESS \
  -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
  -Dmy.pulsar.list=$MY_PULSAR_LIST \
  -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
