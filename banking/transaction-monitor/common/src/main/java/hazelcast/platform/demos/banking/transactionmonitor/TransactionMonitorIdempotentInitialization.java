@@ -102,6 +102,8 @@ public class TransactionMonitorIdempotentInitialization {
                 .filter(name -> !name.startsWith("__"))
                 .collect(Collectors.toCollection(TreeSet::new));
 
+        LOGGER.info("Existing maps: {}", existingIMapNames);
+
         // Add journals and map stores to maps before they are created
         boolean ok = dynamicMapConfig(hazelcastInstance, existingIMapNames,
                 properties, ourProjectProvenance, localhost, useViridian, transactionMonitorFlavor);
@@ -160,6 +162,7 @@ public class TransactionMonitorIdempotentInitialization {
         final String alertsWildcard = "alerts*";
 
         EventJournalConfig eventJournalConfig = new EventJournalConfig().setEnabled(true);
+        boolean ok = true;
 
         if (!existingIMapNames.contains(MyConstants.IMAP_NAME_ALERTS_LOG)) {
             MapConfig alertsMapConfig = new MapConfig(alertsWildcard);
@@ -191,8 +194,8 @@ public class TransactionMonitorIdempotentInitialization {
         } else {
             LOGGER.info("Don't add journal to '{}', map already exists", MyConstants.IMAP_NAME_ALERTS_LOG);
             if (useViridian) {
-                deleteForRetry(hazelcastInstance, useViridian, MyConstants.IMAP_NAME_MYSQL_SLF4J);
-                return false;
+                deleteForRetry(hazelcastInstance, useViridian, MyConstants.IMAP_NAME_ALERTS_LOG);
+                ok = false;
             }
         }
 
@@ -222,11 +225,11 @@ public class TransactionMonitorIdempotentInitialization {
             LOGGER.info("Don't add generic mapstore to '{}', map already exists", MyConstants.IMAP_NAME_MYSQL_SLF4J);
             if (useViridian) {
                 deleteForRetry(hazelcastInstance, useViridian, MyConstants.IMAP_NAME_MYSQL_SLF4J);
-                return false;
+                ok = false;
             }
         }
 
-        return true;
+        return ok;
     }
 
     /**
