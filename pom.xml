@@ -84,7 +84,7 @@
 		<junit-vintage.version>5.9.2</junit-vintage.version>
 		<jython.version>2.7.2</jython.version>
 		<!--  Kafka Clients must match cloud target -->
-		<kafka-clients.version>2.2.2</kafka-clients.version>
+		<kafka-clients.version>2.6.3</kafka-clients.version>
 		<kafka-connect.version>2.6.0</kafka-connect.version>
 		<mongo-java-driver.version>3.12.8</mongo-java-driver.version>
 		<mysql-connector-j.version>8.0.32</mysql-connector-j.version>
