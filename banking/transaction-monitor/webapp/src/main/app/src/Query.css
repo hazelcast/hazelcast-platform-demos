@@ -1,21 +1,21 @@
 
 /* When closed */
 .Collapsible {
-  background-color:   var(--color-mid-blue);
-  color:   var(--color-midnight-blue);
+  background-color:   var(--color-ocean);
+  color:   var(--color-deep-sea);
 }
 
 /* When opened */
 .Collapsible-opened {
-  background-color:   var(--color-mid-blue);
-  color:   var(--color-mid-blue);
+  background-color:   var(--color-ocean);
+  color:   var(--color-ocean);
 }
 
 /* Trigger when closed */
 .Collapsible__trigger {
   background-color: white;
-  border: 2px solid var(--color-mid-blue);
-  color: var(--color-midnight-blue);
+  border: 2px solid var(--color-ocean);
+  color: var(--color-deep-sea);
 }
 .Collapsible__trigger::before {
   content: "\21CA \21CA \21CA ";
@@ -26,7 +26,7 @@
 
 /* Trigger when opened */
 .Collapsible__trigger-opened {
-  background-color:   var(--color-midnight-blue);
+  background-color:   var(--color-deep-sea);
   color:   white;
 }
 .Collapsible__trigger-opened::before {
