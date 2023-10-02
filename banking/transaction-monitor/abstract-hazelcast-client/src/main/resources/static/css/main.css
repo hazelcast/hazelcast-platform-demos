@@ -1,35 +1,37 @@
 :root {
-    --color-bg: #041A3B;
-    --color-midnight-blue: #142B4F;
-    --color-deep-blue: #CBDBFF;
-    --color-light-blue: #fafafa;
-    --color-dark-blue: #293574;
-    --color-hover-blue: #1E3659;
-    --color-mid-blue: #041A3B;
-    --color-body: #fafafa;
+		--color-blueberry: #0019FE;
+		--color-carrot: #F5911E;
+        --color-deep-sea: #051A27;
+        --color-dusk: #0B2B39;
+        --color-ice: #F0F6FF;
+        --color-lime: #C6FF3A;
+        --color-ocean: #0080A9;
+        --color-raspberry: #C91268;
+        --color-sky: #10A4B3;    
 }
 
 body {
-	background-color: var(--color-bg);
-	color: var(--color-body);
+	background-color: var(--color-dusk);
+	color: var(--color-ice);
 }
 
 .headerfooter {
 	text-align: center;
-	color: var(--color-light-blue);
+	color: var(--color-lime);
 	font-family: "Courier New", Courier, monospace;
 	font-size: 80%;
 }
 .headerfooterline {
-	color: var(--color-deep-blue);
+    color: var(--color-blueberry);
 }
 
 .major_pane {
+    border-color: var(--color-carrot);
     font-family: "Courier New", Courier, monospace;	
 }
 
 .finos_pane {
-    color: var(--color-body);
+    color: var(--color-ice);
 }
 
 .finosInnerBox {

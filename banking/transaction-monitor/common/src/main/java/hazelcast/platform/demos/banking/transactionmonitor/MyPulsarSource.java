@@ -108,7 +108,7 @@ public class MyPulsarSource {
     private static StreamSource<TransactionEcommerce> pulsarSourceEcommerce(String pulsarAddress) {
         FunctionEx<Message<String>, TransactionEcommerce> pulsarProjectionFunction =
                 message -> {
-                    //TODO: A new deserializer for each message, could optimize with shared if thread-safe
+                    // A new deserializer for each message, could optimize with shared if thread-safe
                     try (TransactionEcommerceJsonDeserializer transactionJsonDeserializer =
                             new TransactionEcommerceJsonDeserializer()) {
                         byte[] bytes = message.getValue().getBytes(StandardCharsets.UTF_8);
@@ -131,7 +131,7 @@ public class MyPulsarSource {
     private static StreamSource<TransactionPayments> pulsarSourcePayments(String pulsarAddress) {
         FunctionEx<Message<String>, TransactionPayments> pulsarProjectionFunction =
                 message -> {
-                    //TODO: A new deserializer for each message, could optimize with shared if thread-safe
+                    // A new deserializer for each message, could optimize with shared if thread-safe
                     try (TransactionPaymentsJsonDeserializer transactionJsonDeserializer =
                             new TransactionPaymentsJsonDeserializer()) {
                         byte[] bytes = message.getValue().getBytes(StandardCharsets.UTF_8);
@@ -154,7 +154,7 @@ public class MyPulsarSource {
     private static StreamSource<TransactionTrade> pulsarSourceTrade(String pulsarAddress) {
         FunctionEx<Message<String>, TransactionTrade> pulsarProjectionFunction =
                 message -> {
-                    //TODO: A new deserializer for each message, could optimize with shared if thread-safe
+                    // A new deserializer for each message, could optimize with shared if thread-safe
                     try (TransactionTradeJsonDeserializer transactionJsonDeserializer = new TransactionTradeJsonDeserializer()) {
                         byte[] bytes = message.getValue().getBytes(StandardCharsets.UTF_8);
                         return transactionJsonDeserializer.deserialize("", bytes);
