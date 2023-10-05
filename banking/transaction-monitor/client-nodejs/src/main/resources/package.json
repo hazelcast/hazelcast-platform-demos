@@ -9,6 +9,6 @@
   "author": "",
   "dependencies": {
     "async": "^3.2.4",
-    "hazelcast-client": "^5.2.0"
+    "hazelcast-client": "^5.3.0"
   }
 }

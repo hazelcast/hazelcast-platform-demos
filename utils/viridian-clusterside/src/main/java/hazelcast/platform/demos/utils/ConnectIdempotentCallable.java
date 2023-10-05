@@ -26,15 +26,18 @@ import java.util.concurrent.Callable;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
+import com.hazelcast.jet.datamodel.Tuple2;
+import com.hazelcast.version.Version;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * <p>
- * Idempotent callable, used to help confirm clusterside classes have been uploaded.
+ * Idempotent callable, used to help confirm clusterside classes have been uploaded
+ * and version compatible with caller for future operations.
  * </p>
  */
-public class ConnectIdempotentCallable implements Callable<List<String>>, HazelcastInstanceAware, Serializable {
+public class ConnectIdempotentCallable implements Callable<Tuple2<Version, List<String>>>, HazelcastInstanceAware, Serializable {
     private static final long serialVersionUID = 1L;
     private static final String FILENAME = ConnectIdempotentCallable.class.getSimpleName() + ".properties";
 
@@ -43,10 +46,11 @@ public class ConnectIdempotentCallable implements Callable<List<String>>, Hazelc
 
     @SuppressFBWarnings(value = "REC_CATCH_EXCEPTION", justification = "Exception can be thrown by properties.load()")
     @Override
-    public List<String> call() throws Exception {
+    public Tuple2<Version, List<String>> call() throws Exception {
         String clusterName = this.hazelcastInstance.getConfig().getClusterName();
 
-        List<String> result = new ArrayList<>();
+        Version v = this.hazelcastInstance.getCluster().getClusterVersion();
+        List<String> l = new ArrayList<>();
 
         ClassLoader classLoader = this.getClass().getClassLoader();
 
@@ -54,18 +58,18 @@ public class ConnectIdempotentCallable implements Callable<List<String>>, Hazelc
         try (InputStream inputStream = classLoader.getResourceAsStream(FILENAME)) {
             properties.load(inputStream);
             if (properties.isEmpty()) {
-                result.add("On " + clusterName + " '" + FILENAME + "' is empty");
+                l.add("On " + clusterName + " '" + FILENAME + "' is empty");
             }
             for (Entry<?, ?> entry : properties.entrySet()) {
                 String message = String.format("On %s == %s:'%s'=='%s'",
                         clusterName, FILENAME, entry.getKey().toString(), entry.getValue().toString());
-                result.add(message);
+                l.add(message);
             }
         } catch (Exception e) {
-            result.add("'" + FILENAME + "' exception:" + e.getMessage());
+            l.add("'" + FILENAME + "' exception:" + e.getMessage());
         }
 
-        return result;
+        return Tuple2.tuple2(v, l);
     }
 
     @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Safe to share mutable")

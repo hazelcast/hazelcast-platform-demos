@@ -617,7 +617,7 @@ public class ApplicationRunner {
             }
 
             ok &= TransactionMonitorIdempotentInitialization.createNeededObjects(hazelcastInstance,
-                    postgresProperties, ourProjectProvenance, transactionMonitorFlavor, this.localhost, useViridian);
+                    properties, ourProjectProvenance, transactionMonitorFlavor, this.localhost, useViridian);
             ok &= TransactionMonitorIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList,
                     usePulsar, useViridian, transactionMonitorFlavor);
             ok &= TransactionMonitorIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers,

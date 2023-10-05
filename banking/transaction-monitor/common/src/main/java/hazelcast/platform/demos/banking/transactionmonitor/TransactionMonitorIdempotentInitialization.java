@@ -19,8 +19,8 @@ package hazelcast.platform.demos.banking.transactionmonitor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
@@ -92,7 +92,7 @@ public class TransactionMonitorIdempotentInitialization {
      * </p>
      */
     public static boolean createNeededObjects(HazelcastInstance hazelcastInstance,
-            Properties postgresProperties, String ourProjectProvenance,
+            Properties properties, String ourProjectProvenance,
             TransactionMonitorFlavor transactionMonitorFlavor, boolean localhost, boolean useViridian) {
         // Capture what was present before
         Set<String> existingIMapNames = hazelcastInstance.getDistributedObjects()
@@ -102,9 +102,11 @@ public class TransactionMonitorIdempotentInitialization {
                 .filter(name -> !name.startsWith("__"))
                 .collect(Collectors.toCollection(TreeSet::new));
 
+        LOGGER.info("Existing maps: {}", existingIMapNames);
+
         // Add journals and map stores to maps before they are created
         boolean ok = dynamicMapConfig(hazelcastInstance, existingIMapNames,
-                postgresProperties, ourProjectProvenance, localhost, useViridian);
+                properties, ourProjectProvenance, localhost, useViridian, transactionMonitorFlavor);
 
         // Accessing non-existing maps does not return any failures
         List<String> iMapNames;
@@ -128,7 +130,7 @@ public class TransactionMonitorIdempotentInitialization {
 
         // Add index to maps after they are created, if created in this method's run.
         if (ok) {
-            ok = defineIndexes(hazelcastInstance, existingIMapNames, transactionMonitorFlavor);
+            ok = defineIndexes(hazelcastInstance, existingIMapNames, transactionMonitorFlavor, useViridian);
         }
 
         return ok;
@@ -155,13 +157,15 @@ public class TransactionMonitorIdempotentInitialization {
      * @return true, always, either added or not needed
      */
     private static boolean dynamicMapConfig(HazelcastInstance hazelcastInstance,
-            Set<String> existingIMapNames, Properties postgresProperties, String ourProjectProvenance,
-            boolean localhost, boolean useViridian) {
+            Set<String> existingIMapNames, Properties properties, String ourProjectProvenance,
+            boolean localhost, boolean useViridian, TransactionMonitorFlavor transactionMonitorFlavor) {
         final String alertsWildcard = "alerts*";
 
         EventJournalConfig eventJournalConfig = new EventJournalConfig().setEnabled(true);
+        boolean ok = true;
 
-        if (!existingIMapNames.contains(MyConstants.IMAP_NAME_ALERTS_LOG)) {
+        //FIXME && !useViridian
+        if (!existingIMapNames.contains(MyConstants.IMAP_NAME_ALERTS_LOG) && !useViridian) {
             MapConfig alertsMapConfig = new MapConfig(alertsWildcard);
             alertsMapConfig.setEventJournalConfig(eventJournalConfig);
 
@@ -170,45 +174,40 @@ public class TransactionMonitorIdempotentInitialization {
             MapStoreConfig mapStoreConfig = new MapStoreConfig().setEnabled(true);
             mapStoreConfig.setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER);
             mapStoreConfig.setImplementation(alertingToPostgresMapStore);
-            Properties properties = new Properties();
-            properties.putAll(postgresProperties);
-            properties.put(MyConstants.PROJECT_PROVENANCE, ourProjectProvenance);
-            mapStoreConfig.setProperties(properties);
+            Properties postgresProperties = null;
+            try {
+                postgresProperties = MyUtils.getPostgresProperties(properties);
+            } catch (Exception e) {
+                LOGGER.error("dynamicMapConfig()", e);
+                return false;
+            }
+            postgresProperties.put(MyConstants.PROJECT_PROVENANCE, ourProjectProvenance);
+            mapStoreConfig.setProperties(postgresProperties);
 
             if (localhost) {
                 LOGGER.info("localhost=={}, no map store for Postgres", localhost);
             } else {
-                if (useViridian) {
-                    //FIXME Not yet available on Viridian @ March 2023.
-                    LOGGER.warn("use.virian={}, no map store for Postgres", useViridian);
-                } else {
-                    alertsMapConfig.setMapStoreConfig(mapStoreConfig);
-                    LOGGER.info("Postgres configured using: {}", alertsMapConfig.getMapStoreConfig().getProperties());
-                }
+                alertsMapConfig.setMapStoreConfig(mapStoreConfig);
+                LOGGER.info("Postgres configured using: {}", alertsMapConfig.getMapStoreConfig().getProperties());
             }
 
             hazelcastInstance.getConfig().addMapConfig(alertsMapConfig);
         } else {
             LOGGER.info("Don't add journal to '{}', map already exists", MyConstants.IMAP_NAME_ALERTS_LOG);
+            if (useViridian) {
+                deleteForRetry(hazelcastInstance, useViridian, MyConstants.IMAP_NAME_ALERTS_LOG);
+                //FIXME ok = false;
+            }
         }
 
         // Generic config, MapStore implementation is derived
-        if (!existingIMapNames.contains(MyConstants.IMAP_NAME_MYSQL_SLF4J)) {
+        //FIXME && !useViridian
+        if (!existingIMapNames.contains(MyConstants.IMAP_NAME_MYSQL_SLF4J) && !useViridian) {
+            TransactionMonitorIdempotentInitializationMySql.defineMySql(hazelcastInstance, properties, transactionMonitorFlavor);
+
             MapConfig mySqlMapConfig = new MapConfig(MyConstants.IMAP_NAME_MYSQL_SLF4J);
 
-            Properties mySqlProperties = new Properties();
-            mySqlProperties.setProperty("data-connection-ref", MyConstants.MYSQL_DATACONNECTION_CONFIG_NAME);
-            mySqlProperties.setProperty("mapping-type", "JDBC");
-            mySqlProperties.setProperty("table-name", MyConstants.MYSQL_DATACONNECTION_TABLE_NAME);
-            //FIXME Once MySql compound key supported by Data Link
-            //MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN0 + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN1);
-            mySqlProperties.setProperty("id-column", "hash");
-            mySqlProperties.setProperty("column", MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN0
-                    + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN1
-                    + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN2
-                    + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN3
-                    + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN4
-                    + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN5);
+            Properties mySqlProperties = TransactionMonitorIdempotentInitializationMySql.getMySqlProperties();
 
             MapStoreConfig mySqlStoreConfig = new MapStoreConfig().setEnabled(true)
             .setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER)
@@ -217,21 +216,33 @@ public class TransactionMonitorIdempotentInitialization {
             if (localhost) {
                 LOGGER.info("localhost=={}, no map store for MySql", localhost);
             } else {
-                if (useViridian) {
-                    //FIXME Not yet available on Viridian @ March 2023.
-                    LOGGER.warn("use.virian={}, no data link for MySql", useViridian);
-                } else {
-                    mySqlMapConfig.setMapStoreConfig(mySqlStoreConfig);
-                    LOGGER.info("MySql configured using: {}", mySqlMapConfig.getMapStoreConfig().getProperties());
-                }
+                mySqlMapConfig.setMapStoreConfig(mySqlStoreConfig);
+                LOGGER.info("MySql configured using: {}", mySqlMapConfig.getMapStoreConfig().getProperties());
             }
 
             hazelcastInstance.getConfig().addMapConfig(mySqlMapConfig);
         } else {
             LOGGER.info("Don't add generic mapstore to '{}', map already exists", MyConstants.IMAP_NAME_MYSQL_SLF4J);
+            if (useViridian) {
+                deleteForRetry(hazelcastInstance, useViridian, MyConstants.IMAP_NAME_MYSQL_SLF4J);
+                //FIXME ok = false;
+            }
         }
 
-        return true;
+        return ok;
+    }
+
+    /**
+     * <p>Delete so can recreate.
+     * </p>
+     *
+     * @param hazelcastInstance
+     * @param useViridian
+     * @param mapName
+     */
+    private static void deleteForRetry(HazelcastInstance hazelcastInstance, boolean useViridian, String mapName) {
+        LOGGER.info("'useViridian'=={}, destroying map '{}', bounce and try again", useViridian, mapName);
+        hazelcastInstance.getMap(mapName).destroy();
     }
 
     /**
@@ -255,7 +266,7 @@ public class TransactionMonitorIdempotentInitialization {
      * @return true - Always.
      */
     private static boolean defineIndexes(HazelcastInstance hazelcastInstance, Set<String> existingIMapNames,
-            TransactionMonitorFlavor transactionMonitorFlavor) {
+            TransactionMonitorFlavor transactionMonitorFlavor, boolean useViridian) {
 
         // Only add if map hadn't previously existed and so has just been created
         if (!existingIMapNames.contains(MyConstants.IMAP_NAME_TRANSACTIONS)) {
@@ -284,6 +295,9 @@ public class TransactionMonitorIdempotentInitialization {
             transactionsMap.addIndex(indexConfig);
         } else {
             LOGGER.trace("Don't add index to '{}', map already exists", MyConstants.IMAP_NAME_TRANSACTIONS);
+            if (useViridian) {
+                deleteForRetry(hazelcastInstance, useViridian, MyConstants.IMAP_NAME_TRANSACTIONS);
+            }
         }
 
         return true;
@@ -1306,7 +1320,6 @@ public class TransactionMonitorIdempotentInitialization {
             jobConfigAlertingToKafka.setName(AlertingToKafka.class.getSimpleName());
             jobConfigAlertingToKafka.addClass(HazelcastJsonValueSerializer.class);
 
-            //FIXME Fails on Viridian, issue 4241 ??
             Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAlertingToKafka, jobConfigAlertingToKafka);
             LOGGER_TO_IMAP.info(Objects.toString(job));
         } catch (Exception e) {
@@ -1358,10 +1371,10 @@ public class TransactionMonitorIdempotentInitialization {
         }
 
         // Slack alerting (writing), indirectly uses common utils
-        if (useViridian) {
+        //if (useViridian) {
             //FIXME Not yet available on Viridian @ March 2023.
-            LOGGER.error("Slack is not currently supported on Viridian");
-        } else {
+            // LOGGER.error("Slack is not currently supported on Viridian");
+        //} else {
             try {
                 UtilsSlackSQLJob.submitJob(hazelcastInstance,
                         projectName == null ? "" : projectName.toString());
@@ -1370,7 +1383,7 @@ public class TransactionMonitorIdempotentInitialization {
                 return false;
             }
             launchSlackJob(hazelcastInstance, properties, transactionMonitorFlavor);
-        }
+        //}
         return true;
     }
 

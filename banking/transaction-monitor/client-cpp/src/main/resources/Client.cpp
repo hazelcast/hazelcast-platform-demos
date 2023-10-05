@@ -31,7 +31,8 @@ const char* viridianDiscoveryToken = "@my.viridian.cluster1.discovery.token@";
 const char* viridianKeyPassword = "@my.viridian.cluster1.key.password@";
 
 const char* controlFile = "/tmp/control.file";
-std::string genericRecordMap = "__map-store.mysql_slf4j";
+std::string genericRecordMapPrefix = "__map-store.";
+std::string genericRecordMap = "mysql_slf4j";
 std::string useViridianKey = "use.viridian";
 const char* viridianCaFile = "/tmp/ca.pem";
 const char* viridianCertFile = "/tmp/cert.pem";
@@ -157,7 +158,11 @@ void run_sql_query(hazelcast::client::hazelcast_client hazelcast_client, std::st
 								row.get_object<hazelcast::client::local_date_time>(i).get();
 							std::cout << ts;
 						} else {
-							std::cout << "Unhandled Type for Column '" << row_metadata.column(i).name << "'";
+							if (sql_column_type == hazelcast::client::sql::sql_column_type::bigint) {
+								std::cout << row.get_object<int64_t>(i).get();
+							} else {
+								std::cout << "Unhandled Type for Column '" << row_metadata.column(i).name << "'";
+							}
 						}
 					}
 				}
@@ -183,13 +188,14 @@ void get_generic_record(hazelcast::client::hazelcast_client hazelcast_client) {
 	std::cout << "GenericRecord, map '" << genericRecordMap << "'" << std::endl;
 	auto map = hazelcast_client.get_map(genericRecordMap).get();
 	int count = 0;
-	//for (auto& key : map->key_set<typed_data>().get()) {
-	//TODO <generic_record> in 5.2
-		//auto& value = map->get<>(key).get();
-		//std::cout << key << "," << value << std::endl;
-        //std::cout << key << std::endl;
-        //count++;
-	//}
+	for (auto& key : map->key_set<hazelcast::client::typed_data>().get()) {
+    	//auto& value = map->get<>(key).get();
+		//std::cout << "got value" << std::endl;
+	//	std::cout << key << "," << value << std::endl;
+	//TODO FIXME no known conversion for argument 2 from 'hazelcast::client::typed_data' to 'const hazelcast::client::member&'
+		//std::cout << key << "," << std::endl;
+        count++;
+	}
 	std::cout << "[" << count << " rows]" << std::endl;
 
 }
@@ -216,7 +222,7 @@ int main (int argc, char *argv[]) {
 
 	get_generic_record(hazelcast_client);
 
-	run_sql_query(hazelcast_client, "SELECT * FROM \"" + genericRecordMap + "\"");
+	run_sql_query(hazelcast_client, "SELECT * FROM \"" + genericRecordMapPrefix + genericRecordMap + "\"");
 
 	const char* end_time = get_time_iso8601();
 	std::cout << "=================== " << end_time << " ===================" << std::endl;
