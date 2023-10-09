@@ -164,7 +164,8 @@ public class TransactionMonitorIdempotentInitialization {
         EventJournalConfig eventJournalConfig = new EventJournalConfig().setEnabled(true);
         boolean ok = true;
 
-        if (!existingIMapNames.contains(MyConstants.IMAP_NAME_ALERTS_LOG)) {
+        //FIXME && !useViridian
+        if (!existingIMapNames.contains(MyConstants.IMAP_NAME_ALERTS_LOG) && !useViridian) {
             MapConfig alertsMapConfig = new MapConfig(alertsWildcard);
             alertsMapConfig.setEventJournalConfig(eventJournalConfig);
 
@@ -1373,10 +1374,10 @@ public class TransactionMonitorIdempotentInitialization {
         }
 
         // Slack alerting (writing), indirectly uses common utils
-        if (useViridian) {
+        //if (useViridian) {
             //FIXME Not yet available on Viridian @ March 2023.
-            LOGGER.error("Slack is not currently supported on Viridian");
-        } else {
+            // LOGGER.error("Slack is not currently supported on Viridian");
+        //} else {
             try {
                 UtilsSlackSQLJob.submitJob(hazelcastInstance,
                         projectName == null ? "" : projectName.toString());
@@ -1385,7 +1386,7 @@ public class TransactionMonitorIdempotentInitialization {
                 return false;
             }
             launchSlackJob(hazelcastInstance, properties, transactionMonitorFlavor);
-        }
+        //}
         return true;
     }
 

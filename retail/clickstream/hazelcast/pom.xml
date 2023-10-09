@@ -15,7 +15,7 @@
 	<description>Hazelcast node for Blue or Green</description>
 
 	<properties>
-		<guava.version>31.1-jre</guava.version>
+		<guava.version>32.0.0-jre</guava.version>
 		<my.docker.image.name>hazelcast</my.docker.image.name>
 		<my.docker.jar.file>${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
