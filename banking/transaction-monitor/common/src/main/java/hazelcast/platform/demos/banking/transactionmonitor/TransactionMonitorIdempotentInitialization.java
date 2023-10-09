@@ -1497,5 +1497,4 @@ public class TransactionMonitorIdempotentInitialization {
         }
         return true;
     }
-
 }
