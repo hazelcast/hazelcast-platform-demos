@@ -67,9 +67,9 @@ fi
 export INPUT_FILE=/tmp/`basename $0`.input.$$
 touch $INPUT_FILE
 
-cd $CLC_DIR/build
+cd $CLC_DIR
 
-(tail -f $INPUT_FILE | ./clc --config $CONFIG 2>&1 ) &
+(tail -f $INPUT_FILE | /root/.hazelcast/bin/clc --config $CONFIG 2>&1 ) &
 
 doIt() {
  echo "$1"
