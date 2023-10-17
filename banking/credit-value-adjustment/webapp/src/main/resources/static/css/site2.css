@@ -1,4 +1,4 @@
 :root {
-	--site-background: Plum;
+	--site-background: var(--color-sky);
 }
 
