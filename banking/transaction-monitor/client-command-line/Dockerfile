@@ -5,11 +5,7 @@ ARG CONTROL_FILE
 # https://github.blog/2021-09-01-improving-git-protocol-security-github/
 RUN git config --global url.https://github.insteadOf git://github
 
-RUN cd /tmp \
-  && git clone https://github.com/hazelcast/hazelcast-commandline-client.git \
-  && cd hazelcast-commandline-client \
-  && make \
-  && ./build/clc version
+RUN curl https://hazelcast.com/clc/install.sh | bash
   
 COPY target/classes/client.sh /tmp/
 COPY target/classes/hazelcast-client-clc.yaml /tmp/
@@ -33,6 +29,6 @@ CMD ["bash", "-c", "set -euo pipefail \
       && echo date \
       && date \
       && echo @@@@@@@@@@ \
-      && echo /tmp/client.sh /tmp/hazelcast-commandline-client /tmp/hazelcast-client-clc.yaml /tmp/hazelcast-client-clc-viridian.yaml \
-      && /tmp/client.sh /tmp/hazelcast-commandline-client /tmp/hazelcast-client-clc.yaml /tmp/hazelcast-client-clc-viridian.yaml \
+      && echo /tmp/client.sh /tmp /tmp/hazelcast-client-clc.yaml /tmp/hazelcast-client-clc-viridian.yaml \
+      && /tmp/client.sh /tmp /tmp/hazelcast-client-clc.yaml /tmp/hazelcast-client-clc-viridian.yaml \
      "]
