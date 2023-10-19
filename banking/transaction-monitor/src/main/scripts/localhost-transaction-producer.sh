@@ -6,7 +6,7 @@ MODULE=transaction-producer
 BASEDIR=`dirname $0`
 cd $BASEDIR/../../../$MODULE
 
-HOST_IP=`ifconfig | grep -w inet | grep -v 127.0.0.1 | cut -d" " -f2`
+HOST_IP=`ifconfig | grep -w inet | grep 192.168.[012] | cut -d" " -f2`
 if [ "$HOST_IP" == "" ]
 then
  HOST_IP=127.0.0.1

@@ -40,7 +40,7 @@ const Styles = styled.div `
       }
     }
     td {
-  	  color: var(--hazelcast-blue-light);
+  	  color: var(--color-blueberry);
       margin: 0;
       padding: 0.5rem;
       border-bottom: 1px solid gray;

@@ -62,15 +62,17 @@ class Home extends Component {
 
     handleData(data) {
         let result = JSON.parse(data);
-        for (let i = 0; i < result.items.length; i++) {
-            let oldUpDownField;
-            if (typeof this.state.items[i] === "undefined") {
-                oldUpDownField = 0;
-            } else {
-                oldUpDownField = this.state.items[i].upDownField;
-            }
-            result.items[i]["oldUpDownField"] = oldUpDownField;
-        }
+		if (!(result.items == null)) {
+	        for (let i = 0; i < result.items.length; i++) {
+	            let oldUpDownField;
+    	        if (typeof this.state.items[i] === "undefined") {
+        	        oldUpDownField = 0;
+            	} else {
+                	oldUpDownField = this.state.items[i].upDownField;
+            	}
+            	result.items[i]["oldUpDownField"] = oldUpDownField;
+	        }
+		}
         this.setState({ items: result.items });
     }
 
