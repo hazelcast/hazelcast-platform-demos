@@ -30,7 +30,7 @@ const CONFIG = {
   plugin: "Datagrid",
   plugin_config: {},
   settings: false,
-  theme: "Vaporwave",
+  theme: "Pro Light",
   title: "Perspective iMap",
   group_by: ["key"],
   split_by: [],
