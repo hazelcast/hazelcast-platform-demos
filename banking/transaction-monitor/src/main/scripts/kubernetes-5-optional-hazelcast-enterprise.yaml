@@ -291,12 +291,13 @@ spec:
             httpGet:
               path: /health
               port: 8081
+            initialDelaySeconds: 60
           name: transaction-monitor-FLAVOR-management-center-container
           readinessProbe:
             httpGet:
               path: /health
               port: 8081
-            initialDelaySeconds: 30
+            initialDelaySeconds: 60
 ---
 # Service for Prometheus
 ---

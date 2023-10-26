@@ -101,12 +101,13 @@ spec:
             httpGet:
               path: /health
               port: 8081
+            initialDelaySeconds: 60
           name: nexmark-management-center-container
           readinessProbe:
             httpGet:
               path: /health
               port: 8081
-            initialDelaySeconds: 30
+            initialDelaySeconds: 60
           resources:
             requests:
               memory: "12Gi"
