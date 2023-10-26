@@ -57,7 +57,7 @@
       "height": 80,
       "panels": [
         {
-        "content": "<center><img src=\"https://hazelcast.com/brand-assets/files/hazelcast-logo-reverse.png\" width=\"360\" height=\"45\"></img></center>\n",
+        "content": "<center><img src=\"https://hazelcast.com/files/brand-images/logo/hazelcast-logo-reverse.png\" width=\"360\" height=\"45\"></img></center>\n",
           "height": "",
           "id": 1,
           "links": [],
