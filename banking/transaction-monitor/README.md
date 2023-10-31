@@ -65,8 +65,7 @@ client-nodejs
 client-python
 common
 custom-classes
-finos-nodejs
-finos-python
+finos
 grafana
 hazelcast-node
 hazelcast-node-enterprise-1
@@ -351,9 +350,9 @@ This module is an optional extra to show how to package and submit from the comm
 The job involvd is an extra, it does not produce data for the web application. You can
 browse it's output with the Management Center.
 
-### 18. `finos-nodejs` (optional) & `finos-python` (optional)
+### 18. `finos` (optional)
 
-Two options clients using the [Perspective](https://perspective.finos.org/) plugin from
+A web client using the [Perspective](https://perspective.finos.org/) plugin from
 [FinOS](https://www.finos.org/).
 
 ### 19. `client-command-line`, `client-csharp`, `client-cpp`, `client-golang`, `client-nodejs` & `client-python` (all optional)
