@@ -1,13 +1,13 @@
 :root {
-		--color-blueberry: #0019FE;
-		--color-carrot: #F5911E;
-        --color-deep-sea: #051A27;
-        --color-dusk: #0B2B39;
-        --color-ice: #F0F6FF;
-        --color-lime: #C6FF3A;
-        --color-ocean: #0080A9;
-        --color-raspberry: #C91268;
-        --color-sky: #10A4B3;    
+	--color-blueberry: #0019FE;
+	--color-carrot: #F5911E;
+	--color-deep-sea: #051A27;
+	--color-dusk: #0B2B39;
+	--color-ice: #F0F6FF;
+	--color-lime: #C6FF3A;
+	--color-ocean: #0080A9;
+	--color-raspberry: #C91268;
+	--color-sky: #10A4B3;
 }
 
 body {
@@ -15,46 +15,132 @@ body {
 	color: var(--color-ice);
 }
 
+h1, h2, h3, h4 {
+    text-align: center;
+}
+
+h5 {
+	font-size: xx-small;
+    text-align: center;
+}
+
+
 .headerfooter {
 	text-align: center;
 	color: var(--color-lime);
 	font-family: "Courier New", Courier, monospace;
 	font-size: 80%;
 }
+
 .headerfooterline {
-    color: var(--color-blueberry);
+	color: var(--color-blueberry);
 }
 
 .major_pane {
-    border-color: var(--color-carrot);
-    font-family: "Courier New", Courier, monospace;	
+	border-color: var(--color-carrot);
+	font-family: "Courier New", Courier, monospace;
 }
 
 .finos_pane {
-    color: var(--color-ice);
+	color: var(--color-ice);
 }
 
 .finosInnerBox {
-    height: auto;
-    top: 0px;
-    bottom: 0px;
-    right: 0px;
-    left: 0px;
+	height: auto;
+	top: 0px;
+	bottom: 0px;
+	right: 0px;
+	left: 0px;
 }
+
 .finosOuterBox {
-    height: 80%;
-    overflow: scroll;
-    top: 0px;
-    bottom: 0px;
-    right: 0px;
-    left: 0px;
+	height: 80%;
+	overflow: scroll;
+	top: 0px;
+	bottom: 0px;
+	right: 0px;
+	left: 0px;
+}
+
+.graphBackground {
+	background-color: var(--color-lime);
+}
+.graphBox {
+	height: 500px;
+	text-align: center;
+	top: 2px;
+	bottom: 2px;
+	right: 2px;
+	left: 2px;
+}
+.graphButtonBox {
+	padding-top: 2px;
+}
+.graphErrorBox {
+	padding-top: 2px;
+}
+.graphInputBox {
+	height: 440px;
+	margin: 0px;
+	padding-top: 2px;
+	width: 100vw;
+}
+.graphOutputBox {
+	height: 60px;
+}
+.graphStatusBox {
+	font-family: monospace;
+	padding-top: 5px;
+}
+
+.graphNodeSourceBatch {
+	background-color: var(--color-blueberry);
+}
+.graphNodeSourceStreaming {
+	background-color: var(--color-raspberry);
+}
+
+.graph_pane {
+	background-color: var(--color-ice);
+	color: var(--color-dusk);
+	height: 80%;
+	margin-left: auto;
+	margin-right: auto;
+	overflow-y: scroll;
+	vertical-align: top;
+}
+
+.myButton {
+	background-color: var(--color-sky);
+	color: var(--color-ice);
+}
+
+.myInfo {
+	color: var(--color-deep-sea);
+}
+
+.myOk {
+	color: var(--color-blueberry);
+}
+
+.myNotOk {
+	color: var(--color-raspberry);
+	font-weight: bold;
+}
+
+.warninginner {
+	color: var(--color-carrot);
+}
+.warningouter {
+	color: var(--color-raspberry);
+	font-weight: bold;
 }
 
 /* TODO: Fix sizing so not absolute */
 perspective-viewer {
-    position: absolute; 
-    top: 120px; 
-    left: 2px; 
-    right: 2px; 
-    bottom: 120px; 
+	position: absolute;
+	top: 120px;
+	left: 2px;
+	right: 2px;
+	bottom: 120px;
 }

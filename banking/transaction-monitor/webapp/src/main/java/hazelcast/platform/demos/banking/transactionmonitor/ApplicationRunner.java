@@ -136,13 +136,12 @@ public class ApplicationRunner {
         if (ok) {
             PNCounter updateCounter = this.hazelcastInstance.getPNCounter(MyConstants.PN_UPDATER);
             if (updateCounter.get() == 0L) {
-                PerspectiveUpdater perspectiveUpdater
-                    = new PerspectiveUpdater(transactionMonitorFlavor, this.useViridian);
-                this.hazelcastInstance.getExecutorService("default").execute(perspectiveUpdater);
+                LOGGER.info("Launching admin runnables");
+                TransactionMonitorIdempotentInitializationAdmin.launchAdminRunners(hazelcastInstance,
+                        transactionMonitorFlavor, useViridian);
                 updateCounter.incrementAndGet();
-                LOGGER.info("Launch '{}'", perspectiveUpdater.getClass());
             } else {
-                LOGGER.info("Skip launch '{}', PNCounter '{}'=={}", PerspectiveUpdater.class.getSimpleName(),
+                LOGGER.info("Skip launch admin runnables, PNCounter '{}'=={}",
                         updateCounter.getName(), updateCounter.get());
             }
 
@@ -614,7 +613,7 @@ public class ApplicationRunner {
             ok &= TransactionMonitorIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers,
                     pulsarAddress, usePulsar, useViridian, transactionMonitorFlavor);
             ok &= TransactionMonitorIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers,
-                    properties, transactionMonitorFlavor, this.localhost, this.kubernetes);
+                    properties, transactionMonitorFlavor, this.localhost, this.kubernetes, this.useViridian);
             if (ok && !this.localhost) {
                 // Don't even try if broken by this point
                 ok = TransactionMonitorIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,

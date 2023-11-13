@@ -13,27 +13,27 @@
     </appender>
     <appender name="BLUE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldBlue(%logger{60} - %msg) %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %thread %boldBlue(%logger{60} - %msg) %n</pattern>
         </encoder>
     </appender>
     <appender name="CYAN" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldCyan(%logger{60} - %msg) %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %thread %boldCyan(%logger{60} - %msg) %n</pattern>
         </encoder>
     </appender>
     <appender name="MAGENTA" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldMagenta(%logger{60} - %msg) %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %thread %boldMagenta(%logger{60} - %msg) %n</pattern>
         </encoder>
     </appender>
     <appender name="WHITE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldWhite(%logger{60} - %msg) %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %thread %boldWhite(%logger{60} - %msg) %n</pattern>
         </encoder>
     </appender>
     <appender name="YELLOW" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldYellow(%logger{60} - %msg) %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %thread %boldYellow(%logger{60} - %msg) %n</pattern>
         </encoder>
     </appender>
 
@@ -74,6 +74,9 @@
         <appender-ref ref="CYAN"/>
     </logger>
     <logger name="hazelcast.platform.demos.banking.transactionmonitor.MyMembershipListener" level="trace" additivity="false">
+        <appender-ref ref="CYAN"/>
+    </logger>
+    <logger name="hazelcast.platform.demos.banking.transactionmonitor.MyRestGraph" level="debug" additivity="false">
         <appender-ref ref="CYAN"/>
     </logger>
     <logger name="hazelcast.platform.demos.banking.transactionmonitor.MyWebSocketBridgeListener" level="debug" additivity="false">

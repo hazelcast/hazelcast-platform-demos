@@ -69,18 +69,6 @@ public class TransactionMonitorIdempotentInitialization {
     private static final int POS6 = 6;
 
     /**
-     * <p>Maps and mappings needed for WAN, rather than replicate "{@code __sql.catalog}"
-     * </p>
-     */
-    public static boolean createMinimal(HazelcastInstance hazelcastInstance,
-            TransactionMonitorFlavor transactionMonitorFlavor) {
-        boolean ok = defineWANIMaps(hazelcastInstance, transactionMonitorFlavor);
-        MyUtils.logStuff(hazelcastInstance);
-        MyUtils.showMappingsAndViews(hazelcastInstance);
-        return ok;
-    }
-
-    /**
      * <p>Ensure objects have the necessary configuration before
      * accessing, as the access creates them. Some configuration
      * such as journals must be active from the outset, other
@@ -95,12 +83,10 @@ public class TransactionMonitorIdempotentInitialization {
             Properties properties, String ourProjectProvenance,
             TransactionMonitorFlavor transactionMonitorFlavor, boolean localhost, boolean useViridian) {
         // Capture what was present before
-        Set<String> existingIMapNames = hazelcastInstance.getDistributedObjects()
-                .stream()
+        Set<String> existingIMapNames = hazelcastInstance.getDistributedObjects().stream()
                 .filter(distributedObject -> distributedObject instanceof IMap)
                 .map(distributedObject -> distributedObject.getName())
-                .filter(name -> !name.startsWith("__"))
-                .collect(Collectors.toCollection(TreeSet::new));
+                .filter(name -> !name.startsWith("__")).collect(Collectors.toCollection(TreeSet::new));
 
         LOGGER.info("Existing maps: {}", existingIMapNames);
 
@@ -253,16 +239,14 @@ public class TransactionMonitorIdempotentInitialization {
      * @param existingIMapNames
      * @param useViridian
      */
-    private static void dynamicMapConfigJournalOnly(HazelcastInstance hazelcastInstance, Set<String> existingIMapNames,
+    protected static void dynamicMapConfigJournalOnly(HazelcastInstance hazelcastInstance, Set<String> existingIMapNames,
             boolean useViridian) {
-        for (String mapName : List.of(MyConstants.IMAP_NAME_MONGO_ACTIONS)) {
+        for (String mapName : List.of(MyConstants.IMAP_NAME_HEAP, MyConstants.IMAP_NAME_MONGO_ACTIONS)) {
             if (!existingIMapNames.contains(mapName)) {
                 EventJournalConfig eventJournalConfig = new EventJournalConfig().setEnabled(true);
 
-                MapConfig mapConfig = new MapConfig(mapName);
-                mapConfig.setEventJournalConfig(eventJournalConfig);
-
-                hazelcastInstance.getConfig().addMapConfig(mapConfig);
+                hazelcastInstance.getConfig()
+                .addMapConfig(new MapConfig(mapName).setEventJournalConfig(eventJournalConfig));
             } else {
                 LOGGER.info("Don't add journal to '{}', map already exists", mapName);
                 if (useViridian) {
@@ -504,7 +488,7 @@ public class TransactionMonitorIdempotentInitialization {
      */
     public static boolean defineQueryableObjects(HazelcastInstance hazelcastInstance, String bootstrapServers,
             Properties properties, TransactionMonitorFlavor transactionMonitorFlavor,
-            boolean isLocalhost, boolean isKubernetes) {
+            boolean isLocalhost, boolean isKubernetes, boolean useViridian) {
         boolean ok = true;
         ok &= defineKafka1(hazelcastInstance, bootstrapServers, transactionMonitorFlavor);
         ok &= defineKafka2(hazelcastInstance, bootstrapServers);
@@ -516,6 +500,7 @@ public class TransactionMonitorIdempotentInitialization {
             ok &= TransactionMonitorIdempotentInitializationMongo.defineMongo(hazelcastInstance,
                     properties, transactionMonitorFlavor);
         }
+        ok &= TransactionMonitorIdempotentInitializationAdmin.defineAdminIMaps(hazelcastInstance, useViridian);
         ok &= defineWANIMaps(hazelcastInstance, transactionMonitorFlavor);
         ok &= defineIMaps1(hazelcastInstance, transactionMonitorFlavor);
         ok &= defineIMaps2(hazelcastInstance, transactionMonitorFlavor);
@@ -764,7 +749,7 @@ public class TransactionMonitorIdempotentInitialization {
      * @param hazelcastInstance
      * @return
      */
-    private static boolean runDefine(List<String> definitions, HazelcastInstance hazelcastInstance) {
+    protected static boolean runDefine(List<String> definitions, HazelcastInstance hazelcastInstance) {
         boolean ok = true;
         for (String definition : definitions) {
             ok &= define(definition, hazelcastInstance);
@@ -1379,8 +1364,7 @@ public class TransactionMonitorIdempotentInitialization {
             // LOGGER.error("Slack is not currently supported on Viridian");
         //} else {
             try {
-                UtilsSlackSQLJob.submitJob(hazelcastInstance,
-                        projectName == null ? "" : projectName.toString());
+                UtilsSlackSQLJob.submitJob(hazelcastInstance, projectName == null ? "" : projectName.toString());
             } catch (Exception e) {
                 LOGGER.error("launchNeededJobs:" + UtilsSlackSQLJob.class.getSimpleName(), e);
                 return false;
@@ -1479,8 +1463,7 @@ public class TransactionMonitorIdempotentInitialization {
         }
 
         try {
-            Pipeline pipelineArchiverStateController =
-                    AlertLoggerManager.buildPipeline();
+            Pipeline pipelineArchiverStateController = AlertLoggerManager.buildPipeline();
 
             JobConfig jobConfigArchiverStateController = new JobConfig();
             jobConfigArchiverStateController.setName(AlertLoggerManager.class.getSimpleName());

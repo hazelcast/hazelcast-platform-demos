@@ -6,10 +6,10 @@
 		{
 			"name": "hazelcast-cpp-client",
 			"features": ["openssl"],
-            "version>=": "5.2.0"
+            "version>=": "5.3.0"
 		}
     ],
     "overrides": [
-        { "name": "hazelcast-cpp-client", "version": "5.2.0" }
+        { "name": "hazelcast-cpp-client", "version": "5.3.0" }
     ]    
 }

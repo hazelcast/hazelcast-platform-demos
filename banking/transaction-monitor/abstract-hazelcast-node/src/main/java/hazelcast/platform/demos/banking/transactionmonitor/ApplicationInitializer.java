@@ -117,7 +117,7 @@ public class ApplicationInitializer {
             if (size == 1) {
                 LOGGER.info("Mini initialize, only WAN maps as '{}'=='{}', assume client will do the rest",
                         initializerProperty, System.getProperty(initializerProperty));
-                ApplicationInitializer.miniInitialize(hazelcastInstance, transactionMonitorFlavor, useViridian);
+                ApplicationInitializer.miniInitialize(hazelcastInstance, transactionMonitorFlavor, useViridian, localhost);
             } else {
                 LOGGER.info("Skip initialize, assume done by first node, current cluster size is {}", size);
             }
@@ -130,8 +130,9 @@ public class ApplicationInitializer {
      * </p>
      */
     public static void miniInitialize(HazelcastInstance hazelcastInstance,
-            TransactionMonitorFlavor transactionMonitorFlavor, boolean useViridian) throws Exception {
-        TransactionMonitorIdempotentInitialization.createMinimal(hazelcastInstance, transactionMonitorFlavor);
+            TransactionMonitorFlavor transactionMonitorFlavor, boolean useViridian, boolean localhost) throws Exception {
+        TransactionMonitorIdempotentInitializationAdmin
+        .createMinimal(hazelcastInstance, transactionMonitorFlavor, useViridian, localhost);
     }
 
     /**
@@ -171,7 +172,8 @@ public class ApplicationInitializer {
         TransactionMonitorIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarAddress, usePulsar,
                 useViridian, transactionMonitorFlavor);
         TransactionMonitorIdempotentInitialization.defineQueryableObjects(hazelcastInstance,
-                bootstrapServers, properties, transactionMonitorFlavor, localhost, kubernetes);
+                bootstrapServers, properties, transactionMonitorFlavor,
+                localhost, kubernetes, useViridian);
 
         TransactionMonitorIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
                 pulsarAddress, properties, clusterName, transactionMonitorFlavor);

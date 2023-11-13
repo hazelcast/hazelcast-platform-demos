@@ -22,6 +22,7 @@ JAR_FILE=${PROJECT}-${MODULE}-5.4-jar-with-dependencies.jar
 
 JAVA_ARGS="-Dmy.kubernetes.enabled=false"
 JAVA_ARGS="${JAVA_ARGS} -Dmy.autostart.enabled=true"
+JAVA_ARGS="${JAVA_ARGS} -Dmy.docker.enabled=false"
 JAVA_ARGS="${JAVA_ARGS} -Dhazelcast.local.publicAddress=${HOST_IP}:5701"
 JAVA_ARGS="${JAVA_ARGS} -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener"
 JAVA_ARGS="${JAVA_ARGS} -Dmy.mysql.address=${HOST_IP}:3306"

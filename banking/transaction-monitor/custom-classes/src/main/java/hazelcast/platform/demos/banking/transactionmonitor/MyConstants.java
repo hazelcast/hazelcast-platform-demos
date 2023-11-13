@@ -83,6 +83,7 @@ public class MyConstants {
     public static final String IMAP_NAME_ALERTS_LOG = "alertsLog";
     public static final String IMAP_NAME_AUDIT_LOG = "audit_log";
     public static final String IMAP_NAME_BICS = "bics";
+    public static final String IMAP_NAME_HEAP = "heap";
     public static final String IMAP_NAME_JOB_CONTROL = "job_control";
     public static final String IMAP_NAME_JOB_CONFIG = "job_config";
     public static final String IMAP_NAME_MONGO_ACTIONS = "mongoActions";
@@ -96,6 +97,7 @@ public class MyConstants {
 
     public static final List<String> IMAP_NAMES_ECOMMERCE =
             List.of(IMAP_NAME_AGGREGATE_QUERY_RESULTS, IMAP_NAME_ALERTS_LOG,
+                    IMAP_NAME_HEAP,
                     IMAP_NAME_JOB_CONTROL, IMAP_NAME_JOB_CONFIG, IMAP_NAME_MONGO_ACTIONS, IMAP_NAME_MYSQL_SLF4J,
                     IMAP_NAME_PRODUCTS,
                     IMAP_NAME_PERSPECTIVE, IMAP_NAME_PYTHON_SENTIMENT,
@@ -104,12 +106,14 @@ public class MyConstants {
     public static final List<String> IMAP_NAMES_PAYMENTS =
             List.of(IMAP_NAME_AGGREGATE_QUERY_RESULTS, IMAP_NAME_ALERTS_LOG,
                     IMAP_NAME_BICS,
+                    IMAP_NAME_HEAP,
                     IMAP_NAME_JOB_CONTROL, IMAP_NAME_JOB_CONFIG, IMAP_NAME_MONGO_ACTIONS, IMAP_NAME_MYSQL_SLF4J,
                     IMAP_NAME_PERSPECTIVE, IMAP_NAME_PYTHON_SENTIMENT,
                     IMAP_NAME_TRANSACTIONS, IMAP_NAME_TRANSACTIONS_XML);
 
     public static final List<String> IMAP_NAMES_TRADES =
             List.of(IMAP_NAME_AGGREGATE_QUERY_RESULTS, IMAP_NAME_ALERTS_LOG,
+                    IMAP_NAME_HEAP,
                     IMAP_NAME_JOB_CONTROL, IMAP_NAME_JOB_CONFIG, IMAP_NAME_MONGO_ACTIONS, IMAP_NAME_MYSQL_SLF4J,
                     IMAP_NAME_PERSPECTIVE, IMAP_NAME_PYTHON_SENTIMENT,
                     IMAP_NAME_SYMBOLS, IMAP_NAME_TRANSACTIONS);
