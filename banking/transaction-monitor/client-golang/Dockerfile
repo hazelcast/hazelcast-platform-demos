@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 library/golang:1.21.1-bullseye
+FROM --platform=linux/amd64 library/golang:1.21.4-bullseye
 
 ARG CONTROL_FILE
 
