@@ -91,7 +91,7 @@
 		<mariadb-java-client.version>3.1.4</mariadb-java-client.version>
 		<mongo-java-driver.version>3.12.8</mongo-java-driver.version>
 		<mysql-connector-j.version>8.0.33</mysql-connector-j.version>
-		<netty-tcnative.version>2.0.52.Final</netty-tcnative.version>
+		<netty-tcnative.version>2.0.62.Final</netty-tcnative.version>
 		<poi-ooxml.version>5.2.3</poi-ooxml.version>
 		<!-- Run same version with 'protoc - -grpc_out=. - -plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin' 
 			banking/credit-value-adjustment/common/src/main/proto/JetToCpp.proto -->
@@ -101,7 +101,7 @@
 		<slf4j.version>2.0.7</slf4j.version>
 		<spotbugs-annotations.version>4.7.3</spotbugs-annotations.version>
 		<springdoc.version>2.0.0</springdoc.version>
-		<spring-boot.version>3.1.5</spring-boot.version>
+		<spring-boot.version>3.2.0</spring-boot.version>
 		<spring-cloud.version>2021.0.0</spring-cloud.version>
 		<spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
 		<zipkin.version>2.23.3-SNAPSHOT</zipkin.version>
@@ -129,8 +129,8 @@
 		<spotbugs-maven-plugin.version>4.7.3.4</spotbugs-maven-plugin.version>
 
 		<!-- Javascript -->
-		<node.version>v20.8.0</node.version>
-		<npm.version>10.2.0</npm.version>
+		<node.version>v21.2.0</node.version>
+		<npm.version>10.2.3</npm.version>
 
                 <!-- Checkstyle -->
                 <checkstyle.version>8.38</checkstyle.version>
@@ -262,6 +262,9 @@
 				<groupId>com.hazelcast.jet</groupId>
 				<artifactId>hazelcast-jet-mongodb</artifactId>
 				<version>${hazelcast.version}</version>
+<!--
+-->
+                                <classifier>jar-with-dependencies</classifier>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>

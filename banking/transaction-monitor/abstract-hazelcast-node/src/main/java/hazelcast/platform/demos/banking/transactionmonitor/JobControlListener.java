@@ -47,9 +47,10 @@ public class JobControlListener implements EntryAddedListener<String, String>, E
     private final String projectName;
     private final String clusterName;
     private final TransactionMonitorFlavor transactionMonitorFlavor;
+    private final boolean kubernetes;
 
     public JobControlListener(String arg0, String arg1, boolean arg2, String arg3, String arg4,
-            TransactionMonitorFlavor arg5) {
+            TransactionMonitorFlavor arg5, boolean arg6) {
         this.executor = Executors.newSingleThreadExecutor();
         this.bootstrapServers = arg0;
         this.pulsarAddress = arg1;
@@ -57,6 +58,7 @@ public class JobControlListener implements EntryAddedListener<String, String>, E
         this.projectName = arg3;
         this.clusterName = arg4;
         this.transactionMonitorFlavor = arg5;
+        this.kubernetes = arg6;
     }
 
     @Override
@@ -88,7 +90,7 @@ public class JobControlListener implements EntryAddedListener<String, String>, E
         if (verb.toUpperCase(Locale.ROOT).equals("START")) {
             JobControlStartRunnable jobControlStartRunnable =
                     new JobControlStartRunnable(noun, this.bootstrapServers, this.pulsarAddress, this.usePulsar,
-                            this.projectName, this.clusterName, this.transactionMonitorFlavor);
+                            this.projectName, this.clusterName, this.transactionMonitorFlavor, this.kubernetes);
             this.executor.execute(jobControlStartRunnable);
         } else {
             if (verb.toUpperCase(Locale.ROOT).equals("STOP")) {

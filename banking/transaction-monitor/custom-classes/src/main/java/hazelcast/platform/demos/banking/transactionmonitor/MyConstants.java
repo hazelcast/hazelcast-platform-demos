@@ -178,4 +178,9 @@ public class MyConstants {
     public static final String WEBSOCKET_ENDPOINT = "hazelcast";
     public static final String WEBSOCKET_FEED_PREFIX = "feed";
     public static final String WEBSOCKET_DATA_SUFFIX = "data";
+
+    public static final int CP_GROUP_SIZE = 3;
+    public static final int CP_MEMBER_SIZE = CP_GROUP_SIZE;
+    public static final String CP_GROUP_A = "odd";
+    public static final String CP_GROUP_B = "even";
 }

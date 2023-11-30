@@ -617,7 +617,7 @@ public class ApplicationRunner {
             if (ok && !this.localhost) {
                 // Don't even try if broken by this point
                 ok = TransactionMonitorIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
-                        pulsarAddress, properties, clusterName, transactionMonitorFlavor);
+                        pulsarAddress, properties, clusterName, transactionMonitorFlavor, this.kubernetes);
             } else {
                 LOGGER.info("ok=={}, localhost=={} - no job submission", ok, this.localhost);
             }

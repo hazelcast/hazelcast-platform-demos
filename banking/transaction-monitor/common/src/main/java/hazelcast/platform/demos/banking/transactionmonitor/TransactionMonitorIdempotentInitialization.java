@@ -1021,10 +1021,8 @@ public class TransactionMonitorIdempotentInitialization {
                 + MyConstants.IMAP_NAME_TRANSACTIONS_XML
                 + " TYPE IMap "
                 + " OPTIONS ( "
-                + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = '" + String.class.getName() + "',"
-                + " 'valueFormat' = 'java',"
-                + " 'valueJavaClass' = '" + String.class.getName() + "'"
+                + " 'keyFormat' = 'varchar',"
+                + " 'valueFormat' = 'varchar'"
                 + " )";
 
         result[TransactionMonitorFlavor.TRADE.ordinal()] = "";
@@ -1047,10 +1045,8 @@ public class TransactionMonitorIdempotentInitialization {
                 + MyConstants.IMAP_NAME_JOB_CONTROL
                 + " TYPE IMap "
                 + " OPTIONS ( "
-                + " 'keyFormat' = 'java',"
-                + " 'keyJavaClass' = 'java.lang.String',"
-                + " 'valueFormat' = 'java',"
-                + " 'valueJavaClass' = 'java.lang.String'"
+                + " 'keyFormat' = 'varchar',"
+                + " 'valueFormat' = 'varchar'"
                 + " )";
 
         // Not much of view, but shows the concept
@@ -1121,7 +1117,7 @@ public class TransactionMonitorIdempotentInitialization {
      */
     public static boolean launchNeededJobs(HazelcastInstance hazelcastInstance, String bootstrapServers,
             String pulsarAddress, Properties properties, String clusterName,
-            TransactionMonitorFlavor transactionMonitorFlavor) {
+            TransactionMonitorFlavor transactionMonitorFlavor, boolean kubernetes) {
         boolean ok = true;
         String projectName = properties.getOrDefault(UtilsConstants.SLACK_PROJECT_NAME,
                 TransactionMonitorIdempotentInitialization.class.getSimpleName()).toString();
@@ -1136,6 +1132,10 @@ public class TransactionMonitorIdempotentInitialization {
         boolean useViridian = MyUtils.useViridian(kubernetesOrViridian);
         logUseViridian(useViridian, kubernetesOrViridian);
 
+        // CP needs a big enough cluster, only known to be true for Kubernetes
+        //FIXME Not yet available on Viridian @ December 2023
+        boolean useCP = kubernetes & (!useViridian);
+
         if (System.getProperty("my.autostart.enabled", "").equalsIgnoreCase("false")) {
             LOGGER.info("Not launching transaction input jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",
                     System.getProperty("my.autostart.enabled"));
@@ -1143,8 +1143,11 @@ public class TransactionMonitorIdempotentInitialization {
             LOGGER.info("Launching transaction input jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",
                     System.getProperty("my.autostart.enabled"));
             try {
+                if (!usePulsar) {
+                    pulsarAddress = null;
+                }
                 ok = launchTransactionJobs(hazelcastInstance, bootstrapServers, pulsarAddress,
-                        usePulsar, useViridian, projectName, clusterName, transactionMonitorFlavor);
+                        useViridian, projectName, clusterName, transactionMonitorFlavor, useCP);
                 if (!ok) {
                     return ok;
                 }
@@ -1226,16 +1229,16 @@ public class TransactionMonitorIdempotentInitialization {
      * @param bootstrapServers
      * @param pulsarAddresss
      * @param clusterName
-     * @param usePulsar
      * @param useViridian
      * @param projectName
      * @param clusterName
      * @param transactionMonitorFlavor
+     * @param useCP
      * @return
      */
     public static boolean launchTransactionJobs(HazelcastInstance hazelcastInstance, String bootstrapServers,
-            String pulsarAddress, boolean usePulsar, boolean useViridian, String projectName, String clusterName,
-            TransactionMonitorFlavor transactionMonitorFlavor) {
+            String pulsarAddress, boolean useViridian, String projectName, String clusterName,
+            TransactionMonitorFlavor transactionMonitorFlavor, boolean useCP) {
 
         /* Transaction ingest
          */
@@ -1245,7 +1248,7 @@ public class TransactionMonitorIdempotentInitialization {
         jobConfigIngestTransactions.addClass(IngestTransactions.class);
 
         StreamStage<Entry<String, HazelcastJsonValue>> pulsarInputSource1 = null;
-        if (usePulsar) {
+        if (pulsarAddress != null) {
             // Attach Pulsar classes only if needed
             pulsarInputSource1 = MyPulsarSource.inputSourceKeyAndJson(pulsarAddress);
             jobConfigIngestTransactions.addClass(MyPulsarSource.class);
@@ -1254,8 +1257,8 @@ public class TransactionMonitorIdempotentInitialization {
         Pipeline pipelineIngestTransactions = IngestTransactions.buildPipeline(bootstrapServers,
                 pulsarInputSource1, transactionMonitorFlavor);
 
-        if (usePulsar && useViridian) {
-            //FIXME Not yet available on Viridian @ March 2023.
+        if (pulsarAddress != null && useViridian) {
+            //FIXME Not yet available on Viridian @ December 2023.
             LOGGER_TO_IMAP.error("Pulsar is not currently supported on Viridian");
             return false;
         } else {
@@ -1276,7 +1279,7 @@ public class TransactionMonitorIdempotentInitialization {
         jobConfigAggregateQuery.addClass(UtilsFormatter.class);
 
         StreamStage<?> pulsarInputSource2 = null;
-        if (usePulsar) {
+        if (pulsarAddress != null) {
             // Attach Pulsar classes only if needed
             pulsarInputSource2 = MyPulsarSource.inputSourceTransaction(pulsarAddress, transactionMonitorFlavor);
             jobConfigAggregateQuery.addClass(MyPulsarSource.class);
@@ -1284,10 +1287,10 @@ public class TransactionMonitorIdempotentInitialization {
 
         Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(bootstrapServers,
                 pulsarInputSource2, projectName, jobConfigAggregateQuery.getName(),
-                clusterName, transactionMonitorFlavor);
+                clusterName, transactionMonitorFlavor, useCP);
 
-        if (usePulsar && useViridian) {
-            //FIXME Not yet available on Viridian @ March 2023.
+        if (pulsarAddress != null && useViridian) {
+            //FIXME Not yet available on Viridian @ December 2023.
             LOGGER_TO_IMAP.error("Pulsar is not currently supported on Viridian");
             return false;
         } else {
@@ -1359,10 +1362,10 @@ public class TransactionMonitorIdempotentInitialization {
         }
 
         // Slack alerting (writing), indirectly uses common utils
-        //if (useViridian) {
-            //FIXME Not yet available on Viridian @ March 2023.
-            // LOGGER.error("Slack is not currently supported on Viridian");
-        //} else {
+        if (useViridian) {
+            //FIXME Not yet available on Viridian @ December 2023.
+            LOGGER.error("Slack is not currently supported on Viridian");
+        } else {
             try {
                 UtilsSlackSQLJob.submitJob(hazelcastInstance, projectName == null ? "" : projectName.toString());
             } catch (Exception e) {
@@ -1370,7 +1373,8 @@ public class TransactionMonitorIdempotentInitialization {
                 return false;
             }
             launchSlackJob(hazelcastInstance, properties, transactionMonitorFlavor);
-        //}
+        }
+
         return true;
     }
 

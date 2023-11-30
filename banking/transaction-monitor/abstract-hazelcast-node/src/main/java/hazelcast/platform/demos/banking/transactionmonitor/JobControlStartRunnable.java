@@ -48,9 +48,10 @@ public class JobControlStartRunnable implements Runnable {
     private final String projectName;
     private final String clusterName;
     private final TransactionMonitorFlavor transactionMonitorFlavor;
+    private final boolean kubernetes;
 
     public JobControlStartRunnable(String arg0, String arg1, String arg2, boolean arg3,
-            String arg4, String arg5, TransactionMonitorFlavor arg6) {
+            String arg4, String arg5, TransactionMonitorFlavor arg6, boolean arg7) {
         this.hazelcastInstance = Hazelcast.getAllHazelcastInstances().iterator().next();
         this.targetJobNamePrefix = arg0;
         this.bootstrapServers = arg1;
@@ -59,6 +60,7 @@ public class JobControlStartRunnable implements Runnable {
         this.projectName = arg4;
         this.clusterName = arg5;
         this.transactionMonitorFlavor = arg6;
+        this.kubernetes = arg7;
     }
 
     @Override
@@ -121,7 +123,7 @@ public class JobControlStartRunnable implements Runnable {
 
                 Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(this.bootstrapServers,
                         inputSource2, projectName, jobConfigAggregateQuery.getName(),
-                        this.clusterName, this.transactionMonitorFlavor);
+                        this.clusterName, this.transactionMonitorFlavor, this.kubernetes);
 
                 try {
                     hazelcastInstance.getJet().newJob(pipelineAggregateQuery, jobConfigAggregateQuery);

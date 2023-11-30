@@ -75,7 +75,8 @@ public class ApplicationConfig {
         joinConfig.getAutoDetectionConfig().setEnabled(false);
         joinConfig.getMulticastConfig().setEnabled(false);
 
-        if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
+        boolean isKubernetes = System.getProperty("my.kubernetes.enabled", "").equals("true");
+        if (isKubernetes) {
             LOGGER.info("Kubernetes configuration: service-dns: {}",
                     joinConfig.getKubernetesConfig().getProperty("service-dns"));
         } else {
@@ -108,6 +109,10 @@ public class ApplicationConfig {
                     MyUtils.getTransactionMonitorFlavor(properties);
             addPersistentStore(config, transactionMonitorFlavor);
             addTieredStore(config, transactionMonitorFlavor);
+            // Might not have enough members if not running in cloud
+            if (isKubernetes) {
+                addCPSubsystem(config);
+            }
         }
 
         return config;
@@ -307,6 +312,18 @@ public class ApplicationConfig {
             LOGGER.debug("Setting map '{}' for PersistentStore", mapConfig.getName());
             mapConfig.setDataPersistenceConfig(dataPersistenceConfig);
         }
+    }
+
+    /**
+     * <p>Activate the CP Subsystem.
+     * </p>
+     *
+     * @param config
+     */
+    private static void addCPSubsystem(Config config) {
+        config.getCPSubsystemConfig()
+        .setCPMemberCount(MyConstants.CP_MEMBER_SIZE)
+        .setGroupSize(MyConstants.CP_GROUP_SIZE);
     }
 
 }

@@ -86,12 +86,13 @@ public class AggregateQuery {
      * @param bootstrapServers Connection list for Kafka
      * @param pulsarInputSource Ready made source to use for Pulsar instead of Kafka
      * @param transactionMonitorFlavor
+     * @param useCP
      * @return A pipeline job to run in Jet.
      */
     @SuppressWarnings("unchecked")
     public static Pipeline buildPipeline(String bootstrapServers, StreamStage<?> pulsarInputSource,
             String projectName, String jobName, String clusterName,
-            TransactionMonitorFlavor transactionMonitorFlavor) {
+            TransactionMonitorFlavor transactionMonitorFlavor, boolean useCP) {
 
         Properties properties = InitializerConfig.kafkaSourceProperties(bootstrapServers);
 
@@ -136,6 +137,11 @@ public class AggregateQuery {
 
         // Extra stages for alert generation
         AggregateQuery.addMaxAlert(aggregated, projectName, clusterName, jobName);
+
+        // Extra stages for CP if cluster known to be big enough (ie. not 1 node)
+        if (useCP) {
+            AggregateQuery.addCPTallying(aggregated);
+        }
 
         return pipeline;
     }
@@ -332,5 +338,13 @@ public class AggregateQuery {
         .writeTo(Sinks.map(MyConstants.IMAP_NAME_ALERTS_LOG));
     }
 
-
+    /** <p>Count each update to each key.
+     * </p>
+     */
+    private static void addCPTallying(
+            StreamStage<Entry<String, Tuple3<Long, Double, Double>>> aggregated) {
+        aggregated
+        .map(Functions.entryKey())
+        .writeTo(CPAtomicLongSink.cpAtomicLongSink());
+    }
 }

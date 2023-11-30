@@ -168,7 +168,7 @@ public class ApplicationInitializer {
         TransactionMonitorIdempotentInitialization.createNeededObjects(hazelcastInstance,
                 properties, ourProjectProvenance, transactionMonitorFlavor, localhost, useViridian);
         addListeners(hazelcastInstance, bootstrapServers, pulsarAddress, usePulsar, projectName, clusterName,
-                transactionMonitorFlavor);
+                transactionMonitorFlavor, kubernetes);
         TransactionMonitorIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarAddress, usePulsar,
                 useViridian, transactionMonitorFlavor);
         TransactionMonitorIdempotentInitialization.defineQueryableObjects(hazelcastInstance,
@@ -176,7 +176,7 @@ public class ApplicationInitializer {
                 localhost, kubernetes, useViridian);
 
         TransactionMonitorIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
-                pulsarAddress, properties, clusterName, transactionMonitorFlavor);
+                pulsarAddress, properties, clusterName, transactionMonitorFlavor, kubernetes);
     }
 
 
@@ -188,13 +188,13 @@ public class ApplicationInitializer {
      */
     static void addListeners(HazelcastInstance hazelcastInstance, String bootstrapServers,
             String pulsarAddress, boolean usePulsar, String projectName, String clusterName,
-            TransactionMonitorFlavor transactionMonitorFlavor) {
+            TransactionMonitorFlavor transactionMonitorFlavor, boolean kubernetes) {
         MyMembershipListener myMembershipListener = new MyMembershipListener(hazelcastInstance);
         hazelcastInstance.getCluster().addMembershipListener(myMembershipListener);
 
         JobControlListener jobControlListener =
                 new JobControlListener(bootstrapServers, pulsarAddress, usePulsar,
-                        projectName, clusterName, transactionMonitorFlavor);
+                        projectName, clusterName, transactionMonitorFlavor, kubernetes);
         hazelcastInstance.getMap(MyConstants.IMAP_NAME_JOB_CONTROL)
             .addLocalEntryListener(jobControlListener);
     }
