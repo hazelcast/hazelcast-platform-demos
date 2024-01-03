@@ -60,7 +60,7 @@ public class TransactionMonitorIdempotentInitializationSql {
                 + " SELECT * FROM \"" + topic + "\"";
 
         String concatenation;
-        String xxx = "5.4?_";
+        String xxx = "5.x_";
         LOGGER.error("Reminder to remove job prefix {}", xxx);
         // Same for all currently
         switch (transactionMonitorFlavor) {
@@ -82,8 +82,8 @@ public class TransactionMonitorIdempotentInitializationSql {
                 + " SELECT __key, " + concatenation + " || ',' || provenance || ',' || whence || ',' || volume"
                 + " FROM \"" + MyConstants.IMAP_NAME_ALERTS_LOG + "\"";
 
-        //FIXME 5.3 Style, to be removed once "sqlJobMapToKafka" runs as streaming in 5.4
-        //FIXME https://docs.hazelcast.com/hazelcast/5.3/sql/querying-maps-sql#streaming-map-changes
+        //FIXME 5.4 Style, to be removed once "sqlJobMapToKafka" runs as streaming in 5.x
+        //FIXME https://docs.hazelcast.com/hazelcast/5.4-snapshot/sql/querying-maps-sql#streaming-map-changes
         //FIXME See https://github.com/hazelcast/hazelcast-platform-demos/issues/131
         try {
             Pipeline pipelineAlertingToKafka = AlertingToKafka.buildPipeline(bootstrapServers);
