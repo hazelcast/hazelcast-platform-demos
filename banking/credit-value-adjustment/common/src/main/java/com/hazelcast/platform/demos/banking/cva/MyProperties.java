@@ -59,7 +59,7 @@ public class MyProperties {
     @NotNull
     private String viridianCluster1DiscoveryToken;
     @NotNull
-    private String viridianCluster1Id;
+    private String viridianCluster1Name;
     @NotNull
     private String viridianCluster1KeyPassword;
 
@@ -119,11 +119,11 @@ public class MyProperties {
     public void setViridianCluster1DiscoveryToken(String viridianCluster1DiscoveryToken) {
         this.viridianCluster1DiscoveryToken = viridianCluster1DiscoveryToken;
     }
-    public String getViridianCluster1Id() {
-        return viridianCluster1Id;
+    public String getViridianCluster1Name() {
+        return viridianCluster1Name;
     }
-    public void setViridianCluster1Id(String viridianCluster1Id) {
-        this.viridianCluster1Id = viridianCluster1Id;
+    public void setViridianCluster1Name(String viridianCluster1Name) {
+        this.viridianCluster1Name = viridianCluster1Name;
     }
     public String getViridianCluster1KeyPassword() {
         return viridianCluster1KeyPassword;

@@ -27,7 +27,7 @@ cluster_name = "@my.cluster1.name@"
 instance_name = "@project.artifactId@" 
 service_dns = "@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local"
 
-viridianId = "@my.viridian.cluster1.id@"
+viridianName = "@my.viridian.cluster1.name@"
 viridianDiscoveryToken = "@my.viridian.cluster1.discovery.token@"
 viridianKeyPassword = "@my.viridian.cluster1.key.password@"
 
@@ -122,12 +122,9 @@ print("VIRIDIAN '", viridian, "'", flush=True)
 current_date = datetime.now()
 launch_time = current_date.strftime('%Y-%m-%dT%H:%M:%S')
 if viridian:
-    #FIXME Should become default
-    print("CLOUD_URL_BASE TO REMOVE")
-    HazelcastCloudDiscovery._CLOUD_URL_BASE = "api.viridian.hazelcast.com"
     client = hazelcast.HazelcastClient(
         client_name=instance_name,
-        cluster_name=viridianId,
+        cluster_name=viridianName,
         cloud_discovery_token=viridianDiscoveryToken,
         labels=[user, launch_time],
         default_int_type=hazelcast.config.IntType.LONG,

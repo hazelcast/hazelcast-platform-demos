@@ -26,7 +26,7 @@ const char* clusterName = "@my.cluster1.name@";
 const char* instanceName = "@project.artifactId@";
 const char* serviceDns = "@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local";
 
-const char* viridianId = "@my.viridian.cluster1.id@";
+const char* viridianName = "@my.viridian.cluster1.name@";
 const char* viridianDiscoveryToken = "@my.viridian.cluster1.discovery.token@";
 const char* viridianKeyPassword = "@my.viridian.cluster1.key.password@";
 
@@ -75,7 +75,7 @@ hazelcast::client::hazelcast_client get_client(const char* kubernetes, bool viri
 	client_config.set_property("hazelcast.client.statistics.enabled", "true");
 
 	if (viridian) {
-		client_config.set_cluster_name(viridianId);
+		client_config.set_cluster_name(viridianName);
 
 		auto &cloud_configuration = client_config.get_network_config().get_cloud_config();
     	cloud_configuration.enabled = true;

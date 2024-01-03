@@ -83,7 +83,7 @@ public class ApplicationConfig {
 
         if (myProperties.isUseViridian()) {
             UtilsViridian.configure(clientConfig,
-                    myProperties.getViridianCluster1Id(),
+                    myProperties.getViridianCluster1Name(),
                     myProperties.getViridianCluster1DiscoveryToken(),
                     myProperties.getViridianCluster1KeyPassword());
 

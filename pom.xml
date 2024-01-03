@@ -615,6 +615,7 @@
 										<!-- Hazelcast cloud -->
 										<HZ_VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN>${my.viridian.cluster1.discovery.token}</HZ_VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN>
 										<HZ_VIRIDIAN_CLUSTER1_ID>${my.viridian.cluster1.id}</HZ_VIRIDIAN_CLUSTER1_ID>
+										<HZ_VIRIDIAN_CLUSTER1_NAME>${my.viridian.cluster1.name}</HZ_VIRIDIAN_CLUSTER1_NAME>
 										<HZ_VIRIDIAN_CLUSTER1_KEYS_LOCATION>${my.viridian.cluster1.keys.location}</HZ_VIRIDIAN_CLUSTER1_KEYS_LOCATION>
 										<HZ_VIRIDIAN_CLUSTER1_KEY_PASSWORD>${my.viridian.cluster1.key.password}</HZ_VIRIDIAN_CLUSTER1_KEY_PASSWORD>
 										<!-- Dockerfile will use for our built modules -->
@@ -748,6 +749,18 @@
 			<activation>
 				<property>
 					<name>!my.viridian.cluster1.id</name>
+				</property>
+			</activation>
+		</profile>
+		<profile>
+			<!-- docker-maven-plugin does not like null properties -->
+			<id>no-null-docker-maven-plugin-viridian-cluster1-name</id>
+			<properties>
+				<my.viridian.cluster1.name>unset</my.viridian.cluster1.name>
+			</properties>
+			<activation>
+				<property>
+					<name>!my.viridian.cluster1.name</name>
 				</property>
 			</activation>
 		</profile>

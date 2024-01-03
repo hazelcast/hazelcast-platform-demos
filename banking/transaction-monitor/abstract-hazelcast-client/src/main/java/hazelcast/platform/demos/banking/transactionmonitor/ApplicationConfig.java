@@ -40,7 +40,7 @@ import com.hazelcast.platform.demos.utils.UtilsViridian;
 public class ApplicationConfig {
     private static final String FILENAME = "application.properties";
     private static final String VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN = "my.viridian.cluster1.discovery.token";
-    private static final String VIRIDIAN_CLUSTER1_ID = "my.viridian.cluster1.id";
+    private static final String VIRIDIAN_CLUSTER1_NAME = "my.viridian.cluster1.name";
     private static final String VIRIDIAN_CLUSTER1_KEY_PASSWORD = "my.viridian.cluster1.key.password";
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
     private static String clusterName = "";
@@ -89,7 +89,7 @@ public class ApplicationConfig {
 
         if (useViridian) {
             UtilsViridian.configure(clientConfig,
-                    myProperties.getProperty(VIRIDIAN_CLUSTER1_ID),
+                    myProperties.getProperty(VIRIDIAN_CLUSTER1_NAME),
                     myProperties.getProperty(VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN),
                     myProperties.getProperty(VIRIDIAN_CLUSTER1_KEY_PASSWORD));
 

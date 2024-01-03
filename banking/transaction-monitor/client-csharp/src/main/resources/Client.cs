@@ -31,7 +31,7 @@ namespace Client
         public const string instanceName = "@project.artifactId@";
         public const string serviceDns = "@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local";
 
-        public const string viridianId = "@my.viridian.cluster1.id@";
+        public const string viridianName = "@my.viridian.cluster1.name@";
         public const string viridianDiscoveryToken = "@my.viridian.cluster1.discovery.token@";
         public const string viridianKeyPassword = "@my.viridian.cluster1.key.password@";
 
@@ -94,7 +94,7 @@ namespace Client
             options.Metrics.Enabled = true;
 
             if (viridian) {
-                options.ClusterName = MyConstants.viridianId;
+                options.ClusterName = MyConstants.viridianName;
 
                 options.Networking.Cloud.DiscoveryToken = MyConstants.viridianDiscoveryToken;
                 //FIXME IS THIS NEEDED

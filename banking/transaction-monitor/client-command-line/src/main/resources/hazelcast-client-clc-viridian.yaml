@@ -1,5 +1,5 @@
 cluster:
-  name: "@my.viridian.cluster1.id@"
+  name: "@my.viridian.cluster1.name@"
   discovery-token: "@my.viridian.cluster1.discovery.token@"
 ssl:
   ca-path: "/tmp/ca.pem"
