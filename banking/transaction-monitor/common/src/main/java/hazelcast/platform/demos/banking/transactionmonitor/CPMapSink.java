@@ -16,54 +16,55 @@
 
 package hazelcast.platform.demos.banking.transactionmonitor;
 
+import java.util.Map.Entry;
+
 import com.hazelcast.cp.CPSubsystem;
+import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.jet.pipeline.Sink;
 import com.hazelcast.jet.pipeline.SinkBuilder;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
- * <p>Use a CP {@link com.hazelcast.cp.IAtomicLong IAtomicLong} as a sink.
+ * <p>Use a CP {@link com.hazelcast.cp.CPMap CPMap} as a sink.
  * </p>
  */
-public class CPAtomicLongSink {
+public class CPMapSink {
     private final CPSubsystem cpSubsystem;
+    private final String cpMapName;
 
     @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Object is thread-safe")
-    public CPAtomicLongSink(CPSubsystem cpSubsystem) {
+    public CPMapSink(CPSubsystem cpSubsystem, String cpMapName) {
         this.cpSubsystem = cpSubsystem;
+        this.cpMapName = cpMapName;
     }
 
     /**
-     * <p>Build the sink, mainly {@link #receiveFn(String)}.
+     * <p>Build the sink, mainly {@link #receiveFn(Entry<String, Tuple3<Long, Double, Double>>)}.
      * </p>
      *
      * @return
      */
-    public static Sink<String> cpAtomicLongSink() {
+    public static Sink<Entry<String, Tuple3<Long, Double, Double>>> cpMapSink(String cpMapName) {
         return SinkBuilder.sinkBuilder(
-                    "atomicLongSink-",
-                    context -> new CPAtomicLongSink(context.hazelcastInstance().getCPSubsystem())
+                    "cpMapSink-",
+                    context -> new CPMapSink(context.hazelcastInstance().getCPSubsystem(), cpMapName)
                 )
                 .receiveFn(
-                        (CPAtomicLongSink cpAtomicLongSink, String key) -> cpAtomicLongSink.receiveFn(key)
+                        (CPMapSink cpMapSink, Entry<String, Tuple3<Long, Double, Double>> entry) -> cpMapSink.receiveFn(entry)
                         )
                 .build();
     }
 
     /**
-     * <p>Increment the counter for the key.
+     * <p>Replace the entry in the CP Map.
      * </p>
      *
      * @param keu
      * @return
      */
-    public Object receiveFn(String key) {
-        int groupSelector = Math.abs(key.hashCode() % 2);
-
-        String group = (groupSelector == 1) ? MyConstants.CP_GROUP_A : MyConstants.CP_GROUP_B;
-
-        this.cpSubsystem.getAtomicLong(key + "@ " + group).incrementAndGet();
+    public Object receiveFn(Entry<String, Tuple3<Long, Double, Double>> entry) {
+        this.cpSubsystem.getMap(this.cpMapName).set(entry.getKey(), entry.getValue());
 
         return this;
     }

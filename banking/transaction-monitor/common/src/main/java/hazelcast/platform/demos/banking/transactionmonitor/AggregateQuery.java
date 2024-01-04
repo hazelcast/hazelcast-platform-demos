@@ -140,7 +140,8 @@ public class AggregateQuery {
 
         // Extra stages for CP if cluster known to be big enough (ie. not 1 node)
         if (useCP) {
-            AggregateQuery.addCPTallying(aggregated);
+            String cpMapName = MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS;
+            AggregateQuery.addCPTallying(aggregated, cpMapName);
         }
 
         return pipeline;
@@ -338,13 +339,15 @@ public class AggregateQuery {
         .writeTo(Sinks.map(MyConstants.IMAP_NAME_ALERTS_LOG));
     }
 
-    /** <p>Count each update to each key.
+    /** <p>Count each update to each key. Keep the full key.
      * </p>
      */
     private static void addCPTallying(
-            StreamStage<Entry<String, Tuple3<Long, Double, Double>>> aggregated) {
+            StreamStage<Entry<String, Tuple3<Long, Double, Double>>> aggregated, String cpMapName) {
         aggregated
         .map(Functions.entryKey())
         .writeTo(CPAtomicLongSink.cpAtomicLongSink());
+        aggregated
+        .writeTo(CPMapSink.cpMapSink(cpMapName));
     }
 }
