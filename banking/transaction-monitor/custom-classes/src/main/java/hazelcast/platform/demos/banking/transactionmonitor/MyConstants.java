@@ -183,4 +183,12 @@ public class MyConstants {
     public static final int CP_MEMBER_SIZE = CP_GROUP_SIZE;
     public static final String CP_GROUP_A = "odd";
     public static final String CP_GROUP_B = "even";
+
+    // Namespaces and the objects that refer to them
+    public static final String EXECUTOR_NAMESPACE_1 = "executor_ns1";
+    public static final String MAP_NAMESPACE_2 = "map_ns2";
+    public static final String QUEUE_NAMESPACE_3 = "queue_ns3";
+    public static final String USER_CODE_NAMESPACE_1 = "ns1";
+    public static final String USER_CODE_NAMESPACE_2 = "ns2";
+    public static final String USER_CODE_NAMESPACE_3 = "ns3";
 }

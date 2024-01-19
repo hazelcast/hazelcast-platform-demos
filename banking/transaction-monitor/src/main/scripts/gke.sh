@@ -49,6 +49,12 @@ then
  exit 1
 fi
 
+echo ============================================================
+echo Attempts to do all steps for Google Cloud
+echo ============================================================
+echo Flavor: $FLAVOR
+echo Use-Viridian: $USE_VIRIDIAN
+
 if [ "${FLAVOR}" != "${POM_FLAVOR}" ] || [ "${USE_VIRIDIAN}" != "${POM_USE_VIRIDIAN}" ]
 then
  echo '************************************************************'
@@ -67,12 +73,8 @@ then
  echo ""
 fi
 
-echo ============================================================
-echo Attempts to do all steps for Google Cloud
-echo ============================================================
+echo ----
 echo `date +"%H:%M:%S"`
-echo Flavor: $FLAVOR
-echo Use-Viridian: $USE_VIRIDIAN
 echo ----
 
 PROJECT=transaction-monitor

@@ -150,7 +150,7 @@ public class TransactionMonitorIdempotentInitialization {
         EventJournalConfig eventJournalConfig = new EventJournalConfig().setEnabled(true);
         boolean ok = true;
 
-        //FIXME && !useViridian
+        //TODO && !useViridian
         if (!existingIMapNames.contains(MyConstants.IMAP_NAME_ALERTS_LOG) && !useViridian) {
             MapConfig alertsMapConfig = new MapConfig(alertsWildcard);
             alertsMapConfig.setEventJournalConfig(eventJournalConfig);
@@ -1133,7 +1133,7 @@ public class TransactionMonitorIdempotentInitialization {
         logUseViridian(useViridian, kubernetesOrViridian);
 
         // CP needs a big enough cluster, only known to be true for Kubernetes
-        //FIXME Not yet available on Viridian @ December 2023
+        //TODO Not yet available on Viridian @ January 2024.
         boolean useCP = kubernetes & (!useViridian);
 
         if (System.getProperty("my.autostart.enabled", "").equalsIgnoreCase("false")) {
@@ -1258,7 +1258,7 @@ public class TransactionMonitorIdempotentInitialization {
                 pulsarInputSource1, transactionMonitorFlavor);
 
         if (pulsarAddress != null && useViridian) {
-            //FIXME Not yet available on Viridian @ December 2023.
+            //TODO Not yet available on Viridian @ January 2024.
             LOGGER_TO_IMAP.error("Pulsar is not currently supported on Viridian");
             return false;
         } else {
@@ -1290,7 +1290,7 @@ public class TransactionMonitorIdempotentInitialization {
                 clusterName, transactionMonitorFlavor, useCP);
 
         if (pulsarAddress != null && useViridian) {
-            //FIXME Not yet available on Viridian @ December 2023.
+            //TODO Not yet available on Viridian @ January 2024.
             LOGGER_TO_IMAP.error("Pulsar is not currently supported on Viridian");
             return false;
         } else {
@@ -1363,7 +1363,7 @@ public class TransactionMonitorIdempotentInitialization {
 
         // Slack alerting (writing), indirectly uses common utils
         if (useViridian) {
-            //FIXME Not yet available on Viridian @ December 2023.
+            //TODO Not yet available on Viridian @ January 2024.
             LOGGER.error("Slack is not currently supported on Viridian");
         } else {
             try {

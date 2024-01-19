@@ -60,7 +60,7 @@ public class CPMapSink {
      * <p>Replace the entry in the CP Map.
      * </p>
      *
-     * @param keu
+     * @param key/value pair
      * @return
      */
     public Object receiveFn(Entry<String, Tuple3<Long, Double, Double>> entry) {

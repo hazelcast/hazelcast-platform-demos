@@ -33,14 +33,17 @@ import com.hazelcast.config.DataPersistenceConfig;
 import com.hazelcast.config.DiscoveryConfig;
 import com.hazelcast.config.DiscoveryStrategyConfig;
 import com.hazelcast.config.DiskTierConfig;
+import com.hazelcast.config.ExecutorConfig;
 import com.hazelcast.config.InMemoryFormat;
 import com.hazelcast.config.JoinConfig;
 import com.hazelcast.config.LocalDeviceConfig;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MemoryTierConfig;
 import com.hazelcast.config.PersistenceConfig;
+import com.hazelcast.config.QueueConfig;
 import com.hazelcast.config.TcpIpConfig;
 import com.hazelcast.config.TieredStoreConfig;
+import com.hazelcast.config.UserCodeNamespaceConfig;
 import com.hazelcast.config.WanReplicationConfig;
 import com.hazelcast.config.WanReplicationRef;
 import com.hazelcast.memory.Capacity;
@@ -74,6 +77,8 @@ public class ApplicationConfig {
         JoinConfig joinConfig = config.getNetworkConfig().getJoin();
         joinConfig.getAutoDetectionConfig().setEnabled(false);
         joinConfig.getMulticastConfig().setEnabled(false);
+
+        LOGGER.info("Runtime.getRuntime().availableProcessors()=={}", Runtime.getRuntime().availableProcessors());
 
         boolean isKubernetes = System.getProperty("my.kubernetes.enabled", "").equals("true");
         if (isKubernetes) {
@@ -109,6 +114,7 @@ public class ApplicationConfig {
                     MyUtils.getTransactionMonitorFlavor(properties);
             addPersistentStore(config, transactionMonitorFlavor);
             addTieredStore(config, transactionMonitorFlavor);
+            addUserCodeNamespace(config);
             // Might not have enough members if not running in cloud
             if (isKubernetes) {
                 addCPSubsystem(config);
@@ -324,6 +330,44 @@ public class ApplicationConfig {
         config.getCPSubsystemConfig()
         .setCPMemberCount(MyConstants.CP_MEMBER_SIZE)
         .setGroupSize(MyConstants.CP_GROUP_SIZE);
+    }
+
+    /**
+     * <p>Add namespaces for selected maps.</p>
+     */
+    private static void addUserCodeNamespace(Config config) {
+        // Off in hazelcast-common.yml, turn on.
+        config.getNamespacesConfig().setEnabled(true);
+        LOGGER.info("config.getNamespacesConfig().isEnabled()=={}", config.getNamespacesConfig().isEnabled());
+
+        // Create the namespaces
+        UserCodeNamespaceConfig userCodeNamespaceConfig1 = new UserCodeNamespaceConfig();
+        userCodeNamespaceConfig1.setName(MyConstants.USER_CODE_NAMESPACE_1);
+
+        UserCodeNamespaceConfig userCodeNamespaceConfig2 = new UserCodeNamespaceConfig();
+        userCodeNamespaceConfig2.setName(MyConstants.USER_CODE_NAMESPACE_2);
+
+        UserCodeNamespaceConfig userCodeNamespaceConfig3 = new UserCodeNamespaceConfig();
+        userCodeNamespaceConfig3.setName(MyConstants.USER_CODE_NAMESPACE_3);
+
+        config.getNamespacesConfig().addNamespaceConfig(userCodeNamespaceConfig1);
+        config.getNamespacesConfig().addNamespaceConfig(userCodeNamespaceConfig2);
+        config.getNamespacesConfig().addNamespaceConfig(userCodeNamespaceConfig3);
+
+        // Namespace for executor classes
+        ExecutorConfig executorConfig = new ExecutorConfig(MyConstants.EXECUTOR_NAMESPACE_1);
+        executorConfig.setUserCodeNamespace(MyConstants.USER_CODE_NAMESPACE_1);
+        config.getExecutorConfigs().put(executorConfig.getName(), executorConfig);
+
+        // Namespace for map listener classes
+        MapConfig mapConfig = new MapConfig(MyConstants.MAP_NAMESPACE_2);
+        mapConfig.setUserCodeNamespace(MyConstants.USER_CODE_NAMESPACE_2);
+        config.getMapConfigs().put(mapConfig.getName(), mapConfig);
+
+        // Namespace for queue listener classes
+        QueueConfig queueConfig = new QueueConfig(MyConstants.QUEUE_NAMESPACE_3);
+        queueConfig.setUserCodeNamespace(MyConstants.USER_CODE_NAMESPACE_3);
+        config.getQueueConfigs().put(queueConfig.getName(), queueConfig);
     }
 
 }

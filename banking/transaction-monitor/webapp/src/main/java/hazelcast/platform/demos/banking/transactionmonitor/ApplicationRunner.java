@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
+import com.hazelcast.core.IExecutorService;
 import com.hazelcast.crdt.pncounter.PNCounter;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.map.IMap;
@@ -134,6 +136,10 @@ public class ApplicationRunner {
         System.out.println("");
         System.out.println("");
         if (ok) {
+            boolean isEnterprise = this.checkEnterprise();
+            //XXX UCD - runnables in namespace, and do something with a queue, add MAP LISTENER for HEAP MAP ?
+            //XXX UCD - NS1 - Executor : NS2 - Map Listener : NS3 - Queue Listener
+            LOGGER.error("isEnterprise=={}", isEnterprise);
             PNCounter updateCounter = this.hazelcastInstance.getPNCounter(MyConstants.PN_UPDATER);
             if (updateCounter.get() == 0L) {
                 LOGGER.info("Launching admin runnables");
@@ -180,6 +186,32 @@ public class ApplicationRunner {
                 javalinServer.server().join();
             }
         }
+    }
+
+    /**
+     * <p>Probe a server to see if it is Enterprise or Open Source.
+     * </p>
+     *
+     * @return
+     */
+    private boolean checkEnterprise() {
+        IExecutorService iExecutorService = hazelcastInstance.getExecutorService("default");
+
+        boolean isEnterprise = false;
+        EnterpriseChecker enterpriseChecker = new EnterpriseChecker(useViridian);
+        try {
+            Future<Boolean> future = iExecutorService.submit(enterpriseChecker);
+            Boolean b = future.get();
+            if (b == null) {
+                LOGGER.error("launchAdminRunners(), future.get() null");
+            } else {
+                isEnterprise = b;
+            }
+        } catch (Exception e) {
+            LOGGER.error("launchAdminRunners(), future.get()", e);
+        }
+
+        return isEnterprise;
     }
 
     /**

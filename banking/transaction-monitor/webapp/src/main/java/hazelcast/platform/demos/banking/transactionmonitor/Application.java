@@ -38,7 +38,7 @@ public class Application {
     private static int port;
     private static boolean useViridian;
 
-    //FIXME FIX PANEL ON FINOS TO MAKE FOOTER SHOW
+    //TODO FIX PANEL ON FINOS TO MAKE FOOTER SHOW
 
     /**
      * <p>Configure Hazelcast logging via Slf4j. Implementation

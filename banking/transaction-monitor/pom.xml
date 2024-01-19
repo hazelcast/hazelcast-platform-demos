@@ -108,6 +108,9 @@
                         <echo message="Postgres:" />
                         <echo message="Database is 'transaction-monitor-${my.transaction-monitor.flavor}', just amend IP in:" />
                         <echo message="jdbc:postgresql://127.0.0.1:5432/transaction-monitor-${my.transaction-monitor.flavor}" />
+                        <echo message="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" />
+                        <echo message="use.viridian == ${use.viridian}" />
+                        <echo message="my.viridian.cluster1.name == '${my.viridian.cluster1.name}'" />
                         <echo message="@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" />
                     </target>
                 </configuration>

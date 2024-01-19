@@ -82,9 +82,9 @@ public class TransactionMonitorIdempotentInitializationSql {
                 + " SELECT __key, " + concatenation + " || ',' || provenance || ',' || whence || ',' || volume"
                 + " FROM \"" + MyConstants.IMAP_NAME_ALERTS_LOG + "\"";
 
-        //FIXME 5.4 Style, to be removed once "sqlJobMapToKafka" runs as streaming in 5.x
-        //FIXME https://docs.hazelcast.com/hazelcast/5.4-snapshot/sql/querying-maps-sql#streaming-map-changes
-        //FIXME See https://github.com/hazelcast/hazelcast-platform-demos/issues/131
+        //TODO 5.4 Style, to be removed once "sqlJobMapToKafka" runs as streaming in 5.x
+        //TODO https://docs.hazelcast.com/hazelcast/5.4-snapshot/sql/querying-maps-sql#streaming-map-changes
+        //TODO See https://github.com/hazelcast/hazelcast-platform-demos/issues/131
         try {
             Pipeline pipelineAlertingToKafka = AlertingToKafka.buildPipeline(bootstrapServers);
 
@@ -101,7 +101,7 @@ public class TransactionMonitorIdempotentInitializationSql {
             return false;
         }
 
-        //FIXME Submit "sqlJobMapToKafka", will complete until ready for streaming as reminder
+        //TODO Submit "sqlJobMapToKafka", will complete until ready for streaming as reminder
         for (String sql : List.of(sqlJobKafkaToMap, sqlJobMapToKafka)) {
             try {
                 hazelcastInstance.getSql().execute(sql);
