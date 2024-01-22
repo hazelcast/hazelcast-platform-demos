@@ -12,9 +12,8 @@ cd $BASEDIR/../../../$MODULE
 # Darwin vs Linux
 OS=`uname -s`
 if [ "$OS" = "Darwin" ]; then
-    HOST_IP=`ifconfig | grep -w inet | grep 192.168.[012] | cut -d" " -f2`
+    HOST_IP=`ifconfig | grep -v 127.0.0.1 | grep -w inet -m 1 | cut -d" " -f2`
 fi
-
 if [ "$OS" = "Linux" ]; then
     HOST_IP=`ifconfig | grep -w inet -m 1 | awk '{print $2}'`
 fi

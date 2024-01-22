@@ -40,35 +40,38 @@
 	<modules>
 		<module>abstract-hazelcast-client</module>
 		<module>abstract-hazelcast-node</module>
+		<module>cassandra</module>
 		<module>client-command-line</module>
-		<module>client-csharp</module>
 		<module>client-cpp</module>
+		<module>client-csharp</module>
 		<module>client-golang</module>
 		<module>client-nodejs</module>
 		<module>client-python</module>
-		<module>custom-classes</module>
 		<module>common</module>
-		<module>hazelcast-node</module>
+		<module>custom-classes</module>
+		<module>finos</module>
+		<module>grafana</module>
 		<module>hazelcast-node-enterprise-1</module>
 		<module>hazelcast-node-enterprise-2</module>
-		<module>transaction-producer</module>
-		<module>webapp</module>
-		<module>remote-job-sub-1</module>
-		<module>zookeeper</module>
-		<module>kafka-broker</module>
+		<module>hazelcast-node</module>
+		<module>jar-namespace-1</module>
+		<module>jar-namespace-2</module>
+		<module>jar-namespace-3</module>
 		<module>kafdrop</module>
-		<module>topic-create</module>
-		<module>finos</module>
-		<module>cassandra</module>
+		<module>kafka-broker</module>
 		<module>management-center</module>
 		<module>maria</module>
-		<module>mongo</module>
 		<module>mongo-updater</module>
+		<module>mongo</module>
 		<module>mysql</module>
-		<module>prometheus</module>
 		<module>postgres</module>
-		<module>grafana</module>
+		<module>prometheus</module>
 		<module>pulsar</module>
+		<module>remote-job-sub-1</module>
+		<module>topic-create</module>
+		<module>transaction-producer</module>
+		<module>webapp</module>
+		<module>zookeeper</module>
 	</modules>
 
 	<dependencyManagement>
@@ -86,7 +89,7 @@
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <configuration>
-                        <target>
+                    <target>
                         <echo message="@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" />
                         <echo message="Set in top level pom.xml" />
                         <echo message="$my.pulsar.or.kafka=${my.pulsar.or.kafka}" />

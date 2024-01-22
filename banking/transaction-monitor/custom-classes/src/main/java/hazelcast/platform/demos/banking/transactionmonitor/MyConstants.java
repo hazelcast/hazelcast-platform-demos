@@ -184,11 +184,19 @@ public class MyConstants {
     public static final String CP_GROUP_A = "odd";
     public static final String CP_GROUP_B = "even";
 
-    // Namespaces and the objects that refer to them
+    // Objects in namespaces
     public static final String EXECUTOR_NAMESPACE_1 = "executor_ns1";
+    public static final String EXECUTOR_NAMESPACE_2 = "executor_ns2";
+    public static final String EXECUTOR_NAMESPACE_3 = "executor_ns3";
     public static final String MAP_NAMESPACE_2 = "map_ns2";
     public static final String QUEUE_NAMESPACE_3 = "queue_ns3";
+    // Namespace names
     public static final String USER_CODE_NAMESPACE_1 = "ns1";
     public static final String USER_CODE_NAMESPACE_2 = "ns2";
     public static final String USER_CODE_NAMESPACE_3 = "ns3";
+    // These are copied into the Dockerfile for WebApp.
+    public static final String USER_CODE_JAR_FOR_NAMESPACE_1 = "namespace1.jar";
+    public static final String USER_CODE_JAR_FOR_NAMESPACE_2 = "namespace2.jar";
+    public static final String USER_CODE_JAR_FOR_NAMESPACE_3 = "namespace3.jar";
+
 }

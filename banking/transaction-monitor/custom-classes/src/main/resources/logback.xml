@@ -47,6 +47,9 @@
     <logger name="com.hazelcast.jet.kafka.impl" level="warn" additivity="false">
         <appender-ref ref="NORMAL"/>
     </logger>
+    <logger name="com.hazelcast.cp.internal.raft.impl.task" level="error" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
     <logger name="com.hazelcast.cp.internal.RaftGroupMembershipManager" level="warn" additivity="false">
         <appender-ref ref="NORMAL"/>
     </logger>
@@ -75,6 +78,9 @@
     </logger>
     <logger name="hazelcast.platform.demos.banking.transactionmonitor.ApplicationRunner" level="debug" additivity="false">
         <appender-ref ref="CYAN"/>
+    </logger>
+    <logger name="hazelcast.platform.demos.banking.transactionmonitor.ApplicationRunnerNamespaces" level="debug" additivity="false">
+        <appender-ref ref="YELLOW"/>
     </logger>
     <logger name="hazelcast.platform.demos.banking.transactionmonitor.MyMembershipListener" level="trace" additivity="false">
         <appender-ref ref="CYAN"/>

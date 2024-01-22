@@ -57,7 +57,9 @@
 		<!-- docker-maven-plugin does not like empty/null. Modules using the below 
 			can override. -->
 		<my.docker.jar.file>unset</my.docker.jar.file>
+		<my.docker.jar.file1>unset</my.docker.jar.file1>
 		<my.docker.jar.file2>unset</my.docker.jar.file2>
+		<my.docker.jar.file3>unset</my.docker.jar.file3>
 		<main.class>unset</main.class>
 		<my.mc.cluster1.name>unset</my.mc.cluster1.name>
 		<my.mc.cluster1.addresslist>unset</my.mc.cluster1.addresslist>
@@ -101,7 +103,7 @@
 		<slf4j.version>2.0.7</slf4j.version>
 		<spotbugs-annotations.version>4.7.3</spotbugs-annotations.version>
 		<springdoc.version>2.3.0</springdoc.version>
-		<spring-boot.version>3.2.1</spring-boot.version>
+		<spring-boot.version>3.2.2</spring-boot.version>
 		<spring-cloud.version>2021.0.0</spring-cloud.version>
 		<spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
 		<zipkin.version>2.23.3-SNAPSHOT</zipkin.version>
@@ -622,7 +624,9 @@
 										<CONTROL_FILE>${my.docker.control.file}</CONTROL_FILE>
 										<FLAVOR>${my.transaction-monitor.flavor}</FLAVOR>
 										<JAR_FILE>${my.docker.jar.file}</JAR_FILE>
+										<JAR_FILE1>${my.docker.jar.file1}</JAR_FILE1>
 										<JAR_FILE2>${my.docker.jar.file2}</JAR_FILE2>
+										<JAR_FILE3>${my.docker.jar.file3}</JAR_FILE3>
 										<MAIN_CLASS>${main.class}</MAIN_CLASS>
 										<!-- Dockerfile uses for Management Center. -->
 										<MC_LICENSE>${my.mc.license.key}</MC_LICENSE>

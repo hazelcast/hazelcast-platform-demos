@@ -17,6 +17,9 @@
 	<properties>
 		<my.docker.image.name>webapp</my.docker.image.name>
 		<my.docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</my.docker.jar.file>
+		<my.docker.jar.file1>transaction-monitor-jar-namespace-1-${project.version}.jar</my.docker.jar.file1>
+		<my.docker.jar.file2>transaction-monitor-jar-namespace-2-${project.version}.jar</my.docker.jar.file2>
+		<my.docker.jar.file3>transaction-monitor-jar-namespace-3-${project.version}.jar</my.docker.jar.file3>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 		<main.class>hazelcast.platform.demos.banking.transactionmonitor.Application</main.class>
 
@@ -39,6 +42,24 @@
 					<artifactId>hazelcast</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>transaction-monitor-jar-namespace-1</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>transaction-monitor-jar-namespace-2</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>transaction-monitor-jar-namespace-3</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -94,6 +115,11 @@
 					<target>
 						<ant antfile="../../../ant/build.xml" target="conditionalcopy"/>
 					</target>
+                    <target name="Copy ${my.docker.jar.file1} ${my.docker.jar.file2} ${my.docker.jar.file3}">
+                    	<copy file="../jar-namespace-1/target/${my.docker.jar.file1}" todir="${project.build.directory}"/>
+                    	<copy file="../jar-namespace-2/target/${my.docker.jar.file2}" todir="${project.build.directory}"/>
+                    	<copy file="../jar-namespace-3/target/${my.docker.jar.file3}" todir="${project.build.directory}"/>
+                    </target>
 				</configuration>
 			</plugin>
 			<plugin>

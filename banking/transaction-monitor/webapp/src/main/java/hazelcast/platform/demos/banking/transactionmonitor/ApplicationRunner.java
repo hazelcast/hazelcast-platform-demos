@@ -136,10 +136,6 @@ public class ApplicationRunner {
         System.out.println("");
         System.out.println("");
         if (ok) {
-            boolean isEnterprise = this.checkEnterprise();
-            //XXX UCD - runnables in namespace, and do something with a queue, add MAP LISTENER for HEAP MAP ?
-            //XXX UCD - NS1 - Executor : NS2 - Map Listener : NS3 - Queue Listener
-            LOGGER.error("isEnterprise=={}", isEnterprise);
             PNCounter updateCounter = this.hazelcastInstance.getPNCounter(MyConstants.PN_UPDATER);
             if (updateCounter.get() == 0L) {
                 LOGGER.info("Launching admin runnables");
@@ -149,6 +145,10 @@ public class ApplicationRunner {
             } else {
                 LOGGER.info("Skip launch admin runnables, PNCounter '{}'=={}",
                         updateCounter.getName(), updateCounter.get());
+            }
+            // Additional code to demonstrate namespaces where applicable
+            if (this.namespacesApplicable()) {
+                ApplicationRunnerNamespaces.runNamespaceActions(this.hazelcastInstance, this.useViridian);
             }
 
             ok = demoSql();
@@ -163,9 +163,7 @@ public class ApplicationRunner {
             Javalin javalin = Javalin.create();
 
             // ReactJS, see src/main/app
-            javalin.config
-            .addStaticFiles("/app")
-            .addSinglePageRoot("/", "/app/index.html");
+            javalin.config.addStaticFiles("/app").addSinglePageRoot("/", "/app/index.html");
 
             // REST
             MyRestController myRestController = new MyRestController(this.hazelcastInstance);
@@ -190,11 +188,17 @@ public class ApplicationRunner {
 
     /**
      * <p>Probe a server to see if it is Enterprise or Open Source.
+     * Only run if Docker or Kubernetes, to prove classpath not shared on filesystem.
      * </p>
      *
      * @return
      */
-    private boolean checkEnterprise() {
+    private boolean namespacesApplicable() {
+        if (this.localhost) {
+            LOGGER.info("namespacesApplicable(): false as localhost.");
+            return false;
+        }
+
         IExecutorService iExecutorService = hazelcastInstance.getExecutorService("default");
 
         boolean isEnterprise = false;
@@ -203,16 +207,18 @@ public class ApplicationRunner {
             Future<Boolean> future = iExecutorService.submit(enterpriseChecker);
             Boolean b = future.get();
             if (b == null) {
-                LOGGER.error("launchAdminRunners(), future.get() null");
+                LOGGER.error("namespacesApplicable(), future.get() null");
             } else {
                 isEnterprise = b;
             }
         } catch (Exception e) {
-            LOGGER.error("launchAdminRunners(), future.get()", e);
+            LOGGER.error("namespacesApplicable(), future.get()", e);
         }
 
+        LOGGER.info("namespacesApplicable(): isEnterprise=={}", isEnterprise);
         return isEnterprise;
     }
+
 
     /**
      * <p>Handle the start of a new browser session, stashing
