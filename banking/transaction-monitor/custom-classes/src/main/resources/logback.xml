@@ -37,7 +37,59 @@
         </encoder>
     </appender>
 
+	<!-- CP loggers, blue for logger, different color for the message -->
+    <appender name="RAFT_BLUE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %blue(%thread %logger{60}) - %blue(%msg %n)</pattern>
+        </encoder>
+    </appender>
+    <appender name="RAFT_CYAN" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %blue(%thread %logger{60}) - %cyan(%msg %n)</pattern>
+        </encoder>
+    </appender>
+    <appender name="RAFT_MAGENTA" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %blue(%thread %logger{60}) - %magenta(%msg %n)</pattern>
+        </encoder>
+    </appender>
+    <appender name="RAFT_YELLOW" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %blue(%thread %logger{60}) - %cyan(%msg %n)</pattern>
+        </encoder>
+    </appender>
+
     <!-- Tune out some of Hazelcast's normal messages so more of Transaction Monitor in logs -->
+    <logger name="com.hazelcast.cp.internal.raft.impl.handler" level="warn" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
+    <logger name="com.hazelcast.cp.internal.RaftGroupMembershipManager" level="warn" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
+
+    <logger name="com.hazelcast.cp.internal.raft.impl.task.LeaderElectionTask" level="info" additivity="false">
+        <appender-ref ref="RED"/>
+    </logger>
+    
+    <logger name="com.hazelcast.cp.internal.raft.impl.RaftNode(default)" level="info" additivity="false">
+        <appender-ref ref="RAFT_BLUE"/>
+    </logger>
+    <logger name="com.hazelcast.cp.internal.raft.impl.RaftNode(even)" level="info" additivity="false">
+        <appender-ref ref="RAFT_MAGENTA"/>
+    </logger>
+    <logger name="com.hazelcast.cp.internal.raft.impl.RaftNode(odd)" level="info" additivity="false">
+        <appender-ref ref="RAFT_YELLOW"/>
+    </logger>
+    <logger name="com.hazelcast.cp.internal.raft.impl.RaftNode(METADATA)" level="info" additivity="false">
+        <appender-ref ref="RAFT_CYAN"/>
+    </logger>
+    <logger name="com.hazelcast.cp.internal.RaftInvocationManager" level="warn" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
+    <logger name="com.hazelcast.cp.internal.RaftService" level="warn" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
+
     <logger name="com.hazelcast.jet.impl.JobExecutionService" level="warn" additivity="false">
         <appender-ref ref="NORMAL"/>
     </logger>
@@ -45,12 +97,6 @@
         <appender-ref ref="YELLOW"/>
     </logger>
     <logger name="com.hazelcast.jet.kafka.impl" level="warn" additivity="false">
-        <appender-ref ref="NORMAL"/>
-    </logger>
-    <logger name="com.hazelcast.cp.internal.raft.impl.task" level="error" additivity="false">
-        <appender-ref ref="NORMAL"/>
-    </logger>
-    <logger name="com.hazelcast.cp.internal.RaftGroupMembershipManager" level="warn" additivity="false">
         <appender-ref ref="NORMAL"/>
     </logger>
     <logger name="com.hazelcast.internal.cluster.impl.TcpIpJoiner" level="warn" additivity="false">

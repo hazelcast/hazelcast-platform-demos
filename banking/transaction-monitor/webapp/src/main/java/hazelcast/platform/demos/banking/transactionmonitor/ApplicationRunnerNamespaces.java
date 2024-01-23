@@ -16,7 +16,7 @@
 
 package hazelcast.platform.demos.banking.transactionmonitor;
 
-import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,6 +29,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hazelcast.cluster.Member;
+import com.hazelcast.config.ItemListenerConfig;
+import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.MapStoreConfig;
+import com.hazelcast.config.QueueConfig;
 import com.hazelcast.config.UserCodeNamespaceConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IExecutorService;
@@ -71,7 +75,7 @@ public class ApplicationRunnerNamespaces {
     }
 
     /**
-     * <p>Run the namespace 1 variant of the executor.
+     * <p>Run the namespace 1 variant of the executor, mixed case output.
      * </p>
      *
      * @param hazelcastInstance
@@ -93,16 +97,16 @@ public class ApplicationRunnerNamespaces {
     }
 
     /**
-     * <p>Run the namespace 2 variant of the executor.
+     * <p>Run the namespace 2 variant of the executor, upper case output.
      * </p>
-     * XXX
+     * <p>Add a map store, and launch a second runnable that writes to the map with the map store.
+     * </p>
      *
      * @param hazelcastInstance
      * @param isViridian
      * @throws Exception If configuration goes wrong. Exception by called class is caught.
      */
     private static void doNamespace2Action(HazelcastInstance hazelcastInstance, boolean isViridian) throws Exception {
-        //XXX
         addNamespaceJar(hazelcastInstance, MyConstants.USER_CODE_NAMESPACE_2, MyConstants.USER_CODE_JAR_FOR_NAMESPACE_2);
 
         IExecutorService iExecutorServiceNS2 = hazelcastInstance.getExecutorService(MyConstants.EXECUTOR_NAMESPACE_2);
@@ -113,19 +117,33 @@ public class ApplicationRunnerNamespaces {
         } catch (Exception e) {
             LOGGER.error("doNamespace2Action(), futuresMap", e);
         }
+
+        // Map with logging map store
+        MapStoreConfig mapStoreConfigNS2 = new MapStoreConfig();
+        mapStoreConfigNS2.setEnabled(true).setImplementation(new TodayLoggingMapStore(MyConstants.MAP_NAMESPACE_2));
+        MapConfig mapConfigNS2 = new MapConfig(MyConstants.MAP_NAMESPACE_2);
+        mapConfigNS2.setUserCodeNamespace(MyConstants.USER_CODE_NAMESPACE_2);
+        mapConfigNS2.setMapStoreConfig(mapStoreConfigNS2);
+        hazelcastInstance.getConfig().addMapConfig(mapConfigNS2);
+
+        // Runnable that writes to map with logging map store
+        PeriodicQueueWriterRunnable todayLoggingRunnable =
+                new PeriodicQueueWriterRunnable(isViridian, iExecutorServiceNS2.getName());
+        iExecutorServiceNS2.execute(todayLoggingRunnable);
     }
 
     /**
-     * <p>Run the namespace 3 variant of the executor.
+     * <p>Run the namespace 3 variant of the executor, lower case output.
      * </p>
-     * XXX
+     * <p>Add a queue listener into the namespace, then launch runnables to read and write from
+     * this queue.
+     * </p>
      *
      * @param hazelcastInstance
      * @param isViridian
      * @throws Exception If configuration goes wrong. Exception by called class is caught.
      */
     private static void doNamespace3Action(HazelcastInstance hazelcastInstance, boolean isViridian) throws Exception {
-        //XXX
         addNamespaceJar(hazelcastInstance, MyConstants.USER_CODE_NAMESPACE_3, MyConstants.USER_CODE_JAR_FOR_NAMESPACE_3);
 
         IExecutorService iExecutorServiceNS3 = hazelcastInstance.getExecutorService(MyConstants.EXECUTOR_NAMESPACE_3);
@@ -136,6 +154,25 @@ public class ApplicationRunnerNamespaces {
         } catch (Exception e) {
             LOGGER.error("doNamespace3Action(), future.get()", e);
         }
+
+        // Queue with logging queue listener
+        ItemListenerConfig itemListenerConfigNS3 = new ItemListenerConfig();
+        itemListenerConfigNS3.setIncludeValue(true);
+        itemListenerConfigNS3.setImplementation(new LoggingItemListener(MyConstants.QUEUE_NAMESPACE_3));
+        QueueConfig queueConfigNS3 = new QueueConfig(MyConstants.QUEUE_NAMESPACE_3);
+        queueConfigNS3.setUserCodeNamespace(MyConstants.USER_CODE_NAMESPACE_3);
+        queueConfigNS3.addItemListenerConfig(itemListenerConfigNS3);
+        hazelcastInstance.getConfig().addQueueConfig(queueConfigNS3);
+
+        // Runnable that writes to queue with listener
+        PeriodicQueueWriterRunnable periodicQueueWriterRunnable =
+                new PeriodicQueueWriterRunnable(isViridian, iExecutorServiceNS3.getName());
+        iExecutorServiceNS3.execute(periodicQueueWriterRunnable);
+
+        // Runnable that reads from queue with listener
+        PeriodicQueueReaderRunnable periodicQueueReaderRunnable =
+                new PeriodicQueueReaderRunnable(isViridian, iExecutorServiceNS3.getName());
+        iExecutorServiceNS3.execute(periodicQueueReaderRunnable);
     }
 
     /**
@@ -181,9 +218,11 @@ public class ApplicationRunnerNamespaces {
         TreeMap<String, List<String>> result = new TreeMap<>();
 
         for (Map.Entry<Member, Future<List<String>>> entry : futuresMap.entrySet()) {
-            InetAddress inetAddress = entry.getKey().getAddress().getInetAddress();
+            InetSocketAddress inetSocketAddress = entry.getKey().getAddress().getInetSocketAddress();
+            String host = inetSocketAddress.getAddress().getHostAddress();
+            int port = inetSocketAddress.getPort();
             List<String> value = entry.getValue().get();
-            result.put(inetAddress.toString(), value);
+            result.put(host + ":" + port, value);
         }
 
         result

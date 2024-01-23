@@ -40,7 +40,6 @@ import com.hazelcast.config.LocalDeviceConfig;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MemoryTierConfig;
 import com.hazelcast.config.PersistenceConfig;
-import com.hazelcast.config.QueueConfig;
 import com.hazelcast.config.TcpIpConfig;
 import com.hazelcast.config.TieredStoreConfig;
 import com.hazelcast.config.WanReplicationConfig;
@@ -332,7 +331,8 @@ public class ApplicationConfig {
     }
 
     /**
-     * <p>Add namespaces for selected maps, etc. All three namespaces define an executor.
+     * <p>Add namespaces for selected objects. All three namespaces define an executor
+     * and run different implementations, segregated by their classloaders.
      * </p>
      */
     private static void addUserCodeNamespace(Config config) {
@@ -349,17 +349,11 @@ public class ApplicationConfig {
         ExecutorConfig executorConfig2 = new ExecutorConfig(MyConstants.EXECUTOR_NAMESPACE_2);
         executorConfig2.setUserCodeNamespace(MyConstants.USER_CODE_NAMESPACE_2);
         config.getExecutorConfigs().put(executorConfig2.getName(), executorConfig2);
-        MapConfig mapConfig2 = new MapConfig(MyConstants.MAP_NAMESPACE_2);
-        mapConfig2.setUserCodeNamespace(MyConstants.USER_CODE_NAMESPACE_2);
-        config.getMapConfigs().put(mapConfig2.getName(), mapConfig2);
 
         // Namespace for executor queue listener classes
         ExecutorConfig executorConfig3 = new ExecutorConfig(MyConstants.EXECUTOR_NAMESPACE_3);
         executorConfig3.setUserCodeNamespace(MyConstants.USER_CODE_NAMESPACE_3);
         config.getExecutorConfigs().put(executorConfig3.getName(), executorConfig3);
-        QueueConfig queueConfig3 = new QueueConfig(MyConstants.QUEUE_NAMESPACE_3);
-        queueConfig3.setUserCodeNamespace(MyConstants.USER_CODE_NAMESPACE_3);
-        config.getQueueConfigs().put(queueConfig3.getName(), queueConfig3);
     }
 
 }

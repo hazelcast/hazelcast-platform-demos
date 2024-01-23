@@ -95,6 +95,9 @@ public class MyConstants {
     public static final String IMAP_NAME_TRANSACTIONS = "transactions";
     public static final String IMAP_NAME_TRANSACTIONS_XML = "transactions_xml";
 
+    // daily + today's date
+    public static final String IMAP_NAME_PREFIX_DAILY = "daily-";
+
     public static final List<String> IMAP_NAMES_ECOMMERCE =
             List.of(IMAP_NAME_AGGREGATE_QUERY_RESULTS, IMAP_NAME_ALERTS_LOG,
                     IMAP_NAME_HEAP,
