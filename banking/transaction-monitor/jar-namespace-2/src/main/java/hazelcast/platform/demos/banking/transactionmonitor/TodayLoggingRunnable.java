@@ -18,6 +18,8 @@ package hazelcast.platform.demos.banking.transactionmonitor;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -41,12 +43,14 @@ public class TodayLoggingRunnable implements HazelcastInstanceAware, Runnable, S
     private static final Logger LOGGER = LoggerFactory.getLogger(TodayLoggingRunnable.class);
 
     private final boolean useViridian;
-    private final String prefix;
+    private final String executor;
+    private final String mapPrefix;
     private transient HazelcastInstance hazelcastInstance;
 
-    TodayLoggingRunnable(boolean arg0, String arg1) {
+    TodayLoggingRunnable(boolean arg0, String arg1, String arg2) {
         this.useViridian = arg0;
-        this.prefix = arg1;
+        this.executor = arg1;
+        this.mapPrefix = arg2;
     }
 
     /**
@@ -58,7 +62,7 @@ public class TodayLoggingRunnable implements HazelcastInstanceAware, Runnable, S
     public void run() {
         String previous = "";
         if (!useViridian) {
-            LOGGER.info("**{}**'{}'::START run()", LocalConstants.MY_JAR_NAME, this.prefix);
+            LOGGER.info("**{}**'{}'::START run()", LocalConstants.MY_JAR_NAME, this.executor);
         }
 
         try {
@@ -72,9 +76,10 @@ public class TodayLoggingRunnable implements HazelcastInstanceAware, Runnable, S
                 }
                 if (iMap != null) {
                     final var key = address.getInetAddress().getHostAddress() + ":" + address.getPort();
-                    String value = iMap.getName();
+                    String value = LocalTime.now().atOffset(ZoneOffset.UTC).toString();
                     iMap.set(key, value);
-                    LOGGER.info("**{}**'{}'::run() -> set('{}', '{}')", LocalConstants.MY_JAR_NAME, this.prefix, key, value);
+                    LOGGER.info("**{}**'{}'::run() -> Map '{}' set('{}', '{}')",
+                            LocalConstants.MY_JAR_NAME, this.executor, iMap.getName(), key, value);
                 }
 
                 TimeUnit.HOURS.sleep(1L);
@@ -83,22 +88,22 @@ public class TodayLoggingRunnable implements HazelcastInstanceAware, Runnable, S
             if (!useViridian) {
                 LOGGER.info(
                         String.format("**%s**'%s'::HazelcastInstanceNotActiveException run(): %s",
-                                LocalConstants.MY_JAR_NAME, this.prefix, hnae.getMessage()));
+                                LocalConstants.MY_JAR_NAME, this.executor, hnae.getMessage()));
             }
         } catch (InterruptedException ie) {
             if (!useViridian) {
                 LOGGER.info(
                         String.format("**%s**'%s'::InterruptedException run(): %s",
-                                LocalConstants.MY_JAR_NAME, this.prefix, ie.getMessage()));
+                                LocalConstants.MY_JAR_NAME, this.executor, ie.getMessage()));
             }
         } catch (Exception e) {
             if (!useViridian) {
-                LOGGER.info(String.format("**%s**'%s'::EXCEPTION run()", LocalConstants.MY_JAR_NAME, this.prefix), e);
+                LOGGER.info(String.format("**%s**'%s'::EXCEPTION run()", LocalConstants.MY_JAR_NAME, this.executor), e);
             }
         }
 
         if (!useViridian) {
-            LOGGER.info("**{}**'{}'::END run()", LocalConstants.MY_JAR_NAME, this.prefix);
+            LOGGER.info("**{}**'{}'::END run()", LocalConstants.MY_JAR_NAME, this.executor);
         }
     }
 
@@ -108,7 +113,7 @@ public class TodayLoggingRunnable implements HazelcastInstanceAware, Runnable, S
      * @return
      */
     private IMap<String, String> dateRollover(String today) {
-        String mapName = MyConstants.IMAP_NAME_PREFIX_DAILY + today;
+        String mapName = this.mapPrefix + "_" + today.replaceAll("-", "_");
         String definition = "CREATE MAPPING IF NOT EXISTS \"" + mapName + "\""
                 + " TYPE IMap "
                 + " OPTIONS ( "
@@ -116,11 +121,13 @@ public class TodayLoggingRunnable implements HazelcastInstanceAware, Runnable, S
                 + " 'valueFormat' = 'varchar'"
                 + " )";
 
-        LOGGER.debug("**{}**'{}'::Definition '{}'", LocalConstants.MY_JAR_NAME, this.prefix, definition);
         try {
             hazelcastInstance.getSql().execute(definition);
+            LOGGER.debug("**{}**'{}'::Definition '{}'", LocalConstants.MY_JAR_NAME, this.executor, definition);
         } catch (Exception e) {
-            LOGGER.error(String.format("**%s**'%s'::Definition '%s'", LocalConstants.MY_JAR_NAME, this.prefix, definition), e);
+            LOGGER.error(
+                    String.format("**%s**'%s'::Definition '%s'", LocalConstants.MY_JAR_NAME, this.executor, definition),
+                    e);
             return null;
         }
         return this.hazelcastInstance.getMap(mapName);

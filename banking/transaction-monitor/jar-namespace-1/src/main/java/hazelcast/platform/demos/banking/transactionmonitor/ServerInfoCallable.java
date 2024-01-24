@@ -36,11 +36,11 @@ public class ServerInfoCallable implements Callable<List<String>>, Serializable 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerInfoCallable.class);
 
     private final boolean useViridian;
-    private final String prefix;
+    private final String executor;
 
     ServerInfoCallable(boolean arg0, String arg1) {
         this.useViridian = arg0;
-        this.prefix = arg1;
+        this.executor = arg1;
     }
 
     /**
@@ -50,7 +50,7 @@ public class ServerInfoCallable implements Callable<List<String>>, Serializable 
     @Override
     public List<String> call() {
         if (!useViridian) {
-            LOGGER.info("**{}**'{}'::START call()", LocalConstants.MY_JAR_NAME, this.prefix);
+            LOGGER.info("**{}**'{}'::START call()", LocalConstants.MY_JAR_NAME, this.executor);
         }
 
         List<String> result = new ArrayList<>();
@@ -62,20 +62,20 @@ public class ServerInfoCallable implements Callable<List<String>>, Serializable 
                 String.format(
                         "**%s**'%s'::Runtime.getRuntime().availableProcessors()==%d classloader='%s' parent.classloader='%s'",
                         LocalConstants.MY_JAR_NAME,
-                        this.prefix, Runtime.getRuntime().availableProcessors(),
+                        this.executor, Runtime.getRuntime().availableProcessors(),
                         this.getClass().getClassLoader().getName(),
                         this.getClass().getClassLoader().getParent().getName()
                         )
                     );
         } catch (Exception e) {
             if (!useViridian) {
-                LOGGER.info(String.format("**%s**'%s'::EXCEPTION call()", LocalConstants.MY_JAR_NAME, this.prefix), e);
+                LOGGER.info(String.format("**%s**'%s'::EXCEPTION call()", LocalConstants.MY_JAR_NAME, this.executor), e);
             }
             result.add(e.getMessage());
         }
 
         if (!useViridian) {
-            LOGGER.info("**{}**'{}'::END call()", LocalConstants.MY_JAR_NAME, this.prefix);
+            LOGGER.info("**{}**'{}'::END call()", LocalConstants.MY_JAR_NAME, this.executor);
         }
         return result;
     }

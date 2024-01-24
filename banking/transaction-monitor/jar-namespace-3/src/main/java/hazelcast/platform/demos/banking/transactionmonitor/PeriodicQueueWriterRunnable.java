@@ -40,12 +40,12 @@ public class PeriodicQueueWriterRunnable implements HazelcastInstanceAware, Runn
     private static final long SLEEP_15_MINUTES = TimeUnit.HOURS.toMillis(1L) / 4L;
 
     private final boolean useViridian;
-    private final String prefix;
+    private final String executor;
     private transient HazelcastInstance hazelcastInstance;
 
     PeriodicQueueWriterRunnable(boolean arg0, String arg1) {
         this.useViridian = arg0;
-        this.prefix = arg1;
+        this.executor = arg1;
     }
 
     /**
@@ -56,7 +56,7 @@ public class PeriodicQueueWriterRunnable implements HazelcastInstanceAware, Runn
     @SuppressFBWarnings(value = "REC_CATCH_EXCEPTION", justification = "InterruptedException possible")
     public void run() {
         if (!useViridian) {
-            LOGGER.info("**{}**'{}'::START run()", LocalConstants.MY_JAR_NAME, this.prefix);
+            LOGGER.info("**{}**'{}'::START run()", LocalConstants.MY_JAR_NAME, this.executor);
         }
 
         IQueue<String> iQueue = this.hazelcastInstance.getQueue(MyConstants.QUEUE_NAMESPACE_3);
@@ -67,10 +67,11 @@ public class PeriodicQueueWriterRunnable implements HazelcastInstanceAware, Runn
             while (true) {
                 String message = String.format(
                         "Message[%06d], sent by %s at %s",
-                        count, member, LocalDateTime.now().toString()
+                        ++count, member, LocalDateTime.now().toString()
                         );
                 iQueue.put(message);
-                LOGGER.info("**{}**'{}'::run() -> put('{}')", LocalConstants.MY_JAR_NAME, this.prefix, message);
+                LOGGER.info("**{}**'{}'::run() -> put('{}') size=={}",
+                        LocalConstants.MY_JAR_NAME, this.executor, message, iQueue.size());
 
                 Thread.sleep(SLEEP_15_MINUTES);
             }
@@ -78,22 +79,24 @@ public class PeriodicQueueWriterRunnable implements HazelcastInstanceAware, Runn
             if (!useViridian) {
                 LOGGER.info(
                         String.format("**%s**'%s'::HazelcastInstanceNotActiveException run(): %s",
-                                LocalConstants.MY_JAR_NAME, this.prefix, hnae.getMessage()));
+                                LocalConstants.MY_JAR_NAME, this.executor, hnae.getMessage()));
             }
         } catch (InterruptedException ie) {
             if (!useViridian) {
                 LOGGER.info(
                         String.format("**%s**'%s'::InterruptedException run(): %s",
-                                LocalConstants.MY_JAR_NAME, this.prefix, ie.getMessage()));
+                                LocalConstants.MY_JAR_NAME, this.executor, ie.getMessage()));
             }
         } catch (Exception e) {
             if (!useViridian) {
-                LOGGER.info(String.format("**%s**'%s'::EXCEPTION run()", LocalConstants.MY_JAR_NAME, this.prefix), e);
+                LOGGER.info(
+                        String.format("**%s**'%s'::EXCEPTION run()", LocalConstants.MY_JAR_NAME, this.executor),
+                        e);
             }
         }
 
         if (!useViridian) {
-            LOGGER.info("**{}**'{}'::END run()", LocalConstants.MY_JAR_NAME, this.prefix);
+            LOGGER.info("**{}**'{}'::END run()", LocalConstants.MY_JAR_NAME, this.executor);
         }
     }
 

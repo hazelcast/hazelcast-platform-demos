@@ -45,7 +45,6 @@ public class LoggingItemListener implements ItemListener<String> {
 
     @Override
     public void itemRemoved(ItemEvent<String> item) {
-        //XXX Used?
         LOGGER.info("**{}**'{}'::itemRemoved() -> Queue '{}', Message '{}'", LocalConstants.MY_JAR_NAME, this.prefix,
                 item.getSource(),
                 item.getItem()

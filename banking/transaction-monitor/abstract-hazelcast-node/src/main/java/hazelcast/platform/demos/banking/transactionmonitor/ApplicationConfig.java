@@ -343,6 +343,7 @@ public class ApplicationConfig {
         // Namespace for executor classes
         ExecutorConfig executorConfig1 = new ExecutorConfig(MyConstants.EXECUTOR_NAMESPACE_1);
         executorConfig1.setUserCodeNamespace(MyConstants.USER_CODE_NAMESPACE_1);
+        executorConfig1.setPoolSize(2);
         config.getExecutorConfigs().put(executorConfig1.getName(), executorConfig1);
 
         // Namespace for executor and map listener classes
@@ -353,6 +354,7 @@ public class ApplicationConfig {
         // Namespace for executor queue listener classes
         ExecutorConfig executorConfig3 = new ExecutorConfig(MyConstants.EXECUTOR_NAMESPACE_3);
         executorConfig3.setUserCodeNamespace(MyConstants.USER_CODE_NAMESPACE_3);
+        executorConfig3.setPoolSize(2);
         config.getExecutorConfigs().put(executorConfig3.getName(), executorConfig3);
     }
 

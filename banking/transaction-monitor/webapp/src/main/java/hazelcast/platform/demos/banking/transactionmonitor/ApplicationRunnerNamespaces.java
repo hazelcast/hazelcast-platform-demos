@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
 import java.util.concurrent.Future;
 
@@ -119,16 +120,22 @@ public class ApplicationRunnerNamespaces {
         }
 
         // Map with logging map store
+        Properties todayLoggingMapStoreProperties = new Properties();
+        todayLoggingMapStoreProperties.put("prefix", MyConstants.MAP_NAMESPACE_2);
         MapStoreConfig mapStoreConfigNS2 = new MapStoreConfig();
-        mapStoreConfigNS2.setEnabled(true).setImplementation(new TodayLoggingMapStore(MyConstants.MAP_NAMESPACE_2));
-        MapConfig mapConfigNS2 = new MapConfig(MyConstants.MAP_NAMESPACE_2);
+        mapStoreConfigNS2.setEnabled(true)
+        .setFactoryClassName(TodayLoggingMapStoreFactory.class.getCanonicalName())
+        .setProperties(todayLoggingMapStoreProperties);
+
+        // Note wildcard
+        MapConfig mapConfigNS2 = new MapConfig(MyConstants.MAP_NAMESPACE_2 + "*");
         mapConfigNS2.setUserCodeNamespace(MyConstants.USER_CODE_NAMESPACE_2);
         mapConfigNS2.setMapStoreConfig(mapStoreConfigNS2);
         hazelcastInstance.getConfig().addMapConfig(mapConfigNS2);
 
         // Runnable that writes to map with logging map store
-        PeriodicQueueWriterRunnable todayLoggingRunnable =
-                new PeriodicQueueWriterRunnable(isViridian, iExecutorServiceNS2.getName());
+        TodayLoggingRunnable todayLoggingRunnable =
+                new TodayLoggingRunnable(isViridian, iExecutorServiceNS2.getName(), MyConstants.MAP_NAMESPACE_2);
         iExecutorServiceNS2.execute(todayLoggingRunnable);
     }
 
