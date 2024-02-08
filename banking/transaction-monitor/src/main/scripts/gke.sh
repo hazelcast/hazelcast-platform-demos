@@ -288,6 +288,8 @@ then
   echo RC=$RC, exiting
   exit 0
  fi
+else
+ RC=0
 fi
 
 # Apply the files in order
