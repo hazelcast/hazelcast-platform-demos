@@ -88,7 +88,7 @@
 		<junit-vintage.version>5.9.3</junit-vintage.version>
 		<jython.version>2.7.2</jython.version>
 		<!--  Kafka Clients must match cloud target -->
-		<kafka-clients.version>2.2.2</kafka-clients.version>
+		<kafka-clients.version>3.6.1</kafka-clients.version>
 		<kafka-connect.version>2.6.0</kafka-connect.version>
 		<logback.version>1.4.8</logback.version>
 		<mariadb-java-client.version>3.1.4</mariadb-java-client.version>
