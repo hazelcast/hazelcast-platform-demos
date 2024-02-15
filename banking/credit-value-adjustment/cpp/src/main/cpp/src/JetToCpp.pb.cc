@@ -14,70 +14,68 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
+
+PROTOBUF_PRAGMA_INIT_SEG
+
+namespace _pb = ::PROTOBUF_NAMESPACE_ID;
+namespace _pbi = _pb::internal;
+
 namespace com_hazelcast_platform_demos_banking_cva {
-class InputMessageDefaultTypeInternal {
- public:
-  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<InputMessage> _instance;
-} _InputMessage_default_instance_;
-class OutputMessageDefaultTypeInternal {
- public:
-  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<OutputMessage> _instance;
-} _OutputMessage_default_instance_;
+PROTOBUF_CONSTEXPR InputMessage::InputMessage(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.inputvalue_)*/{}
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct InputMessageDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR InputMessageDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~InputMessageDefaultTypeInternal() {}
+  union {
+    InputMessage _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 InputMessageDefaultTypeInternal _InputMessage_default_instance_;
+PROTOBUF_CONSTEXPR OutputMessage::OutputMessage(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.outputvalue_)*/{}
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct OutputMessageDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR OutputMessageDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~OutputMessageDefaultTypeInternal() {}
+  union {
+    OutputMessage _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 OutputMessageDefaultTypeInternal _OutputMessage_default_instance_;
 }  // namespace com_hazelcast_platform_demos_banking_cva
-static void InitDefaultsscc_info_InputMessage_JetToCpp_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
+static ::_pb::Metadata file_level_metadata_JetToCpp_2eproto[2];
+static constexpr ::_pb::EnumDescriptor const** file_level_enum_descriptors_JetToCpp_2eproto = nullptr;
+static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_JetToCpp_2eproto = nullptr;
 
-  {
-    void* ptr = &::com_hazelcast_platform_demos_banking_cva::_InputMessage_default_instance_;
-    new (ptr) ::com_hazelcast_platform_demos_banking_cva::InputMessage();
-    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::com_hazelcast_platform_demos_banking_cva::InputMessage::InitAsDefaultInstance();
-}
-
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_InputMessage_JetToCpp_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_InputMessage_JetToCpp_2eproto}, {}};
-
-static void InitDefaultsscc_info_OutputMessage_JetToCpp_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::com_hazelcast_platform_demos_banking_cva::_OutputMessage_default_instance_;
-    new (ptr) ::com_hazelcast_platform_demos_banking_cva::OutputMessage();
-    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::com_hazelcast_platform_demos_banking_cva::OutputMessage::InitAsDefaultInstance();
-}
-
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_OutputMessage_JetToCpp_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_OutputMessage_JetToCpp_2eproto}, {}};
-
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_JetToCpp_2eproto[2];
-static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_JetToCpp_2eproto = nullptr;
-static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_JetToCpp_2eproto = nullptr;
-
-const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_JetToCpp_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+const uint32_t TableStruct_JetToCpp_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::com_hazelcast_platform_demos_banking_cva::InputMessage, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::com_hazelcast_platform_demos_banking_cva::InputMessage, inputvalue_),
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::com_hazelcast_platform_demos_banking_cva::InputMessage, _impl_.inputvalue_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::com_hazelcast_platform_demos_banking_cva::OutputMessage, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::com_hazelcast_platform_demos_banking_cva::OutputMessage, outputvalue_),
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::com_hazelcast_platform_demos_banking_cva::OutputMessage, _impl_.outputvalue_),
 };
-static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, sizeof(::com_hazelcast_platform_demos_banking_cva::InputMessage)},
-  { 6, -1, sizeof(::com_hazelcast_platform_demos_banking_cva::OutputMessage)},
+static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+  { 0, -1, -1, sizeof(::com_hazelcast_platform_demos_banking_cva::InputMessage)},
+  { 7, -1, -1, sizeof(::com_hazelcast_platform_demos_banking_cva::OutputMessage)},
 };
 
-static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::com_hazelcast_platform_demos_banking_cva::_InputMessage_default_instance_),
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::com_hazelcast_platform_demos_banking_cva::_OutputMessage_default_instance_),
+static const ::_pb::Message* const file_default_instances[] = {
+  &::com_hazelcast_platform_demos_banking_cva::_InputMessage_default_instance_._instance,
+  &::com_hazelcast_platform_demos_banking_cva::_OutputMessage_default_instance_._instance,
 };
 
 const char descriptor_table_protodef_JetToCpp_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
@@ -94,133 +92,132 @@ const char descriptor_table_protodef_JetToCpp_2eproto[] PROTOBUF_SECTION_VARIABL
   "tputMessage\"\000B,\n(com.hazelcast.platform."
   "demos.banking.cvaP\001b\006proto3"
   ;
-static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_JetToCpp_2eproto_deps[1] = {
+static ::_pbi::once_flag descriptor_table_JetToCpp_2eproto_once;
+const ::_pbi::DescriptorTable descriptor_table_JetToCpp_2eproto = {
+    false, false, 467, descriptor_table_protodef_JetToCpp_2eproto,
+    "JetToCpp.proto",
+    &descriptor_table_JetToCpp_2eproto_once, nullptr, 0, 2,
+    schemas, file_default_instances, TableStruct_JetToCpp_2eproto::offsets,
+    file_level_metadata_JetToCpp_2eproto, file_level_enum_descriptors_JetToCpp_2eproto,
+    file_level_service_descriptors_JetToCpp_2eproto,
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_JetToCpp_2eproto_sccs[2] = {
-  &scc_info_InputMessage_JetToCpp_2eproto.base,
-  &scc_info_OutputMessage_JetToCpp_2eproto.base,
-};
-static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_JetToCpp_2eproto_once;
-const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_JetToCpp_2eproto = {
-  false, false, descriptor_table_protodef_JetToCpp_2eproto, "JetToCpp.proto", 467,
-  &descriptor_table_JetToCpp_2eproto_once, descriptor_table_JetToCpp_2eproto_sccs, descriptor_table_JetToCpp_2eproto_deps, 2, 0,
-  schemas, file_default_instances, TableStruct_JetToCpp_2eproto::offsets,
-  file_level_metadata_JetToCpp_2eproto, 2, file_level_enum_descriptors_JetToCpp_2eproto, file_level_service_descriptors_JetToCpp_2eproto,
-};
+PROTOBUF_ATTRIBUTE_WEAK const ::_pbi::DescriptorTable* descriptor_table_JetToCpp_2eproto_getter() {
+  return &descriptor_table_JetToCpp_2eproto;
+}
 
 // Force running AddDescriptors() at dynamic initialization time.
-static bool dynamic_init_dummy_JetToCpp_2eproto = (static_cast<void>(::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_JetToCpp_2eproto)), true);
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_init_dummy_JetToCpp_2eproto(&descriptor_table_JetToCpp_2eproto);
 namespace com_hazelcast_platform_demos_banking_cva {
 
 // ===================================================================
 
-void InputMessage::InitAsDefaultInstance() {
-}
 class InputMessage::_Internal {
  public:
 };
 
-InputMessage::InputMessage(::PROTOBUF_NAMESPACE_ID::Arena* arena)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
-  inputvalue_(arena) {
-  SharedCtor();
-  RegisterArenaDtor(arena);
+InputMessage::InputMessage(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
   // @@protoc_insertion_point(arena_constructor:com_hazelcast_platform_demos_banking_cva.InputMessage)
 }
 InputMessage::InputMessage(const InputMessage& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message(),
-      inputvalue_(from.inputvalue_) {
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  InputMessage* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.inputvalue_){from._impl_.inputvalue_}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   // @@protoc_insertion_point(copy_constructor:com_hazelcast_platform_demos_banking_cva.InputMessage)
 }
 
-void InputMessage::SharedCtor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_InputMessage_JetToCpp_2eproto.base);
+inline void InputMessage::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.inputvalue_){arena}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
 }
 
 InputMessage::~InputMessage() {
   // @@protoc_insertion_point(destructor:com_hazelcast_platform_demos_banking_cva.InputMessage)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
   SharedDtor();
-  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void InputMessage::SharedDtor() {
-  GOOGLE_DCHECK(GetArena() == nullptr);
+inline void InputMessage::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.inputvalue_.~RepeatedPtrField();
 }
 
-void InputMessage::ArenaDtor(void* object) {
-  InputMessage* _this = reinterpret_cast< InputMessage* >(object);
-  (void)_this;
-}
-void InputMessage::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
-}
 void InputMessage::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
+  _impl_._cached_size_.Set(size);
 }
-const InputMessage& InputMessage::default_instance() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_InputMessage_JetToCpp_2eproto.base);
-  return *internal_default_instance();
-}
-
 
 void InputMessage::Clear() {
 // @@protoc_insertion_point(message_clear_start:com_hazelcast_platform_demos_banking_cva.InputMessage)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  inputvalue_.Clear();
+  _impl_.inputvalue_.Clear();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* InputMessage::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* InputMessage::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
-    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
-    CHK_(ptr);
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // repeated string inputValue = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           ptr -= 1;
           do {
             ptr += 1;
             auto str = _internal_add_inputvalue();
-            ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-            CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "com_hazelcast_platform_demos_banking_cva.InputMessage.inputValue"));
+            ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
             CHK_(ptr);
+            CHK_(::_pbi::VerifyUTF8(str, "com_hazelcast_platform_demos_banking_cva.InputMessage.inputValue"));
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
-      default: {
-      handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->SetLastTag(tag);
-          goto success;
-        }
-        ptr = UnknownFieldParse(tag,
-            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-            ptr, ctx);
-        CHK_(ptr != nullptr);
-        continue;
-      }
+      default:
+        goto handle_unusual;
     }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
   }  // while
-success:
+message_done:
   return ptr;
 failure:
   ptr = nullptr;
-  goto success;
+  goto message_done;
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* InputMessage::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* InputMessage::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:com_hazelcast_platform_demos_banking_cva.InputMessage)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // repeated string inputValue = 1;
@@ -234,7 +231,7 @@ failure:
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:com_hazelcast_platform_demos_banking_cva.InputMessage)
@@ -245,57 +242,38 @@ size_t InputMessage::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:com_hazelcast_platform_demos_banking_cva.InputMessage)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // repeated string inputValue = 1;
   total_size += 1 *
-      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(inputvalue_.size());
-  for (int i = 0, n = inputvalue_.size(); i < n; i++) {
+      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(_impl_.inputvalue_.size());
+  for (int i = 0, n = _impl_.inputvalue_.size(); i < n; i++) {
     total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-      inputvalue_.Get(i));
+      _impl_.inputvalue_.Get(i));
   }
 
-  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
-        _internal_metadata_, total_size, &_cached_size_);
-  }
-  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-void InputMessage::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:com_hazelcast_platform_demos_banking_cva.InputMessage)
-  GOOGLE_DCHECK_NE(&from, this);
-  const InputMessage* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<InputMessage>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:com_hazelcast_platform_demos_banking_cva.InputMessage)
-    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:com_hazelcast_platform_demos_banking_cva.InputMessage)
-    MergeFrom(*source);
-  }
-}
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData InputMessage::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    InputMessage::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*InputMessage::GetClassData() const { return &_class_data_; }
 
-void InputMessage::MergeFrom(const InputMessage& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:com_hazelcast_platform_demos_banking_cva.InputMessage)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+
+void InputMessage::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<InputMessage*>(&to_msg);
+  auto& from = static_cast<const InputMessage&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:com_hazelcast_platform_demos_banking_cva.InputMessage)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  inputvalue_.MergeFrom(from.inputvalue_);
-}
-
-void InputMessage::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:com_hazelcast_platform_demos_banking_cva.InputMessage)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
+  _this->_impl_.inputvalue_.MergeFrom(from._impl_.inputvalue_);
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void InputMessage::CopyFrom(const InputMessage& from) {
@@ -311,124 +289,125 @@ bool InputMessage::IsInitialized() const {
 
 void InputMessage::InternalSwap(InputMessage* other) {
   using std::swap;
-  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
-  inputvalue_.InternalSwap(&other->inputvalue_);
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.inputvalue_.InternalSwap(&other->_impl_.inputvalue_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata InputMessage::GetMetadata() const {
-  return GetMetadataStatic();
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_JetToCpp_2eproto_getter, &descriptor_table_JetToCpp_2eproto_once,
+      file_level_metadata_JetToCpp_2eproto[0]);
 }
-
 
 // ===================================================================
 
-void OutputMessage::InitAsDefaultInstance() {
-}
 class OutputMessage::_Internal {
  public:
 };
 
-OutputMessage::OutputMessage(::PROTOBUF_NAMESPACE_ID::Arena* arena)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
-  outputvalue_(arena) {
-  SharedCtor();
-  RegisterArenaDtor(arena);
+OutputMessage::OutputMessage(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
   // @@protoc_insertion_point(arena_constructor:com_hazelcast_platform_demos_banking_cva.OutputMessage)
 }
 OutputMessage::OutputMessage(const OutputMessage& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message(),
-      outputvalue_(from.outputvalue_) {
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  OutputMessage* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.outputvalue_){from._impl_.outputvalue_}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   // @@protoc_insertion_point(copy_constructor:com_hazelcast_platform_demos_banking_cva.OutputMessage)
 }
 
-void OutputMessage::SharedCtor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_OutputMessage_JetToCpp_2eproto.base);
+inline void OutputMessage::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.outputvalue_){arena}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
 }
 
 OutputMessage::~OutputMessage() {
   // @@protoc_insertion_point(destructor:com_hazelcast_platform_demos_banking_cva.OutputMessage)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
   SharedDtor();
-  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void OutputMessage::SharedDtor() {
-  GOOGLE_DCHECK(GetArena() == nullptr);
+inline void OutputMessage::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.outputvalue_.~RepeatedPtrField();
 }
 
-void OutputMessage::ArenaDtor(void* object) {
-  OutputMessage* _this = reinterpret_cast< OutputMessage* >(object);
-  (void)_this;
-}
-void OutputMessage::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
-}
 void OutputMessage::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
+  _impl_._cached_size_.Set(size);
 }
-const OutputMessage& OutputMessage::default_instance() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_OutputMessage_JetToCpp_2eproto.base);
-  return *internal_default_instance();
-}
-
 
 void OutputMessage::Clear() {
 // @@protoc_insertion_point(message_clear_start:com_hazelcast_platform_demos_banking_cva.OutputMessage)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  outputvalue_.Clear();
+  _impl_.outputvalue_.Clear();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* OutputMessage::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* OutputMessage::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
-    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
-    CHK_(ptr);
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // repeated string outputValue = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           ptr -= 1;
           do {
             ptr += 1;
             auto str = _internal_add_outputvalue();
-            ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-            CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "com_hazelcast_platform_demos_banking_cva.OutputMessage.outputValue"));
+            ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
             CHK_(ptr);
+            CHK_(::_pbi::VerifyUTF8(str, "com_hazelcast_platform_demos_banking_cva.OutputMessage.outputValue"));
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
-      default: {
-      handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->SetLastTag(tag);
-          goto success;
-        }
-        ptr = UnknownFieldParse(tag,
-            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-            ptr, ctx);
-        CHK_(ptr != nullptr);
-        continue;
-      }
+      default:
+        goto handle_unusual;
     }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
   }  // while
-success:
+message_done:
   return ptr;
 failure:
   ptr = nullptr;
-  goto success;
+  goto message_done;
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* OutputMessage::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* OutputMessage::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:com_hazelcast_platform_demos_banking_cva.OutputMessage)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // repeated string outputValue = 1;
@@ -442,7 +421,7 @@ failure:
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:com_hazelcast_platform_demos_banking_cva.OutputMessage)
@@ -453,57 +432,38 @@ size_t OutputMessage::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:com_hazelcast_platform_demos_banking_cva.OutputMessage)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // repeated string outputValue = 1;
   total_size += 1 *
-      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(outputvalue_.size());
-  for (int i = 0, n = outputvalue_.size(); i < n; i++) {
+      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(_impl_.outputvalue_.size());
+  for (int i = 0, n = _impl_.outputvalue_.size(); i < n; i++) {
     total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-      outputvalue_.Get(i));
+      _impl_.outputvalue_.Get(i));
   }
 
-  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
-        _internal_metadata_, total_size, &_cached_size_);
-  }
-  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-void OutputMessage::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:com_hazelcast_platform_demos_banking_cva.OutputMessage)
-  GOOGLE_DCHECK_NE(&from, this);
-  const OutputMessage* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<OutputMessage>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:com_hazelcast_platform_demos_banking_cva.OutputMessage)
-    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:com_hazelcast_platform_demos_banking_cva.OutputMessage)
-    MergeFrom(*source);
-  }
-}
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData OutputMessage::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    OutputMessage::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*OutputMessage::GetClassData() const { return &_class_data_; }
 
-void OutputMessage::MergeFrom(const OutputMessage& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:com_hazelcast_platform_demos_banking_cva.OutputMessage)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+
+void OutputMessage::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<OutputMessage*>(&to_msg);
+  auto& from = static_cast<const OutputMessage&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:com_hazelcast_platform_demos_banking_cva.OutputMessage)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  outputvalue_.MergeFrom(from.outputvalue_);
-}
-
-void OutputMessage::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:com_hazelcast_platform_demos_banking_cva.OutputMessage)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
+  _this->_impl_.outputvalue_.MergeFrom(from._impl_.outputvalue_);
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void OutputMessage::CopyFrom(const OutputMessage& from) {
@@ -519,22 +479,25 @@ bool OutputMessage::IsInitialized() const {
 
 void OutputMessage::InternalSwap(OutputMessage* other) {
   using std::swap;
-  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
-  outputvalue_.InternalSwap(&other->outputvalue_);
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.outputvalue_.InternalSwap(&other->_impl_.outputvalue_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata OutputMessage::GetMetadata() const {
-  return GetMetadataStatic();
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_JetToCpp_2eproto_getter, &descriptor_table_JetToCpp_2eproto_once,
+      file_level_metadata_JetToCpp_2eproto[1]);
 }
-
 
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace com_hazelcast_platform_demos_banking_cva
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::com_hazelcast_platform_demos_banking_cva::InputMessage* Arena::CreateMaybeMessage< ::com_hazelcast_platform_demos_banking_cva::InputMessage >(Arena* arena) {
+template<> PROTOBUF_NOINLINE ::com_hazelcast_platform_demos_banking_cva::InputMessage*
+Arena::CreateMaybeMessage< ::com_hazelcast_platform_demos_banking_cva::InputMessage >(Arena* arena) {
   return Arena::CreateMessageInternal< ::com_hazelcast_platform_demos_banking_cva::InputMessage >(arena);
 }
-template<> PROTOBUF_NOINLINE ::com_hazelcast_platform_demos_banking_cva::OutputMessage* Arena::CreateMaybeMessage< ::com_hazelcast_platform_demos_banking_cva::OutputMessage >(Arena* arena) {
+template<> PROTOBUF_NOINLINE ::com_hazelcast_platform_demos_banking_cva::OutputMessage*
+Arena::CreateMaybeMessage< ::com_hazelcast_platform_demos_banking_cva::OutputMessage >(Arena* arena) {
   return Arena::CreateMessageInternal< ::com_hazelcast_platform_demos_banking_cva::OutputMessage >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE

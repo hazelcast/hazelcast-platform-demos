@@ -1,8 +1,13 @@
 :root {
-	--hazelcast-blue: #012168;
-	--hazelcast-blue-dark: #0b2a35;
-	--hazelcast-blue-light: #2e7de1;
-	--hazelcast-orange: #ff5f00;
+	--color-blueberry: #0019FE;
+	--color-carrot: #F5911E;
+	--color-deep-sea: #051A27;
+	--color-dusk: #0B2B39;
+	--color-ice: #F0F6FF;
+	--color-lime: #C6FF3A;
+	--color-ocean: #0080A9;
+	--color-raspberry: #C91268;
+	--color-sky: #10A4B3; 	
 }
 
 body {
@@ -11,7 +16,7 @@ body {
 
 h1, h2 {
 	text-align: center;
-	color: var(--hazelcast-blue);
+	color: var(--color-blueberry);
 }
 
 .whiteBox {
@@ -27,24 +32,23 @@ h3 {
 
 .headerfooter {
 	text-align: center;
-	color: var(--hazelcast-blue-light);
+	color: var(--color-raspberry);
 	font-family: "Courier New", Courier, monospace;
 	font-size: 80%;
 }
 .headerfooterline {
-	color: var(--hazelcast-orange);
+	color: var(--color-carrot);
 }
 
 .major_pane {
-	border-size: 5px;
 	border-style: solid;
-	border-color: var(--hazelcast-blue-dark);
+	border-color: var(--color-raspberry);
 	padding: 5px 5px 5px 5px;
 }
 
 .minor_pane {
 	border-top: 1px dashed;
-	border-color: var(--hazelcast-blue-light);
+	border-color: var(--color-raspberry);
 	overflow-y: scroll;
 	vertical-align: top;
 }
@@ -64,23 +68,23 @@ h3 {
     border-radius: 8px;
     border: 2px solid blue;
     background-color: rgba(255,0,0,0.5);
-    color: var(--hazelcast-blue-dark);
+    color: var(--color-blueberry);
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.8); 
 }
 .three_row_scrollbar::-webkit-scrollbar-thumb:window-inactive {
     border-radius: 8px;
     border: 2px solid blue;
     background-color: rgba(255,0,0,0.8);
-    color: var(--hazelcast-blue-dark);
+    color: var(--color-blueberry);
 }
 .three_row_scrollbar::-webkit-scrollbar-track {
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
     border-radius: 10px;
     background-color: rgba(0,255,0,0.8);
-    color: var(--hazelcast-orange);
+    color: var(--color-carrot);
 }
 .three_row_scrollbar::-webkit-scrollbar-track-piece {
     background-color: rgba(0,0,255,0.8);
-    color: var(--hazelcast-blue-light);
+    color: var(--color-ocean);
 }
 

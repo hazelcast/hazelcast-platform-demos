@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.telco.churn</groupId>
 		<artifactId>churn-root</artifactId>
-		<version>5.2</version>
+		<version>5.4</version>
 	</parent>
 
 	<artifactId>churn-cassandra</artifactId>
@@ -17,7 +17,6 @@
 	<properties>
 		<my.docker.image.name>cassandra</my.docker.image.name>
 		<my.docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</my.docker.jar.file>
-		<guava.version>24.1.1-jre</guava.version>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 		<!-- Entry point of io.debezium:debezium-connector-cassandra -->
 		<main.class>io.debezium.connector.cassandra.CassandraConnectorTask</main.class>
@@ -25,17 +24,19 @@
 	
 	<dependencies>
 		<dependency>
-	        <groupId>com.datastax.cassandra</groupId>
-    	    <artifactId>cassandra-driver-core</artifactId>
+	            <groupId>com.datastax.oss</groupId>
+    	            <artifactId>java-driver-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.debezium</groupId>
-			<artifactId>debezium-connector-cassandra</artifactId>
+			<artifactId>debezium-connector-cassandra-4</artifactId>
 		</dependency>
+		<!--
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-tcnative</artifactId>
 		</dependency>
+		-->
 	</dependencies>
 
 	<build>

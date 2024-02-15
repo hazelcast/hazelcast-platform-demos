@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2024, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,6 +63,7 @@ public class ApplicationRunner implements CommandLineRunner {
      */
     @Override
     public void run(String... args) throws Exception {
+        CVAIdempotentInitialization.fullInitialize(this.hazelcastInstance);
 
         ITopic<Tuple2<HazelcastJsonValue, JobStatus>> jobStateTopic =
                 this.hazelcastInstance.getTopic(MyConstants.ITOPIC_NAME_JOB_STATE);

@@ -1,0 +1,53 @@
+.App {
+  text-align: center;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.App-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2rem;
+}
+
+.App-title {
+  font-family: 'Ubuntu', sans-serif;
+  margin: 0;
+  margin-bottom: 0.5rem;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--color-sky);
+  
+}
+
+.App-subtitle {
+  font-family: 'Ubuntu', sans-serif;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  color: var(--color-sky);
+  font-weight: 400;
+ 
+}
+
+.App-link {
+  font-size: inherit;
+  color: var(--color-sky);
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin: 8rem 0;
+}
+
+.error-message {
+  margin: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--color-sky);
+  text-transform: uppercase;
+}

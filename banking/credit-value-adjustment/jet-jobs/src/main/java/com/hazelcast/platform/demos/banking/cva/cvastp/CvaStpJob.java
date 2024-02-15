@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2024, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -326,10 +326,11 @@ public class CvaStpJob {
      * @param batchSize    For C++, how many requests to send
      * @param parallelism  Ratio of C++ workers to Jet node
      * @param debug        For development, save intermediate results
+     * @param useViridian  Adjust job if Viridian
      * @return
      */
     public static Pipeline buildPipeline(String jobName, long timestamp, LocalDate calcDate,
-            String loadBalancer, int batchSize, int parallelism, boolean debug) {
+            String loadBalancer, int batchSize, int parallelism, boolean debug, boolean useViridian) {
         String timestampStr = MyUtils.timestampToISO8601(timestamp);
         String calcDateStr = CvaStpUtils.escapeQuotes("{\"calc_date\":\"" + calcDate + "\"}");
 
@@ -414,7 +415,12 @@ public class CvaStpJob {
         .writeTo(Sinks.map(MyConstants.IMAP_NAME_CVA_DATA));
 
         // Step 19 above, provides Excel spreadsheet for download
-        saveAsExcelForLaterDownload(excelDataContent, jobName, timestamp, timestampStr, calcDate);
+        if (useViridian) {
+            //FIXME https://github.com/hazelcast/hazelcast-platform-demos/issues/149
+            LOGGER.warn("saveAsExcelForLaterDownload() deactivated for Viridian");
+        } else {
+            saveAsExcelForLaterDownload(excelDataContent, jobName, timestamp, timestampStr, calcDate);
+        }
 
         // Optional stages for debugging, impacting performance and memory usage
         if (debug) {

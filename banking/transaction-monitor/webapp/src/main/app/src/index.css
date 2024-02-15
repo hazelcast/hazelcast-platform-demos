@@ -1,0 +1,77 @@
+
+
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/ubuntu-v15-latin-regular.eot'); /* IE9 Compat Modes */
+  src: local(''),
+       url('/fonts/ubuntu-v15-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('/fonts/ubuntu-v15-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('/fonts/ubuntu-v15-latin-regular.woff') format('woff'), /* Modern Browsers */
+       url('/fonts/ubuntu-v15-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('/fonts/ubuntu-v15-latin-regular.svg#Ubuntu') format('svg'); /* Legacy iOS */
+}
+*/
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+:root {
+  box-sizing: border-box;
+
+	--color-blueberry: #0019FE;
+	--color-carrot: #F5911E;
+        --color-deep-sea: #051A27;
+        --color-dusk: #0B2B39;
+        --color-ice: #F0F6FF;
+        --color-lime: #C6FF3A;
+        --color-ocean: #0080A9;
+        --color-raspberry: #C91268;
+        --color-sky: #10A4B3;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  font-family: "Ubuntu", sans-serif;
+  background-color: var(--color-dusk);
+  font-size: 0.75rem;
+  color: var(--color-ice);
+  /* font rendering optimalizations */
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button, input, textarea {
+  font-family: "Ubuntu", sans-serif;
+  font-size: 0.75rem;
+  /* font rendering optimalizations */
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: 'source-code-pro', 'Menlo', 'Monaco', 'Consolas', "Courier New",
+    monospace;
+}
+
+.hazelcastLogo {
+  width: 5.6rem;
+
+}
+
+.sr-only {
+  position: absolute;
+  opacity: 0;
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  word-wrap: normal;
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  overflow: hidden;
+}

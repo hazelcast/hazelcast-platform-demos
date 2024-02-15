@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2024, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ public class Application {
     static {
         Properties properties = new Properties();
         if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
-            properties.put("spring.data.cassandra.contact-points",
+            properties.put("spring.cassandra.contact-points",
                     "churn-cassandra.default.svc.cluster.local");
             properties.put("spring.data.mongodb.host",
                     "churn-mongo.default.svc.cluster.local");
@@ -45,7 +45,7 @@ public class Application {
                     "jdbc:mysql://churn-mysql.default.svc.cluster.local:3306/churn"
                     + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC");
         } else {
-            properties.put("spring.data.cassandra.contact-points", "cassandra");
+            properties.put("spring.cassandra.contact-points", "cassandra");
             properties.put("spring.data.mongodb.host", "mongo");
             properties.put("spring.datasource.url",
                     "jdbc:mysql://mysql:3306/churn"

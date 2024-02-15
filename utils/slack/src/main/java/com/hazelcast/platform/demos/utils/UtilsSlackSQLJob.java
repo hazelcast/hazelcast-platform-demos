@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2024, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.hazelcast.platform.demos.utils;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -125,7 +126,7 @@ public class UtilsSlackSQLJob {
     private static final Logger LOGGER = LoggerFactory.getLogger(UtilsSlackSQLJob.class);
 
     // Local constant, never needed outside this class
-    private static final List<String> ALLOWED_PREFIXES = List.of("SELECT");
+    private static final List<String> ALLOWED_PREFIXES_UC = List.of("SELECT");
 
     /**
      * <p>Validates the properties and launches the job.
@@ -148,8 +149,10 @@ public class UtilsSlackSQLJob {
         String buildUser = safeGet(slackProperties, UtilsConstants.SLACK_BUILD_USER);
         String channelId = safeGet(slackProperties, UtilsConstants.SLACK_CHANNEL_ID);
         String channelName = safeGet(slackProperties, UtilsConstants.SLACK_CHANNEL_NAME);
-        if (accessToken.length() == 0 || channelId.length() == 0 || channelName.length() == 0) {
-            LOGGER.warn("{}: missing values for '{}', '{}' and/or '{}',"
+        if (accessToken.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY
+                || channelId.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY
+                || channelName.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY) {
+            LOGGER.warn("{}: missing sensible values for '{}', '{}' and/or '{}',"
                     + " not launching Slack SQL integration",
                     UtilsSlackSQLJob.class.getSimpleName(),
                     UtilsConstants.SLACK_ACCESS_TOKEN,
@@ -262,7 +265,7 @@ public class UtilsSlackSQLJob {
                 streamSource
                 .map(str -> {
                     String[] tokens = str.split(" ");
-                    return Tuple2.tuple2(ALLOWED_PREFIXES.contains(tokens[0]), str);
+                    return Tuple2.tuple2(ALLOWED_PREFIXES_UC.contains(tokens[0].toUpperCase(Locale.ROOT)), str);
                 })
                 .setName("determine-if-handled");
 
@@ -273,7 +276,7 @@ public class UtilsSlackSQLJob {
                 .map(Tuple2::f1)
                 .map(str -> {
                     return "Sorry, only '"
-                            + ALLOWED_PREFIXES
+                            + ALLOWED_PREFIXES_UC
                             + "' commands handled, not '" + str + "'";
                 })
                 .setName("not-sql-statement");

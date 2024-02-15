@@ -23,7 +23,7 @@ docker network create $PROJECT --driver bridge > /dev/null 2>&1
 
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
-CMD="docker run -e ALLOW_ANONYMOUS_LOGIN=yes --name=${MODULE} --network=${PROJECT} ${DOCKER_IMAGE}"
+CMD="docker run -e ALLOW_ANONYMOUS_LOGIN=yes --name=${MODULE} --rm --network=${PROJECT} ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD

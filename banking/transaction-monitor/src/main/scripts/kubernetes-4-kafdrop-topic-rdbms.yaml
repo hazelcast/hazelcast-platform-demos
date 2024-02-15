@@ -1,0 +1,220 @@
+---
+# Creates a Kafka topic, and Kafdrop UI
+---
+############################################################################
+# Services
+############################################################################
+---
+# Kafdrop : DNS will be "transaction-monitor-FLAVOR-kafdrop.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-FLAVOR-kafdrop
+spec:
+  selector:
+    app: transaction-monitor-FLAVOR-kafdrop
+  ports:
+  - port: 8080
+    targetPort: 9000
+  type: LoadBalancer
+---
+############################################################################
+# Jobs - runs immediately
+############################################################################
+---
+# Topic Create
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: transaction-monitor-FLAVOR-job-topic-create
+  name: transaction-monitor-FLAVOR-job-topic-create
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-FLAVOR-job-topic-create
+    spec:
+      containers:
+        - env:
+          - name: "MY_BOOTSTRAP_SERVERS"
+            value: "transaction-monitor-FLAVOR-kafka-broker-0.transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-FLAVOR-kafka-broker-1.transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local:9092,transaction-monitor-FLAVOR-kafka-broker-2.transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local:9092"
+          image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-topic-create"
+          imagePullPolicy: Never
+          name: transaction-monitor-FLAVOR-job-topic-create-container
+      restartPolicy: Never
+---
+############################################################################
+# Deployments - wait to allow jobs to run, then create
+############################################################################
+---
+# Kafdrop
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: kafdrop
+  name: transaction-monitor-FLAVOR-kafdrop
+spec:
+  selector:
+    matchLabels:
+      app: transaction-monitor-FLAVOR-kafdrop
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-FLAVOR-kafdrop
+        app.kubernetes.io/component: kafdrop
+    spec:
+      initContainers:
+        - name: wait-for-topic-create
+          image: busybox
+          command: ['sh', '-c', 'sleep 60']
+      containers:
+        - env:
+          # Internal port 19092
+          - name: "KAFKA_BROKERCONNECT"
+            value: "transaction-monitor-FLAVOR-kafka-broker-0.transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local:19092,transaction-monitor-FLAVOR-kafka-broker-1.transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local:19092,transaction-monitor-FLAVOR-kafka-broker-2.transaction-monitor-FLAVOR-kafka-broker.default.svc.cluster.local:19092"
+          image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-kafdrop"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 9000
+          name: transaction-monitor-FLAVOR-kafdrop-container
+          ports:
+            - containerPort: 9000
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9000
+            initialDelaySeconds: 30
+--- 
+# Cassandra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: cassandra
+  name: transaction-monitor-FLAVOR-cassandra
+spec:
+  selector: 
+    matchLabels:
+      app: transaction-monitor-FLAVOR-cassandra
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-FLAVOR-cassandra
+        app.kubernetes.io/component: cassandra
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-cassandra"
+          imagePullPolicy: Never
+          name: transaction-monitor-FLAVOR-cassandra-container
+          ports:
+            - containerPort: 9042
+--- 
+# Maria
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: maria
+  name: transaction-monitor-FLAVOR-maria
+spec:
+  selector: 
+    matchLabels:
+      app: transaction-monitor-FLAVOR-maria
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-FLAVOR-maria
+        app.kubernetes.io/component: maria
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-maria"
+          imagePullPolicy: Never
+          name: transaction-monitor-FLAVOR-maria-container
+          ports:
+            - containerPort: 3306
+--- 
+# Mongo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: mongo
+  name: transaction-monitor-FLAVOR-mongo
+spec:
+  selector: 
+    matchLabels:
+      app: transaction-monitor-FLAVOR-mongo
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-FLAVOR-mongo
+        app.kubernetes.io/component: mongo
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-mongo"
+          imagePullPolicy: Never
+          name: transaction-monitor-FLAVOR-mongo-container
+          ports:
+            - containerPort: 27017
+---
+# MySql
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: mysql
+  name: transaction-monitor-FLAVOR-mysql
+spec:
+  selector:
+    matchLabels:
+      app: transaction-monitor-FLAVOR-mysql
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-FLAVOR-mysql
+        app.kubernetes.io/component: mysql
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-mysql"
+          imagePullPolicy: Never
+          name: transaction-monitor-FLAVOR-mysql-container
+          ports:
+            - containerPort: 3306
+---
+# Postgres
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: postgres
+  name: transaction-monitor-FLAVOR-postgres
+spec:
+  selector:
+    matchLabels:
+      app: transaction-monitor-FLAVOR-postgres
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-FLAVOR-postgres
+        app.kubernetes.io/component: postgres
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-postgres"
+          imagePullPolicy: Never
+          name: transaction-monitor-FLAVOR-postgres-container
+          ports:
+            - containerPort: 5432
+---

@@ -2,23 +2,23 @@
 // If you make any local change, they will be lost.
 // source: JetToCpp.proto
 
-#include "JetToCpp.pb.h"
-#include "JetToCpp.grpc.pb.h"
+#include "../include/JetToCpp.pb.h"
+#include "../include/JetToCpp.grpc.pb.h"
 
 #include <functional>
-#include <grpcpp/impl/codegen/async_stream.h>
-#include <grpcpp/impl/codegen/async_unary_call.h>
-#include <grpcpp/impl/codegen/channel_interface.h>
-#include <grpcpp/impl/codegen/client_unary_call.h>
-#include <grpcpp/impl/codegen/client_callback.h>
-#include <grpcpp/impl/codegen/message_allocator.h>
-#include <grpcpp/impl/codegen/method_handler.h>
-#include <grpcpp/impl/codegen/rpc_service_method.h>
-#include <grpcpp/impl/codegen/server_callback.h>
-#include <grpcpp/impl/codegen/server_callback_handlers.h>
-#include <grpcpp/impl/codegen/server_context.h>
-#include <grpcpp/impl/codegen/service_type.h>
-#include <grpcpp/impl/codegen/sync_stream.h>
+#include <grpcpp/support/async_stream.h>
+#include <grpcpp/support/async_unary_call.h>
+#include <grpcpp/impl/channel_interface.h>
+#include <grpcpp/impl/client_unary_call.h>
+#include <grpcpp/support/client_callback.h>
+#include <grpcpp/support/message_allocator.h>
+#include <grpcpp/support/method_handler.h>
+#include <grpcpp/impl/rpc_service_method.h>
+#include <grpcpp/support/server_callback.h>
+#include <grpcpp/impl/server_callback_handlers.h>
+#include <grpcpp/server_context.h>
+#include <grpcpp/impl/service_type.h>
+#include <grpcpp/support/sync_stream.h>
 namespace com_hazelcast_platform_demos_banking_cva {
 
 static const char* JetToCpp_method_names[] = {
@@ -28,57 +28,52 @@ static const char* JetToCpp_method_names[] = {
 
 std::unique_ptr< JetToCpp::Stub> JetToCpp::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
   (void)options;
-  std::unique_ptr< JetToCpp::Stub> stub(new JetToCpp::Stub(channel));
+  std::unique_ptr< JetToCpp::Stub> stub(new JetToCpp::Stub(channel, options));
   return stub;
 }
 
-JetToCpp::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
-  : channel_(channel), rpcmethod_streamingCall_(JetToCpp_method_names[0], ::grpc::internal::RpcMethod::BIDI_STREAMING, channel)
-  , rpcmethod_myUnaryCall_(JetToCpp_method_names[1], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+JetToCpp::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
+  : channel_(channel), rpcmethod_streamingCall_(JetToCpp_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::BIDI_STREAMING, channel)
+  , rpcmethod_myUnaryCall_(JetToCpp_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::ClientReaderWriter< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>* JetToCpp::Stub::streamingCallRaw(::grpc::ClientContext* context) {
-  return ::grpc_impl::internal::ClientReaderWriterFactory< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>::Create(channel_.get(), rpcmethod_streamingCall_, context);
+  return ::grpc::internal::ClientReaderWriterFactory< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>::Create(channel_.get(), rpcmethod_streamingCall_, context);
 }
 
-void JetToCpp::Stub::experimental_async::streamingCall(::grpc::ClientContext* context, ::grpc::experimental::ClientBidiReactor< ::com_hazelcast_platform_demos_banking_cva::InputMessage,::com_hazelcast_platform_demos_banking_cva::OutputMessage>* reactor) {
-  ::grpc_impl::internal::ClientCallbackReaderWriterFactory< ::com_hazelcast_platform_demos_banking_cva::InputMessage,::com_hazelcast_platform_demos_banking_cva::OutputMessage>::Create(stub_->channel_.get(), stub_->rpcmethod_streamingCall_, context, reactor);
+void JetToCpp::Stub::async::streamingCall(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::com_hazelcast_platform_demos_banking_cva::InputMessage,::com_hazelcast_platform_demos_banking_cva::OutputMessage>* reactor) {
+  ::grpc::internal::ClientCallbackReaderWriterFactory< ::com_hazelcast_platform_demos_banking_cva::InputMessage,::com_hazelcast_platform_demos_banking_cva::OutputMessage>::Create(stub_->channel_.get(), stub_->rpcmethod_streamingCall_, context, reactor);
 }
 
 ::grpc::ClientAsyncReaderWriter< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>* JetToCpp::Stub::AsyncstreamingCallRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
-  return ::grpc_impl::internal::ClientAsyncReaderWriterFactory< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>::Create(channel_.get(), cq, rpcmethod_streamingCall_, context, true, tag);
+  return ::grpc::internal::ClientAsyncReaderWriterFactory< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>::Create(channel_.get(), cq, rpcmethod_streamingCall_, context, true, tag);
 }
 
 ::grpc::ClientAsyncReaderWriter< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>* JetToCpp::Stub::PrepareAsyncstreamingCallRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
-  return ::grpc_impl::internal::ClientAsyncReaderWriterFactory< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>::Create(channel_.get(), cq, rpcmethod_streamingCall_, context, false, nullptr);
+  return ::grpc::internal::ClientAsyncReaderWriterFactory< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>::Create(channel_.get(), cq, rpcmethod_streamingCall_, context, false, nullptr);
 }
 
 ::grpc::Status JetToCpp::Stub::myUnaryCall(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage& request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response) {
-  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_myUnaryCall_, context, request, response);
+  return ::grpc::internal::BlockingUnaryCall< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_myUnaryCall_, context, request, response);
 }
 
-void JetToCpp::Stub::experimental_async::myUnaryCall(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage* request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response, std::function<void(::grpc::Status)> f) {
-  ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_myUnaryCall_, context, request, response, std::move(f));
+void JetToCpp::Stub::async::myUnaryCall(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage* request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_myUnaryCall_, context, request, response, std::move(f));
 }
 
-void JetToCpp::Stub::experimental_async::myUnaryCall(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response, std::function<void(::grpc::Status)> f) {
-  ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_myUnaryCall_, context, request, response, std::move(f));
-}
-
-void JetToCpp::Stub::experimental_async::myUnaryCall(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage* request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
-  ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_myUnaryCall_, context, request, response, reactor);
-}
-
-void JetToCpp::Stub::experimental_async::myUnaryCall(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
-  ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_myUnaryCall_, context, request, response, reactor);
-}
-
-::grpc::ClientAsyncResponseReader< ::com_hazelcast_platform_demos_banking_cva::OutputMessage>* JetToCpp::Stub::AsyncmyUnaryCallRaw(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::com_hazelcast_platform_demos_banking_cva::OutputMessage>::Create(channel_.get(), cq, rpcmethod_myUnaryCall_, context, request, true);
+void JetToCpp::Stub::async::myUnaryCall(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage* request, ::com_hazelcast_platform_demos_banking_cva::OutputMessage* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_myUnaryCall_, context, request, response, reactor);
 }
 
 ::grpc::ClientAsyncResponseReader< ::com_hazelcast_platform_demos_banking_cva::OutputMessage>* JetToCpp::Stub::PrepareAsyncmyUnaryCallRaw(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::com_hazelcast_platform_demos_banking_cva::OutputMessage>::Create(channel_.get(), cq, rpcmethod_myUnaryCall_, context, request, false);
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::com_hazelcast_platform_demos_banking_cva::OutputMessage, ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_myUnaryCall_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::com_hazelcast_platform_demos_banking_cva::OutputMessage>* JetToCpp::Stub::AsyncmyUnaryCallRaw(::grpc::ClientContext* context, const ::com_hazelcast_platform_demos_banking_cva::InputMessage& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncmyUnaryCallRaw(context, request, cq);
+  result->StartCall();
+  return result;
 }
 
 JetToCpp::Service::Service() {
@@ -87,17 +82,17 @@ JetToCpp::Service::Service() {
       ::grpc::internal::RpcMethod::BIDI_STREAMING,
       new ::grpc::internal::BidiStreamingHandler< JetToCpp::Service, ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>(
           [](JetToCpp::Service* service,
-             ::grpc_impl::ServerContext* ctx,
-             ::grpc_impl::ServerReaderWriter<::com_hazelcast_platform_demos_banking_cva::OutputMessage,
+             ::grpc::ServerContext* ctx,
+             ::grpc::ServerReaderWriter<::com_hazelcast_platform_demos_banking_cva::OutputMessage,
              ::com_hazelcast_platform_demos_banking_cva::InputMessage>* stream) {
                return service->streamingCall(ctx, stream);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       JetToCpp_method_names[1],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< JetToCpp::Service, ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage>(
+      new ::grpc::internal::RpcMethodHandler< JetToCpp::Service, ::com_hazelcast_platform_demos_banking_cva::InputMessage, ::com_hazelcast_platform_demos_banking_cva::OutputMessage, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](JetToCpp::Service* service,
-             ::grpc_impl::ServerContext* ctx,
+             ::grpc::ServerContext* ctx,
              const ::com_hazelcast_platform_demos_banking_cva::InputMessage* req,
              ::com_hazelcast_platform_demos_banking_cva::OutputMessage* resp) {
                return service->myUnaryCall(ctx, req, resp);

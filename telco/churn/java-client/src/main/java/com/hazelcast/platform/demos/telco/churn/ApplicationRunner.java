@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2024, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,8 +70,7 @@ public class ApplicationRunner {
      * <p>Starts, runs some demonstration queries, then the "{@code @Bean}"
      * ends but the Hazelcast client stays running for web front-end.
      * </p>
-     * <p>Runs the GA features, then the new 4.1 features, SQL which is
-     * in Beta state
+     * <p>Runs the basic features, then the SQL features.
      * </p>
      * <p>Finally, starts publishing map sizes to a web socket to push
      * these to the web client's "{@code React}" front-end.
@@ -83,9 +82,9 @@ public class ApplicationRunner {
              this.addTopicLister(this.hazelcastInstance);
 
             LOGGER.info("-=-=-=-=- START '{}' START -=-=-=-=-=-", hazelcastInstance.getName());
-            this.gaFeatures(hazelcastInstance);
+            this.basicFeatures(hazelcastInstance);
             LOGGER.info("-=-=-=  MIDDLE  '{}'  MIDDLE  =-=-=-=-", hazelcastInstance.getName());
-            this.betaFeatures(this.hazelcastInstance);
+            this.sqlFeatures(this.hazelcastInstance);
             LOGGER.info("-=-=-=-=-  END  '{}'  END  -=-=-=-=-=-", hazelcastInstance.getName());
 
             LOGGER.debug("Starting web-socket feed");
@@ -121,7 +120,7 @@ public class ApplicationRunner {
      *
      * @param hazelcastInstance
      */
-    private void gaFeatures(HazelcastInstance hazelcastInstance) {
+    private void basicFeatures(HazelcastInstance hazelcastInstance) {
         for (DistributedObject distributedObject : hazelcastInstance.getDistributedObjects()) {
             // Hide system objects
             if (!distributedObject.getName().startsWith("__")) {
@@ -177,16 +176,16 @@ public class ApplicationRunner {
     }
 
     /**
-     * <p>Demonstrate beta features in Hazelcast IMDG 4.1 and Jet 4.4, the new
-     * SQL. As these are beta features, they may change in 4.2 and beyond until GA.
+     * <p>Demonstrate SQL features in Hazelcast.
      * </p>
      *
      * @param hazelcastInstance
      */
-    private void betaFeatures(HazelcastInstance hazelcastInstance) {
+    private void sqlFeatures(HazelcastInstance hazelcastInstance) {
         String[] queries = new String[] {
                 // IMap with Portable
-                "SELECT * FROM " + MyConstants.IMAP_NAME_SENTIMENT,
+                "SELECT * FROM " + MyConstants.IMAP_NAME_SENTIMENT
+                        + " ORDER BY \"current\" DESC",
                 // Above with function, need to escape as current is reserved word
                 "SELECT __key, FLOOR(\"current\") || '%' AS \"Churn Risk\""
                         + " FROM " + MyConstants.IMAP_NAME_SENTIMENT,

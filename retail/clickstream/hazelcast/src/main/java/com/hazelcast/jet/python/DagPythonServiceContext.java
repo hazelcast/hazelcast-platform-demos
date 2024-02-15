@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2024, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,15 @@
 
 package com.hazelcast.jet.python;
 
-import com.hazelcast.internal.nio.IOUtil;
-import com.hazelcast.jet.JetException;
-import com.hazelcast.jet.core.ProcessorSupplier;
-import com.hazelcast.jet.impl.util.Util;
-import com.hazelcast.logging.ILogger;
+import static com.hazelcast.jet.impl.util.IOUtil.copyStream;
+import static com.hazelcast.jet.impl.util.Util.editPermissionsRecursively;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.attribute.PosixFilePermission.GROUP_WRITE;
+import static java.nio.file.attribute.PosixFilePermission.OTHERS_WRITE;
+import static java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE;
+import static java.nio.file.attribute.PosixFilePermission.OWNER_WRITE;
+import static java.util.Arrays.asList;
 
-import javax.annotation.Nonnull;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -39,15 +41,16 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static com.hazelcast.jet.impl.util.IOUtil.copyStream;
-import static com.hazelcast.jet.impl.util.IOUtil.readFully;
-import static com.hazelcast.jet.impl.util.Util.editPermissionsRecursively;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.nio.file.attribute.PosixFilePermission.GROUP_WRITE;
-import static java.nio.file.attribute.PosixFilePermission.OTHERS_WRITE;
-import static java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE;
-import static java.nio.file.attribute.PosixFilePermission.OWNER_WRITE;
-import static java.util.Arrays.asList;
+import javax.annotation.Nonnull;
+
+import com.hazelcast.function.BiFunctionEx;
+import com.hazelcast.internal.nio.IOUtil;
+import com.hazelcast.jet.JetException;
+import com.hazelcast.jet.core.ProcessorSupplier;
+import com.hazelcast.jet.impl.util.Util;
+import com.hazelcast.logging.ILogger;
+
+import io.grpc.ManagedChannelBuilder;
 
 /**
  * The context object used by the "map using Python" pipeline stage. As a
@@ -78,11 +81,13 @@ class DagPythonServiceContext {
 
     private final ILogger logger;
     private final Path runtimeBaseDir;
+    private final BiFunctionEx<String, Integer, ? extends ManagedChannelBuilder<?>> channelFn;
 
     DagPythonServiceContext(ProcessorSupplier.Context context, PythonServiceConfig cfg) {
         logger = context.hazelcastInstance().getLoggingService()
                 .getLogger(getClass().getPackage().getName());
         checkIfPythonIsAvailable();
+        this.channelFn = cfg.channelFn();
         try {
             long start = System.nanoTime();
             runtimeBaseDir = recreateRuntimeBaseDir(context, cfg);
@@ -120,7 +125,7 @@ class DagPythonServiceContext {
             Process process = new ProcessBuilder("python3", "--version").redirectErrorStream(true).start();
             process.waitFor();
             try (InputStream inputStream = process.getInputStream()) {
-                String output = new String(readFully(inputStream), UTF_8);
+                String output = new String(inputStream.readAllBytes(), UTF_8);
                 if (process.exitValue() != 0) {
                     logger.severe("python3 version check returned non-zero exit value, output: " + output);
                     throw new IllegalStateException("python3 is not available");
@@ -234,8 +239,7 @@ class DagPythonServiceContext {
     static Thread logStdOut(ILogger logger, Process process, String taskName) {
         Thread thread = new Thread(() -> {
             try (BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream(), UTF_8))) {
-                String line;
-                while ((line = in.readLine()) != null) {
+                for (String line; (line = in.readLine()) != null; ) {
                     logger.fine(line);
                 }
             } catch (IOException e) {
@@ -266,5 +270,9 @@ class DagPythonServiceContext {
                 }
             }
         }
+    }
+
+    public BiFunctionEx<String, Integer, ? extends ManagedChannelBuilder<?>>    channelFn() {
+        return channelFn;
     }
 }

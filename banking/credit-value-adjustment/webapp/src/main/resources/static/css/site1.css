@@ -1,4 +1,4 @@
 :root {
-	--site-background: DarkKhaki;
+	--site-background: var(--color-carrot);
 }
 

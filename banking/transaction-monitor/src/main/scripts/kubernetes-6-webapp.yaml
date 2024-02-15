@@ -1,0 +1,105 @@
+---
+# Service DNS for Webapp will be "transaction-monitor-FLAVOR-webapp.default.svc.cluster.local".
+# Service DNS for FINOS Node.js will be "transaction-monitor-FLAVOR-finos.default.svc.cluster.local".
+---
+# Webapp
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-FLAVOR-webapp
+spec:
+  selector:
+    app: transaction-monitor-FLAVOR-webapp
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: LoadBalancer
+---
+# Only need 1 webapp
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transaction-monitor-FLAVOR-webapp
+spec:
+  selector:
+    matchLabels:
+      app: transaction-monitor-FLAVOR-webapp
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-FLAVOR-webapp
+    spec:
+      containers:
+        - env:
+          - name: "MY_MYSQL_ADDRESS"
+            value: "transaction-monitor-FLAVOR-mysql.default.svc.cluster.local:3306"
+          image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-webapp"
+          imagePullPolicy: Never
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 120
+          name: transaction-monitor-FLAVOR-webapp-container
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 120
+          volumeMounts:
+            - name: configmap
+              mountPath: /customize/my-env.sh
+              subPath: my-env.sh
+      volumes:
+        - name: configmap
+          configMap:
+            name: transaction-monitor-FLAVOR-configmap
+            defaultMode: 0755
+---
+# FinOS
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-FLAVOR-finos
+spec:
+  selector:
+    app: transaction-monitor-FLAVOR-finos
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: LoadBalancer
+---
+# Only need 1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transaction-monitor-FLAVOR-finos
+spec:
+  selector:
+    matchLabels:
+      app: transaction-monitor-FLAVOR-finos
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-FLAVOR-finos
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-finos"
+          imagePullPolicy: Never
+          name: transaction-monitor-FLAVOR-finos-container
+          volumeMounts:
+            - name: configmap
+              mountPath: /customize/my-env.sh
+              subPath: my-env.sh
+      volumes:
+        - name: configmap
+          configMap:
+            name: transaction-monitor-FLAVOR-configmap
+            defaultMode: 0755
+---

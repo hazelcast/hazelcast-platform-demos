@@ -1,6 +1,4 @@
-# Use Python 3.7 as Grppcio:1.26.0 is incompatible with Python 3.8.
-# Use Buster (Debian) as Alpine does not work well with wheel packages.
-FROM --platform=linux/amd64 library/python:3.7-buster
+FROM --platform=linux/amd64 library/python:3.9-buster
 
 # Add Java
 RUN apt update
@@ -10,9 +8,9 @@ RUN cd /tmp ; \
 RUN update-alternatives --install /usr/bin/java java /tmp/jdk-17/bin/java 1
 
 # Download requirements into image makes start up faster when growing cluster
-#COPY target/classes/requirements.txt /
-#RUN pip install --upgrade pip
-#RUN pip install -r ./requirements.txt
+COPY target/classes/python/requirements.txt /
+RUN pip install --upgrade pip
+RUN pip install -r ./requirements.txt
 
 # From pom.xml
 ARG MC_CLUSTER1_NAME

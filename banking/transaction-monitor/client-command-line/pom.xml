@@ -1,0 +1,47 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+        <parent>
+                <groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
+                <artifactId>transaction-monitor-root</artifactId>
+                <version>5.4</version>
+        </parent>
+
+        <artifactId>transaction-monitor-client-command-line</artifactId>
+
+        <name>Hazelcast Platform - Transaction Monitor - Command Line Client</name>
+        <description>Transaction Monitor - Command Line Client</description>
+
+	<properties>
+		<my.docker.control.file>control.file</my.docker.control.file>
+		<my.docker.image.name>client-command-line</my.docker.image.name>
+		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
+	</properties>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<plugins>
+			<!-- Copy keystore/truststore if found -->
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<configuration>
+					<target>
+						<ant antfile="../../../ant/build.xml" target="conditionalcopy"/>
+					</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

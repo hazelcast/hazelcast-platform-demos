@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hazelcast.platform.demos.banking</groupId>
+		<artifactId>banking-root</artifactId>
+		<version>5.4</version>
+	</parent>
+
+	<groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
+	<artifactId>transaction-monitor-root</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Hazelcast Platform - Banking - Transaction Monitor</name>
+	<description>Example implementation for monitoring a series of transactions</description>
+
+	<properties>
+		<!-- Don't want Java 19 dependencies -->
+		<jackson.version>2.14.0</jackson.version>
+		
+		<my.docker.image.prefix>transaction-monitor-${my.transaction-monitor.flavor}</my.docker.image.prefix>
+		<main.basedir>${project.parent.parent.basedir}</main.basedir>
+		<my.cluster1.name>live</my.cluster1.name>
+		<my.cluster2.name>cqrs</my.cluster2.name>
+		<my.pulsar.or.kafka>pulsar</my.pulsar.or.kafka>
+		<my.pulsar.or.kafka>kafka</my.pulsar.or.kafka>
+
+		<!-- Project specific versions -->
+		<javalin.version>3.13.0</javalin.version>
+
+		<!-- So Grafana can find Prometheus service, must match K8S YAML -->
+		<my.prometheus.name>${my.docker.image.prefix}-prometheus</my.prometheus.name>
+		<my.prometheus.port>9090</my.prometheus.port>
+		<my.management.center.name>${my.docker.image.prefix}-management-center</my.management.center.name>
+	</properties>
+
+	<modules>
+		<module>abstract-hazelcast-client</module>
+		<module>abstract-hazelcast-node</module>
+		<module>cassandra</module>
+		<module>client-command-line</module>
+		<module>client-cpp</module>
+		<module>client-csharp</module>
+		<module>client-golang</module>
+		<module>client-nodejs</module>
+		<module>client-python</module>
+		<module>common</module>
+		<module>custom-classes</module>
+		<module>finos</module>
+		<module>grafana</module>
+		<module>hazelcast-node-enterprise-1</module>
+		<module>hazelcast-node-enterprise-2</module>
+		<module>hazelcast-node</module>
+		<module>jar-namespace-1</module>
+		<module>jar-namespace-2</module>
+		<module>jar-namespace-3</module>
+		<module>kafdrop</module>
+		<module>kafka-broker</module>
+		<module>management-center</module>
+		<module>maria</module>
+		<module>mongo-updater</module>
+		<module>mongo</module>
+		<module>mysql</module>
+		<module>postgres</module>
+		<module>prometheus</module>
+		<module>pulsar</module>
+		<module>remote-job-sub-1</module>
+		<module>topic-create</module>
+		<module>transaction-producer</module>
+		<module>webapp</module>
+		<module>zookeeper</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>io.javalin</groupId>
+				<artifactId>javalin</artifactId>
+				<version>${javalin.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
+	<build>
+		<plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <configuration>
+                    <target>
+                        <echo message="@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" />
+                        <echo message="Set in top level pom.xml" />
+                        <echo message="$my.pulsar.or.kafka=${my.pulsar.or.kafka}" />
+                        <echo message="$my.transaction-monitor.flavor=${my.transaction-monitor.flavor}" />
+                        <echo message="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" />
+                        <echo message="Cassandra:" />
+                        <echo message="Keyspace is 'transaction-monitor-${my.transaction-monitor.flavor}', just amend IP in:" />
+                        <echo message="jdbc:cassandra://127.0.0.1:9042/transaction-monitor-${my.transaction-monitor.flavor}" />
+                        <echo message="Maria:" />
+                        <echo message="Database is 'transaction-monitor-${my.transaction-monitor.flavor}', just amend IP in:" />
+                        <echo message="Port in Docker is 4306 to avoid clash with MySql" />
+                        <echo message="jdbc:mariadb://127.0.0.1:4306/transaction-monitor-${my.transaction-monitor.flavor}" />
+                        <echo message="Mongo:" />
+                        <echo message="Database is 'transaction-monitor-${my.transaction-monitor.flavor}', just amend IP in:" />
+                        <echo message="mongodb://${my.other.admin.user}:${my.other.admin.password}@127.0.0.1:27017/?authMechanism=DEFAULT&amp;tls=false" />
+                        <echo message="MySql:" />
+                        <echo message="Database is 'transaction-monitor-${my.transaction-monitor.flavor}', just amend IP in:" />
+                        <echo message="jdbc:mysql://127.0.0.1:3306/transaction-monitor-${my.transaction-monitor.flavor}" />
+                        <echo message="Postgres:" />
+                        <echo message="Database is 'transaction-monitor-${my.transaction-monitor.flavor}', just amend IP in:" />
+                        <echo message="jdbc:postgresql://127.0.0.1:5432/transaction-monitor-${my.transaction-monitor.flavor}" />
+                        <echo message="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" />
+                        <echo message="use.viridian == ${use.viridian}" />
+                        <echo message="my.viridian.cluster1.name == '${my.viridian.cluster1.name}'" />
+                        <echo message="@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" />
+                    </target>
+                </configuration>
+            </plugin>
+		</plugins>	
+	</build>
+</project>

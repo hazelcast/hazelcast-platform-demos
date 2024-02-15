@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+        <parent>
+                <groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
+                <artifactId>transaction-monitor-root</artifactId>
+                <version>5.4</version>
+        </parent>
+
+        <artifactId>transaction-monitor-prometheus</artifactId>
+
+        <name>Hazelcast Platform - Transaction Monitor - Prometheus</name>
+        <description>Transaction Monitor - Prometheus</description>
+
+	<properties>
+                <dockerfile.skip>${skip.when.viridian}</dockerfile.skip>
+		<my.docker.image.name>prometheus</my.docker.image.name>
+		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
+	</properties>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

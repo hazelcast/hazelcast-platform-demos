@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.banking.cva</groupId>
 		<artifactId>cva-root</artifactId>
-		<version>5.2</version>
+		<version>5.4</version>
 	</parent>
 
 	<artifactId>cva-jet-jobs</artifactId>
@@ -23,11 +23,6 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>cva-common</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
 		</dependency>
 
 		<!-- scope==provided -->

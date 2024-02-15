@@ -33,7 +33,7 @@ const Styles = styled.div `
       }
     }
     td {
-  	  color: var(--hazelcast-blue-light);
+  	  color: var(--color-blueberry);
       margin: 0;
       padding: 0.5rem;
       border-bottom: 1px solid gray;
@@ -136,7 +136,7 @@ class Fixings extends Component {
 	    	var client = rest.wrap(mime);
 	    	var self = this;
 	    	
-	    	var restURL = '/rest/cva/run/?batch_size=' + this.state.batch_size
+	    	var restURL = '/rest/cva/run?batch_size=' + this.state.batch_size
 	    		+ '&calc_date=' + this.state.calc_date
 	    		+ '&debug=' + this.state.debug
 	    		+ '&parallelism=' + this.state.parallelism;
@@ -155,7 +155,7 @@ class Fixings extends Component {
             		fontWeight: 'bold'
             	}
 	        	var success_style = {
-	        		color: 'var(--hazelcast-blue)',
+	        		color: 'var(--color-sky)',
 	            	fontWeight: 'lighter'
 	            }
 	            

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2024, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.hazelcast.platform.demos.telco.churn;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -28,8 +29,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.platform.demos.telco.churn.domain.CallDataRecord;
@@ -50,7 +49,6 @@ public class ApplicationRunner implements CommandLineRunner {
     private static AtomicLong onSuccessCount = new AtomicLong(0);
     private static AtomicLong onFailureCount = new AtomicLong(0);
 
-    private final MyCallback myCallback = new MyCallback();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${spring.application.name}")
@@ -186,28 +184,16 @@ public class ApplicationRunner implements CommandLineRunner {
                      count, key, partition, value);
          }
 
-         ListenableFuture<SendResult<String, String>> sendResult =
+         CompletableFuture<SendResult<String, String>> sendResult =
              kafkaTemplate.sendDefault(partition, key, value);
 
-         sendResult.addCallback(this.myCallback);
-     }
-
-     /**
-      * <p>A callback to count successful and unsuccessful writes to Kafka.
-      * </p>
-      */
-     private static class MyCallback implements ListenableFutureCallback<SendResult<String, String>> {
-
-         @Override
-         public void onSuccess(SendResult<String, String> result) {
-             onSuccessCount.incrementAndGet();
-         }
-
-         @Override
-         public void onFailure(Throwable ex) {
-             onFailureCount.incrementAndGet();
-             LOGGER.error("onFailure()", ex);
-         }
-
+         sendResult.whenComplete((result, ex) -> {
+             if (ex == null) {
+                 onSuccessCount.incrementAndGet();
+             } else {
+                 onFailureCount.incrementAndGet();
+                 LOGGER.error("onFailure()", ex);
+             }
+         });
      }
 }

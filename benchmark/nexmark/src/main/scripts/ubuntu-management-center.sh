@@ -12,7 +12,6 @@ JAVA_OPTS="\
  --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED \
  --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
 
-# Pre-5.2 - CMD="java -server $JAVA_ARGS $JAVA_OPTS -cp $JAR_FILE com.hazelcast.webmonitor.Launcher"
 CMD="java -server $JAVA_ARGS $JAVA_OPTS -cp $JAR_FILE org.springframework.boot.loader.JarLauncher"
 echo $CMD
 

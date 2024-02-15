@@ -18,7 +18,7 @@ then
  exit 1
 fi
 
-JAR_FILE=${PROJECT}-${MODULE}-5.2.jar
+JAR_FILE=${PROJECT}-${MODULE}-5.4.jar
 
 JAVA_ARGS="-Dhazelcast.client.config="`pwd`/../src/main/scripts/hazelcast-client.xml
 JAVA_ARGS="${JAVA_ARGS} -Dhost.ip=$HOST_IP"

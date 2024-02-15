@@ -1,0 +1,210 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
+		<artifactId>transaction-monitor-root</artifactId>
+		<version>5.4</version>
+	</parent>
+
+	<artifactId>transaction-monitor-webapp</artifactId>
+
+	<name>Hazelcast Platform - Transaction Monitor - Webapp</name>
+	<description>Transaction Monitor - Web Application</description>
+
+	<properties>
+		<my.docker.image.name>webapp</my.docker.image.name>
+		<my.docker.jar.file>${project.artifactId}-${project.version}-jar-with-dependencies.jar</my.docker.jar.file>
+		<my.docker.jar.file1>transaction-monitor-jar-namespace-1-${project.version}.jar</my.docker.jar.file1>
+		<my.docker.jar.file2>transaction-monitor-jar-namespace-2-${project.version}.jar</my.docker.jar.file2>
+		<my.docker.jar.file3>transaction-monitor-jar-namespace-3-${project.version}.jar</my.docker.jar.file3>
+		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
+		<main.class>hazelcast.platform.demos.banking.transactionmonitor.Application</main.class>
+
+		<!-- See comment on maven-resources-plugin -->
+		<frontend.app.dir>${project.basedir}/src/main/app</frontend.app.dir>
+
+		<!-- Temp uptil upgraded to Node 17, and remove Yarn -->
+		<node.version>v16.4.0</node.version>
+		<yarn.version>v1.22.5</yarn.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>transaction-monitor-abstract-hazelcast-client</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.hazelcast</groupId>
+					<artifactId>hazelcast</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>transaction-monitor-jar-namespace-1</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>transaction-monitor-jar-namespace-2</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>transaction-monitor-jar-namespace-3</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-sql</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.hazelcast</groupId>
+					<artifactId>hazelcast</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- Need this for SSL for HZ Viridian -->
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-enterprise</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.javalin</groupId>
+			<artifactId>javalin</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<plugins>
+			<!-- Copy keystore/truststore if found -->
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<configuration>
+					<target>
+						<ant antfile="../../../ant/build.xml" target="conditionalcopy"/>
+					</target>
+                    <target name="Copy ${my.docker.jar.file1} ${my.docker.jar.file2} ${my.docker.jar.file3}">
+                    	<copy file="../jar-namespace-1/target/${my.docker.jar.file1}" todir="${project.build.directory}"/>
+                    	<copy file="../jar-namespace-2/target/${my.docker.jar.file2}" todir="${project.build.directory}"/>
+                    	<copy file="../jar-namespace-3/target/${my.docker.jar.file3}" todir="${project.build.directory}"/>
+                    </target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<configuration>
+					<nodeVersion>${node.version}</nodeVersion>
+					<yarnVersion>${yarn.version}</yarnVersion>
+					<workingDirectory>${frontend.app.dir}</workingDirectory>
+					<installDirectory>${project.build.directory}</installDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<id>install-frontend-tools</id>
+						<goals>
+							<goal>install-node-and-yarn</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>yarn-install</id>
+						<goals>
+							<goal>yarn</goal>
+						</goals>
+						<configuration>
+							<arguments>install</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>build-frontend</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>yarn</goal>
+						</goals>
+						<configuration>
+							<arguments>build</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<phase>prepare-package</phase>
+						<configuration>
+							<outputDirectory>${project.build.outputDirectory}/app</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${frontend.app.dir}/build</directory>
+									<filtering>true</filtering>
+									<excludes>
+										<exclude>**/*.eot</exclude>
+										<exclude>**/*.svg</exclude>
+										<exclude>**/*.ttf</exclude>
+										<exclude>**/*.woff</exclude>
+										<exclude>**/*.woff2</exclude>
+									</excludes>
+								</resource>
+								<resource>
+									<directory>${frontend.app.dir}/build</directory>
+									<filtering>false</filtering>
+									<includes>
+										<include>**/*.eot</include>
+										<include>**/*.svg</include>
+										<include>**/*.ttf</include>
+										<include>**/*.woff</include>
+										<include>**/*.woff2</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

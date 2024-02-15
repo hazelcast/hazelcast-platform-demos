@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2022, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2024, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,8 @@ import org.slf4j.LoggerFactory;
 import com.hazelcast.function.FunctionEx;
 import com.hazelcast.jet.datamodel.Tuple3;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * <p>Prepare job output, converting from a two-dimensional array
  * to an Excel spreadsheet to download
@@ -60,6 +62,7 @@ public class XlstFileAsByteArray {
      * grid for later downloading.
      * </p>
      */
+    @SuppressFBWarnings(value = "REC_CATCH_EXCEPTION", justification = "workbook.close() can throw exception")
     public static final FunctionEx<Tuple3<String, Long, Object[][]>, byte[]>
         CONVERT_TUPLE3_TO_BYTE_ARRAY =
                 (Tuple3<String, Long, Object[][]> tuple3) -> {
