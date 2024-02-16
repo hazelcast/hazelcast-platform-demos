@@ -74,7 +74,7 @@
 		<!-- See also banking/credit-value-adjustment/cpp/Dockerfile -->
 		<!-- Same as version using in Hazelcast https://github.com/hazelcast/hazelcast/blob/master/pom.xml#L99 -->
 		<grpc.version>1.48.0</grpc.version>
-		<hazelcast.version>5.3.1</hazelcast.version>
+		<hazelcast.version>5.3.5</hazelcast.version>
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
 		<hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
 		<jackson.version>2.15.0</jackson.version>
