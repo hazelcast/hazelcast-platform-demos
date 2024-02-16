@@ -1332,7 +1332,7 @@ public class TransactionMonitorIdempotentInitialization {
     }
 
     /**
-     * <p>Launch Slack jobs for SQL (read/write) and alerting (write)
+     * <p>Launch Slack jobs for SQL (read/write) and alerting (write) if credentials provided.
      * </p>
      *
      * @param useViridian
@@ -1350,15 +1350,15 @@ public class TransactionMonitorIdempotentInitialization {
 
         if (slackAccessToken.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY) {
             LOGGER.warn("No Slack jobs, '{}' too short: '{}'", UtilsConstants.SLACK_ACCESS_TOKEN, slackAccessToken);
-            return false;
+            return true;
         }
         if (slackChannelId.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY) {
             LOGGER.warn("No Slack jobs, '{}' too short: '{}'", UtilsConstants.SLACK_CHANNEL_ID, slackChannelId);
-            return false;
+            return true;
         }
         if (slackChannelName.length() < UtilsSlack.REASONABLE_MINIMAL_LENGTH_FOR_SLACK_PROPERTY) {
             LOGGER.warn("No Slack jobs, '{}' too short: '{}'", UtilsConstants.SLACK_CHANNEL_NAME, slackChannelName);
-            return false;
+            return true;
         }
 
         // Slack alerting (writing), indirectly uses common utils
