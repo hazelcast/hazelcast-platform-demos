@@ -168,7 +168,7 @@ public class ApplicationRunnerNamespaces {
         itemListenerConfigNS3.setImplementation(new LoggingItemListener(MyConstants.QUEUE_NAMESPACE_3));
         QueueConfig queueConfigNS3 = new QueueConfig(MyConstants.QUEUE_NAMESPACE_3);
         queueConfigNS3.setUserCodeNamespace(MyConstants.USER_CODE_NAMESPACE_3);
-        queueConfigNS3.addItemListenerConfig(itemListenerConfigNS3);
+        //FIXME Scaling post initiatialize queueConfigNS3.addItemListenerConfig(itemListenerConfigNS3);
         hazelcastInstance.getConfig().addQueueConfig(queueConfigNS3);
 
         // Runnable that writes to queue with listener

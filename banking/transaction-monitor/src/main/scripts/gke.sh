@@ -13,7 +13,7 @@ POM_USE_VIRIDIAN=`grep '<use.viridian>' $TOP_LEVEL_POM | tail -1 | cut -d'>' -f2
 K_MACHINE_TYPE="c2-standard-4"
 K_NETWORK="neil-europe-west1"
 K_NETWORK_SUBNET="neil-europe-west1-subnet"
-K_NUM_NODES=10
+K_NUM_NODES=15
 K_PROJECT=hazelcast-33
 K_ZONE=europe-west1-d
 
@@ -332,3 +332,7 @@ fi
 echo `date +"%H:%M:%S"` - Done
 
 /bin/rm $TMPFILE.* > /dev/null 2>&1
+RC=0
+echo RC=$RC
+exit $RC
+
