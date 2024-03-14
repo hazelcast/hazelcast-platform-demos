@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
+import com.hazelcast.core.HazelcastInstanceNotActiveException;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.map.IMap;
 
@@ -92,7 +93,15 @@ public class PerspectiveUpdater implements Runnable, Serializable, HazelcastInst
                 this.logExponentially(object);
 
                 TimeUnit.MILLISECONDS.sleep(FIFTY);
-            } catch (InterruptedException e) {
+            } catch (HazelcastInstanceNotActiveException hnae) {
+                if (!useViridian) {
+                    LOGGER.info("HazelcastInstanceNotActiveException run(): {}", hnae.getMessage());
+                }
+                break;
+            } catch (InterruptedException ie) {
+                if (!useViridian) {
+                    LOGGER.info("InterruptedException run(): {}", ie.getMessage());
+                }
                 break;
             } catch (Exception e) {
                 if (!useViridian) {

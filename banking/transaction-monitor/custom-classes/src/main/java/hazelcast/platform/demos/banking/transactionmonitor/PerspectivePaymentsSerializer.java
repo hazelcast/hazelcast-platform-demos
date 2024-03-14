@@ -29,23 +29,23 @@ public class PerspectivePaymentsSerializer implements CompactSerializer<Perspect
     @Override
     public PerspectivePayments read(CompactReader in) {
         PerspectivePayments perspectivePayments = new PerspectivePayments();
-        perspectivePayments.setBic(in.readString("bic"));
-        perspectivePayments.setCount(in.readInt64("count"));
-        perspectivePayments.setSum(in.readFloat64("sum"));
-        perspectivePayments.setAverage(in.readFloat64("average"));
-        perspectivePayments.setSeconds(in.readInt32("seconds"));
-        perspectivePayments.setRandom(in.readInt32("random"));
+        perspectivePayments.setBic(in.readString(MyConstants.PERSPECTIVE_FIELD_BIC));
+        perspectivePayments.setCount(in.readInt64(MyConstants.PERSPECTIVE_FIELD_COUNT));
+        perspectivePayments.setSum(in.readFloat64(MyConstants.PERSPECTIVE_FIELD_SUM));
+        perspectivePayments.setAverage(in.readFloat64(MyConstants.PERSPECTIVE_FIELD_AVERAGE));
+        perspectivePayments.setSeconds(in.readInt32(MyConstants.PERSPECTIVE_FIELD_SECONDS));
+        perspectivePayments.setRandom(in.readInt32(MyConstants.PERSPECTIVE_FIELD_RANDOM));
         return perspectivePayments;
     }
 
     @Override
     public void write(CompactWriter out, PerspectivePayments perspectivePayments) {
-        out.writeString("bic", perspectivePayments.getBic());
-        out.writeInt64("count", perspectivePayments.getCount());
-        out.writeFloat64("sum", perspectivePayments.getSum());
-        out.writeFloat64("average", perspectivePayments.getAverage());
-        out.writeInt32("seconds", perspectivePayments.getSeconds());
-        out.writeInt32("random", perspectivePayments.getRandom());
+        out.writeString(MyConstants.PERSPECTIVE_FIELD_BIC, perspectivePayments.getBic());
+        out.writeInt64(MyConstants.PERSPECTIVE_FIELD_COUNT, perspectivePayments.getCount());
+        out.writeFloat64(MyConstants.PERSPECTIVE_FIELD_SUM, perspectivePayments.getSum());
+        out.writeFloat64(MyConstants.PERSPECTIVE_FIELD_AVERAGE, perspectivePayments.getAverage());
+        out.writeInt32(MyConstants.PERSPECTIVE_FIELD_SECONDS, perspectivePayments.getSeconds());
+        out.writeInt32(MyConstants.PERSPECTIVE_FIELD_RANDOM, perspectivePayments.getRandom());
     }
 
     @Override

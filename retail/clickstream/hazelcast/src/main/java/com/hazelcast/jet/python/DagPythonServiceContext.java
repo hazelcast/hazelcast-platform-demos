@@ -16,16 +16,14 @@
 
 package com.hazelcast.jet.python;
 
-import com.hazelcast.function.BiFunctionEx;
-import com.hazelcast.internal.nio.IOUtil;
-import com.hazelcast.jet.JetException;
-import com.hazelcast.jet.core.ProcessorSupplier;
-import com.hazelcast.jet.impl.util.Util;
-import com.hazelcast.logging.ILogger;
-
-import io.grpc.ManagedChannelBuilder;
-
-import javax.annotation.Nonnull;
+import static com.hazelcast.jet.impl.util.IOUtil.copyStream;
+import static com.hazelcast.jet.impl.util.Util.editPermissionsRecursively;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.attribute.PosixFilePermission.GROUP_WRITE;
+import static java.nio.file.attribute.PosixFilePermission.OTHERS_WRITE;
+import static java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE;
+import static java.nio.file.attribute.PosixFilePermission.OWNER_WRITE;
+import static java.util.Arrays.asList;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,15 +41,16 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static com.hazelcast.jet.impl.util.IOUtil.copyStream;
-import static com.hazelcast.jet.impl.util.IOUtil.readFully;
-import static com.hazelcast.jet.impl.util.Util.editPermissionsRecursively;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.nio.file.attribute.PosixFilePermission.GROUP_WRITE;
-import static java.nio.file.attribute.PosixFilePermission.OTHERS_WRITE;
-import static java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE;
-import static java.nio.file.attribute.PosixFilePermission.OWNER_WRITE;
-import static java.util.Arrays.asList;
+import javax.annotation.Nonnull;
+
+import com.hazelcast.function.BiFunctionEx;
+import com.hazelcast.internal.nio.IOUtil;
+import com.hazelcast.jet.JetException;
+import com.hazelcast.jet.core.ProcessorSupplier;
+import com.hazelcast.jet.impl.util.Util;
+import com.hazelcast.logging.ILogger;
+
+import io.grpc.ManagedChannelBuilder;
 
 /**
  * The context object used by the "map using Python" pipeline stage. As a
@@ -126,7 +125,7 @@ class DagPythonServiceContext {
             Process process = new ProcessBuilder("python3", "--version").redirectErrorStream(true).start();
             process.waitFor();
             try (InputStream inputStream = process.getInputStream()) {
-                String output = new String(readFully(inputStream), UTF_8);
+                String output = new String(inputStream.readAllBytes(), UTF_8);
                 if (process.exitValue() != 0) {
                     logger.severe("python3 version check returned non-zero exit value, output: " + output);
                     throw new IllegalStateException("python3 is not available");

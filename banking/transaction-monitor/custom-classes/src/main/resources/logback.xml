@@ -3,41 +3,93 @@
 
     <appender name="NORMAL" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %thread %logger{40} - %msg %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %thread %logger{60} - %msg %n</pattern>
         </encoder>
     </appender>
     <appender name="HIGHLIGHT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level %thread %logger{40} - %msg) %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level %thread %logger{60} - %msg) %n</pattern>
         </encoder>
     </appender>
     <appender name="BLUE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldBlue(%logger{40} - %msg) %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %thread %boldBlue(%logger{60} - %msg) %n</pattern>
         </encoder>
     </appender>
     <appender name="CYAN" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldCyan(%logger{40} - %msg) %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %thread %boldCyan(%logger{60} - %msg) %n</pattern>
         </encoder>
     </appender>
     <appender name="MAGENTA" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldMagenta(%logger{40} - %msg) %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %thread %boldMagenta(%logger{60} - %msg) %n</pattern>
         </encoder>
     </appender>
     <appender name="WHITE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldWhite(%logger{40} - %msg) %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %thread %boldWhite(%logger{60} - %msg) %n</pattern>
         </encoder>
     </appender>
     <appender name="YELLOW" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %-5level %thread %boldYellow(%logger{40} - %msg) %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %thread %boldYellow(%logger{60} - %msg) %n</pattern>
+        </encoder>
+    </appender>
+
+	<!-- CP loggers, blue for logger, different color for the message -->
+    <appender name="RAFT_BLUE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %blue(%thread %logger{60}) - %blue(%msg %n)</pattern>
+        </encoder>
+    </appender>
+    <appender name="RAFT_CYAN" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %blue(%thread %logger{60}) - %cyan(%msg %n)</pattern>
+        </encoder>
+    </appender>
+    <appender name="RAFT_MAGENTA" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %blue(%thread %logger{60}) - %magenta(%msg %n)</pattern>
+        </encoder>
+    </appender>
+    <appender name="RAFT_YELLOW" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %blue(%thread %logger{60}) - %cyan(%msg %n)</pattern>
         </encoder>
     </appender>
 
     <!-- Tune out some of Hazelcast's normal messages so more of Transaction Monitor in logs -->
+    <logger name="com.hazelcast.cp.internal.raft.impl.handler" level="warn" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
+    <logger name="com.hazelcast.cp.internal.RaftGroupMembershipManager" level="warn" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
+
+    <logger name="com.hazelcast.cp.internal.raft.impl.task.LeaderElectionTask" level="info" additivity="false">
+        <appender-ref ref="RED"/>
+    </logger>
+    
+    <logger name="com.hazelcast.cp.internal.raft.impl.RaftNode(default)" level="info" additivity="false">
+        <appender-ref ref="RAFT_BLUE"/>
+    </logger>
+    <logger name="com.hazelcast.cp.internal.raft.impl.RaftNode(even)" level="info" additivity="false">
+        <appender-ref ref="RAFT_MAGENTA"/>
+    </logger>
+    <logger name="com.hazelcast.cp.internal.raft.impl.RaftNode(odd)" level="info" additivity="false">
+        <appender-ref ref="RAFT_YELLOW"/>
+    </logger>
+    <logger name="com.hazelcast.cp.internal.raft.impl.RaftNode(METADATA)" level="info" additivity="false">
+        <appender-ref ref="RAFT_CYAN"/>
+    </logger>
+    <logger name="com.hazelcast.cp.internal.RaftInvocationManager" level="warn" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
+    <logger name="com.hazelcast.cp.internal.RaftService" level="warn" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
+
     <logger name="com.hazelcast.jet.impl.JobExecutionService" level="warn" additivity="false">
         <appender-ref ref="NORMAL"/>
     </logger>
@@ -59,6 +111,10 @@
     <logger name="com.hazelcast.system.logo" level="trace" additivity="false">
         <appender-ref ref="MAGENTA"/>
     </logger>
+    <!-- Cassandra connector -->
+    <logger name="com.ing.data.cassandra.jdbc.CassandraConnection" level="error" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
     <logger name="io.debezium" level="error" additivity="false">
         <appender-ref ref="BLUE"/>
     </logger>
@@ -69,7 +125,16 @@
     <logger name="hazelcast.platform.demos.banking.transactionmonitor.ApplicationRunner" level="debug" additivity="false">
         <appender-ref ref="CYAN"/>
     </logger>
+    <logger name="hazelcast.platform.demos.banking.transactionmonitor.ApplicationRunnerNamespaces" level="debug" additivity="false">
+        <appender-ref ref="YELLOW"/>
+    </logger>
     <logger name="hazelcast.platform.demos.banking.transactionmonitor.MyMembershipListener" level="trace" additivity="false">
+        <appender-ref ref="CYAN"/>
+    </logger>
+    <logger name="hazelcast.platform.demos.banking.transactionmonitor.MyRestGraph" level="debug" additivity="false">
+        <appender-ref ref="CYAN"/>
+    </logger>
+    <logger name="hazelcast.platform.demos.banking.transactionmonitor.MyWebSocketBridgeListener" level="debug" additivity="false">
         <appender-ref ref="CYAN"/>
     </logger>
     <logger name="hazelcast.platform.demos.banking.transactionmonitor.TransactionsMapListener" level="debug" additivity="false">
@@ -84,6 +149,10 @@
     </logger>
     <!-- Kafka connector -->
     <logger name="org.apache.kafka" level="error" additivity="false">
+        <appender-ref ref="NORMAL"/>
+    </logger>
+    <!-- Mongo connector -->
+    <logger name="org.mongodb.driver" level="error" additivity="false">
         <appender-ref ref="NORMAL"/>
     </logger>
     

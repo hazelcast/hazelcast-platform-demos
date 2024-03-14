@@ -43,9 +43,9 @@ public class UtilsViridian {
      * <p>Configure for Viridian.
      * </p>
      */
-    public static void configure(ClientConfig clientConfig, String clusterId, String discoveryToken, String keyPassword)
+    public static void configure(ClientConfig clientConfig, String clusterName, String discoveryToken, String keyPassword)
         throws Exception {
-        clientConfig.setClusterName(clusterId);
+        clientConfig.setClusterName(clusterName);
 
         ClientNetworkConfig clientNetworkConfig = clientConfig.getNetworkConfig();
         clientNetworkConfig.getAutoDetectionConfig().setEnabled(false);

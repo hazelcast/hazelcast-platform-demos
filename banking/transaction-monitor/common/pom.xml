@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
 		<artifactId>transaction-monitor-root</artifactId>
-		<version>5.3</version>
+		<version>5.4</version>
 	</parent>
 
 	<artifactId>transaction-monitor-common</artifactId>
@@ -26,18 +26,27 @@
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.platform.demos.utils</groupId>
+			<artifactId>utils-miscellaneous</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.platform.demos.utils</groupId>
 			<artifactId>utils-slack-integration</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
+			<groupId>com.datastax.oss</groupId>
+			<artifactId>java-driver-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.ing.data</groupId>
+			<artifactId>cassandra-jdbc-wrapper</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
+			<groupId>org.mariadb.jdbc</groupId>
+			<artifactId>mariadb-java-client </artifactId>
 		</dependency>
 
 		<dependency>
@@ -62,6 +71,10 @@
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-jet-mongodb</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet-python</artifactId>
 		</dependency>
 		<dependency>
@@ -82,19 +95,19 @@
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-sql</artifactId>
 		</dependency>
-	</dependencies>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-parent</artifactId>
-				<type>pom</type>
-				<scope>import</scope>
-				<version>${spring-boot.version}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<resources>

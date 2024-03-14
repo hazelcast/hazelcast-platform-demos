@@ -26,7 +26,7 @@ const char* clusterName = "@my.cluster1.name@";
 const char* instanceName = "@project.artifactId@";
 const char* serviceDns = "@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local";
 
-const char* viridianId = "@my.viridian.cluster1.id@";
+const char* viridianName = "@my.viridian.cluster1.name@";
 const char* viridianDiscoveryToken = "@my.viridian.cluster1.discovery.token@";
 const char* viridianKeyPassword = "@my.viridian.cluster1.key.password@";
 
@@ -75,7 +75,7 @@ hazelcast::client::hazelcast_client get_client(const char* kubernetes, bool viri
 	client_config.set_property("hazelcast.client.statistics.enabled", "true");
 
 	if (viridian) {
-		client_config.set_cluster_name(viridianId);
+		client_config.set_cluster_name(viridianName);
 
 		auto &cloud_configuration = client_config.get_network_config().get_cloud_config();
     	cloud_configuration.enabled = true;
@@ -184,16 +184,28 @@ void list_distributed_objects(hazelcast::client::hazelcast_client hazelcast_clie
 }
 
 void get_generic_record(hazelcast::client::hazelcast_client hazelcast_client) {
+	using namespace hazelcast::client::serialization::generic_record;
 	std::cout << "--------------------------------------" << std::endl;
 	std::cout << "GenericRecord, map '" << genericRecordMap << "'" << std::endl;
 	auto map = hazelcast_client.get_map(genericRecordMap).get();
 	int count = 0;
+
 	for (auto& key : map->key_set<hazelcast::client::typed_data>().get()) {
-    	//auto& value = map->get<>(key).get();
-		//std::cout << "got value" << std::endl;
-	//	std::cout << key << "," << value << std::endl;
-	//TODO FIXME no known conversion for argument 2 from 'hazelcast::client::typed_data' to 'const hazelcast::client::member&'
-		//std::cout << key << "," << std::endl;
+		boost::optional<hazelcast::client::typed_data> value =
+            map->get<hazelcast::client::typed_data, hazelcast::client::typed_data>(key).get();
+		hazelcast::client::serialization::pimpl::object_type keyType = key.get_type();
+		hazelcast::client::serialization::pimpl::object_type valueType = value->get_type();
+		if (keyType.type_id == hazelcast::client::serialization::pimpl::serialization_constants::CONSTANT_TYPE_LONG) {
+			if (valueType.type_id == hazelcast::client::serialization::pimpl::serialization_constants::CONSTANT_TYPE_COMPACT) {
+				auto keyRecord = key.get<int64_t>().value();
+				auto valueRecord = value->get<generic_record>().value();
+    			std::cout << keyRecord << " :: " << valueRecord << std::endl;
+			} else {
+				std::cout << "Row " << count << ": Unknown value type: " << valueType << std::endl;
+			}
+		} else {
+			std::cout << "Row " << count << ": Unknown key type: " << keyType << std::endl;
+		}
         count++;
 	}
 	std::cout << "[" << count << " rows]" << std::endl;

@@ -56,23 +56,23 @@ public class Application {
         LOGGER.info("TransactionMonitorFlavor=='{}'", transactionMonitorFlavor);
 
         String bootstrapServers = null;
-        String pulsarList = null;
+        String pulsarAddress = null;
 
         if (args.length == 1) {
             bootstrapServers = args[0];
-            pulsarList = args[0];
+            pulsarAddress = args[0];
         } else {
             bootstrapServers = System.getProperty("my.bootstrap.servers", "");
-            pulsarList = System.getProperty("my.pulsar.list", "");
+            pulsarAddress = System.getProperty("my.pulsar.address", "");
             if ((bootstrapServers.isBlank() && !usePulsar)
-                    || (pulsarList.isBlank() && usePulsar)) {
-                LOGGER.error("Usage: 1 arg expected: bootstrapServers or pulsarList");
+                    || (pulsarAddress.isBlank() && usePulsar)) {
+                LOGGER.error("Usage: 1 arg expected: bootstrapServers or pulsarAddress");
                 LOGGER.error("eg: 127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094 / 127.0.0.1:6650");
                 System.exit(1);
             }
         }
         LOGGER.info("bootstrapServers={}", bootstrapServers);
-        LOGGER.info("pulsarList={}", pulsarList);
+        LOGGER.info("pulsarAddress={}", pulsarAddress);
 
         int rate = DEFAULT_RATE;
         int max = DEFAULT_MAX;
@@ -83,7 +83,7 @@ public class Application {
             max = Integer.parseInt(args[2]);
         }
 
-        new ApplicationRunner(rate, max, bootstrapServers, pulsarList, usePulsar, transactionMonitorFlavor).run();
+        new ApplicationRunner(rate, max, bootstrapServers, pulsarAddress, usePulsar, transactionMonitorFlavor).run();
     }
 
 }

@@ -154,12 +154,13 @@ spec:
             httpGet:
               path: /health
               port: 8081
+            initialDelaySeconds: 60
           name: clickstream-management-center-container
           readinessProbe:
             httpGet:
               path: /health
               port: 8081
-            initialDelaySeconds: 30
+            initialDelaySeconds: 60
 ---
 # Pod for Prometheus
 ---

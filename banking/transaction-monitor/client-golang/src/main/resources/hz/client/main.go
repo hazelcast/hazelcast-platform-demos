@@ -36,7 +36,7 @@ const clusterName = "@my.cluster1.name@"
 const instanceName = "@project.artifactId@"
 const serviceDns = "@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local"
 
-const viridianId = "@my.viridian.cluster1.id@"
+const viridianName = "@my.viridian.cluster1.name@"
 const viridianDiscoveryToken = "@my.viridian.cluster1.discovery.token@"
 const viridianKeyPassword = "@my.viridian.cluster1.key.password@"
 
@@ -61,7 +61,7 @@ func getClient(ctx context.Context, kubernetes string, viridian bool) *hazelcast
 	config.Stats.Enabled = true
 
 	if viridian {
-		config.Cluster.Name = viridianId
+		config.Cluster.Name = viridianName
 		config.Cluster.Cloud.Enabled = true
 		config.Cluster.Cloud.Token = viridianDiscoveryToken
 		config.Cluster.Network.SSL.Enabled = true

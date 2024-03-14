@@ -141,7 +141,7 @@ spec:
             httpGet:
               path: /health
               port: 8081
-            initialDelaySeconds: 30
+            initialDelaySeconds: 60
             periodSeconds: 10
             timeoutSeconds: 10
           name: booking-management-center-container
@@ -149,7 +149,7 @@ spec:
             httpGet:
               path: /health
               port: 8081
-            initialDelaySeconds: 30
+            initialDelaySeconds: 60
             periodSeconds: 10
 ---
 # Pod for Prometheus

@@ -29,23 +29,23 @@ public class PerspectiveEcommerceSerializer implements CompactSerializer<Perspec
     @Override
     public PerspectiveEcommerce read(CompactReader in) {
         PerspectiveEcommerce perspectiveEcommerce = new PerspectiveEcommerce();
-        perspectiveEcommerce.setCode(in.readString("code"));
-        perspectiveEcommerce.setCount(in.readInt64("count"));
-        perspectiveEcommerce.setSum(in.readFloat64("sum"));
-        perspectiveEcommerce.setAverage(in.readFloat64("average"));
-        perspectiveEcommerce.setSeconds(in.readInt32("seconds"));
-        perspectiveEcommerce.setRandom(in.readInt32("random"));
+        perspectiveEcommerce.setCode(in.readString(MyConstants.PERSPECTIVE_FIELD_CODE));
+        perspectiveEcommerce.setCount(in.readInt64(MyConstants.PERSPECTIVE_FIELD_COUNT));
+        perspectiveEcommerce.setSum(in.readFloat64(MyConstants.PERSPECTIVE_FIELD_SUM));
+        perspectiveEcommerce.setAverage(in.readFloat64(MyConstants.PERSPECTIVE_FIELD_AVERAGE));
+        perspectiveEcommerce.setSeconds(in.readInt32(MyConstants.PERSPECTIVE_FIELD_SECONDS));
+        perspectiveEcommerce.setRandom(in.readInt32(MyConstants.PERSPECTIVE_FIELD_RANDOM));
         return perspectiveEcommerce;
     }
 
     @Override
     public void write(CompactWriter out, PerspectiveEcommerce perspectiveEcommerce) {
-        out.writeString("code", perspectiveEcommerce.getCode());
-        out.writeInt64("count", perspectiveEcommerce.getCount());
-        out.writeFloat64("sum", perspectiveEcommerce.getSum());
-        out.writeFloat64("average", perspectiveEcommerce.getAverage());
-        out.writeInt32("seconds", perspectiveEcommerce.getSeconds());
-        out.writeInt32("random", perspectiveEcommerce.getRandom());
+        out.writeString(MyConstants.PERSPECTIVE_FIELD_CODE, perspectiveEcommerce.getCode());
+        out.writeInt64(MyConstants.PERSPECTIVE_FIELD_COUNT, perspectiveEcommerce.getCount());
+        out.writeFloat64(MyConstants.PERSPECTIVE_FIELD_SUM, perspectiveEcommerce.getSum());
+        out.writeFloat64(MyConstants.PERSPECTIVE_FIELD_AVERAGE, perspectiveEcommerce.getAverage());
+        out.writeInt32(MyConstants.PERSPECTIVE_FIELD_SECONDS, perspectiveEcommerce.getSeconds());
+        out.writeInt32(MyConstants.PERSPECTIVE_FIELD_RANDOM, perspectiveEcommerce.getRandom());
     }
 
     @Override

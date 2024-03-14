@@ -45,11 +45,11 @@ public class MyPulsarSource {
      * <p>Return a string key and a string value that is converted to JSON.
      * </p>
      *
-     * @param pulsarList Connection endpoints
+     * @param pulsarAddress Connection endpoint(s)
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static StreamStage<Entry<String, HazelcastJsonValue>> inputSourceKeyAndJson(String pulsarList) {
+    public static StreamStage<Entry<String, HazelcastJsonValue>> inputSourceKeyAndJson(String pulsarAddress) {
         FunctionEx<Message<String>, Entry<String, HazelcastJsonValue>> pulsarProjectionFunction =
                 message -> {
                     String key = message.getKey();
@@ -61,7 +61,7 @@ public class MyPulsarSource {
         Pipeline pipeline = Pipeline.create();
 
         return pipeline
-                .readFrom(MyPulsarSource.pulsarSource(pulsarList, pulsarProjectionFunction))
+                .readFrom(MyPulsarSource.pulsarSource(pulsarAddress, pulsarProjectionFunction))
                .withoutTimestamps();
     }
 
@@ -69,10 +69,10 @@ public class MyPulsarSource {
      * <p>Return a value formatted as a Java object from a set of known types.
      * </p>
      *
-     * @param pulsarList Connection endpoints
+     * @param pulsarAddress Connection endpoint(s)
      * @return
      */
-    public static StreamStage<?> inputSourceTransaction(String pulsarList,
+    public static StreamStage<?> inputSourceTransaction(String pulsarAddress,
             TransactionMonitorFlavor transactionMonitorFlavor) {
 
         Pipeline pipeline = Pipeline.create();
@@ -80,14 +80,14 @@ public class MyPulsarSource {
         StreamSource<?> pulsarSource;
         switch (transactionMonitorFlavor) {
         case ECOMMERCE:
-            pulsarSource = pulsarSourceEcommerce(pulsarList);
+            pulsarSource = pulsarSourceEcommerce(pulsarAddress);
             break;
         case PAYMENTS:
-            pulsarSource = pulsarSourcePayments(pulsarList);
+            pulsarSource = pulsarSourcePayments(pulsarAddress);
             break;
         case TRADE:
         default:
-            pulsarSource = pulsarSourceTrade(pulsarList);
+            pulsarSource = pulsarSourceTrade(pulsarAddress);
             break;
         }
 
@@ -101,14 +101,14 @@ public class MyPulsarSource {
      * returns a different type.
      * </p>
      *
-     * @param pulsarList
+     * @param pulsarAddress
      * @return
      */
     @SuppressWarnings("unchecked")
-    private static StreamSource<TransactionEcommerce> pulsarSourceEcommerce(String pulsarList) {
+    private static StreamSource<TransactionEcommerce> pulsarSourceEcommerce(String pulsarAddress) {
         FunctionEx<Message<String>, TransactionEcommerce> pulsarProjectionFunction =
                 message -> {
-                    //TODO: A new deserializer for each message, could optimize with shared if thread-safe
+                    // A new deserializer for each message, could optimize with shared if thread-safe
                     try (TransactionEcommerceJsonDeserializer transactionJsonDeserializer =
                             new TransactionEcommerceJsonDeserializer()) {
                         byte[] bytes = message.getValue().getBytes(StandardCharsets.UTF_8);
@@ -116,7 +116,7 @@ public class MyPulsarSource {
                     }
                 };
 
-        return (StreamSource<TransactionEcommerce>) pulsarSource(pulsarList, pulsarProjectionFunction);
+        return pulsarSource(pulsarAddress, pulsarProjectionFunction);
     }
 
     /**
@@ -124,14 +124,14 @@ public class MyPulsarSource {
      * returns a different type.
      * </p>
      *
-     * @param pulsarList
+     * @param pulsarAddress
      * @return
      */
     @SuppressWarnings("unchecked")
-    private static StreamSource<TransactionPayments> pulsarSourcePayments(String pulsarList) {
+    private static StreamSource<TransactionPayments> pulsarSourcePayments(String pulsarAddress) {
         FunctionEx<Message<String>, TransactionPayments> pulsarProjectionFunction =
                 message -> {
-                    //TODO: A new deserializer for each message, could optimize with shared if thread-safe
+                    // A new deserializer for each message, could optimize with shared if thread-safe
                     try (TransactionPaymentsJsonDeserializer transactionJsonDeserializer =
                             new TransactionPaymentsJsonDeserializer()) {
                         byte[] bytes = message.getValue().getBytes(StandardCharsets.UTF_8);
@@ -139,7 +139,7 @@ public class MyPulsarSource {
                     }
                 };
 
-        return (StreamSource<TransactionPayments>) pulsarSource(pulsarList, pulsarProjectionFunction);
+        return pulsarSource(pulsarAddress, pulsarProjectionFunction);
     }
 
     /**
@@ -147,34 +147,34 @@ public class MyPulsarSource {
      * returns a different type.
      * </p>
      *
-     * @param pulsarList
+     * @param pulsarAddress
      * @return
      */
     @SuppressWarnings("unchecked")
-    private static StreamSource<TransactionTrade> pulsarSourceTrade(String pulsarList) {
+    private static StreamSource<TransactionTrade> pulsarSourceTrade(String pulsarAddress) {
         FunctionEx<Message<String>, TransactionTrade> pulsarProjectionFunction =
                 message -> {
-                    //TODO: A new deserializer for each message, could optimize with shared if thread-safe
+                    // A new deserializer for each message, could optimize with shared if thread-safe
                     try (TransactionTradeJsonDeserializer transactionJsonDeserializer = new TransactionTradeJsonDeserializer()) {
                         byte[] bytes = message.getValue().getBytes(StandardCharsets.UTF_8);
                         return transactionJsonDeserializer.deserialize("", bytes);
                     }
                 };
 
-        return (StreamSource<TransactionTrade>) pulsarSource(pulsarList, pulsarProjectionFunction);
+        return pulsarSource(pulsarAddress, pulsarProjectionFunction);
     }
 
     /**
      * <p>Builds a source for Pulsar
      * </p>
      *
-     * @param pulsarList
+     * @param pulsarAddress
      * @param pulsarProjectionFunction - Extracts the data
      * @return
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private static StreamSource pulsarSource(String pulsarList, FunctionEx pulsarProjectionFunction) {
-        String serviceUrl = UtilsUrls.getPulsarServiceUrl(pulsarList);
+    private static StreamSource pulsarSource(String pulsarAddress, FunctionEx pulsarProjectionFunction) {
+        String serviceUrl = UtilsUrls.getPulsarServiceUrl(pulsarAddress);
 
         SupplierEx<PulsarClient> pulsarConnectionSupplier =
                 () -> PulsarClient.builder()

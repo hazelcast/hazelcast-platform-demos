@@ -1,8 +1,13 @@
 :root {
-	--hazelcast-blue: #012168;
-	--hazelcast-blue-dark: #0b2a35;
-	--hazelcast-blue-light: #2e7de1;
-	--hazelcast-orange: #ff5f00;
+        --color-blueberry: #0019FE;
+        --color-carrot: #F5911E;
+        --color-deep-sea: #051A27;
+        --color-dusk: #0B2B39;
+        --color-ice: #F0F6FF;
+        --color-lime: #C6FF3A;
+        --color-ocean: #0080A9;
+        --color-raspberry: #C91268;
+        --color-sky: #10A4B3;   
 }
 
 body {
@@ -18,13 +23,13 @@ h2, h3, h4 {
 
 .major_pane {
 	border-style: solid;
-    border-color: var(--hazelcast-blue-dark);
+    border-color: var(--color-lime);
     padding: 5px 5px 5px 5px;
 }
 
 .minor_pane {
     border-top: 1px dashed;
-    border-color: var(--hazelcast-blue-light);
+    border-color: var(--color-blueberry);
     margin-left: auto;
     margin-right: auto;
     overflow-y: scroll;
@@ -71,12 +76,12 @@ h2, h3, h4 {
 }
 
 .headerfooter {
-	color: var(--hazelcast-blue-dark);
+	color: var(--color-raspberry);
 	font-family: "Courier New", Courier, monospace;
 	font-size: 80%;
 	text-align: center;
 }
 .headerfooterline {
-	color: var(--hazelcast-orange);
+	color: var(--color-carrot);
 }
 

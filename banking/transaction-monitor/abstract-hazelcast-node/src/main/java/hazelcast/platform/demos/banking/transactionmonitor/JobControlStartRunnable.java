@@ -17,8 +17,8 @@
 package hazelcast.platform.demos.banking.transactionmonitor;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,22 +43,24 @@ public class JobControlStartRunnable implements Runnable {
     private final HazelcastInstance hazelcastInstance;
     private final String targetJobNamePrefix;
     private final String bootstrapServers;
-    private final String pulsarList;
+    private final String pulsarAddress;
     private final boolean usePulsar;
     private final String projectName;
     private final String clusterName;
     private final TransactionMonitorFlavor transactionMonitorFlavor;
+    private final boolean kubernetes;
 
     public JobControlStartRunnable(String arg0, String arg1, String arg2, boolean arg3,
-            String arg4, String arg5, TransactionMonitorFlavor arg6) {
+            String arg4, String arg5, TransactionMonitorFlavor arg6, boolean arg7) {
         this.hazelcastInstance = Hazelcast.getAllHazelcastInstances().iterator().next();
         this.targetJobNamePrefix = arg0;
         this.bootstrapServers = arg1;
-        this.pulsarList = arg2;
+        this.pulsarAddress = arg2;
         this.usePulsar = arg3;
         this.projectName = arg4;
         this.clusterName = arg5;
         this.transactionMonitorFlavor = arg6;
+        this.kubernetes = arg7;
     }
 
     @Override
@@ -92,7 +94,7 @@ public class JobControlStartRunnable implements Runnable {
             StreamStage<Entry<String, HazelcastJsonValue>> inputSource1 = null;
             if (usePulsar) {
                 // Attach Pulsar classes only if needed
-                inputSource1 = MyPulsarSource.inputSourceKeyAndJson(pulsarList);
+                inputSource1 = MyPulsarSource.inputSourceKeyAndJson(pulsarAddress);
                 jobConfigIngestTransactions.addClass(MyPulsarSource.class);
             }
 
@@ -115,13 +117,13 @@ public class JobControlStartRunnable implements Runnable {
                 StreamStage<?> inputSource2 = null;
                 if (usePulsar) {
                     // Attach Pulsar classes only if needed
-                    inputSource2 = MyPulsarSource.inputSourceTransaction(pulsarList, transactionMonitorFlavor);
+                    inputSource2 = MyPulsarSource.inputSourceTransaction(pulsarAddress, transactionMonitorFlavor);
                     jobConfigAggregateQuery.addClass(MyPulsarSource.class);
                 }
 
                 Pipeline pipelineAggregateQuery = AggregateQuery.buildPipeline(this.bootstrapServers,
                         inputSource2, projectName, jobConfigAggregateQuery.getName(),
-                        this.clusterName, this.transactionMonitorFlavor);
+                        this.clusterName, this.transactionMonitorFlavor, this.kubernetes);
 
                 try {
                     hazelcastInstance.getJet().newJob(pipelineAggregateQuery, jobConfigAggregateQuery);

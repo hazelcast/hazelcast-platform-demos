@@ -199,9 +199,9 @@
           "exemplar": true,
           "expr": "max(hz_map_putCount{mc_cluster='site1',name='cva_trades'})",
           "interval": "",
-          "legendFormat": "site1.writes",
+          "legendFormat": "site1.puts",
           "refId": "B",
-          "target": "alias(max(hz_map_putCount{mc_cluster='site1',name='cva_trades'}), 'site1.writes')"
+          "target": "alias(max(hz_map_putCount{mc_cluster='site1',name='cva_trades'}), 'site1.puts')"
         },
         {
           "exemplar": true,
@@ -248,7 +248,7 @@
           "expr": "max(hz_map_setCount{mc_cluster='site2',name='cva_trades'})",
           "interval": "",
           "legendFormat": "site2.sets",
-          "refId": "G",
+          "refId": "H",
           "target": "alias(max(hz_map_setCount{mc_cluster='site2',name='cva_trades'}), 'site2.sets')"
         }
       ],

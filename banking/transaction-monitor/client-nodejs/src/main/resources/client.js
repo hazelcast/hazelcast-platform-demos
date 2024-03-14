@@ -25,7 +25,7 @@ const clusterName = '@my.cluster1.name@';
 const instanceName = '@project.artifactId@';
 const serviceDns = '@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local';
 
-const viridianId = "@my.viridian.cluster1.id@";
+const viridianName = "@my.viridian.cluster1.name@";
 const viridianDiscoveryToken = "@my.viridian.cluster1.discovery.token@";
 const viridianKeyPassword = "@my.viridian.cluster1.key.password@";
 
@@ -69,7 +69,7 @@ const clientConfig = {
     }
 };
 const clientConfigViridian = {
-	clusterName: viridianId,
+	clusterName: viridianName,
 	instanceName: instanceName,
 	clientLabels: [ user, launchTime ],
     network: {

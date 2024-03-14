@@ -78,7 +78,7 @@ public class TransactionMonitorIdempotentInitializationMySql {
         mySqlProperties.setProperty("data-connection-ref", MyConstants.MYSQL_DATACONNECTION_CONFIG_NAME);
         mySqlProperties.setProperty("mapping-type", "JDBC");
         mySqlProperties.setProperty("table-name", MyConstants.MYSQL_DATACONNECTION_TABLE_NAME);
-        //FIXME Once MySql compound key supported by Data Link
+        //TODO Once MySql compound key supported by Data Link
         //MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN0 + "," + MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN1);
         mySqlProperties.setProperty("id-column", "hash");
         mySqlProperties.setProperty("column", MyConstants.MYSQL_DATACONNECTION_TABLE_COLUMN0

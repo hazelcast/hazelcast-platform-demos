@@ -92,6 +92,81 @@ spec:
               path: /
               port: 9000
             initialDelaySeconds: 30
+--- 
+# Cassandra
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: cassandra
+  name: transaction-monitor-FLAVOR-cassandra
+spec:
+  selector: 
+    matchLabels:
+      app: transaction-monitor-FLAVOR-cassandra
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-FLAVOR-cassandra
+        app.kubernetes.io/component: cassandra
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-cassandra"
+          imagePullPolicy: Never
+          name: transaction-monitor-FLAVOR-cassandra-container
+          ports:
+            - containerPort: 9042
+--- 
+# Maria
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: maria
+  name: transaction-monitor-FLAVOR-maria
+spec:
+  selector: 
+    matchLabels:
+      app: transaction-monitor-FLAVOR-maria
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-FLAVOR-maria
+        app.kubernetes.io/component: maria
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-maria"
+          imagePullPolicy: Never
+          name: transaction-monitor-FLAVOR-maria-container
+          ports:
+            - containerPort: 3306
+--- 
+# Mongo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: mongo
+  name: transaction-monitor-FLAVOR-mongo
+spec:
+  selector: 
+    matchLabels:
+      app: transaction-monitor-FLAVOR-mongo
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-FLAVOR-mongo
+        app.kubernetes.io/component: mongo
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-mongo"
+          imagePullPolicy: Never
+          name: transaction-monitor-FLAVOR-mongo-container
+          ports:
+            - containerPort: 27017
 ---
 # MySql
 ---
