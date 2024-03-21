@@ -1,6 +1,6 @@
 #!/bin/bash
 
-START=`date +"%y-%m-%d-%H-%M-%S"`
+START=`date +"%Y-%m-%d-%H-%M-%S"`
 
 DIRNAME=`dirname $0`
 cd $DIRNAME
