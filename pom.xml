@@ -646,6 +646,7 @@
 										<platforms>
 											<platform>linux/arm64</platform>
 											<platform>linux/x86_64</platform>
+											<platform>linux/amd64</platform>
 										</platforms>
 									</buildx>
 									<createImageOptions>

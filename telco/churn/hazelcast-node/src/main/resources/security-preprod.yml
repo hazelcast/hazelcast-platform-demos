@@ -156,6 +156,7 @@ hazelcast:
     client-block-unmapped-actions: false
     
     # Doesn't block, just logs
-    security-interceptors:
-      - com.hazelcast.platform.demos.telco.churn.security.MyLoggingSecurityInterceptor
+    # java.security.AccessControlException is deprecated
+#    security-interceptors:
+#      - com.hazelcast.platform.demos.telco.churn.security.MyLoggingSecurityInterceptor
  
