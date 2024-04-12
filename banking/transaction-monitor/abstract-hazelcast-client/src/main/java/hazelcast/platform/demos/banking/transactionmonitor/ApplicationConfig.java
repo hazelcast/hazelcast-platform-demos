@@ -26,7 +26,7 @@ import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
 import com.hazelcast.client.config.YamlClientConfigBuilder;
 import com.hazelcast.platform.demos.utils.UtilsFormatter;
-import com.hazelcast.platform.demos.utils.UtilsViridian;
+import com.hazelcast.platform.demos.utils.UtilsHazelcastCloud;
 
 /**
  * <p>Configure client for connection to cluster. Use a config file, then override
@@ -39,9 +39,9 @@ import com.hazelcast.platform.demos.utils.UtilsViridian;
  */
 public class ApplicationConfig {
     private static final String FILENAME = "application.properties";
-    private static final String VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN = "my.viridian.cluster1.discovery.token";
-    private static final String VIRIDIAN_CLUSTER1_NAME = "my.viridian.cluster1.name";
-    private static final String VIRIDIAN_CLUSTER1_KEY_PASSWORD = "my.viridian.cluster1.key.password";
+    private static final String HZ_CLOUD_CLUSTER1_DISCOVERY_TOKEN = "my.hz.cloud.cluster1.discovery.token";
+    private static final String HZ_CLOUD_CLUSTER1_NAME = "my.hz.cloud.cluster1.name";
+    private static final String HZ_CLOUD_CLUSTER1_KEY_PASSWORD = "my.hz.cloud.cluster1.key.password";
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfig.class);
     private static String clusterName = "";
 
@@ -63,7 +63,7 @@ public class ApplicationConfig {
         ClientNetworkConfig clientNetworkConfig = clientConfig.getNetworkConfig();
         clientNetworkConfig.getAutoDetectionConfig().setEnabled(false);
 
-        // Use Viridian even if in Kubernetes if discovery token set
+        // Use Hazelcast Cloud even if in Kubernetes if discovery token set
         Properties myProperties = new Properties();
         try {
             myProperties = MyUtils.loadProperties(FILENAME);
@@ -71,9 +71,9 @@ public class ApplicationConfig {
             LOGGER.error(FILENAME, e);
         }
 
-        String useViridianStr = myProperties.getProperty(MyConstants.USE_VIRIDIAN);
-        boolean useViridian = MyUtils.useViridian(useViridianStr);
-        LOGGER.info("useViridian='{}'", useViridian);
+        String useHzCloudStr = myProperties.getProperty(MyConstants.USE_HZ_CLOUD);
+        boolean useHzCloud = MyUtils.useHzCloud(useHzCloudStr);
+        LOGGER.info("useHzCloud='{}'", useHzCloud);
         boolean kubernetesEnabled = System.getProperty("my.kubernetes.enabled", "")
                 .equalsIgnoreCase("true");
         boolean dockerEnabled = System.getProperty("my.docker.enabled", "")
@@ -81,19 +81,19 @@ public class ApplicationConfig {
         boolean localhost = !dockerEnabled && !kubernetesEnabled;
         String publicAddress = System.getProperty("hazelcast.local.publicAddress", "");
 
-        if (localhost && useViridian) {
-            String message = "Localhost access not implemented for Viridian, keystore/truststore location"
+        if (localhost && useHzCloud) {
+            String message = "Localhost access not implemented for Hz Cloud, keystore/truststore location"
                     + " not known, use Docker script instead";
             throw new RuntimeException(message);
         }
 
-        if (useViridian) {
-            UtilsViridian.configure(clientConfig,
-                    myProperties.getProperty(VIRIDIAN_CLUSTER1_NAME),
-                    myProperties.getProperty(VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN),
-                    myProperties.getProperty(VIRIDIAN_CLUSTER1_KEY_PASSWORD));
+        if (useHzCloud) {
+            UtilsHazelcastCloud.configure(clientConfig,
+                    myProperties.getProperty(HZ_CLOUD_CLUSTER1_NAME),
+                    myProperties.getProperty(HZ_CLOUD_CLUSTER1_DISCOVERY_TOKEN),
+                    myProperties.getProperty(HZ_CLOUD_CLUSTER1_KEY_PASSWORD));
 
-            LOGGER.info("Viridian configured, cluster id: "
+            LOGGER.info("Hazelcast Cloud configured, cluster id: "
                     + clientConfig.getClusterName());
         } else {
             if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {

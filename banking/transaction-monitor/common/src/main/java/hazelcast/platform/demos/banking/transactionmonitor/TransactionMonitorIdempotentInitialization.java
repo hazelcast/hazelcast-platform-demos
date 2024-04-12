@@ -81,7 +81,7 @@ public class TransactionMonitorIdempotentInitialization {
      */
     public static boolean createNeededObjects(HazelcastInstance hazelcastInstance,
             Properties properties, String ourProjectProvenance,
-            TransactionMonitorFlavor transactionMonitorFlavor, boolean localhost, boolean useViridian) {
+            TransactionMonitorFlavor transactionMonitorFlavor, boolean localhost, boolean useHzCloud) {
         // Capture what was present before
         Set<String> existingIMapNames = hazelcastInstance.getDistributedObjects().stream()
                 .filter(distributedObject -> distributedObject instanceof IMap)
@@ -92,7 +92,7 @@ public class TransactionMonitorIdempotentInitialization {
 
         // Add journals and map stores to maps before they are created
         boolean ok = dynamicMapConfig(hazelcastInstance, existingIMapNames,
-                properties, ourProjectProvenance, localhost, useViridian, transactionMonitorFlavor);
+                properties, ourProjectProvenance, localhost, useHzCloud, transactionMonitorFlavor);
 
         // Accessing non-existing maps does not return any failures
         List<String> iMapNames;
@@ -116,7 +116,7 @@ public class TransactionMonitorIdempotentInitialization {
 
         // Add index to maps after they are created, if created in this method's run.
         if (ok) {
-            ok = defineIndexes(hazelcastInstance, existingIMapNames, transactionMonitorFlavor, useViridian);
+            ok = defineIndexes(hazelcastInstance, existingIMapNames, transactionMonitorFlavor, useHzCloud);
         }
 
         return ok;
@@ -144,14 +144,14 @@ public class TransactionMonitorIdempotentInitialization {
      */
     private static boolean dynamicMapConfig(HazelcastInstance hazelcastInstance,
             Set<String> existingIMapNames, Properties properties, String ourProjectProvenance,
-            boolean localhost, boolean useViridian, TransactionMonitorFlavor transactionMonitorFlavor) {
+            boolean localhost, boolean useHzCloud, TransactionMonitorFlavor transactionMonitorFlavor) {
         final String alertsWildcard = "alerts*";
 
         EventJournalConfig eventJournalConfig = new EventJournalConfig().setEnabled(true);
         boolean ok = true;
 
-        //TODO && !useViridian
-        if (!existingIMapNames.contains(MyConstants.IMAP_NAME_ALERTS_LOG) && !useViridian) {
+        //TODO && !useHzCloud
+        if (!existingIMapNames.contains(MyConstants.IMAP_NAME_ALERTS_LOG) && !useHzCloud) {
             MapConfig alertsMapConfig = new MapConfig(alertsWildcard);
             alertsMapConfig.setEventJournalConfig(eventJournalConfig);
 
@@ -180,13 +180,13 @@ public class TransactionMonitorIdempotentInitialization {
             hazelcastInstance.getConfig().addMapConfig(alertsMapConfig);
         } else {
             LOGGER.info("Don't add journal to '{}', map already exists", MyConstants.IMAP_NAME_ALERTS_LOG);
-            if (useViridian) {
-                deleteForRetry(hazelcastInstance, useViridian, MyConstants.IMAP_NAME_ALERTS_LOG);
+            if (useHzCloud) {
+                deleteForRetry(hazelcastInstance, useHzCloud, MyConstants.IMAP_NAME_ALERTS_LOG);
                 ok = false;
             }
         }
 
-        dynamicMapConfigJournalOnly(hazelcastInstance, existingIMapNames, useViridian);
+        dynamicMapConfigJournalOnly(hazelcastInstance, existingIMapNames, useHzCloud);
 
         // Generic config, MapStore implementation is derived
         if (!existingIMapNames.contains(MyConstants.IMAP_NAME_MYSQL_SLF4J)) {
@@ -210,8 +210,8 @@ public class TransactionMonitorIdempotentInitialization {
             hazelcastInstance.getConfig().addMapConfig(mySqlMapConfig);
         } else {
             LOGGER.info("Don't add generic mapstore to '{}', map already exists", MyConstants.IMAP_NAME_MYSQL_SLF4J);
-            if (useViridian) {
-                deleteForRetry(hazelcastInstance, useViridian, MyConstants.IMAP_NAME_MYSQL_SLF4J);
+            if (useHzCloud) {
+                deleteForRetry(hazelcastInstance, useHzCloud, MyConstants.IMAP_NAME_MYSQL_SLF4J);
                 ok = false;
             }
         }
@@ -224,11 +224,11 @@ public class TransactionMonitorIdempotentInitialization {
      * </p>
      *
      * @param hazelcastInstance
-     * @param useViridian
+     * @param useHzCloud
      * @param mapName
      */
-    private static void deleteForRetry(HazelcastInstance hazelcastInstance, boolean useViridian, String mapName) {
-        LOGGER.info("'useViridian'=={}, destroying map '{}', bounce and try again", useViridian, mapName);
+    private static void deleteForRetry(HazelcastInstance hazelcastInstance, boolean useHzCloud, String mapName) {
+        LOGGER.info("'useHzCloud'=={}, destroying map '{}', bounce and try again", useHzCloud, mapName);
         hazelcastInstance.getMap(mapName).destroy();
     }
 
@@ -237,10 +237,10 @@ public class TransactionMonitorIdempotentInitialization {
      * </p>
      * @param hazelcastInstance
      * @param existingIMapNames
-     * @param useViridian
+     * @param useHzCloud
      */
     protected static void dynamicMapConfigJournalOnly(HazelcastInstance hazelcastInstance, Set<String> existingIMapNames,
-            boolean useViridian) {
+            boolean useHzCloud) {
         for (String mapName : List.of(MyConstants.IMAP_NAME_HEAP, MyConstants.IMAP_NAME_MONGO_ACTIONS)) {
             if (!existingIMapNames.contains(mapName)) {
                 EventJournalConfig eventJournalConfig = new EventJournalConfig().setEnabled(true);
@@ -249,8 +249,8 @@ public class TransactionMonitorIdempotentInitialization {
                 .addMapConfig(new MapConfig(mapName).setEventJournalConfig(eventJournalConfig));
             } else {
                 LOGGER.info("Don't add journal to '{}', map already exists", mapName);
-                if (useViridian) {
-                    deleteForRetry(hazelcastInstance, useViridian, mapName);
+                if (useHzCloud) {
+                    deleteForRetry(hazelcastInstance, useHzCloud, mapName);
                 }
             }
         }
@@ -277,7 +277,7 @@ public class TransactionMonitorIdempotentInitialization {
      * @return true - Always.
      */
     private static boolean defineIndexes(HazelcastInstance hazelcastInstance, Set<String> existingIMapNames,
-            TransactionMonitorFlavor transactionMonitorFlavor, boolean useViridian) {
+            TransactionMonitorFlavor transactionMonitorFlavor, boolean useHzCloud) {
 
         // Only add if map hadn't previously existed and so has just been created
         if (!existingIMapNames.contains(MyConstants.IMAP_NAME_TRANSACTIONS)) {
@@ -306,8 +306,8 @@ public class TransactionMonitorIdempotentInitialization {
             transactionsMap.addIndex(indexConfig);
         } else {
             LOGGER.trace("Don't add index to '{}', map already exists", MyConstants.IMAP_NAME_TRANSACTIONS);
-            if (useViridian) {
-                deleteForRetry(hazelcastInstance, useViridian, MyConstants.IMAP_NAME_TRANSACTIONS);
+            if (useHzCloud) {
+                deleteForRetry(hazelcastInstance, useHzCloud, MyConstants.IMAP_NAME_TRANSACTIONS);
             }
         }
 
@@ -323,7 +323,7 @@ public class TransactionMonitorIdempotentInitialization {
      * </p>
      */
     public static boolean loadNeededData(HazelcastInstance hazelcastInstance, String bootstrapServers,
-            String pulsarSource, boolean usePulsar, boolean useViridian, TransactionMonitorFlavor transactionMonitorFlavor) {
+            String pulsarSource, boolean usePulsar, boolean useHzCloud, TransactionMonitorFlavor transactionMonitorFlavor) {
         boolean ok = true;
         try {
             IMap<String, String> jobConfigMap =
@@ -349,7 +349,7 @@ public class TransactionMonitorIdempotentInitialization {
                 jobConfigMap.put(MyConstants.PULSAR_CONFIG_KEY, pulsarSource);
                 jobConfigMap.put(MyConstants.PULSAR_OR_KAFKA_KEY, (usePulsar ? "pulsar" : "kafka"));
                 jobConfigMap.put(MyConstants.TRANSACTION_MONITOR_FLAVOR, transactionMonitorFlavor.toString());
-                jobConfigMap.put(MyConstants.USE_VIRIDIAN, Boolean.valueOf(useViridian).toString());
+                jobConfigMap.put(MyConstants.USE_HZ_CLOUD, Boolean.valueOf(useHzCloud).toString());
 
                 LOGGER.trace("Loaded {} into '{}'", jobConfigMap.size(), jobConfigMap.getName());
             }
@@ -488,7 +488,7 @@ public class TransactionMonitorIdempotentInitialization {
      */
     public static boolean defineQueryableObjects(HazelcastInstance hazelcastInstance, String bootstrapServers,
             Properties properties, TransactionMonitorFlavor transactionMonitorFlavor,
-            boolean isLocalhost, boolean isKubernetes, boolean useViridian) {
+            boolean isLocalhost, boolean isKubernetes, boolean useHzCloud) {
         boolean ok = true;
         ok &= defineKafka1(hazelcastInstance, bootstrapServers, transactionMonitorFlavor);
         ok &= defineKafka2(hazelcastInstance, bootstrapServers);
@@ -500,7 +500,7 @@ public class TransactionMonitorIdempotentInitialization {
             ok &= TransactionMonitorIdempotentInitializationMongo.defineMongo(hazelcastInstance,
                     properties, transactionMonitorFlavor);
         }
-        ok &= TransactionMonitorIdempotentInitializationAdmin.defineAdminIMaps(hazelcastInstance, useViridian);
+        ok &= TransactionMonitorIdempotentInitializationAdmin.defineAdminIMaps(hazelcastInstance, useHzCloud);
         ok &= defineWANIMaps(hazelcastInstance, transactionMonitorFlavor);
         ok &= defineIMaps1(hazelcastInstance, transactionMonitorFlavor);
         ok &= defineIMaps2(hazelcastInstance, transactionMonitorFlavor);
@@ -1127,14 +1127,14 @@ public class TransactionMonitorIdempotentInitialization {
         boolean usePulsar = MyUtils.usePulsar(pulsarOrKafka);
         logUsePulsar(usePulsar, pulsarOrKafka);
 
-        String kubernetesOrViridian = hazelcastInstance
-                .getMap(MyConstants.IMAP_NAME_JOB_CONFIG).get(MyConstants.USE_VIRIDIAN).toString();
-        boolean useViridian = MyUtils.useViridian(kubernetesOrViridian);
-        logUseViridian(useViridian, kubernetesOrViridian);
+        String kubernetesOrHzCloud = hazelcastInstance
+                .getMap(MyConstants.IMAP_NAME_JOB_CONFIG).get(MyConstants.USE_HZ_CLOUD).toString();
+        boolean useHzCloud = MyUtils.useHzCloud(kubernetesOrHzCloud);
+        logUseHzCloud(useHzCloud, kubernetesOrHzCloud);
 
         // CP needs a big enough cluster, only known to be true for Kubernetes
-        //TODO Not yet available on Viridian @ January 2024.
-        boolean useCP = kubernetes & (!useViridian);
+        //TODO Not yet available on Hazelcast Cloud @ January 2024.
+        boolean useCP = kubernetes & (!useHzCloud);
 
         if (System.getProperty("my.autostart.enabled", "").equalsIgnoreCase("false")) {
             LOGGER.info("Not launching transaction input jobs automatically at cluster creation: 'my.autostart.enabled'=='{}'",
@@ -1147,7 +1147,7 @@ public class TransactionMonitorIdempotentInitialization {
                     pulsarAddress = null;
                 }
                 ok = launchTransactionJobs(hazelcastInstance, bootstrapServers, pulsarAddress,
-                        useViridian, projectName, clusterName, transactionMonitorFlavor, useCP);
+                        useHzCloud, projectName, clusterName, transactionMonitorFlavor, useCP);
                 if (!ok) {
                     return ok;
                 }
@@ -1169,7 +1169,7 @@ public class TransactionMonitorIdempotentInitialization {
 
         if (ok) {
             // Slack SQL integration (reading/writing) from common utils
-            ok &= launchSlackReadWrite(useViridian, projectName, hazelcastInstance, properties, transactionMonitorFlavor);
+            ok &= launchSlackReadWrite(useHzCloud, projectName, hazelcastInstance, properties, transactionMonitorFlavor);
         }
 
         if (ok) {
@@ -1177,7 +1177,7 @@ public class TransactionMonitorIdempotentInitialization {
                 // Feed changes from Postgres directly into Hazelcast
                 Properties postgresProperties = MyUtils.getPostgresProperties(properties);
                 ok &= launchPostgresCDC(hazelcastInstance, postgresProperties,
-                        Objects.toString(properties.get(MyConstants.PROJECT_PROVENANCE)), useViridian);
+                        Objects.toString(properties.get(MyConstants.PROJECT_PROVENANCE)), useHzCloud);
             } catch (Exception e) {
                 LOGGER.error("launchNeededJobs: postgresProperties", e);
                 ok = false;
@@ -1229,7 +1229,7 @@ public class TransactionMonitorIdempotentInitialization {
      * @param bootstrapServers
      * @param pulsarAddresss
      * @param clusterName
-     * @param useViridian
+     * @param useHzCloud
      * @param projectName
      * @param clusterName
      * @param transactionMonitorFlavor
@@ -1237,7 +1237,7 @@ public class TransactionMonitorIdempotentInitialization {
      * @return
      */
     public static boolean launchTransactionJobs(HazelcastInstance hazelcastInstance, String bootstrapServers,
-            String pulsarAddress, boolean useViridian, String projectName, String clusterName,
+            String pulsarAddress, boolean useHzCloud, String projectName, String clusterName,
             TransactionMonitorFlavor transactionMonitorFlavor, boolean useCP) {
 
         /* Transaction ingest
@@ -1257,9 +1257,9 @@ public class TransactionMonitorIdempotentInitialization {
         Pipeline pipelineIngestTransactions = IngestTransactions.buildPipeline(bootstrapServers,
                 pulsarInputSource1, transactionMonitorFlavor);
 
-        if (pulsarAddress != null && useViridian) {
-            //TODO Not yet available on Viridian @ January 2024.
-            LOGGER_TO_IMAP.error("Pulsar is not currently supported on Viridian");
+        if (pulsarAddress != null && useHzCloud) {
+            //TODO Not yet available on Hazelcast Cloud @ January 2024.
+            LOGGER_TO_IMAP.error("Pulsar is not currently supported on Hazelcast Cloud");
             return false;
         } else {
             Job job = UtilsJobs.myNewJobIfAbsent(LOGGER,
@@ -1289,9 +1289,9 @@ public class TransactionMonitorIdempotentInitialization {
                 pulsarInputSource2, projectName, jobConfigAggregateQuery.getName(),
                 clusterName, transactionMonitorFlavor, useCP);
 
-        if (pulsarAddress != null && useViridian) {
-            //TODO Not yet available on Viridian @ January 2024.
-            LOGGER_TO_IMAP.error("Pulsar is not currently supported on Viridian");
+        if (pulsarAddress != null && useHzCloud) {
+            //TODO Not yet available on Hazelcast Cloud @ January 2024.
+            LOGGER_TO_IMAP.error("Pulsar is not currently supported on Hazelcast Cloud");
             return false;
         } else {
             Job job = UtilsJobs.myNewJobIfAbsent(LOGGER, hazelcastInstance, pipelineAggregateQuery, jobConfigAggregateQuery);
@@ -1320,14 +1320,14 @@ public class TransactionMonitorIdempotentInitialization {
     /**
      * <p>Helper for logging.
      * </p>
-     * @param useViridian
-     * @param kubernetesOrViridian
+     * @param useHzCloud
+     * @param kubernetesOrHzCloud
      */
-    private static void logUseViridian(boolean useViridian, String kubernetesOrViridian) {
-        if (useViridian) {
-            LOGGER.info("Using Viridian => '{}'=='{}'", MyConstants.USE_VIRIDIAN, kubernetesOrViridian);
+    private static void logUseHzCloud(boolean useHzCloud, String kubernetesOrHzCloud) {
+        if (useHzCloud) {
+            LOGGER.info("Using Hazelcast Cloud => '{}'=='{}'", MyConstants.USE_HZ_CLOUD, kubernetesOrHzCloud);
         } else {
-            LOGGER.info("Not using Viridian => '{}'=='{}'", MyConstants.USE_VIRIDIAN, kubernetesOrViridian);
+            LOGGER.info("Not using Hazelcast Cloud => '{}'=='{}'", MyConstants.USE_HZ_CLOUD, kubernetesOrHzCloud);
         }
     }
 
@@ -1335,12 +1335,12 @@ public class TransactionMonitorIdempotentInitialization {
      * <p>Launch Slack jobs for SQL (read/write) and alerting (write) if credentials provided.
      * </p>
      *
-     * @param useViridian
+     * @param useHzCloud
      * @param projectName
      * @param hazelcastInstance
      * @param properties
      */
-    private static boolean launchSlackReadWrite(boolean useViridian, Object projectName,
+    private static boolean launchSlackReadWrite(boolean useHzCloud, Object projectName,
             HazelcastInstance hazelcastInstance, Properties properties,
             TransactionMonitorFlavor transactionMonitorFlavor) {
 
@@ -1362,9 +1362,9 @@ public class TransactionMonitorIdempotentInitialization {
         }
 
         // Slack alerting (writing), indirectly uses common utils
-        if (useViridian) {
-            //TODO Not yet available on Viridian @ January 2024.
-            LOGGER.error("Slack is not currently supported on Viridian");
+        if (useHzCloud) {
+            //TODO Not yet available on Hazelcast Cloud @ January 2024.
+            LOGGER.error("Slack is not currently supported on Hazelcast Cloud");
         } else {
             try {
                 UtilsSlackSQLJob.submitJob(hazelcastInstance, projectName == null ? "" : projectName.toString());
@@ -1421,7 +1421,7 @@ public class TransactionMonitorIdempotentInitialization {
      * @param properties
      */
     private static boolean launchPostgresCDC(HazelcastInstance hazelcastInstance,
-            Properties properties, String ourProjectProvenance, boolean useViridian) {
+            Properties properties, String ourProjectProvenance, boolean useHzCloud) {
 
         try {
             Pipeline pipelinePostgresCDC = PostgresCDC.buildPipeline(
@@ -1433,7 +1433,7 @@ public class TransactionMonitorIdempotentInitialization {
                     hazelcastInstance.getConfig().getClusterName(),
                     MyConstants.IMAP_NAME_ALERTS_LOG,
                     ourProjectProvenance,
-                    useViridian
+                    useHzCloud
                     );
 
             JobConfig jobConfigPostgresCDC = new JobConfig();

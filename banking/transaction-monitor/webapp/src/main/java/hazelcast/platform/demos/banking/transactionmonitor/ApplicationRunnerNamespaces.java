@@ -57,19 +57,19 @@ public class ApplicationRunnerNamespaces {
      * attempted.
      * </p>
      */
-    static void runNamespaceActions(HazelcastInstance hazelcastInstance, boolean isViridian) {
+    static void runNamespaceActions(HazelcastInstance hazelcastInstance, boolean isHzCloud) {
         try {
-            doNamespace1Action(hazelcastInstance, isViridian);
+            doNamespace1Action(hazelcastInstance, isHzCloud);
         } catch (Exception e) {
             LOGGER.error("doNamespace1Action", e);
         }
         try {
-            doNamespace2Action(hazelcastInstance, isViridian);
+            doNamespace2Action(hazelcastInstance, isHzCloud);
         } catch (Exception e) {
             LOGGER.error("doNamespace2Action", e);
         }
         try {
-            doNamespace3Action(hazelcastInstance, isViridian);
+            doNamespace3Action(hazelcastInstance, isHzCloud);
         } catch (Exception e) {
             LOGGER.error("doNamespace3Action", e);
         }
@@ -80,15 +80,15 @@ public class ApplicationRunnerNamespaces {
      * </p>
      *
      * @param hazelcastInstance
-     * @param isViridian
+     * @param isHzCloud
      * @throws Exception If configuration goes wrong. Exception by called class is caught.
      */
     @SuppressFBWarnings(value = "DMI_HARDCODED_ABSOLUTE_FILENAME", justification = "File location in Docker image is fixed.")
-    private static void doNamespace1Action(HazelcastInstance hazelcastInstance, boolean isViridian) throws Exception {
+    private static void doNamespace1Action(HazelcastInstance hazelcastInstance, boolean isHzCloud) throws Exception {
         addNamespaceJar(hazelcastInstance, MyConstants.USER_CODE_NAMESPACE_1, MyConstants.USER_CODE_JAR_FOR_NAMESPACE_1);
 
         IExecutorService iExecutorServiceNS1 = hazelcastInstance.getExecutorService(MyConstants.EXECUTOR_NAMESPACE_1);
-        ServerInfoCallable serverInfoCallable = new ServerInfoCallable(isViridian, iExecutorServiceNS1.getName());
+        ServerInfoCallable serverInfoCallable = new ServerInfoCallable(isHzCloud, iExecutorServiceNS1.getName());
         try {
             Map<Member, Future<List<String>>> futuresMap = iExecutorServiceNS1.submitToAllMembers(serverInfoCallable);
             printFuturesMap("doNamespace1Action", futuresMap);
@@ -104,14 +104,14 @@ public class ApplicationRunnerNamespaces {
      * </p>
      *
      * @param hazelcastInstance
-     * @param isViridian
+     * @param isHzCloud
      * @throws Exception If configuration goes wrong. Exception by called class is caught.
      */
-    private static void doNamespace2Action(HazelcastInstance hazelcastInstance, boolean isViridian) throws Exception {
+    private static void doNamespace2Action(HazelcastInstance hazelcastInstance, boolean isHzCloud) throws Exception {
         addNamespaceJar(hazelcastInstance, MyConstants.USER_CODE_NAMESPACE_2, MyConstants.USER_CODE_JAR_FOR_NAMESPACE_2);
 
         IExecutorService iExecutorServiceNS2 = hazelcastInstance.getExecutorService(MyConstants.EXECUTOR_NAMESPACE_2);
-        ServerInfoCallable serverInfoCallable = new ServerInfoCallable(isViridian, iExecutorServiceNS2.getName());
+        ServerInfoCallable serverInfoCallable = new ServerInfoCallable(isHzCloud, iExecutorServiceNS2.getName());
         try {
             Map<Member, Future<List<String>>> futuresMap = iExecutorServiceNS2.submitToAllMembers(serverInfoCallable);
             printFuturesMap("doNamespace2Action", futuresMap);
@@ -135,7 +135,7 @@ public class ApplicationRunnerNamespaces {
 
         // Runnable that writes to map with logging map store
         TodayLoggingRunnable todayLoggingRunnable =
-                new TodayLoggingRunnable(isViridian, iExecutorServiceNS2.getName(), MyConstants.MAP_NAMESPACE_2);
+                new TodayLoggingRunnable(isHzCloud, iExecutorServiceNS2.getName(), MyConstants.MAP_NAMESPACE_2);
         iExecutorServiceNS2.execute(todayLoggingRunnable);
     }
 
@@ -147,14 +147,14 @@ public class ApplicationRunnerNamespaces {
      * </p>
      *
      * @param hazelcastInstance
-     * @param isViridian
+     * @param isHzCloud
      * @throws Exception If configuration goes wrong. Exception by called class is caught.
      */
-    private static void doNamespace3Action(HazelcastInstance hazelcastInstance, boolean isViridian) throws Exception {
+    private static void doNamespace3Action(HazelcastInstance hazelcastInstance, boolean isHzCloud) throws Exception {
         addNamespaceJar(hazelcastInstance, MyConstants.USER_CODE_NAMESPACE_3, MyConstants.USER_CODE_JAR_FOR_NAMESPACE_3);
 
         IExecutorService iExecutorServiceNS3 = hazelcastInstance.getExecutorService(MyConstants.EXECUTOR_NAMESPACE_3);
-        ServerInfoCallable serverInfoCallable = new ServerInfoCallable(isViridian, iExecutorServiceNS3.getName());
+        ServerInfoCallable serverInfoCallable = new ServerInfoCallable(isHzCloud, iExecutorServiceNS3.getName());
         try {
             Map<Member, Future<List<String>>> futuresMap = iExecutorServiceNS3.submitToAllMembers(serverInfoCallable);
             printFuturesMap("doNamespace3Action", futuresMap);
@@ -173,12 +173,12 @@ public class ApplicationRunnerNamespaces {
 
         // Runnable that writes to queue with listener
         PeriodicQueueWriterRunnable periodicQueueWriterRunnable =
-                new PeriodicQueueWriterRunnable(isViridian, iExecutorServiceNS3.getName());
+                new PeriodicQueueWriterRunnable(isHzCloud, iExecutorServiceNS3.getName());
         iExecutorServiceNS3.execute(periodicQueueWriterRunnable);
 
         // Runnable that reads from queue with listener
         PeriodicQueueReaderRunnable periodicQueueReaderRunnable =
-                new PeriodicQueueReaderRunnable(isViridian, iExecutorServiceNS3.getName());
+                new PeriodicQueueReaderRunnable(isHzCloud, iExecutorServiceNS3.getName());
         iExecutorServiceNS3.execute(periodicQueueReaderRunnable);
     }
 

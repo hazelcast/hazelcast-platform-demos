@@ -9,10 +9,10 @@
 		<version>5.4</version>
 	</parent>
 
-	<artifactId>utils-viridian-clusterside</artifactId>
+	<artifactId>utils-hz-cloud-clusterside</artifactId>
 
-	<name>Hazelcast Platform - Utils - Viridian Clusterside</name>
-	<description>Utils - Serverside Viridian Code</description>
+	<name>Hazelcast Platform - Utils - HZ Cloud Clusterside</name>
+	<description>Utils - Serverside Hazelcast Cloud</description>
 
 	<properties>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>

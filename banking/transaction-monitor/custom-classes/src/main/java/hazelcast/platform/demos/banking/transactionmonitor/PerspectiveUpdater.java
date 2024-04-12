@@ -49,14 +49,14 @@ public class PerspectiveUpdater implements Runnable, Serializable, HazelcastInst
     private static final Random RANDOM = new Random();
 
     private final TransactionMonitorFlavor transactionMonitorFlavor;
-    private final boolean useViridian;
+    private final boolean useHzCloud;
     private transient HazelcastInstance hazelcastInstance;
     private int binaryLoggingInterval = 1;
     private int count;
 
     PerspectiveUpdater(TransactionMonitorFlavor arg0, boolean arg1) {
         this.transactionMonitorFlavor = arg0;
-        this.useViridian = arg1;
+        this.useHzCloud = arg1;
     }
     /**
      * <p>Randomly update data for FINOS Perspective periodically.
@@ -64,7 +64,7 @@ public class PerspectiveUpdater implements Runnable, Serializable, HazelcastInst
      */
     @Override
     public void run() {
-        if (!useViridian) {
+        if (!useHzCloud) {
             LOGGER.info("START run()");
         }
         ThreadLocalRandom random = ThreadLocalRandom.current();
@@ -79,7 +79,7 @@ public class PerspectiveUpdater implements Runnable, Serializable, HazelcastInst
         // Init
         for (int i = 0; i < selectedKeys.length; i++) {
             Object object = this.etl(selectedKeys[i], sourceMap, targetMap);
-            if (!useViridian) {
+            if (!useHzCloud) {
                 this.logExponentially(object);
             }
         }
@@ -94,23 +94,23 @@ public class PerspectiveUpdater implements Runnable, Serializable, HazelcastInst
 
                 TimeUnit.MILLISECONDS.sleep(FIFTY);
             } catch (HazelcastInstanceNotActiveException hnae) {
-                if (!useViridian) {
+                if (!useHzCloud) {
                     LOGGER.info("HazelcastInstanceNotActiveException run(): {}", hnae.getMessage());
                 }
                 break;
             } catch (InterruptedException ie) {
-                if (!useViridian) {
+                if (!useHzCloud) {
                     LOGGER.info("InterruptedException run(): {}", ie.getMessage());
                 }
                 break;
             } catch (Exception e) {
-                if (!useViridian) {
+                if (!useHzCloud) {
                     LOGGER.info("EXCEPTION run()", e);
                 }
                 break;
             }
         }
-        if (!useViridian) {
+        if (!useHzCloud) {
             LOGGER.info("END run()");
         }
     }

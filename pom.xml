@@ -28,17 +28,16 @@
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
 		<dockerfile.skip>true</dockerfile.skip>
 		<failsafe.skip>true</failsafe.skip>
-		<!-- Needs to be 11 currently for Viridian upload -->
-		<java.version>11</java.version>
+		<java.version>21</java.version>
 		<main.basedir>${project.basedir}</main.basedir>
 		<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- Reset only by "release" profile -->
-		<skip.when.viridian>true</skip.when.viridian>
+		<skip.when.hz.cloud>true</skip.when.hz.cloud>
 		<spotbugs.skip>true</spotbugs.skip>
-		<!-- Configure the build for HZ Viridian or all Kubernetes -->
-		<use.viridian>true</use.viridian>
-		<use.viridian>false</use.viridian>
+		<!-- Configure the build for HZ Cloud or all Kubernetes -->
+		<use.hz.cloud>true</use.hz.cloud>
+		<use.hz.cloud>false</use.hz.cloud>
 
 		<!-- Variations for the Transaction Monitor, TransactionMonitorFlavor.java ENUM -->
 		<!-- "ecommerce" is last, hence is the value used, as most generally applicable -->
@@ -615,11 +614,11 @@
 								<build>
                     				<args>
 										<!-- Hazelcast cloud -->
-										<HZ_VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN>${my.viridian.cluster1.discovery.token}</HZ_VIRIDIAN_CLUSTER1_DISCOVERY_TOKEN>
-										<HZ_VIRIDIAN_CLUSTER1_ID>${my.viridian.cluster1.id}</HZ_VIRIDIAN_CLUSTER1_ID>
-										<HZ_VIRIDIAN_CLUSTER1_NAME>${my.viridian.cluster1.name}</HZ_VIRIDIAN_CLUSTER1_NAME>
-										<HZ_VIRIDIAN_CLUSTER1_KEYS_LOCATION>${my.viridian.cluster1.keys.location}</HZ_VIRIDIAN_CLUSTER1_KEYS_LOCATION>
-										<HZ_VIRIDIAN_CLUSTER1_KEY_PASSWORD>${my.viridian.cluster1.key.password}</HZ_VIRIDIAN_CLUSTER1_KEY_PASSWORD>
+										<HZ_CLOUD_CLUSTER1_DISCOVERY_TOKEN>${my.hz.cloud.cluster1.discovery.token}</HZ_CLOUD_CLUSTER1_DISCOVERY_TOKEN>
+										<HZ_CLOUD_CLUSTER1_ID>${my.hz.cloud.cluster1.id}</HZ_CLOUD_CLUSTER1_ID>
+										<HZ_CLOUD_CLUSTER1_NAME>${my.hz.cloud.cluster1.name}</HZ_CLOUD_CLUSTER1_NAME>
+										<HZ_CLOUD_CLUSTER1_KEYS_LOCATION>${my.hz.cloud.cluster1.keys.location}</HZ_CLOUD_CLUSTER1_KEYS_LOCATION>
+										<HZ_CLOUD_CLUSTER1_KEY_PASSWORD>${my.hz.cloud.cluster1.key.password}</HZ_CLOUD_CLUSTER1_KEY_PASSWORD>
 										<!-- Dockerfile will use for our built modules -->
 										<CONTROL_FILE>${my.docker.control.file}</CONTROL_FILE>
 										<FLAVOR>${my.transaction-monitor.flavor}</FLAVOR>
@@ -747,85 +746,85 @@
 		</profile>
 		<profile>
 			<!-- docker-maven-plugin does not like null properties -->
-			<id>no-null-docker-maven-plugin-viridian-cluster1-id</id>
+			<id>no-null-docker-maven-plugin-hz.cloud-cluster1-id</id>
 			<properties>
-				<my.viridian.cluster1.id>unset</my.viridian.cluster1.id>
+				<my.hz.cloud.cluster1.id>unset</my.hz.cloud.cluster1.id>
 			</properties>
 			<activation>
 				<property>
-					<name>!my.viridian.cluster1.id</name>
+					<name>!my.hz.cloud.cluster1.id</name>
 				</property>
 			</activation>
 		</profile>
 		<profile>
 			<!-- docker-maven-plugin does not like null properties -->
-			<id>no-null-docker-maven-plugin-viridian-cluster1-name</id>
+			<id>no-null-docker-maven-plugin-hz.cloud-cluster1-name</id>
 			<properties>
-				<my.viridian.cluster1.name>unset</my.viridian.cluster1.name>
+				<my.hz.cloud.cluster1.name>unset</my.hz.cloud.cluster1.name>
 			</properties>
 			<activation>
 				<property>
-					<name>!my.viridian.cluster1.name</name>
+					<name>!my.hz.cloud.cluster1.name</name>
 				</property>
 			</activation>
 		</profile>
 		<profile>
 			<!-- docker-maven-plugin does not like null properties -->
-			<id>no-null-docker-maven-plugin-viridian-cluster1-discovery-token</id>
+			<id>no-null-docker-maven-plugin-hz.cloud-cluster1-discovery-token</id>
 			<properties>
-				<my.viridian.cluster1.discovery.token>unset</my.viridian.cluster1.discovery.token>
+				<my.hz.cloud.cluster1.discovery.token>unset</my.hz.cloud.cluster1.discovery.token>
 			</properties>
 			<activation>
 				<property>
-					<name>!my.viridian.cluster1.discovery.token</name>
+					<name>!my.hz.cloud.cluster1.discovery.token</name>
 				</property>
 			</activation>
 		</profile>
 		<profile>
 			<!-- docker-maven-plugin does not like null properties -->
-			<id>no-null-docker-maven-plugin-viridian-cluster1-key-password</id>
+			<id>no-null-docker-maven-plugin-hz.cloud-cluster1-key-password</id>
 			<properties>
-				<my.viridian.cluster1.key.password>unset</my.viridian.cluster1.key.password>
+				<my.hz.cloud.cluster1.key.password>unset</my.hz.cloud.cluster1.key.password>
 			</properties>
 			<activation>
 				<property>
-					<name>!my.viridian.cluster1.key.password</name>
+					<name>!my.hz.cloud.cluster1.key.password</name>
 				</property>
 			</activation>
 		</profile>
 		<profile>
 			<!-- docker-maven-plugin does not like null properties -->
-			<id>no-null-docker-maven-plugin-viridian-cluster1-keys-location</id>
+			<id>no-null-docker-maven-plugin-hz.cloud-cluster1-keys-location</id>
 			<properties>
-				<my.viridian.cluster1.keys.location>unset</my.viridian.cluster1.keys.location>
+				<my.hz.cloud.cluster1.keys.location>unset</my.hz.cloud.cluster1.keys.location>
 			</properties>
 			<activation>
 				<property>
-					<name>!my.viridian.cluster1.keys.location</name>
+					<name>!my.hz.cloud.cluster1.keys.location</name>
 				</property>
 			</activation>
 		</profile>
 		<profile>
 			<!-- docker-maven-plugin does not like null properties -->
-			<id>no-null-docker-maven-plugin-viridian-cluster1-api-key</id>
+			<id>no-null-docker-maven-plugin-hz.cloud-cluster1-api-key</id>
 			<properties>
-				<my.viridian.api.key>unset</my.viridian.api.key>
+				<my.hz.cloud.api.key>unset</my.hz.cloud.api.key>
 			</properties>
 			<activation>
 				<property>
-					<name>!my.viridian.api.key</name>
+					<name>!my.hz.cloud.api.key</name>
 				</property>
 			</activation>
 		</profile>
 		<profile>
 			<!-- docker-maven-plugin does not like null properties -->
-			<id>no-null-docker-maven-plugin-viridian-cluster1-api-secret</id>
+			<id>no-null-docker-maven-plugin-hz.cloud-cluster1-api-secret</id>
 			<properties>
-				<my.viridian.api.secret>unset</my.viridian.api.secret>
+				<my.hz.cloud.api.secret>unset</my.hz.cloud.api.secret>
 			</properties>
 			<activation>
 				<property>
-					<name>!my.viridian.api.secret</name>
+					<name>!my.hz.cloud.api.secret</name>
 				</property>
 			</activation>
 		</profile>
@@ -872,7 +871,7 @@
 				<dockerfile.skip>false</dockerfile.skip>
 				<failsafe.skip>false</failsafe.skip>
 				<spotbugs.skip>false</spotbugs.skip>
-				<skip.when.viridian>${use.viridian}</skip.when.viridian>
+				<skip.when.hz.cloud>${use.hz.cloud}</skip.when.hz.cloud>
 			</properties>
 			<build>
 				<plugins>
@@ -902,10 +901,10 @@
 			</build>
 		</profile>
 		<profile>
-			<id>viridian</id>
+			<id>hz.cloud</id>
 			<activation>
 				<property>
-					<name>use.viridian</name>
+					<name>use.hz.cloud</name>
 					<value>true</value>
 				</property>
 			</activation>

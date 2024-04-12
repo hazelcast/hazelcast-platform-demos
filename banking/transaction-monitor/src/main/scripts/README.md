@@ -48,9 +48,9 @@ directory "/data/transaction-monitor".
 
 Create open source Hazelcast cluster for transaction storage.
 
-### 5.C Viridian
+### 5.C Hazelcast Cloud
 
-Use an existing Viridian cluster, so don't run any YAML for step 5.
+Use an existing Hazelcast Cloud cluster, so don't run any YAML for step 5.
 
 ### 6=. `kubernetes-6-webapp.yaml`
 

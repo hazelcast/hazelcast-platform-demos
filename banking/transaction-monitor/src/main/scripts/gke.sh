@@ -7,7 +7,7 @@ cd $DIRNAME
 TOP_LEVEL_DIR=`cd ../../../../.. ; pwd`
 TOP_LEVEL_POM=$TOP_LEVEL_DIR/pom.xml
 POM_FLAVOR=`grep '<my.transaction-monitor.flavor>' ../../../../../pom.xml | tail -1 | cut -d'>' -f2 | cut -d'<' -f1`
-POM_USE_VIRIDIAN=`grep '<use.viridian>' $TOP_LEVEL_POM | tail -1 | cut -d'>' -f2 | cut -d'<' -f1 | tr '[:upper:]' '[:lower:]'`
+POM_USE_HZ_CLOUD=`grep '<use.hz.cloud>' $TOP_LEVEL_POM | tail -1 | cut -d'>' -f2 | cut -d'<' -f1 | tr '[:upper:]' '[:lower:]'`
 
 # For Kubernetes cluster creation
 K_MACHINE_TYPE="c2-standard-4"
@@ -25,7 +25,7 @@ ARG3=`echo $3 | awk '{print tolower($0)}'`
 if [ "${ARG1}" == "" ]
 then
  FLAVOR=$POM_FLAVOR
- USE_VIRIDIAN=$POM_USE_VIRIDIAN
+ USE_HZ_CLOUD=$POM_USE_HZ_CLOUD
  CREATE_KUBERNETES_CLUSTER=true
 else
  if [ "${ARG1}" == "ecommerce" ]
@@ -44,9 +44,9 @@ else
  # False if absent
  if [ "${ARG2}" == "true" ]
  then
-  USE_VIRIDIAN=true
+  USE_HZ_CLOUD=true
  else
-  USE_VIRIDIAN=false
+  USE_HZ_CLOUD=false
  fi
 
  # True if absent
@@ -61,7 +61,7 @@ fi
 if [ "${FLAVOR}" == "" ]
 then
  echo $0: usage: `basename $0`
- echo $0: usage: `basename $0` '<flavor>' '<viridian>' '<create-cluster>'
+ echo $0: usage: `basename $0` '<flavor>' '<hz.cloud>' '<create-cluster>'
  echo $0: eg: `basename $0`
  echo $0: ' ' to use top-level pom.xml values
  echo $0: eg: `basename $0` ecommerce true false
@@ -73,14 +73,14 @@ echo ============================================================
 echo Attempts to do all steps for Google Cloud
 echo ============================================================
 echo Flavor: $FLAVOR
-echo Use-Viridian: $USE_VIRIDIAN
+echo Use-Hz-Cloud: $USE_HZ_CLOUD
 echo Create-Kubernetes-Cluster: $CREATE_KUBERNETES_CLUSTER
 
-if [ "${FLAVOR}" != "${POM_FLAVOR}" ] || [ "${USE_VIRIDIAN}" != "${POM_USE_VIRIDIAN}" ]
+if [ "${FLAVOR}" != "${POM_FLAVOR}" ] || [ "${USE_HZ_CLOUD}" != "${POM_USE_HZ_CLOUD}" ]
 then
  echo '************************************************************'
  echo '************************************************************'
- echo $TOP_LEVEL_POM is configured with FLAVOR=$POM_FLAVOR and USE_VIRIDIAN=$POM_USE_VIRIDIAN
+ echo $TOP_LEVEL_POM is configured with FLAVOR=$POM_FLAVOR and USE_HZ_CLOUD=$POM_USE_HZ_CLOUD
  echo '************************************************************'
  echo '************************************************************'
  echo -n Proceeding in 10 seconds
@@ -293,7 +293,7 @@ else
 fi
 
 # Apply the files in order
-if [ "$USE_VIRIDIAN" == "true" ]
+if [ "$USE_HZ_CLOUD" == "true" ]
 then
  FILES=`ls kubernetes* | grep -v kubernetes-5`
 else

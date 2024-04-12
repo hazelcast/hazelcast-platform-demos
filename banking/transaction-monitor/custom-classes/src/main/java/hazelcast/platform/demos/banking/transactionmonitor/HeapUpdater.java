@@ -39,13 +39,13 @@ public class HeapUpdater implements Runnable, Serializable, HazelcastInstanceAwa
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(HeapUpdater.class);
 
-    private final boolean useViridian;
+    private final boolean useHzCloud;
     private transient HazelcastInstance hazelcastInstance;
     private int binaryLoggingInterval = 1;
     private int count;
 
     HeapUpdater(boolean arg0) {
-        this.useViridian = arg0;
+        this.useHzCloud = arg0;
     }
     /**
      * <p>Periodically record heap size in a map with journal
@@ -55,7 +55,7 @@ public class HeapUpdater implements Runnable, Serializable, HazelcastInstanceAwa
     @Override
     @SuppressFBWarnings(value = "REC_CATCH_EXCEPTION", justification = "InterruptedException possible")
     public void run() {
-        if (!useViridian) {
+        if (!useHzCloud) {
             LOGGER.info("START run()");
         }
 
@@ -71,7 +71,7 @@ public class HeapUpdater implements Runnable, Serializable, HazelcastInstanceAwa
             // Init
             long usedHeap = maxMemory - Runtime.getRuntime().freeMemory();
             heapMap.set(key, usedHeap);
-            if (!useViridian) {
+            if (!useHzCloud) {
                 this.logExponentially(new SimpleEntry<>(key, usedHeap));
             }
 
@@ -83,20 +83,20 @@ public class HeapUpdater implements Runnable, Serializable, HazelcastInstanceAwa
                 TimeUnit.SECONDS.sleep(1L);
             }
         } catch (HazelcastInstanceNotActiveException hnae) {
-            if (!useViridian) {
+            if (!useHzCloud) {
                 LOGGER.info("HazelcastInstanceNotActiveException run(): {}", hnae.getMessage());
             }
         } catch (InterruptedException ie) {
-            if (!useViridian) {
+            if (!useHzCloud) {
                 LOGGER.info("InterruptedException run(): {}", ie.getMessage());
             }
         } catch (Exception e) {
-            if (!useViridian) {
+            if (!useHzCloud) {
                 LOGGER.info("EXCEPTION run()", e);
             }
         }
 
-        if (!useViridian) {
+        if (!useHzCloud) {
             LOGGER.info("END run()");
         }
     }

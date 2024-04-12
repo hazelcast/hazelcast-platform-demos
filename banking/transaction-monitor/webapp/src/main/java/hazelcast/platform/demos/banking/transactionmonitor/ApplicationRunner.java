@@ -74,7 +74,7 @@ public class ApplicationRunner {
     private final String moduleName;
     private final boolean localhost;
     private final boolean kubernetes;
-    private final boolean useViridian;
+    private final boolean useHzCloud;
     private IMap<String, Tuple3<Long, Long, Integer>> aggregateQueryResultsMap;
     private IMap<String, BicInfo> bicsMap;
     private IMap<String, ProductInfo> productsMap;
@@ -96,7 +96,7 @@ public class ApplicationRunner {
            System.getProperty("my.docker.enabled", "").equalsIgnoreCase("false");
         this.kubernetes =
            System.getProperty("my.kubernetes.enabled", "").equalsIgnoreCase("true");
-        this.useViridian = arg3;
+        this.useHzCloud = arg3;
     }
 
     /**
@@ -140,7 +140,7 @@ public class ApplicationRunner {
             if (updateCounter.get() == 0L) {
                 LOGGER.info("Launching admin runnables");
                 TransactionMonitorIdempotentInitializationAdmin.launchAdminRunners(hazelcastInstance,
-                        transactionMonitorFlavor, useViridian);
+                        transactionMonitorFlavor, useHzCloud);
                 updateCounter.incrementAndGet();
             } else {
                 LOGGER.info("Skip launch admin runnables, PNCounter '{}'=={}",
@@ -148,7 +148,7 @@ public class ApplicationRunner {
             }
             // Additional code to demonstrate namespaces where applicable
             if (this.namespacesApplicable()) {
-                ApplicationRunnerNamespaces.runNamespaceActions(this.hazelcastInstance, this.useViridian);
+                ApplicationRunnerNamespaces.runNamespaceActions(this.hazelcastInstance, this.useHzCloud);
             }
 
             ok = demoSql();
@@ -202,7 +202,7 @@ public class ApplicationRunner {
         IExecutorService iExecutorService = hazelcastInstance.getExecutorService("default");
 
         boolean isEnterprise = false;
-        EnterpriseChecker enterpriseChecker = new EnterpriseChecker(useViridian);
+        EnterpriseChecker enterpriseChecker = new EnterpriseChecker(useHzCloud);
         try {
             Future<Boolean> future = iExecutorService.submit(enterpriseChecker);
             Boolean b = future.get();
@@ -636,9 +636,9 @@ public class ApplicationRunner {
             String pulsarOrKafka = properties.getProperty(MyConstants.PULSAR_OR_KAFKA_KEY);
             boolean usePulsar = MyUtils.usePulsar(pulsarOrKafka);
             LOGGER.debug("usePulsar='{}'", usePulsar);
-            String kubernetesOrViridian = properties.getProperty(MyConstants.USE_VIRIDIAN);
-            boolean useViridian = MyUtils.useViridian(kubernetesOrViridian);
-            LOGGER.debug("useViridian='{}'", useViridian);
+            String kubernetesOrHzCloud = properties.getProperty(MyConstants.USE_HZ_CLOUD);
+            boolean useHzCloud = MyUtils.useHzCloud(kubernetesOrHzCloud);
+            LOGGER.debug("useHzCloud='{}'", useHzCloud);
             TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(properties);
             LOGGER.info("TransactionMonitorFlavor=='{}'", transactionMonitorFlavor);
 
@@ -647,11 +647,11 @@ public class ApplicationRunner {
             String ourProjectProvenance = properties.getProperty(MyConstants.PROJECT_PROVENANCE);
 
             ok &= TransactionMonitorIdempotentInitialization.createNeededObjects(hazelcastInstance,
-                    properties, ourProjectProvenance, transactionMonitorFlavor, this.localhost, useViridian);
+                    properties, ourProjectProvenance, transactionMonitorFlavor, this.localhost, useHzCloud);
             ok &= TransactionMonitorIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers,
-                    pulsarAddress, usePulsar, useViridian, transactionMonitorFlavor);
+                    pulsarAddress, usePulsar, useHzCloud, transactionMonitorFlavor);
             ok &= TransactionMonitorIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers,
-                    properties, transactionMonitorFlavor, this.localhost, this.kubernetes, this.useViridian);
+                    properties, transactionMonitorFlavor, this.localhost, this.kubernetes, this.useHzCloud);
             if (ok && !this.localhost) {
                 // Don't even try if broken by this point
                 ok = TransactionMonitorIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,

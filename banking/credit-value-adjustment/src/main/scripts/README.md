@@ -35,17 +35,17 @@ Tester scripts to confirm C++ is working.
 ### 3=. `kubernetes-3-grafana-prometheus.yaml`, `kubernetes-3-hazelcast-node-site1.yaml`, `kubernetes-3-hazelcast-node-site2.yaml`
 and `kubernetes-3-management-center.yaml`
 
-Creates two clusters, with monitoring. Omit if using Viridian.
+Creates two clusters, with monitoring. Omit if using Hazelcast Cloud.
 
 ### 4. `kubernetes-4-data-loader-site1.yaml` or `kubernetes-4-data-loader-site2.yaml`
 
 Use either one to load test data into one cluster, WAN replicated to the other.
-Only use `kubernetes-4-data-loader-site1.yaml` if Viridian.
+Only use `kubernetes-4-data-loader-site1.yaml` if Hazelcast Cloud.
 
 ### 5. `kubernetes-5-webapp-site1.yaml` and `kubernetes-5-webapp-site2.yaml`
 
 Start clients connected to each cluster.
-Only use `kubernetes-5-webapp-site1.yaml` if Viridian.
+Only use `kubernetes-5-webapp-site1.yaml` if Hazelcast Cloud.
 
 
 

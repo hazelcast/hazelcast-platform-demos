@@ -142,7 +142,7 @@ public class IngestTransactions {
             stringBuilder.append(", \"ccy\" : \"").append(json.getString("ccy")).append("\"");
             stringBuilder.append(", \"amtFloor\" : ").append(json.getDouble("amtFloor"));
         } catch (Exception e) {
-            // Don't log, if running in Viridian user may not download logs. Null means no entry passed to next stage, filter.
+            // Don't log, if running in Hz Cloud user may not bother to download logs. Nulls are filtered out by next stage.
             return null;
         }
         stringBuilder.append("}");
@@ -172,7 +172,7 @@ public class IngestTransactions {
             }
             xml = stringBuilder.toString();
         } catch (Exception e) {
-            // Don't log, if running in Viridian user may not download logs
+            // Don't log, if running in Hz Cloud user may not bother to download logs
             xml = input.getValue().toString();
         }
         return Tuple2.tuple2(input.getKey(), xml);

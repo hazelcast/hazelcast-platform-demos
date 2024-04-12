@@ -42,13 +42,13 @@ public class TodayLoggingRunnable implements HazelcastInstanceAware, Runnable, S
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(TodayLoggingRunnable.class);
 
-    private final boolean useViridian;
+    private final boolean useHzCloud;
     private final String executor;
     private final String mapPrefix;
     private transient HazelcastInstance hazelcastInstance;
 
     TodayLoggingRunnable(boolean arg0, String arg1, String arg2) {
-        this.useViridian = arg0;
+        this.useHzCloud = arg0;
         this.executor = arg1;
         this.mapPrefix = arg2;
     }
@@ -61,7 +61,7 @@ public class TodayLoggingRunnable implements HazelcastInstanceAware, Runnable, S
     @SuppressFBWarnings(value = "REC_CATCH_EXCEPTION", justification = "InterruptedException possible")
     public void run() {
         String previous = "";
-        if (!useViridian) {
+        if (!useHzCloud) {
             LOGGER.info("**{}**'{}'::START run()", LocalConstants.MY_JAR_NAME, this.executor);
         }
 
@@ -85,24 +85,24 @@ public class TodayLoggingRunnable implements HazelcastInstanceAware, Runnable, S
                 TimeUnit.HOURS.sleep(1L);
             }
         } catch (HazelcastInstanceNotActiveException hnae) {
-            if (!useViridian) {
+            if (!useHzCloud) {
                 LOGGER.info(
                         String.format("**%s**'%s'::HazelcastInstanceNotActiveException run(): %s",
                                 LocalConstants.MY_JAR_NAME, this.executor, hnae.getMessage()));
             }
         } catch (InterruptedException ie) {
-            if (!useViridian) {
+            if (!useHzCloud) {
                 LOGGER.info(
                         String.format("**%s**'%s'::InterruptedException run(): %s",
                                 LocalConstants.MY_JAR_NAME, this.executor, ie.getMessage()));
             }
         } catch (Exception e) {
-            if (!useViridian) {
+            if (!useHzCloud) {
                 LOGGER.info(String.format("**%s**'%s'::EXCEPTION run()", LocalConstants.MY_JAR_NAME, this.executor), e);
             }
         }
 
-        if (!useViridian) {
+        if (!useHzCloud) {
             LOGGER.info("**{}**'{}'::END run()", LocalConstants.MY_JAR_NAME, this.executor);
         }
     }

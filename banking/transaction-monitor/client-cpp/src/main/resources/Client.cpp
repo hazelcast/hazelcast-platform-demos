@@ -26,17 +26,17 @@ const char* clusterName = "@my.cluster1.name@";
 const char* instanceName = "@project.artifactId@";
 const char* serviceDns = "@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local";
 
-const char* viridianName = "@my.viridian.cluster1.name@";
-const char* viridianDiscoveryToken = "@my.viridian.cluster1.discovery.token@";
-const char* viridianKeyPassword = "@my.viridian.cluster1.key.password@";
+const char* hzCloudName = "@my.hz.cloud.cluster1.name@";
+const char* hzCloudDiscoveryToken = "@my.hz.cloud.cluster1.discovery.token@";
+const char* hzCloudKeyPassword = "@my.hz.cloud.cluster1.key.password@";
 
 const char* controlFile = "/tmp/control.file";
 std::string genericRecordMapPrefix = "__map-store.";
 std::string genericRecordMap = "mysql_slf4j";
-std::string useViridianKey = "use.viridian";
-const char* viridianCaFile = "/tmp/ca.pem";
-const char* viridianCertFile = "/tmp/cert.pem";
-const char* viridianKeyFile = "/tmp/key.pem";
+std::string useHzCloudKey = "use.hz.cloud";
+const char* hzCloudCaFile = "/tmp/ca.pem";
+const char* hzCloudCertFile = "/tmp/cert.pem";
+const char* hzCloudKeyFile = "/tmp/key.pem";
 
 char* get_time_iso8601() {
 	time_t now;
@@ -46,21 +46,21 @@ char* get_time_iso8601() {
 	return result;
 }
 
-bool is_viridian() {
-	std::string targetForTrue = useViridianKey.append("=true");
+bool is_hz_cloud() {
+	std::string targetForTrue = useHzCloudKey.append("=true");
     std::ifstream file;
     file.open(controlFile);
-    bool viridian = false;
+    bool hzCloud = false;
     std::string line;
 	while(getline(file, line)) {
         if (line.compare(targetForTrue)==0) {
-    	    viridian = true;
+    	    hzCloud = true;
         }
     }
-    return viridian;
+    return hzCloud;
 }
 
-hazelcast::client::hazelcast_client get_client(const char* kubernetes, bool viridian) {
+hazelcast::client::hazelcast_client get_client(const char* kubernetes, bool hzCloud) {
     hazelcast::client::client_config client_config;
 
     client_config.set_instance_name(instanceName);
@@ -74,24 +74,20 @@ hazelcast::client::hazelcast_client get_client(const char* kubernetes, bool viri
 	//client_config.get_logger_config().level(hazelcast::logger::level::finest);
 	client_config.set_property("hazelcast.client.statistics.enabled", "true");
 
-	if (viridian) {
-		client_config.set_cluster_name(viridianName);
+	if (hzCloud) {
+		client_config.set_cluster_name(hzCloudName);
 
 		auto &cloud_configuration = client_config.get_network_config().get_cloud_config();
     	cloud_configuration.enabled = true;
-    	cloud_configuration.discovery_token = viridianDiscoveryToken;
+    	cloud_configuration.discovery_token = hzCloudDiscoveryToken;
     	boost::asio::ssl::context ctx(boost::asio::ssl::context::tlsv12);
-    	ctx.load_verify_file(viridianCaFile);
-    	ctx.use_certificate_file(viridianCertFile, boost::asio::ssl::context::pem);
+    	ctx.load_verify_file(hzCloudCaFile);
+    	ctx.use_certificate_file(hzCloudCertFile, boost::asio::ssl::context::pem);
     	ctx.set_password_callback([&] (std::size_t max_length, boost::asio::ssl::context::password_purpose purpose) {
-        	return viridianKeyPassword;
+        	return hzCloudKeyPassword;
     	});
-    	ctx.use_private_key_file(viridianKeyFile, boost::asio::ssl::context::pem);
+    	ctx.use_private_key_file(hzCloudKeyFile, boost::asio::ssl::context::pem);
     	client_config.get_network_config().get_ssl_config().set_context(std::move(ctx));
-
-		//FIXME Required until 5.3.0?
-		std::cout << "TODO: Remove " << hazelcast::client::client_properties::CLOUD_URL_BASE << std::endl;
-		client_config.set_property(hazelcast::client::client_properties::CLOUD_URL_BASE, "api.viridian.hazelcast.com");
 	} else {
 		client_config.set_cluster_name(clusterName);
 
@@ -215,10 +211,10 @@ void get_generic_record(hazelcast::client::hazelcast_client hazelcast_client) {
 int main (int argc, char *argv[]) {
 	std::cout << "--------------------------------------" << std::endl;
 	const char* kubernetes = std::getenv("MY_KUBERNETES_ENABLED");
-	bool viridian = is_viridian();
+	bool hzCloud = is_hz_cloud();
 	std::cout << "MY_KUBERNETES_ENABLED '" << kubernetes << "'" << std::endl;
-	std::cout << "VIRIDIAN '" << viridian << "'" << std::endl;
-    auto hazelcast_client = get_client(kubernetes, viridian);
+	std::cout << "HZ_CLOUD '" << hzCloud << "'" << std::endl;
+    auto hazelcast_client = get_client(kubernetes, hzCloud);
 	std::cout << "--------------------------------------" << std::endl;
 
 	const char* start_time = get_time_iso8601();

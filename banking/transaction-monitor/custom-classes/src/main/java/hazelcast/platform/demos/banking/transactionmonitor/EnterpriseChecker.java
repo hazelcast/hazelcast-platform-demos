@@ -36,11 +36,11 @@ public class EnterpriseChecker implements Callable<Boolean>, Serializable, Hazel
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(EnterpriseChecker.class);
 
-    private final boolean useViridian;
+    private final boolean useHzCloud;
     private transient HazelcastInstance hazelcastInstance;
 
     EnterpriseChecker(boolean arg0) {
-        this.useViridian = arg0;
+        this.useHzCloud = arg0;
     }
     /**
      * <p>Determine if the server supports enterprise features.
@@ -52,7 +52,7 @@ public class EnterpriseChecker implements Callable<Boolean>, Serializable, Hazel
     @SuppressFBWarnings(value = "REC_CATCH_EXCEPTION", justification = "InterruptedException possible")
     public Boolean call() {
         Boolean result = null;
-        if (!useViridian) {
+        if (!useHzCloud) {
             LOGGER.info("START call()");
         }
 
@@ -64,16 +64,16 @@ public class EnterpriseChecker implements Callable<Boolean>, Serializable, Hazel
                 result = true;
             }
         } catch (HazelcastInstanceNotActiveException hnae) {
-            if (!useViridian) {
+            if (!useHzCloud) {
                 LOGGER.info("HazelcastInstanceNotActiveException run(): {}", hnae.getMessage());
             }
         } catch (Exception e) {
-            if (!useViridian) {
+            if (!useHzCloud) {
                 LOGGER.info("EXCEPTION call()", e);
             }
         }
 
-        if (!useViridian) {
+        if (!useHzCloud) {
             LOGGER.info("END call() -> {}", result);
         }
         return result;

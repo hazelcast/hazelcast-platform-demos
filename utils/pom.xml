@@ -22,9 +22,9 @@
 	</properties>
 
 	<modules>
+		<module>hz-cloud-clusterside</module>
 		<module>misc</module>
 		<module>slack</module>
-		<module>viridian-clusterside</module>
 		<module>zoom</module>
 	</modules>
 

@@ -36,21 +36,21 @@ const clusterName = "@my.cluster1.name@"
 const instanceName = "@project.artifactId@"
 const serviceDns = "@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local"
 
-const viridianName = "@my.viridian.cluster1.name@"
-const viridianDiscoveryToken = "@my.viridian.cluster1.discovery.token@"
-const viridianKeyPassword = "@my.viridian.cluster1.key.password@"
+const hzCloudName = "@my.hz.cloud.cluster1.name@"
+const hzCloudDiscoveryToken = "@my.hz.cloud.cluster1.discovery.token@"
+const hzCloudKeyPassword = "@my.hz.cloud.cluster1.key.password@"
 
 const controlFile = "/tmp/control.file"
 const cloudServerName = "hazelcast.cloud"
 const genericRecordMapPrefix = "__map-store."
 const genericRecordMap = "mysql_slf4j"
 const loggingLevel = logger.InfoLevel
-const useViridianKey = "use.viridian"
-const viridianCaFile = "/tmp/ca.pem"
-const viridianCertFile = "/tmp/cert.pem"
-const viridianKeyFile = "/tmp/key.pem"
+const useHzCloudKey = "use.hz.cloud"
+const hzCloudCaFile = "/tmp/ca.pem"
+const hzCloudCertFile = "/tmp/cert.pem"
+const hzCloudKeyFile = "/tmp/key.pem"
 
-func getClient(ctx context.Context, kubernetes string, viridian bool) *hazelcast.Client {
+func getClient(ctx context.Context, kubernetes string, hzCloud bool) *hazelcast.Client {
 	config := hazelcast.Config{}
 	config.ClientName = instanceName
 	home := os.Getenv("HOME")
@@ -60,22 +60,22 @@ func getClient(ctx context.Context, kubernetes string, viridian bool) *hazelcast
 	config.Logger.Level = loggingLevel
 	config.Stats.Enabled = true
 
-	if viridian {
-		config.Cluster.Name = viridianName
+	if hzCloud {
+		config.Cluster.Name = hzCloudName
 		config.Cluster.Cloud.Enabled = true
-		config.Cluster.Cloud.Token = viridianDiscoveryToken
+		config.Cluster.Cloud.Token = hzCloudDiscoveryToken
 		config.Cluster.Network.SSL.Enabled = true
 		//config.Cluster.Network.SSL.SetTLSConfig(&tls.Config{ServerName: cloudServerName})
 
-		caFile, err := filepath.Abs(viridianCaFile)
+		caFile, err := filepath.Abs(hzCloudCaFile)
 		if err != nil {
 			panic(err)
 		}
-		certFile, err := filepath.Abs(viridianCertFile)
+		certFile, err := filepath.Abs(hzCloudCertFile)
 		if err != nil {
 			panic(err)
 		}
-		keyFile, err := filepath.Abs(viridianKeyFile)
+		keyFile, err := filepath.Abs(hzCloudKeyFile)
 		if err != nil {
 			panic(err)
 		}
@@ -84,7 +84,7 @@ func getClient(ctx context.Context, kubernetes string, viridian bool) *hazelcast
 		if err != nil {
 			panic(err)
 		}
-		err = config.Cluster.Network.SSL.AddClientCertAndEncryptedKeyPath(certFile, keyFile, viridianKeyPassword)
+		err = config.Cluster.Network.SSL.AddClientCertAndEncryptedKeyPath(certFile, keyFile, hzCloudKeyPassword)
 		if err != nil {
 			panic(err)
 		}
@@ -206,7 +206,7 @@ func main() {
 	fmt.Printf("--------------------------------------\n")
 	kubernetes := os.Getenv("MY_KUBERNETES_ENABLED")
 	fmt.Printf("MY_KUBERNETES_ENABLED '%s'\n", kubernetes)
-	viridian := false
+	hzCloud := false
 	f, err := os.Open(controlFile)
 	if err != nil {
 		log.Print(err)
@@ -214,14 +214,14 @@ func main() {
 		scanner := bufio.NewScanner(f)
 		for scanner.Scan() {
 			line := scanner.Text()
-			if strings.HasPrefix(line, useViridianKey) {
-				viridian = strings.EqualFold(line, useViridianKey+"=true")
+			if strings.HasPrefix(line, useHzCloudKey) {
+				hzCloud = strings.EqualFold(line, useHzCloudKey+"=true")
 			}
 		}
 	}
 	defer f.Close()
-	fmt.Printf("VIRIDIAN '%t'\n", viridian)
-	hazelcastClient := getClient(ctx, kubernetes, viridian)
+	fmt.Printf("HZ CLOUD '%t'\n", hzCloud)
+	hazelcastClient := getClient(ctx, kubernetes, hzCloud)
 	fmt.Printf("--------------------------------------\n")
 
 	startTime := time.Now().Format(time.RFC3339)

@@ -31,15 +31,15 @@ namespace Client
         public const string instanceName = "@project.artifactId@";
         public const string serviceDns = "@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local";
 
-        public const string viridianName = "@my.viridian.cluster1.name@";
-        public const string viridianDiscoveryToken = "@my.viridian.cluster1.discovery.token@";
-        public const string viridianKeyPassword = "@my.viridian.cluster1.key.password@";
+        public const string hzCloudName = "@my.hz.cloud.cluster1.name@";
+        public const string hzCloudDiscoveryToken = "@my.hz.cloud.cluster1.discovery.token@";
+        public const string hzCloudKeyPassword = "@my.hz.cloud.cluster1.key.password@";
 
         public const string controlFile = "/tmp/control.file";
         public const string genericRecordMapPrefix = "__map-store.";
         public const string genericRecordMap = "mysql_slf4j";
-        public const string useViridianKey = "use.viridian";
-        public const string viridianPfxFile = "/tmp/client.pfx";
+        public const string useHzCloudKey = "use.hz.cloud";
+        public const string hzCloudPfxFile = "/tmp/client.pfx";
 
         public const int ONE_MINUTE = 60 * 1000;
         public const int ONE_DAY = 24 * 60 * 60 * 1000;
@@ -62,17 +62,17 @@ namespace Client
                             .AddConsole());
                 });
         }
-        public static bool IsViridian() {
+        public static bool IsHzCloud() {
             string[] lines = File.ReadAllLines(MyConstants.controlFile);
-            bool viridian = false;
+            bool hzCloud = false;
             foreach (string line in lines) {
-                if (line.Equals(MyConstants.useViridianKey + "=true", StringComparison.OrdinalIgnoreCase)) {
-                    viridian = true;
+                if (line.Equals(MyConstants.useHzCloudKey + "=true", StringComparison.OrdinalIgnoreCase)) {
+                    hzCloud = true;
                 }
             }
-            return viridian;
+            return hzCloud;
         }
-        public static HazelcastOptions GetClientConfig(string kubernetes, bool viridian)
+        public static HazelcastOptions GetClientConfig(string kubernetes, bool hzCloud)
         {
             var options = new HazelcastOptionsBuilder()
                 .WithConsoleLogger()
@@ -93,19 +93,16 @@ namespace Client
 
             options.Metrics.Enabled = true;
 
-            if (viridian) {
-                options.ClusterName = MyConstants.viridianName;
+            if (hzCloud) {
+                options.ClusterName = MyConstants.hzCloudName;
 
-                options.Networking.Cloud.DiscoveryToken = MyConstants.viridianDiscoveryToken;
-                //FIXME IS THIS NEEDED
-                Console.WriteLine("TODO IS THIS NEEDED");
-                options.Networking.Cloud.Url = new Uri("https://api.viridian.hazelcast.com");
+                options.Networking.Cloud.DiscoveryToken = MyConstants.hzCloudDiscoveryToken;
 
                 options.Networking.Ssl.Enabled = true;
                 options.Networking.Ssl.ValidateCertificateChain = false;
                 options.Networking.Ssl.Protocol = SslProtocols.Tls12;
-                options.Networking.Ssl.CertificatePath = MyConstants.viridianPfxFile;
-                options.Networking.Ssl.CertificatePassword = MyConstants.viridianKeyPassword;
+                options.Networking.Ssl.CertificatePath = MyConstants.hzCloudPfxFile;
+                options.Networking.Ssl.CertificatePassword = MyConstants.hzCloudKeyPassword;
 
             } else {
                 options.ClusterName = MyConstants.clusterName;
@@ -205,9 +202,9 @@ namespace Client
             Console.WriteLine("--------------------------------------");
             string kubernetes = Environment.GetEnvironmentVariable("MY_KUBERNETES_ENABLED") ?? "";
             Console.WriteLine("MY_KUBERNETES_ENABLED '" + kubernetes + "'");
-            bool viridian = IsViridian();
-            Console.WriteLine("VIRIDIAN '" + viridian + "'");
-            var options = GetClientConfig(kubernetes, viridian);
+            bool hzCloud = IsHzCloud();
+            Console.WriteLine("HZ_CLOUD '" + hzCloud + "'");
+            var options = GetClientConfig(kubernetes, hzCloud);
             await using var hazelcast_client = await HazelcastClientFactory.StartNewClientAsync(options);
             Console.WriteLine("--------------------------------------");
 

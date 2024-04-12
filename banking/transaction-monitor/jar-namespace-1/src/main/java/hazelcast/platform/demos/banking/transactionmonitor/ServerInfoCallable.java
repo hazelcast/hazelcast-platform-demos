@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <p>Returns information about the server. On Viridian, some information may be restricted.
+ * <p>Returns information about the server. On Hazelcast Cloud, some information may be restricted.
  * </p>
  * <p>NOTE: To emphasise namespaces, this exact same executor is in
  * {@code jar-namespace-1}, {@code jar-namespace-2} and {@code jar-namespace-3}
@@ -35,11 +35,11 @@ public class ServerInfoCallable implements Callable<List<String>>, Serializable 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerInfoCallable.class);
 
-    private final boolean useViridian;
+    private final boolean useHzCloud;
     private final String executor;
 
     ServerInfoCallable(boolean arg0, String arg1) {
-        this.useViridian = arg0;
+        this.useHzCloud = arg0;
         this.executor = arg1;
     }
 
@@ -49,7 +49,7 @@ public class ServerInfoCallable implements Callable<List<String>>, Serializable 
      */
     @Override
     public List<String> call() {
-        if (!useViridian) {
+        if (!useHzCloud) {
             LOGGER.info("**{}**'{}'::START call()", LocalConstants.MY_JAR_NAME, this.executor);
         }
 
@@ -68,13 +68,13 @@ public class ServerInfoCallable implements Callable<List<String>>, Serializable 
                         )
                     );
         } catch (Exception e) {
-            if (!useViridian) {
+            if (!useHzCloud) {
                 LOGGER.info(String.format("**%s**'%s'::EXCEPTION call()", LocalConstants.MY_JAR_NAME, this.executor), e);
             }
             result.add(e.getMessage());
         }
 
-        if (!useViridian) {
+        if (!useHzCloud) {
             LOGGER.info("**{}**'{}'::END call()", LocalConstants.MY_JAR_NAME, this.executor);
         }
         return result;

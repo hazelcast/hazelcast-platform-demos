@@ -28,19 +28,19 @@ import com.hazelcast.client.config.ClientNetworkConfig;
 import com.hazelcast.config.SSLConfig;
 
 /**
- * <p>Utilities for working with Viridian
+ * <p>Utilities for working with Hazelcast Cloud
  * </p>
  */
-public class UtilsViridian {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UtilsViridian.class);
+public class UtilsHazelcastCloud {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UtilsHazelcastCloud.class);
 
-    // Docker images copies keystore/truststore into riit directory
+    // Docker images copies keystore/truststore into right directory
     private static final String DOCKER_KEYSTORE_TRUSTSTORE_DIRECTORY = "/";
     private static final int EXPECTED_PASSWORD_LENGTH = 11;
     private static final int EXPECTED_TOKEN_LENGTH = 50;
 
     /**
-     * <p>Configure for Viridian.
+     * <p>Configure for Hazelcast Cloud.
      * </p>
      */
     public static void configure(ClientConfig clientConfig, String clusterName, String discoveryToken, String keyPassword)
@@ -60,9 +60,7 @@ public class UtilsViridian {
 
         clientNetworkConfig.setSSLConfig(sslConfig);
 
-        clientConfig.setProperty("hazelcast.client.cloud.url", "https://api.viridian.hazelcast.com");
-
-        logViridianConfig(clientConfig);
+        logHzCloudConfig(clientConfig);
     }
 
     /**
@@ -92,7 +90,7 @@ public class UtilsViridian {
      *
      * @param clientConfig
      */
-    private static void logViridianConfig(ClientConfig clientConfig) throws Exception {
+    private static void logHzCloudConfig(ClientConfig clientConfig) throws Exception {
         LOGGER.info("Cluster id=='{}'", clientConfig.getClusterName());
 
         String token = Objects.toString(clientConfig.getNetworkConfig()

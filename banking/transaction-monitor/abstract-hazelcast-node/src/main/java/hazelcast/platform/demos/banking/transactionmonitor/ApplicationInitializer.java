@@ -95,15 +95,15 @@ public class ApplicationInitializer {
         Config config = ApplicationConfig.buildConfig(properties);
 
         HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance(config);
-        // Since this code creates a Hazelcast node, it cannot be Viridian
-        boolean useViridian = false;
+        // Since this code creates a Hazelcast node, it cannot be Hazelcast Cloud
+        boolean useHzCloud = false;
 
         TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(properties);
         LOGGER.info("TransactionMonitorFlavor=='{}'", transactionMonitorFlavor);
         boolean localhost = System.getProperty("my.docker.enabled", "").equalsIgnoreCase("false");
         boolean kubernetes = System.getProperty("my.kubernetes.enabled", "").equalsIgnoreCase("true");
 
-        // Custom classes on classpath check, only likely to fail if Viridian and not uploaded
+        // Custom classes on classpath check, only likely to fail if Hz Cloud and not uploaded
         CheckConnectIdempotentCallable.silentCheckCustomClasses(hazelcastInstance);
 
         // First node runs initialization
@@ -117,7 +117,7 @@ public class ApplicationInitializer {
             if (size == 1) {
                 LOGGER.info("Mini initialize, only WAN maps as '{}'=='{}', assume client will do the rest",
                         initializerProperty, System.getProperty(initializerProperty));
-                ApplicationInitializer.miniInitialize(hazelcastInstance, transactionMonitorFlavor, useViridian, localhost);
+                ApplicationInitializer.miniInitialize(hazelcastInstance, transactionMonitorFlavor, useHzCloud, localhost);
             } else {
                 LOGGER.info("Skip initialize, assume done by first node, current cluster size is {}", size);
             }
@@ -130,9 +130,9 @@ public class ApplicationInitializer {
      * </p>
      */
     public static void miniInitialize(HazelcastInstance hazelcastInstance,
-            TransactionMonitorFlavor transactionMonitorFlavor, boolean useViridian, boolean localhost) throws Exception {
+            TransactionMonitorFlavor transactionMonitorFlavor, boolean useHzCloud, boolean localhost) throws Exception {
         TransactionMonitorIdempotentInitializationAdmin
-        .createMinimal(hazelcastInstance, transactionMonitorFlavor, useViridian, localhost);
+        .createMinimal(hazelcastInstance, transactionMonitorFlavor, useHzCloud, localhost);
     }
 
     /**
@@ -148,12 +148,12 @@ public class ApplicationInitializer {
         String pulsarOrKafka = properties.getProperty(MyConstants.PULSAR_OR_KAFKA_KEY);
         boolean usePulsar = MyUtils.usePulsar(pulsarOrKafka);
         LOGGER.debug("usePulsar='{}'", usePulsar);
-        String kubernetesOrViridian = properties.getProperty(MyConstants.USE_VIRIDIAN);
-        boolean useViridian = MyUtils.useViridian(kubernetesOrViridian);
-        LOGGER.debug("useViridian='{}'", useViridian);
-        if (useViridian) {
-            String message = String.format("useViridian=%b but running Hazelcast node! (property '%s'=='%s')",
-                    useViridian, MyConstants.USE_VIRIDIAN, kubernetesOrViridian);
+        String kubernetesOrHzCloud = properties.getProperty(MyConstants.USE_HZ_CLOUD);
+        boolean useHzCloud = MyUtils.useHzCloud(kubernetesOrHzCloud);
+        LOGGER.debug("useHzCloud='{}'", useHzCloud);
+        if (useHzCloud) {
+            String message = String.format("useHzCloud=%b but running Hazelcast node! (property '%s'=='%s')",
+                    useHzCloud, MyConstants.USE_HZ_CLOUD, kubernetesOrHzCloud);
             throw new RuntimeException(message);
         }
         TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(properties);
@@ -166,14 +166,14 @@ public class ApplicationInitializer {
                 ApplicationInitializer.class.getSimpleName()).toString();
 
         TransactionMonitorIdempotentInitialization.createNeededObjects(hazelcastInstance,
-                properties, ourProjectProvenance, transactionMonitorFlavor, localhost, useViridian);
+                properties, ourProjectProvenance, transactionMonitorFlavor, localhost, useHzCloud);
         addListeners(hazelcastInstance, bootstrapServers, pulsarAddress, usePulsar, projectName, clusterName,
                 transactionMonitorFlavor, kubernetes);
         TransactionMonitorIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarAddress, usePulsar,
-                useViridian, transactionMonitorFlavor);
+                useHzCloud, transactionMonitorFlavor);
         TransactionMonitorIdempotentInitialization.defineQueryableObjects(hazelcastInstance,
                 bootstrapServers, properties, transactionMonitorFlavor,
-                localhost, kubernetes, useViridian);
+                localhost, kubernetes, useHzCloud);
 
         TransactionMonitorIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
                 pulsarAddress, properties, clusterName, transactionMonitorFlavor, kubernetes);

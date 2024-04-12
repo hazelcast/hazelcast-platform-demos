@@ -32,7 +32,7 @@ import com.hazelcast.version.Version;
 
 /**
  * <p>If this module is a dependency, it provides an easy check to confirm
- * if the user has uploaded classes to Viridian.
+ * if the user has uploaded classes to Hazelcast Cloud.
  * </p>
  */
 public class CheckConnectIdempotentCallable {
@@ -41,7 +41,7 @@ public class CheckConnectIdempotentCallable {
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckConnectIdempotentCallable.class);
 
     /**
-     * <p>Test serverside. Only really needed if using Viridian
+     * <p>Test serverside. Only really needed if using Hazelcast Cloud
      * to confirm upload of custom classes hasn't been forgotten.
      * </p>
      * @return
@@ -100,7 +100,7 @@ public class CheckConnectIdempotentCallable {
             if (clients.isEmpty()) {
                 message += "bad Maven dependency if classes not found?";
             } else {
-                message += "custom classes not uploaded to Viridian? Version mismatches?";
+                message += "custom classes not uploaded to Hazelcast Cloud? Version mismatches?";
             }
 
             throw new RuntimeException(message);

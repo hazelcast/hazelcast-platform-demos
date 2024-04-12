@@ -57,7 +57,7 @@ public class ConfigLoader implements CommandLineRunner {
     public void run(String... args) throws Exception {
         IMap<String, String> cvaConfigMap = this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_CVA_CONFIG);
 
-        cvaConfigMap.set(MyConstants.CONFIG_CPP_SERVICE_KEY, getLoadBalancer(this.myProperties.isUseViridian()));
+        cvaConfigMap.set(MyConstants.CONFIG_CPP_SERVICE_KEY, getLoadBalancer(this.myProperties.isUseHzCloud()));
 
         Set<String> keySet = new TreeSet<>(cvaConfigMap.keySet());
         keySet.forEach(key -> LOGGER.info("Config: '{}'=='{}'",
@@ -72,7 +72,7 @@ public class ConfigLoader implements CommandLineRunner {
      *
      * @return Hostname, no port.
      */
-    private static String getLoadBalancer(boolean useViridian) {
+    private static String getLoadBalancer(boolean useHzCloud) {
         String cppService = System.getProperty("my.cpp.service", "");
         boolean dockerEnabled =
                 System.getProperty("my.docker.enabled", "false").equalsIgnoreCase(Boolean.TRUE.toString());
@@ -82,19 +82,19 @@ public class ConfigLoader implements CommandLineRunner {
         LOGGER.info("my.cpp.service=={}", cppService);
         LOGGER.info("dockerEnabled=={}", dockerEnabled);
         LOGGER.info("kubernetesEnabled=={}", kubernetesEnabled);
-        LOGGER.info("use.viridian=={}", useViridian);
+        LOGGER.info("use.hz.cloud=={}", useHzCloud);
 
         // If set, validate but don't reject
         if (cppService.length() > 0) {
-            validate(dockerEnabled, kubernetesEnabled, cppService, useViridian);
+            validate(dockerEnabled, kubernetesEnabled, cppService, useHzCloud);
         } else {
             // Unset, so guess
             if (!dockerEnabled && !kubernetesEnabled) {
                 cppService = CPP_LOCALHOST;
             }
             if (dockerEnabled && !kubernetesEnabled) {
-                if (useViridian) {
-                    String message = "Can't use Docker with Viridian for data loader, CVA-CPP service must be in cloud";
+                if (useHzCloud) {
+                    String message = "Can't use Docker with Hz Cloud for data loader, CVA-CPP service must be in cloud";
                     throw new RuntimeException(message);
                 } else {
                     cppService = CPP_DOCKER;
@@ -120,7 +120,7 @@ public class ConfigLoader implements CommandLineRunner {
      * @param if true, service must be in the cloud
      */
     private static void validate(boolean dockerEnabled, boolean kubernetesEnabled, String cppService,
-            boolean useViridian) {
+            boolean useHzCloud) {
         if (!dockerEnabled && !kubernetesEnabled && !cppService.equals(CPP_LOCALHOST)) {
             LOGGER.warn("localhost, but 'my.cpp.service'=='{}'", cppService);
         }
@@ -128,7 +128,7 @@ public class ConfigLoader implements CommandLineRunner {
             LOGGER.warn("Docker, but 'my.cpp.service'=='{}'", cppService);
         }
         if (kubernetesEnabled && !cppService.startsWith(CPP_KUBERNETES)) {
-            if (!useViridian) {
+            if (!useHzCloud) {
                 LOGGER.warn("Kubernetes, but 'my.cpp.service'=='{}'", cppService);
             }
         }

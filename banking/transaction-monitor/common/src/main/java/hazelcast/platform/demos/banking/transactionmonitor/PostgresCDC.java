@@ -64,7 +64,7 @@ public class PostgresCDC {
     @SuppressWarnings({"checkstyle:ParameterNumber"})
     public static Pipeline buildPipeline(String address, String database, String schema,
             String user, String password, String clusterName, String mapName, String ourProvenanceProject,
-            boolean useViridian)
+            boolean useHzCloud)
                     throws Exception {
         LOGGER.info("address={}", address);
         LOGGER.info("database='{}'", database);
@@ -79,16 +79,16 @@ public class PostgresCDC {
         }
         LOGGER.info("mapName='{}'", mapName);
         LOGGER.info("ourProvenanceProject='{}'", ourProvenanceProject);
-        LOGGER.info("useViridian={}", useViridian);
+        LOGGER.info("useHzCloud={}", useHzCloud);
 
         Pipeline pipeline = Pipeline.create();
 
         StreamSource<ChangeRecord> postgresCdc = PostgresCDC.postgresCdc(address,
-                database, schema, MyConstants.POSTGRES_TABLE_NAME, user, password, clusterName, useViridian);
+                database, schema, MyConstants.POSTGRES_TABLE_NAME, user, password, clusterName, useHzCloud);
 
         pipeline
         .readFrom(postgresCdc).withoutTimestamps()
-        .map(PostgresCDC.filterAndFormat(ourProvenanceProject, useViridian))
+        .map(PostgresCDC.filterAndFormat(ourProvenanceProject, useHzCloud))
         .writeTo(Sinks.map(mapName));
 
         return pipeline;
@@ -105,11 +105,11 @@ public class PostgresCDC {
      * @param user
      * @param password
      * @param clusterName
-     * @param useViridian
+     * @param useHzCloud
      * @return
      */
     public static StreamSource<ChangeRecord> postgresCdc(String address, String database,
-            String schema, String table, String user, String password, String clusterName, boolean useViridian) {
+            String schema, String table, String user, String password, String clusterName, boolean useHzCloud) {
 
         int port = POSTGRES_PORT;
         int colon = address.indexOf(":");
@@ -119,7 +119,7 @@ public class PostgresCDC {
         }
 
         String whitelist = schema + "." + table;
-        if (!useViridian) {
+        if (!useHzCloud) {
             LOGGER.info("Database: '{}', whitelisting: '{}'", database, whitelist);
         }
 
@@ -144,12 +144,12 @@ public class PostgresCDC {
      * </p>
      *
      * @param ourProvenanceProject "{@code transaction-monitor}"
-     * @param useViridian
+     * @param useHzCloud
      * @return
      */
     @SuppressWarnings({"checkstyle:MethodLength", "checkstyle:CyclomaticComplexity"})
     public static FunctionEx<ChangeRecord, Tuple2<Long, HazelcastJsonValue>>
-        filterAndFormat(String ourProvenanceProject, boolean useViridian) {
+        filterAndFormat(String ourProvenanceProject, boolean useHzCloud) {
         return changeRecord -> {
             try {
                 Map<String, Object> keyFields = changeRecord.key().toMap();
@@ -157,7 +157,7 @@ public class PostgresCDC {
 
                 Long key;
                 if (keyFields.size() != 1) {
-                    if (!useViridian) {
+                    if (!useHzCloud) {
                         LOGGER.error("Composite key unexpected, {}", keyFields.keySet());
                     }
                     return null;
@@ -170,7 +170,7 @@ public class PostgresCDC {
                         if (keyObject instanceof Long) {
                             key = (Long) keyObject;
                         } else {
-                            if (!useViridian) {
+                            if (!useHzCloud) {
                                 LOGGER.error("Key class unexpected, {}", keyObject.getClass().getCanonicalName());
                             }
                             return null;
@@ -183,7 +183,7 @@ public class PostgresCDC {
                 Object whence = valueFields.get("whence");
                 Object volume = valueFields.get("volume");
                 if (code == null || provenance == null || whence == null || volume == null) {
-                    if (!useViridian) {
+                    if (!useHzCloud) {
                         LOGGER.error("Value fields incomplete, {}", valueFields.keySet());
                     }
                     return null;
@@ -205,18 +205,18 @@ public class PostgresCDC {
                      * test data loaded by MapLoader or writes by Jet which
                      * we don't wish to re-read.
                      */
-                    if (!useViridian) {
+                    if (!useHzCloud) {
                         LOGGER.info("Skip re-read of own write ('{}'): {}", provenance, tuple2);
                     }
                     return null;
                 } else {
-                    if (!useViridian) {
+                    if (!useHzCloud) {
                         LOGGER.info("Save: {}", tuple2);
                     }
                     return tuple2;
                 }
             } catch (Exception e) {
-                if (!useViridian) {
+                if (!useHzCloud) {
                     LOGGER.error("Failed to process: " + changeRecord, e);
                 }
                 return null;

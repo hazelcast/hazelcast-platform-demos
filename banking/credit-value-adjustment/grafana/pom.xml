@@ -15,7 +15,7 @@
 	<description>Credit Value Adjustment - Re-package Grafana</description>
 
 	<properties>
-                <dockerfile.skip>${skip.when.viridian}</dockerfile.skip>
+                <dockerfile.skip>${skip.when.hz.cloud}</dockerfile.skip>
 		<my.docker.image.name>grafana</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
                 <my.mc.admin.user>${my.other.admin.user}</my.mc.admin.user>

@@ -82,20 +82,20 @@ There are two ways to run the example.
 Firstly, where you manage everything yourself - the Hazelcast servers, C++ pricers, etc.
 If you do it this way, there should be two Hazelcast clusters, connected by WAN replication.
 
-Secondly, where data is hosted in Hazelcast Viridian, but C++ pricing is still elsewhere.
-For simplicity, this uses only a single Hazelcast cluster, the one provided by the Viridian.
+Secondly, where data is hosted in Hazelcast Cloud, but C++ pricing is still elsewhere.
+For simplicity, this uses only a single Hazelcast cluster, the one provided by Hazelcast Cloud.
 
-Clusters on Viridian can be linked for WAN replication, so you can add WAN to this yourself
+Clusters on Hazelcast Cloud can be linked for WAN replication, so you can add WAN to this yourself
 easily.
 
-### Running on Viridian
+### Running on Hazelcast Cloud
 
-If the build property `use.viridian` is _true_, the build will be configured for Viridian.
+If the build property `use.hz.cloud` is _true_, the build will be configured for Hazelcast Cloud.
 
 This requires the `cva-custom-classes-*-jar-with-dependencies.jar` file to be uploaded to
-Viridian and then all the clients will connect as before.
+Hazelcast Cloud and then all the clients will connect as before.
 
-You don't then need to create Hazelcast clusters as Viridian will be used instead.
+You don't then need to create Hazelcast clusters as Hazelcast Cloud will be used instead.
 
 ## Modules
 
@@ -112,16 +112,16 @@ This is a Protobuf3 definition of the gRPC communications between Jet and C++, f
 
 ### 2. `custom-classes`
 
-This module is used to upload to Viridian, when running from Viridian.
+This module is used to upload to Hazelcast Cloud, when running with Hazelcast Cloud.
 
 ### 3. `common`
 
 This module holds items that are shared between client-side and server-side.
 
 It is separate to `custom-classes` is it includes extra modules that are needed to run
-without Viridian, that are provided by Viridian.
+without Hazelcast Cloud, that are provided already by Hazelcast Cloud.
 
-For example, logging classes. Viridian has these, so we don't include them in `custom-classes`
+For example, logging classes. Hazelcast Cloud has these, so we don't include them in `custom-classes`
 to upload. But we will need logging classes if running elsewhere, hence this `common` module.
 
 ### 4. `cva-cpp`
@@ -263,7 +263,7 @@ These should be started first.
  These should be started second.
  Run as many of each as you want. If you don't wish to use WAN, one cluster is enough,
 and *WAN* is only available in Kubernetes.
- Omit these if using Viridian instead.
+ Omit these if using Hazelcast Cloud instead.
 
 * *data-loader*, *prometheus*, *management-center* &amp; *webapp* -
  These should be started last.
@@ -347,7 +347,7 @@ as Management Center has stricter rules for allowable pas:swords. However, neith
 strength, and you shouldn't put them on public Github repositories either. This is just an
 example, not a practice to copy.
 
-## Running -- Kubernetes (and Viridian)
+## Running -- Kubernetes (and Hazelcast Cloud)
 
 Kubernetes is slightly more complicated, as it is a full enterprise-grade product. However, the steps
 are much the same.
@@ -380,7 +380,7 @@ First, Grafana and Prometheus together and also C++, independent of the first tw
 kubectl create -f kubernetes-grafana-prometheus.yaml -f kubernetes-cpp.yaml
 ```
 
-Second, the two Hazelcast clusters if not using Viridian.
+Second, the two Hazelcast clusters if not using Hazelcast Cloud.
 
 ```
 kubectl create -f kubernetes-hazelcast-node-site1.yaml -f kubernetes-hazelcast-node-site2.yaml

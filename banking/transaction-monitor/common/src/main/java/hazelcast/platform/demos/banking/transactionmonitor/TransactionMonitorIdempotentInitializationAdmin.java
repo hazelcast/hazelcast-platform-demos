@@ -35,14 +35,14 @@ public class TransactionMonitorIdempotentInitializationAdmin {
      * </p>
      */
     public static boolean createMinimal(HazelcastInstance hazelcastInstance,
-            TransactionMonitorFlavor transactionMonitorFlavor, boolean useViridian, boolean localhost) {
+            TransactionMonitorFlavor transactionMonitorFlavor, boolean useHzCloud, boolean localhost) {
         boolean ok;
         if (localhost) {
-            if (useViridian) {
-                throw new RuntimeException("localhost==true and useViridian==true");
+            if (useHzCloud) {
+                throw new RuntimeException("localhost==true and useHzCloud==true");
             }
-            ok = defineAdminIMaps(hazelcastInstance, useViridian);
-            ok &= launchAdminRunners(hazelcastInstance, transactionMonitorFlavor, useViridian);
+            ok = defineAdminIMaps(hazelcastInstance, useHzCloud);
+            ok &= launchAdminRunners(hazelcastInstance, transactionMonitorFlavor, useHzCloud);
             ok &= TransactionMonitorIdempotentInitialization.defineWANIMaps(hazelcastInstance, transactionMonitorFlavor);
         } else {
             ok = TransactionMonitorIdempotentInitialization.defineWANIMaps(hazelcastInstance, transactionMonitorFlavor);
@@ -59,7 +59,7 @@ public class TransactionMonitorIdempotentInitializationAdmin {
      * @param hazelcastInstance
      * @return
      */
-    static boolean defineAdminIMaps(HazelcastInstance hazelcastInstance, boolean useViridian) {
+    static boolean defineAdminIMaps(HazelcastInstance hazelcastInstance, boolean useHzCloud) {
         String definition1 = "CREATE MAPPING IF NOT EXISTS "
                 + MyConstants.IMAP_NAME_HEAP
                 + " TYPE IMap "
@@ -83,16 +83,16 @@ public class TransactionMonitorIdempotentInitializationAdmin {
      * @return
      */
     public static boolean launchAdminRunners(HazelcastInstance hazelcastInstance,
-            TransactionMonitorFlavor transactionMonitorFlavor, boolean useViridian) {
+            TransactionMonitorFlavor transactionMonitorFlavor, boolean useHzCloud) {
         IExecutorService iExecutorService = hazelcastInstance.getExecutorService("default");
 
         // Runs on one node, data for all
         PerspectiveUpdater perspectiveUpdater
-            = new PerspectiveUpdater(transactionMonitorFlavor, useViridian);
+            = new PerspectiveUpdater(transactionMonitorFlavor, useHzCloud);
         iExecutorService.execute(perspectiveUpdater);
 
         // Runs on all nodes, data for all sourced from each
-        HeapUpdater heapUpdater = new HeapUpdater(useViridian);
+        HeapUpdater heapUpdater = new HeapUpdater(useHzCloud);
         iExecutorService.executeOnAllMembers(heapUpdater);
 
         // Cannot currently fail, but may be extended in future

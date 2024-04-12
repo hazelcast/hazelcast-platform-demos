@@ -52,12 +52,12 @@ public class CvaStpJobSubmitter {
      * @throws Exception If the job is rejected as a duplicate is still running
      */
     public static Job submitCvaStpJob(HazelcastInstance hazelcastInstance, LocalDate calcDate,
-            boolean useViridian) throws Exception {
+            boolean useHzCloud) throws Exception {
         boolean debug = false;
         int batchSize = MyConstants.DEFAULT_BATCH_SIZE;
         int parallelism = 1;
         return CvaStpJobSubmitter.submitCvaStpJob(hazelcastInstance, calcDate, batchSize, parallelism,
-                debug, useViridian);
+                debug, useHzCloud);
     }
 
     /**
@@ -79,7 +79,7 @@ public class CvaStpJobSubmitter {
      * @throws Exception If the job is rejected as a duplicate is still running
      */
     public static Job submitCvaStpJob(HazelcastInstance hazelcastInstance, LocalDate calcDate,
-            int batchSize, int parallelism, boolean debug, boolean useViridian) throws Exception {
+            int batchSize, int parallelism, boolean debug, boolean useHzCloud) throws Exception {
         long timestamp = System.currentTimeMillis();
         String timestampStr = MyUtils.timestampToISO8601(timestamp);
 
@@ -89,7 +89,7 @@ public class CvaStpJobSubmitter {
         LOGGER.info("Using '{}' for C++ service", cppLoadBalancer);
 
         Pipeline pipeline = CvaStpJob.buildPipeline(jobName, timestamp, calcDate, cppLoadBalancer,
-                batchSize, parallelism, debug, useViridian);
+                batchSize, parallelism, debug, useHzCloud);
 
         JobConfig jobConfig = new JobConfig();
         jobConfig.setName(jobName);
