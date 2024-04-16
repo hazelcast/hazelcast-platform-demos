@@ -255,6 +255,14 @@ fi
 
 # Create Kubernetes cluster
 K_CLUSTER_NAME=${USER}-${FLAVOR}-${START}
+LEN_K_CLUSTER_NAME=`echo $K_CLUSTER_NAME | wc -c`
+MAX_LEN=40
+if [ $LEN_K_CLUSTER_NAME -gt $MAX_LEN ]
+then
+ echo Truncating cluster name: $K_CLUSTER_NAME from $LEN_K_CLUSTER_NAME to $MAX_LEN
+ K_CLUSTER_NAME=`echo $K_CLUSTER_NAME | cut -c-$MAX_LEN`
+ echo Truncated cluster name: $K_CLUSTER_NAME
+fi
 if [ "$CREATE_KUBERNETES_CLUSTER" == true ]
 then
  echo ================================================================================

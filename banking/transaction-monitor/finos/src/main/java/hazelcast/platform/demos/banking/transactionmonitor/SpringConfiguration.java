@@ -30,7 +30,7 @@ import com.hazelcast.client.config.ClientConfig;
 public class SpringConfiguration {
 
     @Bean
-    public ClientConfig clientConfig() throws Exception {
+    ClientConfig clientConfig() throws Exception {
         return ApplicationConfig.buildClientConfig();
     }
 
