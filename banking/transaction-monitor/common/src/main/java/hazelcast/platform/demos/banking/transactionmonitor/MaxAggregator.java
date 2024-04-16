@@ -32,7 +32,7 @@ import com.hazelcast.platform.demos.utils.UtilsFormatter;
  */
 public class MaxAggregator implements Serializable {
     private static final long serialVersionUID = 1L;
-    // Don't log, if running in Viridian user may not download logs
+    // Don't log, if running in Hazelcast Cloud user may not bother to download logs
     // private static final Logger LOGGER = LoggerFactory.getLogger(MaxAggregator.class);
 
     private final String provenance;

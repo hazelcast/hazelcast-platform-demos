@@ -35,9 +35,6 @@ public class InitializerConfig {
      * <p></li>
      * <li><p><i>BOOTSTRAP_SERVERS_CONFIG</i> - the list of brokers to connect to.
      * <p></li>
-     * <li><p><i>GROUP_ID_CONFIG</i> - The Id for the Jet job connecting to Kafka,
-     * make it unique rather than rely on Kafka generating one.
-     * <p></li>
      * <li><p><i>KEY_DESERIALIZER_CLASS_CONFIG</i> - how to de-serialize the message key.
      * <p></li>
      * <li><p><i>VALUE_DESERIALIZER_CLASS_CONFIG</i> - how to de-serialize the message value.

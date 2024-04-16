@@ -6,7 +6,7 @@
         <parent>
                 <groupId>com.hazelcast.platform.demos.benchmark.nexmark</groupId>
                 <artifactId>nexmark-root</artifactId>
-                <version>5.3</version>
+                <version>5.4</version>
         </parent>
 
 	<artifactId>nexmark-grafana</artifactId>

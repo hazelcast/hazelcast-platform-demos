@@ -29,23 +29,23 @@ public class PerspectiveTradeSerializer implements CompactSerializer<Perspective
     @Override
     public PerspectiveTrade read(CompactReader in) {
         PerspectiveTrade perspectiveTrade = new PerspectiveTrade();
-        perspectiveTrade.setSymbol(in.readString("symbol"));
-        perspectiveTrade.setCount(in.readInt64("count"));
-        perspectiveTrade.setSum(in.readFloat64("sum"));
-        perspectiveTrade.setLatest(in.readFloat64("latest"));
-        perspectiveTrade.setSeconds(in.readInt32("seconds"));
-        perspectiveTrade.setRandom(in.readInt32("random"));
+        perspectiveTrade.setSymbol(in.readString(MyConstants.PERSPECTIVE_FIELD_SYMBOL));
+        perspectiveTrade.setCount(in.readInt64(MyConstants.PERSPECTIVE_FIELD_COUNT));
+        perspectiveTrade.setSum(in.readFloat64(MyConstants.PERSPECTIVE_FIELD_SUM));
+        perspectiveTrade.setLatest(in.readFloat64(MyConstants.PERSPECTIVE_FIELD_LATEST));
+        perspectiveTrade.setSeconds(in.readInt32(MyConstants.PERSPECTIVE_FIELD_SECONDS));
+        perspectiveTrade.setRandom(in.readInt32(MyConstants.PERSPECTIVE_FIELD_RANDOM));
         return perspectiveTrade;
     }
 
     @Override
     public void write(CompactWriter out, PerspectiveTrade perspectiveTrade) {
-        out.writeString("symbol", perspectiveTrade.getSymbol());
-        out.writeInt64("count", perspectiveTrade.getCount());
-        out.writeFloat64("sum", perspectiveTrade.getSum());
-        out.writeFloat64("latest", perspectiveTrade.getLatest());
-        out.writeInt32("seconds", perspectiveTrade.getSeconds());
-        out.writeInt32("random", perspectiveTrade.getRandom());
+        out.writeString(MyConstants.PERSPECTIVE_FIELD_SYMBOL, perspectiveTrade.getSymbol());
+        out.writeInt64(MyConstants.PERSPECTIVE_FIELD_COUNT, perspectiveTrade.getCount());
+        out.writeFloat64(MyConstants.PERSPECTIVE_FIELD_SUM, perspectiveTrade.getSum());
+        out.writeFloat64(MyConstants.PERSPECTIVE_FIELD_LATEST, perspectiveTrade.getLatest());
+        out.writeInt32(MyConstants.PERSPECTIVE_FIELD_SECONDS, perspectiveTrade.getSeconds());
+        out.writeInt32(MyConstants.PERSPECTIVE_FIELD_RANDOM, perspectiveTrade.getRandom());
     }
 
     @Override

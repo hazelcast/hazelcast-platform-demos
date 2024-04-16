@@ -69,6 +69,10 @@ public class MyUtils {
     private static final int CSV_THIRD = 2;
     private static final int CSV_FOURTH = 3;
     private static final int CSV_FIFTH = 4;
+    private static final int DEFAULT_CASSANDRA_PORT = 9042;
+    private static final int DEFAULT_MARIA_PORT = 3306;
+    private static final int ALTERNATIVE_MARIA_PORT = 4306;
+    private static final int DEFAULT_MONGO_PORT = 27017;
     private static final int POS4 = 4;
     private static final int POS6 = 6;
 
@@ -396,12 +400,12 @@ public class MyUtils {
     }
 
     /**
-     * <p>Determine target, assume Viridian
+     * <p>Determine target, assume Hazelcast Cloud
      * </p>
      * @param s
      * @return
      */
-    public static boolean useViridian(String s) {
+    public static boolean useHzCloud(String s) {
         if (s == null || s.isBlank()) {
             return true;
         } else {
@@ -615,13 +619,13 @@ public class MyUtils {
      */
     @SuppressWarnings("unchecked")
     private static void logMySqlSlf4j(HazelcastInstance hazelcastInstance) {
-        IMap<GenericRecord, GenericRecord> mapMySqlSlf4j = null;
+        IMap<Object, GenericRecord> mapMySqlSlf4j = null;
 
         // Do not look up by name, as that force creates
         for (DistributedObject distributedObject : hazelcastInstance.getDistributedObjects()) {
             if (distributedObject instanceof IMap
                     && distributedObject.getName().equals(MyConstants.IMAP_NAME_MYSQL_SLF4J)) {
-                mapMySqlSlf4j = (IMap<GenericRecord, GenericRecord>) distributedObject;
+                mapMySqlSlf4j = (IMap<Object, GenericRecord>) distributedObject;
             }
         }
 
@@ -629,10 +633,11 @@ public class MyUtils {
         LOGGER.info("logMySqlSlf4j()");
         LOGGER.info("---------");
         if (mapMySqlSlf4j == null) {
-            LOGGER.info("Map does not currently exist");
+            LOGGER.info("Map '{}' does not currently exist", MyConstants.IMAP_NAME_MYSQL_SLF4J);
         } else {
-            Set<Entry<GenericRecord, GenericRecord>> entrySet = mapMySqlSlf4j.entrySet();
-            for (Entry<GenericRecord, GenericRecord> entry : entrySet) {
+            LOGGER.info("Map '{}'", MyConstants.IMAP_NAME_MYSQL_SLF4J);
+            Set<Entry<Object, GenericRecord>> entrySet = mapMySqlSlf4j.entrySet();
+            for (Entry<Object, GenericRecord> entry : entrySet) {
                 LOGGER.info("Key '{}', Value '{}'", entry.getKey(), entry.getValue());
             }
             LOGGER.info("[{} entr{}]", entrySet.size(), entrySet.size() == 1 ? "y" : "ies");
@@ -662,6 +667,136 @@ public class MyUtils {
             }
         }
         LOGGER.info("~_~_~_~_~");
+    }
+
+    /**
+     * <p>To connect...to Cassandra
+     * </p>
+     */
+    public static String buildCassandraURI(Properties properties, String keyspace) throws Exception {
+        String myCassandraAddress = System.getProperty(MyConstants.CASSANDRA_CONFIG_KEY, "");
+        String hostIp = System.getProperty(MyConstants.HOST_IP, "");
+        LOGGER.debug("'{}'=='{}'", MyConstants.CASSANDRA_CONFIG_KEY, myCassandraAddress);
+        LOGGER.debug("'{}'=='{}'", MyConstants.HOST_IP, hostIp);
+
+        String uri = "jdbc:cassandra://";
+        if (!myCassandraAddress.isBlank()) {
+            String[] tokens = myCassandraAddress.split(":");
+            uri += tokens[0];
+        } else {
+            if (!hostIp.isBlank()) {
+                String[] tokens = hostIp.split(":");
+                uri += tokens[0];
+            } else {
+                String message = String.format("Missing both '{}' and '{}', need one to connect",
+                        MyConstants.HOST_IP, MyConstants.CASSANDRA_CONFIG_KEY);
+                throw new RuntimeException(message);
+            }
+        }
+
+        uri += ":" + DEFAULT_CASSANDRA_PORT;
+        uri += "/" + keyspace + "?localdatacenter=datacenter1";
+
+        return uri;
+    }
+
+    /**
+     * <p>To connect...to MariaDB
+     * </p>
+     */
+    public static String buildMariaURI(Properties properties, String database, boolean isKubernetes) throws Exception {
+        String myMariaAddress = System.getProperty(MyConstants.MARIA_CONFIG_KEY, "");
+        String hostIp = System.getProperty(MyConstants.HOST_IP, "");
+        LOGGER.debug("'{}'=='{}'", MyConstants.MARIA_CONFIG_KEY, myMariaAddress);
+        LOGGER.debug("'{}'=='{}'", MyConstants.HOST_IP, hostIp);
+
+        String uri = "jdbc:mariadb://";
+        if (!myMariaAddress.isBlank()) {
+            String[] tokens = myMariaAddress.split(":");
+            uri += tokens[0];
+        } else {
+            if (!hostIp.isBlank()) {
+                String[] tokens = hostIp.split(":");
+                uri += tokens[0];
+            } else {
+                String message = String.format("Missing both '{}' and '{}', need one to connect",
+                        MyConstants.HOST_IP, MyConstants.MARIA_CONFIG_KEY);
+                throw new RuntimeException(message);
+            }
+        }
+
+        if (isKubernetes) {
+            uri += ":" + DEFAULT_MARIA_PORT;
+        } else {
+            // Localhost or Docker, Maria on different port so doesn't clash with MySql
+            uri += ":" + ALTERNATIVE_MARIA_PORT;
+        }
+        uri += "/" + database;
+
+        return uri;
+    }
+
+    /**
+     * <p>To connect...to MongoDB
+     * </p>
+     */
+    public static String buildMongoURI(Properties properties) throws Exception {
+        String myMongoAddress = System.getProperty(MyConstants.MONGO_CONFIG_KEY, "");
+        String hostIp = System.getProperty(MyConstants.HOST_IP, "");
+        String user = properties.getProperty(MyConstants.MONGO_USER, "");
+        String password = properties.getProperty(MyConstants.MONGO_PASSWORD, "");
+
+        LOGGER.debug("'{}'=='{}'", MyConstants.MONGO_CONFIG_KEY, myMongoAddress);
+        LOGGER.debug("'{}'=='{}'", MyConstants.HOST_IP, hostIp);
+        LOGGER.debug("'{}'=='{}'", MyConstants.MONGO_USER, user);
+        LOGGER.debug("'{}'=='{}'", MyConstants.MONGO_PASSWORD, password);
+
+        if (user.isBlank() || password.isBlank()) {
+            String message = String.format("Missing user/password pair, got '%s'/'%s'", user, password);
+            throw new RuntimeException(message);
+        }
+
+        int port = DEFAULT_MONGO_PORT;
+
+        String uri = "mongodb://" + user + ":" + password + "@";
+        if (!myMongoAddress.isBlank()) {
+            String[] tokens = myMongoAddress.split(":");
+            uri += tokens[0];
+            if (tokens.length > 1) {
+                port = Integer.parseInt(tokens[1]);
+            }
+        } else {
+            if (!hostIp.isBlank()) {
+                String[] tokens = hostIp.split(":");
+                uri += tokens[0];
+                if (tokens.length > 1) {
+                    port = Integer.parseInt(tokens[1]);
+                }
+            } else {
+                String message = String.format("Missing both '{}' and '{}', need one to connect",
+                        MyConstants.HOST_IP, MyConstants.MONGO_CONFIG_KEY);
+                throw new RuntimeException(message);
+            }
+        }
+        uri += ":" + port + "/?tls=false";
+        return uri;
+    }
+
+    /**
+     * <p>Retrieve a property, exception if missing.
+     * </p>
+     *
+     * @param properties
+     * @param key
+     * @return
+     * @throws Exception
+     */
+    public static String ensureGet(Properties properties, String key) throws Exception {
+        String value = properties.getProperty(key, "");
+        if (value.isBlank()) {
+            throw new RuntimeException(String.format("Blank for '{}'", key));
+        }
+        return value;
     }
 
 }

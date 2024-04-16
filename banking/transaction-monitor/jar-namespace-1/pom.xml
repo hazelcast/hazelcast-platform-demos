@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
+		<artifactId>transaction-monitor-root</artifactId>
+		<version>5.4</version>
+	</parent>
+
+	<artifactId>transaction-monitor-jar-namespace-1</artifactId>
+
+	<name>Hazelcast Platform - Transaction Monitor - Jar Namespace 1</name>
+	<description>Transaction Monitor - Jar for Namespace 1</description>
+
+	<properties>
+		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
+		<my.properties.value>jar-namespace-1</my.properties.value>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>transaction-monitor-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+	</build>
+</project>

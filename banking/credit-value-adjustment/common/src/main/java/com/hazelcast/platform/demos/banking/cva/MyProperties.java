@@ -55,13 +55,13 @@ public class MyProperties {
     @NotNull
     private int initSize;
     @NotNull
-    private boolean useViridian;
+    private boolean useHzCloud;
     @NotNull
-    private String viridianCluster1DiscoveryToken;
+    private String hzCloudCluster1DiscoveryToken;
     @NotNull
-    private String viridianCluster1Id;
+    private String hzCloudCluster1Name;
     @NotNull
-    private String viridianCluster1KeyPassword;
+    private String hzCloudCluster1KeyPassword;
 
     public String getBuildTimestamp() {
         return this.buildTimestamp;
@@ -107,29 +107,32 @@ public class MyProperties {
         LOGGER.info("myProperties.site=='{}'", this.site);
         LOGGER.info("myProperties.remoteSite=='{}'", this.remoteSite);
     }
-    public boolean isUseViridian() {
-        return useViridian;
+    public boolean isUseHzCloud() {
+        return useHzCloud;
     }
-    public void setUseViridian(boolean useViridian) {
-        this.useViridian = useViridian;
+    public void setUseHzCloud(boolean useHzCloud) {
+        this.useHzCloud = useHzCloud;
     }
-    public String getViridianCluster1DiscoveryToken() {
-        return viridianCluster1DiscoveryToken;
+    public String getHzCloudCluster1DiscoveryToken() {
+        return hzCloudCluster1DiscoveryToken;
     }
-    public void setViridianCluster1DiscoveryToken(String viridianCluster1DiscoveryToken) {
-        this.viridianCluster1DiscoveryToken = viridianCluster1DiscoveryToken;
+    public void setHzCloudCluster1DiscoveryToken(String hzCloudCluster1DiscoveryToken) {
+        this.hzCloudCluster1DiscoveryToken = hzCloudCluster1DiscoveryToken;
     }
-    public String getViridianCluster1Id() {
-        return viridianCluster1Id;
+    public String getHzCloudCluster1Name() {
+        return hzCloudCluster1Name;
     }
-    public void setViridianCluster1Id(String viridianCluster1Id) {
-        this.viridianCluster1Id = viridianCluster1Id;
+    public void setHzCloudCluster1Name(String hzCloudCluster1Name) {
+        this.hzCloudCluster1Name = hzCloudCluster1Name;
     }
-    public String getViridianCluster1KeyPassword() {
-        return viridianCluster1KeyPassword;
+    public String getHzCloudCluster1KeyPassword() {
+        return hzCloudCluster1KeyPassword;
     }
-    public void setViridianCluster1KeyPassword(String viridianCluster1KeyPassword) {
-        this.viridianCluster1KeyPassword = viridianCluster1KeyPassword;
+    public void setHzCloudCluster1KeyPassword(String hzCloudCluster1KeyPassword) {
+        this.hzCloudCluster1KeyPassword = hzCloudCluster1KeyPassword;
+    }
+    public void setRemoteSite(Site remoteSite) {
+        this.remoteSite = remoteSite;
     }
 
 }

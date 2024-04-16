@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 library/golang:1.21.1-bullseye
+FROM --platform=linux/amd64 library/golang:1.22.0-bullseye
 
 ARG CONTROL_FILE
 
@@ -9,7 +9,7 @@ RUN curl https://hazelcast.com/clc/install.sh | bash
   
 COPY target/classes/client.sh /tmp/
 COPY target/classes/hazelcast-client-clc.yaml /tmp/
-COPY target/classes/hazelcast-client-clc-viridian.yaml /tmp/
+COPY target/classes/hazelcast-client-clc-hz-cloud.yaml /tmp/
 
 RUN chmod 755 /tmp/*.sh
 
@@ -29,6 +29,6 @@ CMD ["bash", "-c", "set -euo pipefail \
       && echo date \
       && date \
       && echo @@@@@@@@@@ \
-      && echo /tmp/client.sh /tmp /tmp/hazelcast-client-clc.yaml /tmp/hazelcast-client-clc-viridian.yaml \
-      && /tmp/client.sh /tmp /tmp/hazelcast-client-clc.yaml /tmp/hazelcast-client-clc-viridian.yaml \
+      && echo /tmp/client.sh /tmp /tmp/hazelcast-client-clc.yaml /tmp/hazelcast-client-clc-hz-cloud.yaml \
+      && /tmp/client.sh /tmp /tmp/hazelcast-client-clc.yaml /tmp/hazelcast-client-clc-hz-cloud.yaml \
      "]

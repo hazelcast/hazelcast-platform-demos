@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="head">
+ <link rel="shortcut icon" th:href="@{/images/favicon.ico}">
+ <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}" />
+ <link rel="stylesheet" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer/dist/css/themes.css" />
+ <title th:text="'@my.webapp.title@'">?</title>
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body th:fragment="header">
+	<div class="headerfooter">
+		<div>
+			<center><img th:src="@{/images/hazelcast-logo-reverse.png}"
+			             alt="Hazelcast logo" width="360" height="45"></img></center>
+			<h5>Build @maven.build.timestamp@</h5>
+		</div>
+		<hr class="headerfooterline"/>
+	</div>
+</body>
+
+<body th:fragment="footer">
+	<div class="headerfooter">
+		<hr class="headerfooterline"/>
+		<p th:text="'&copy; Hazelcast ' + ${#dates.year(#dates.createNow())}" />
+	</div>
+</body>
+
+</html>

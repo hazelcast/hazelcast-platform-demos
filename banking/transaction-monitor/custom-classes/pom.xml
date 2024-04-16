@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
 		<artifactId>transaction-monitor-root</artifactId>
-		<version>5.3</version>
+		<version>5.4</version>
 	</parent>
 
 	<artifactId>transaction-monitor-custom-classes</artifactId>
@@ -19,10 +19,10 @@
 	</properties>
 
 	<dependencies>
-		<!-- Generic utils for Viridian clusterside -->
+		<!-- Generic utils for Hazelcast Cloud clusterside -->
 		<dependency>
 			<groupId>com.hazelcast.platform.demos.utils</groupId>
-			<artifactId>utils-viridian-clusterside</artifactId>
+			<artifactId>utils-hz-cloud-clusterside</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		

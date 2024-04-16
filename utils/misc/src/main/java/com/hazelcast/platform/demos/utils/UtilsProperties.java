@@ -40,11 +40,12 @@ public class UtilsProperties {
      * </pre></p>
      *
      * @param fileName
+     * @param classLoader
      * @return Properties, not null but may be empty.
      */
-    public static Properties loadClasspathProperties(String fileName) {
+    public static Properties loadClasspathProperties(String fileName, ClassLoader classLoader) {
+        LOGGER.trace("loadClasspathProperties('{}', classLoader='{}')", fileName, classLoader.getName());
         Properties properties = new Properties();
-        ClassLoader classLoader = UtilsProperties.class.getClassLoader();
         InputStream inputStream = classLoader.getResourceAsStream(fileName);
         try {
             properties.load(inputStream);
@@ -72,4 +73,14 @@ public class UtilsProperties {
         return properties;
     }
 
+    /**
+     * <p>Convenience method to use current class
+     * </p>
+     *
+     * @param fileName
+     * @return
+     */
+    public static Properties loadClasspathProperties(String fileName) {
+        return loadClasspathProperties(fileName, UtilsProperties.class.getClassLoader());
+    }
 }

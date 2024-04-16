@@ -25,18 +25,17 @@ const clusterName = '@my.cluster1.name@';
 const instanceName = '@project.artifactId@';
 const serviceDns = '@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local';
 
-const viridianId = "@my.viridian.cluster1.id@";
-const viridianDiscoveryToken = "@my.viridian.cluster1.discovery.token@";
-const viridianKeyPassword = "@my.viridian.cluster1.key.password@";
+const hzCloudName = "@my.hz.cloud.cluster1.name@";
+const hzCloudDiscoveryToken = "@my.hz.cloud.cluster1.discovery.token@";
+const hzCloudKeyPassword = "@my.hz.cloud.cluster1.key.password@";
 
 const controlFile = "/tmp/control.file";
-const cloudServerUrl = "https://api.viridian.hazelcast.com";
 const genericRecordMapPrefix = "__map-store."
 const genericRecordMap = "mysql_slf4j"
-const useViridianKey = "use.viridian"
-const viridianCaFile = "/tmp/ca.pem"
-const viridianCertFile = "/tmp/cert.pem"
-const viridianKeyFile = "/tmp/key.pem"
+const useHzCloudKey = "use.hz.cloud"
+const hzCloudCaFile = "/tmp/ca.pem"
+const hzCloudCertFile = "/tmp/cert.pem"
+const hzCloudKeyFile = "/tmp/key.pem"
 
 const kubernetes = process.env.MY_KUBERNETES_ENABLED
 const host_ip = process.env.HOST_IP
@@ -68,27 +67,26 @@ const clientConfig = {
         'hazelcast.client.statistics.enabled': true,
     }
 };
-const clientConfigViridian = {
-	clusterName: viridianId,
+const clientConfigHzCloud = {
+	clusterName: hzCloudName,
 	instanceName: instanceName,
 	clientLabels: [ user, launchTime ],
     network: {
         hazelcastCloud: {
-            discoveryToken: viridianDiscoveryToken
+            discoveryToken: hzCloudDiscoveryToken
         },
         ssl: {
             enabled: true,
             sslOptions: {
-                ca: [fs.readFileSync(path.resolve(viridianCaFile))],
-                cert: [fs.readFileSync(path.resolve(viridianCertFile))],
-                key: [fs.readFileSync(path.resolve(viridianKeyFile))],
-                passphrase: viridianKeyPassword,
+                ca: [fs.readFileSync(path.resolve(hzCloudCaFile))],
+                cert: [fs.readFileSync(path.resolve(hzCloudCertFile))],
+                key: [fs.readFileSync(path.resolve(hzCloudKeyFile))],
+                passphrase: hzCloudKeyPassword,
                 checkServerIdentity: () => null
             }
         }
     },
     properties: {
-        'hazelcast.client.cloud.url': cloudServerUrl,
         'hazelcast.client.statistics.enabled': true,
     }
 };
@@ -188,23 +186,23 @@ async function getGenericRecord(hazelcastClient) {
     try {
         console.log('--------------------------------------')
 		console.log('MY_KUBERNETES_ENABLED ', kubernetes)
-        var viridian = false;
+        var hzCloud = false;
         var readerI = readline.createInterface({
             input: fs.createReadStream(controlFile)
         });
-        const matchStr = useViridianKey + "=true";
-        const checkViridian = async () =>{
+        const matchStr = useHzCloudKey + "=true";
+        const checkHzCloud = async () =>{
             for await (const line of readerI) {
                 if (line.toLowerCase() == matchStr) {
-                    viridian = true;
+                    hzCloud = true;
                 }
             }
         }
-        await checkViridian()
-        console.log('VIRIDIAN \'', viridian, '\'')
+        await checkHzCloud()
+        console.log('HZ CLOUD \'', hzCloud, '\'')
         var hazelcastClient;
-        if (viridian) {
-            hazelcastClient = await Client.newHazelcastClient(clientConfigViridian);
+        if (hzCloud) {
+            hazelcastClient = await Client.newHazelcastClient(clientConfigHzCloud);
         } else {
             hazelcastClient = await Client.newHazelcastClient(clientConfig);
         }

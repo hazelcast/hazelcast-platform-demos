@@ -1,0 +1,10 @@
+cluster:
+  name: "@my.hz.cloud.cluster1.name@"
+  discovery-token: "@my.hz.cloud.cluster1.discovery.token@"
+ssl:
+  ca-path: "/tmp/ca.pem"
+  cert-path: "/tmp/cert.pem"
+  key-path: "/tmp/key.pem"
+  key-password: "@my.hz.cloud.cluster1.key.password@"
+log:
+ level: info

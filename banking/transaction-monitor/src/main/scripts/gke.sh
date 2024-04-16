@@ -1,20 +1,32 @@
 #!/bin/bash
 
+START=`date +"%Y-%m-%d-%H-%M-%S"`
+
 DIRNAME=`dirname $0`
 cd $DIRNAME
 TOP_LEVEL_DIR=`cd ../../../../.. ; pwd`
 TOP_LEVEL_POM=$TOP_LEVEL_DIR/pom.xml
 POM_FLAVOR=`grep '<my.transaction-monitor.flavor>' ../../../../../pom.xml | tail -1 | cut -d'>' -f2 | cut -d'<' -f1`
-POM_USE_VIRIDIAN=`grep '<use.viridian>' $TOP_LEVEL_POM | tail -1 | cut -d'>' -f2 | cut -d'<' -f1 | tr '[:upper:]' '[:lower:]'`
+POM_USE_HZ_CLOUD=`grep '<use.hz.cloud>' $TOP_LEVEL_POM | tail -1 | cut -d'>' -f2 | cut -d'<' -f1 | tr '[:upper:]' '[:lower:]'`
+
+# For Kubernetes cluster creation
+K_MACHINE_TYPE="c2-standard-4"
+K_NETWORK="neil-europe-west1"
+K_NETWORK_SUBNET="neil-europe-west1-subnet"
+K_NUM_NODES=15
+K_PROJECT=hazelcast-33
+K_ZONE=europe-west1-d
 
 ARG1=`echo $1 | awk '{print tolower($0)}'`
 ARG2=`echo $2 | awk '{print tolower($0)}'`
+ARG3=`echo $3 | awk '{print tolower($0)}'`
 
 # Use top level pom.xml values if no args
 if [ "${ARG1}" == "" ]
 then
  FLAVOR=$POM_FLAVOR
- USE_VIRIDIAN=$POM_USE_VIRIDIAN
+ USE_HZ_CLOUD=$POM_USE_HZ_CLOUD
+ CREATE_KUBERNETES_CLUSTER=true
 else
  if [ "${ARG1}" == "ecommerce" ]
  then
@@ -32,28 +44,43 @@ else
  # False if absent
  if [ "${ARG2}" == "true" ]
  then
-  USE_VIRIDIAN=true
+  USE_HZ_CLOUD=true
  else
-  USE_VIRIDIAN=false
+  USE_HZ_CLOUD=false
+ fi
+
+ # True if absent
+ if [ "${ARG3}" == "false" ]
+ then
+  CREATE_KUBERNETES_CLUSTER=false
+ else
+  CREATE_KUBERNETES_CLUSTER=true
  fi
 fi
 
 if [ "${FLAVOR}" == "" ]
 then
  echo $0: usage: `basename $0`
- echo $0: usage: `basename $0` '<flavor>' '<viridian>'
+ echo $0: usage: `basename $0` '<flavor>' '<hz.cloud>' '<create-cluster>'
  echo $0: eg: `basename $0`
  echo $0: ' ' to use top-level pom.xml values
- echo $0: eg: `basename $0` ecommerce true
+ echo $0: eg: `basename $0` ecommerce true false
  echo $0: ' ' to use specific values
  exit 1
 fi
 
-if [ "${FLAVOR}" != "${POM_FLAVOR}" ] || [ "${USE_VIRIDIAN}" != "${POM_USE_VIRIDIAN}" ]
+echo ============================================================
+echo Attempts to do all steps for Google Cloud
+echo ============================================================
+echo Flavor: $FLAVOR
+echo Use-Hz-Cloud: $USE_HZ_CLOUD
+echo Create-Kubernetes-Cluster: $CREATE_KUBERNETES_CLUSTER
+
+if [ "${FLAVOR}" != "${POM_FLAVOR}" ] || [ "${USE_HZ_CLOUD}" != "${POM_USE_HZ_CLOUD}" ]
 then
  echo '************************************************************'
  echo '************************************************************'
- echo $TOP_LEVEL_POM is configured with FLAVOR=$POM_FLAVOR and USE_VIRIDIAN=$POM_USE_VIRIDIAN
+ echo $TOP_LEVEL_POM is configured with FLAVOR=$POM_FLAVOR and USE_HZ_CLOUD=$POM_USE_HZ_CLOUD
  echo '************************************************************'
  echo '************************************************************'
  echo -n Proceeding in 10 seconds
@@ -67,12 +94,8 @@ then
  echo ""
 fi
 
-echo ============================================================
-echo Attempts to do all steps for Google Cloud
-echo ============================================================
-echo `date +"%H:%M:%S"`
-echo Flavor: $FLAVOR
-echo Use-Viridian: $USE_VIRIDIAN
+echo ----
+echo $START | cut -d- -f4- | tr '-' ':'
 echo ----
 
 PROJECT=transaction-monitor
@@ -98,7 +121,7 @@ wait_for_pod() {
    REQUIRED_STATE=Completed
    ;;
   5)
-   WAIT_ON=grid1-hazelcast-2
+   WAIT_ON=live-hazelcast-2
    REQUIRED_STATE=Running
    ;;
   6)
@@ -189,40 +212,135 @@ do_cmd() {
  fi
 }
 
+# Waits for Kubernetes cluster to be running
+wait_for_cluster() {
+ CLUSTER=$1
+ REQUIRED_STATE=RUNNING
+ echo Waiting for \'$CLUSTER\' to reach \"$REQUIRED_STATE\" state.
+ COUNT=0
+ READY="false"
+ while [ $COUNT -lt $MAX_COUNT ] && [ "$READY" == "false" ]
+ do
+  COUNT=$(($COUNT + 1))
+  STATUS=`gcloud container clusters list | grep $CLUSTER | awk '{print $8}'`
+  if [ "$STATUS" != "" ]
+  then
+   if [ "$STATUS" == "$REQUIRED_STATE" ]
+   then
+    echo `date +"%H:%M:%S"`: Cluster \'$CLUSTER\' in expected state
+    READY=true
+   else
+    echo `date +"%H:%M:%S"`: Cluster \'$CLUSTERD\' in state \'$STATUS\', waiting
+    sleep $SLEEPTIME
+   fi
+  else
+   echo `date +"%H:%M:%S"`: Cluster \'$CLUSTER\' not yet created
+   sleep $SLEEPTIME
+  fi
+ done
+ if [ "$READY" == "false" ]
+ then
+  echo `date +"%H:%M:%S"`: Did not reach required state in $COUNT loops of $SLEEPTIME seconds
+  exit 0
+ fi
+}
+
+# Check connected to Gcloud
+CHECK=`gcloud container clusters list 2>&1`
+if [ $? -ne 0 ]
+then
+ echo Problem connecting to GCloud: $CHECK
+ exit 0
+fi
+
+# Create Kubernetes cluster
+K_CLUSTER_NAME=${USER}-${FLAVOR}-${START}
+LEN_K_CLUSTER_NAME=`echo $K_CLUSTER_NAME | wc -c`
+MAX_LEN=40
+if [ $LEN_K_CLUSTER_NAME -gt $MAX_LEN ]
+then
+ echo Truncating cluster name: $K_CLUSTER_NAME from $LEN_K_CLUSTER_NAME to $MAX_LEN
+ K_CLUSTER_NAME=`echo $K_CLUSTER_NAME | cut -c-$MAX_LEN`
+ echo Truncated cluster name: $K_CLUSTER_NAME
+fi
+if [ "$CREATE_KUBERNETES_CLUSTER" == true ]
+then
+ echo ================================================================================
+ echo Attempting to create Kubernetes cluster : "$K_CLUSTER_NAME" 
+ echo ================================================================================
+
+ CREATE_CMD="gcloud container clusters create $K_CLUSTER_NAME \
+  --enable-ip-alias \
+  --machine-type $K_MACHINE_TYPE \
+  --network projects/$K_PROJECT/global/networks/$K_NETWORK \
+  --subnetwork projects/$K_PROJECT/regions/europe-west1/subnetworks/$K_NETWORK_SUBNET \
+  --num-nodes $K_NUM_NODES \
+  --project $K_PROJECT \
+  --zone $K_ZONE"
+ echo `date +"%H:%M:%S"` - Creating, may take a while, usually about 6-7 minutes.
+ echo $CREATE_CMD
+ CREATE=`$CREATE_CMD 2>&1`
+ RC=$?
+ echo `date +"%H:%M:%S"` - RC=$RC
+ if [ $RC -ne 0 ]
+ then
+  echo Problem create Kubernetes cluster in GCloud: $CREATE
+  exit 0
+ fi
+
+ wait_for_cluster $K_CLUSTER_NAME
+ RC=$?
+ echo RC=$RC
+ if [ $RC -ne 0 ]
+ then 
+  echo RC=$RC, exiting
+  exit 0
+ fi
+else
+ RC=0
+fi
+
 # Apply the files in order
-if [ "$USE_VIRIDIAN" == "true" ]
+if [ "$USE_HZ_CLOUD" == "true" ]
 then
  FILES=`ls kubernetes* | grep -v kubernetes-5`
 else
  FILES=`ls kubernetes* | grep -v kubernetes-5-optional-hazelcast.yaml`
 fi
 
-for INPUT_FILE in $FILES
-do
- echo START: $INPUT_FILE
- echo ====
- OUTPUT_FILE=$TMPFILE.$INPUT_FILE
- IS_YAML=`echo $INPUT_FILE | grep -c yaml`
- if [ $IS_YAML -eq 1 ]
- then
-  # Assumed naming standard to find image
-  sed "s#image: \"hazelcast-platform-demos#image: \"europe-west1-docker.pkg.dev/hazelcast-33/${USER}#" < $INPUT_FILE | \
-  sed "s#FLAVOR#${FLAVOR}#g" | \
-  sed 's#imagePullPolicy: Never#imagePullPolicy: Always#' > ${OUTPUT_FILE}
-  CMD="kubectl create -f $OUTPUT_FILE"
-  echo $CMD
-  echo ----
-  $CMD
-  echo ----
-  wait_for_pod $INPUT_FILE
- else
-  do_cmd $INPUT_FILE $FLAVOR
- fi
- rm $OUTPUT_FILE > /dev/null 2>&1
- echo ====
- echo END: $INPUT_FILE
-done
+if [ $RC == 0 ]
+then
+ for INPUT_FILE in $FILES
+ do
+  echo START: $INPUT_FILE
+  echo ====
+  OUTPUT_FILE=$TMPFILE.$INPUT_FILE
+  IS_YAML=`echo $INPUT_FILE | grep -c yaml`
+  if [ $IS_YAML -eq 1 ]
+  then
+   # Assumed naming standard to find image
+   sed "s#image: \"hazelcast-platform-demos#image: \"europe-west1-docker.pkg.dev/hazelcast-33/${USER}#" < $INPUT_FILE | \
+   sed "s#FLAVOR#${FLAVOR}#g" | \
+   sed 's#imagePullPolicy: Never#imagePullPolicy: Always#' > ${OUTPUT_FILE}
+   CMD="kubectl create -f $OUTPUT_FILE"
+   echo $CMD
+   echo ----
+   $CMD
+   echo ----
+   wait_for_pod $INPUT_FILE
+  else
+   do_cmd $INPUT_FILE $FLAVOR
+  fi
+  rm $OUTPUT_FILE > /dev/null 2>&1
+  echo ====
+  echo END: $INPUT_FILE
+ done
+fi
 
 echo `date +"%H:%M:%S"` - Done
 
 /bin/rm $TMPFILE.* > /dev/null 2>&1
+RC=0
+echo RC=$RC
+exit $RC
+

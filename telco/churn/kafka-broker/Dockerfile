@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 bitnami/kafka:3.4.0
+FROM --platform=linux/amd64 bitnami/kafka:3.7.0
 
 # OpenJDK 11.0.6
 RUN java --version

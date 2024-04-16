@@ -6,23 +6,23 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.banking.cva</groupId>
 		<artifactId>cva-root</artifactId>
-		<version>5.3</version>
+		<version>5.4</version>
 	</parent>
 
 	<artifactId>cva-custom-classes</artifactId>
 
 	<name>Hazelcast Platform - CVA - Custom Classes</name>
-	<description>Credit Value Adjustment - Custom Classes - to upload to Viridian</description>
+	<description>Credit Value Adjustment - Custom Classes - to upload to Hazelcast Cloud</description>
 
 	<properties>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 
 	<dependencies>
-		<!-- Generic utils for Viridian clusterside -->
+		<!-- Generic utils for Hazelcast Cloud clusterside -->
 		<dependency>
 			<groupId>com.hazelcast.platform.demos.utils</groupId>
-			<artifactId>utils-viridian-clusterside</artifactId>
+			<artifactId>utils-hz-cloud-clusterside</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

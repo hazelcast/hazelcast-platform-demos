@@ -1,0 +1,163 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
+		<artifactId>transaction-monitor-root</artifactId>
+		<version>5.4</version>
+	</parent>
+
+	<artifactId>transaction-monitor-finos</artifactId>
+
+	<name>Hazelcast Platform - Transaction Monitor - Finos</name>
+	<description>Transaction Monitor - Finos</description>
+
+	<properties>
+		<my.docker.control.file>control.file</my.docker.control.file>
+		<my.docker.image.name>finos</my.docker.image.name>
+		<my.docker.jar.file>
+			${project.artifactId}-${project.version}.jar</my.docker.jar.file>
+		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
+		<my.webapp.title>${project.artifactId}</my.webapp.title>
+
+		<!-- See comment on maven-resources-plugin -->
+		<frontend.app.dir>${project.basedir}/src/main/app</frontend.app.dir>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>transaction-monitor-abstract-hazelcast-client</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.hazelcast</groupId>
+					<artifactId>hazelcast</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.hazelcast.jet</groupId>
+					<artifactId>hazelcast-jet-mongodb</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.hazelcast.jet.contrib</groupId>
+					<artifactId>pulsar</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- Need this for SSL for Hazelcast Cloud -->
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-enterprise</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+			<version>${spring-boot.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
+			<version>${spring-boot.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<plugins>
+			<!-- Copy keystore/truststore if found -->
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<configuration>
+					<target>
+						<ant antfile="../../../ant/build.xml"
+							target="conditionalcopy" />
+					</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<configuration>
+					<workingDirectory>${frontend.app.dir}</workingDirectory>
+					<installDirectory>${project.build.directory}</installDirectory>
+					<environmentVariables>
+						<SCARF_ANALYTICS>false</SCARF_ANALYTICS>
+					</environmentVariables>
+				</configuration>
+				<executions>
+					<execution>
+						<id>install-node-and-npm</id>
+						<goals>
+							<goal>install-node-and-npm</goal>
+						</goals>
+						<configuration>
+							<nodeVersion>${node.version}</nodeVersion>
+							<npmVersion>${npm.version}</npmVersion>
+						</configuration>
+					</execution>
+					<execution>
+						<id>npm-install</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>install</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>webpack-build</id>
+						<goals>
+							<goal>webpack</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+                        <plugin>
+                                <artifactId>maven-resources-plugin</artifactId>
+                                <executions>
+                                        <execution>
+                                                <goals>
+                                                        <goal>copy-resources</goal>
+                                                </goals>
+                                                <phase>prepare-package</phase>
+                                                <configuration>
+                                                        <outputDirectory>${project.build.outputDirectory}/static</outputDirectory>
+                                                        <resources>
+                                                                <resource>
+                                                                        <directory>${frontend.app.dir}</directory>
+                                                                        <filtering>false</filtering>
+                                                                        <includes>
+                                                                                <include>*.js</include>
+                                                                                <include>*.wasm</include>
+                                                                        </includes>
+                                                                </resource>
+                                                                <resource>
+                                                                        <directory>${frontend.app.dir}/static</directory>
+                                                                        <filtering>true</filtering>
+                                                                </resource>
+                                                        </resources>
+                                                </configuration>
+                                        </execution>
+                                </executions>
+                        </plugin>
+                        			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>
