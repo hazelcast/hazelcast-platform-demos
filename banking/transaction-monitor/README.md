@@ -633,7 +633,7 @@ the member. Once successful, this should list the running jobs in the cluster,
 Then do this to launch the additional job
 
 ```
-hazelcast/bin/hz-cli -t grid1@123.456.789.0 submit target/trade-monitor-remote-job-sub-5.4.0.jar
+hazelcast/bin/hz-cli -t grid1@123.456.789.0 submit target/trade-monitor-remote-job-sub-5.5.0.jar
 ```
 
 This will send the job from your machine to wherever in the world the cluster

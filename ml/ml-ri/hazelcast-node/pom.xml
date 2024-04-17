@@ -6,7 +6,7 @@
         <parent>
                 <groupId>com.hazelcast.platform.demos.ml.ri</groupId>
                 <artifactId>ml-ri-root</artifactId>
-                <version>5.4</version>
+                <version>5.5</version>
         </parent>
 
         <artifactId>ml-ri-hazelcast-node</artifactId>
