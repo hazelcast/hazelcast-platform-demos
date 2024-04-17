@@ -6,8 +6,7 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
+# # http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,8 +21,8 @@ cd `dirname $0`
 set -m
 
 CLC_DIR=$1
-CONFIG_NON_VIRIDIAN=$2
-CONFIG_VIRIDIAN=$3
+CONFIG_NON_HZ_CLOUD=$2
+CONFIG_HZ_CLOUD=$3
 
 export CLC_CLIENT_NAME='@project.artifactId@'
 export CLC_CLIENT_LABELS=`basename $HOME`","`date +"%Y-%m-%dT%H:%M:%S"`
@@ -33,13 +32,13 @@ HOST_IP="${HOST_IP}"
 KUBERNETES="${MY_KUBERNETES_ENABLED}"
 
 CONTROL_FILE="/tmp/control.file"
-USE_VIRIDIAN_KEY="use.viridian"
-VIRIDIAN=`grep "${USE_VIRIDIAN_KEY}" $CONTROL_FILE | tail -1 | cut -d= -f2`
-if [ `echo "$VIRIDIAN" | tr '[:upper:]' '[:lower:]'` == "true" ]
+USE_HZ_CLOUD_KEY="use.hz.cloud"
+HZ_CLOUD=`grep "${USE_HZ_CLOUD_KEY}" $CONTROL_FILE | tail -1 | cut -d= -f2`
+if [ `echo "$HZ_CLOUD" | tr '[:upper:]' '[:lower:]'` == "true" ]
 then 
- VIRIDIAN=true
+ HZ_CLOUD=true
 else
- VIRIDIAN=false
+ HZ_CLOUD=false
 fi
 
 ONE_MINUTE=60
@@ -47,14 +46,14 @@ ONE_DAY=$(($ONE_MINUTE * 60 * 24))
 
 echo "--------------------------------------"
 echo MY_KUBERNETES_ENABLED \'${KUBERNETES}\'
-echo VIRIDIAN \'${VIRIDIAN}\'
+echo HZ_CLOUD \'${HZ_CLOUD}\'
 echo "--------------------------------------"
 
-if [ "$VIRIDIAN" == "true" ]
+if [ "$HZ_CLOUD" == "true" ]
 then 
- CONFIG=$CONFIG_VIRIDIAN
+ CONFIG=$CONFIG_HZ_CLOUD
 else 
- CONFIG=$CONFIG_NON_VIRIDIAN
+ CONFIG=$CONFIG_NON_HZ_CLOUD
 fi
 
 if [ `echo "$KUBERNETES" | tr A-Z a-z` == "false" ]

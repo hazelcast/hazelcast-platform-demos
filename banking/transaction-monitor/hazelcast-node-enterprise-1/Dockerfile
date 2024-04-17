@@ -3,9 +3,9 @@ FROM --platform=linux/amd64 library/python:3.8-buster
 # Add Java
 RUN apt update
 RUN cd /tmp ; \
-    wget -q https://download.java.net/java/GA/jdk17/0d483333a00540d886896bac774ff48b/35/GPL/openjdk-17_linux-x64_bin.tar.gz ; \
-    tar xf openjdk-17_linux-x64_bin.tar.gz ;
-RUN update-alternatives --install /usr/bin/java java /tmp/jdk-17/bin/java 1
+    wget -q https://download.java.net/java/GA/jdk21/fd2272bbf8e04c3dbaee13770090416c/35/GPL/openjdk-21_linux-x64_bin.tar.gz ; \
+    tar xf openjdk-21_linux-x64_bin.tar.gz ;
+RUN update-alternatives --install /usr/bin/java java /tmp/jdk-21/bin/java 1
 
 # Download requirements into image makes start up faster when growing cluster
 COPY target/classes/requirements.txt /
@@ -39,10 +39,13 @@ CMD ["bash", "-c", "set -euo pipefail \
       && echo java $JAVA_ARGS $JAVA_OPTS \
  -Dmy.autostart.enabled=$MY_AUTOSTART_ENABLED \
  -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS \
+ -Dmy.cassandra.address=$MY_CASSANDRA_ADDRESS \
  -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+ -Dmy.maria.address=$MY_MARIA_ADDRESS \
+ -Dmy.mongo.address=$MY_MONGO_ADDRESS \
  -Dmy.mysql.address=$MY_MYSQL_ADDRESS \
  -Dmy.native.megabytes=$MY_NATIVE_MEGABYTES \
- -Dmy.pulsar.list=$MY_PULSAR_LIST \
+ -Dmy.pulsar.address=$MY_PULSAR_ADDRESS \
  -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
  -Dhazelcast.enterprise.license.key=${MC_LICENSE} \
  -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
@@ -50,10 +53,13 @@ CMD ["bash", "-c", "set -euo pipefail \
       && java $JAVA_ARGS $JAVA_OPTS \
  -Dmy.autostart.enabled=$MY_AUTOSTART_ENABLED \
  -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS \
+ -Dmy.cassandra.address=$MY_CASSANDRA_ADDRESS \
  -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+ -Dmy.maria.address=$MY_MARIA_ADDRESS \
+ -Dmy.mongo.address=$MY_MONGO_ADDRESS \
  -Dmy.mysql.address=$MY_MYSQL_ADDRESS \
  -Dmy.native.megabytes=$MY_NATIVE_MEGABYTES \
- -Dmy.pulsar.list=$MY_PULSAR_LIST \
+ -Dmy.pulsar.address=$MY_PULSAR_ADDRESS \
  -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
  -Dhazelcast.enterprise.license.key=${MC_LICENSE} \
  -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \

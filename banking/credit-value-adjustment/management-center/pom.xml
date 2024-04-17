@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.banking.cva</groupId>
 		<artifactId>cva-root</artifactId>
-		<version>5.3</version>
+		<version>5.4</version>
 	</parent>
 
 	<artifactId>cva-management-center</artifactId>
@@ -15,7 +15,7 @@
 	<description>Credit Value Adjustment - Hazelcast Management Center</description>
 
 	<properties>
-                <dockerfile.skip>${skip.when.viridian}</dockerfile.skip>
+                <dockerfile.skip>${skip.when.hz.cloud}</dockerfile.skip>
 		<my.docker.image.name>management-center</my.docker.image.name>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 

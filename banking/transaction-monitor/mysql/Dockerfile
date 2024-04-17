@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 mysql:8.0.32
+FROM --platform=linux/amd64 mysql:8.3.0
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MY_OTHERUSER
@@ -13,6 +13,5 @@ ENV MYSQL_ROOT_PASSWORD=$MY_OTHERPASSWORD
 
 # Setup
 COPY target/classes/init.sql     /docker-entrypoint-initdb.d 
-ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["mysqld", "--log-bin=ON", "--binlog_format=ROW", "--server-id=1"]

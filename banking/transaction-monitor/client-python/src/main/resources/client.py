@@ -27,17 +27,17 @@ cluster_name = "@my.cluster1.name@"
 instance_name = "@project.artifactId@" 
 service_dns = "@my.docker.image.prefix@-@my.cluster1.name@-hazelcast.default.svc.cluster.local"
 
-viridianId = "@my.viridian.cluster1.id@"
-viridianDiscoveryToken = "@my.viridian.cluster1.discovery.token@"
-viridianKeyPassword = "@my.viridian.cluster1.key.password@"
+hzCloudName = "@my.hz.cloud.cluster1.name@"
+hzCloudDiscoveryToken = "@my.hz.cloud.cluster1.discovery.token@"
+hzCloudKeyPassword = "@my.hz.cloud.cluster1.key.password@"
 
 controlFile = "/tmp/control.file"
 generic_record_map_prefix = "__map-store."
 generic_record_map = "mysql_slf4j"
-useViridianKey = "use.viridian"
-viridianCaFile = "/tmp/ca.pem"
-viridianCertFile = "/tmp/cert.pem"
-viridianKeyFile = "/tmp/key.pem"
+useHzCloudKey = "use.hz.cloud"
+hzCloudCaFile = "/tmp/ca.pem"
+hzCloudCertFile = "/tmp/cert.pem"
+hzCloudKeyFile = "/tmp/key.pem"
 
 logging.basicConfig(level=logging.INFO)
 
@@ -50,15 +50,15 @@ if kubernetes.lower() == 'false':
     member = host_ip
 current_date = datetime.now()
 
-def isViridian():
+def isHzCloud():
     file = open(controlFile)
     lines = file.readlines()
     for line in lines:
-        if line.lower().startswith(useViridianKey + "=true"):
+        if line.lower().startswith(useHzCloudKey + "=true"):
             return True
     return False
 
-viridian = isViridian()
+hzCloud = isHzCloud()
 
 def run_sql_query(client: hazelcast.HazelcastClient, query: str):
     print("--------------------------------------", flush=True)
@@ -88,6 +88,7 @@ def run_sql_query(client: hazelcast.HazelcastClient, query: str):
                             print("Unhandled Type for Column '" + str(sqltype) + "'", end = '')
                 i = i + 1
             print("", flush=True)
+            count = count + 1
         print("[" + str(count) + " rows]", flush=True)
     except Exception as e:
         print(str(e), flush=True)
@@ -117,24 +118,22 @@ def get_generic_record(client: hazelcast.HazelcastClient):
 
 print("--------------------------------------", flush=True)
 print("MY_KUBERNETES_ENABLED '", kubernetes, "'", flush=True)
-print("VIRIDIAN '", viridian, "'", flush=True)
+print("HZ_CLOUD '", hzCloud, "'", flush=True)
 current_date = datetime.now()
 launch_time = current_date.strftime('%Y-%m-%dT%H:%M:%S')
-if viridian:
-    #FIXME Should become default
-    print("CLOUD_URL_BASE TO REMOVE")
-    HazelcastCloudDiscovery._CLOUD_URL_BASE = "api.viridian.hazelcast.com"
+if hzCloud:
     client = hazelcast.HazelcastClient(
         client_name=instance_name,
-        cluster_name=viridianId,
-        cloud_discovery_token=viridianDiscoveryToken,
+        cluster_name=hzCloudName,
+        cloud_discovery_token=hzCloudDiscoveryToken,
         labels=[user, launch_time],
+        default_int_type=hazelcast.config.IntType.LONG,
         statistics_enabled=True,
         ssl_enabled=True,
-        ssl_cafile=os.path.abspath(viridianCaFile),
-        ssl_certfile=os.path.abspath(viridianCertFile),
-        ssl_keyfile=os.path.abspath(viridianKeyFile),
-        ssl_password=viridianKeyPassword,
+        ssl_cafile=os.path.abspath(hzCloudCaFile),
+        ssl_certfile=os.path.abspath(hzCloudCertFile),
+        ssl_keyfile=os.path.abspath(hzCloudKeyFile),
+        ssl_password=hzCloudKeyPassword,
     )
 else:
     client = hazelcast.HazelcastClient(
@@ -142,6 +141,7 @@ else:
         cluster_name=cluster_name,
         cluster_members=[member],
         labels=[user, launch_time],
+        default_int_type=hazelcast.config.IntType.LONG,
         statistics_enabled=True
     )
 print("--------------------------------------", flush=True) 

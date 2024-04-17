@@ -29,7 +29,7 @@ import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
 import com.hazelcast.client.config.YamlClientConfigBuilder;
 import com.hazelcast.config.KubernetesConfig;
-import com.hazelcast.platform.demos.utils.UtilsViridian;
+import com.hazelcast.platform.demos.utils.UtilsHazelcastCloud;
 
 /**
  * <p>Common configuration for clients of the clusters. Uses
@@ -70,24 +70,24 @@ public class ApplicationConfig {
         ClientNetworkConfig clientNetworkConfig = clientConfig.getNetworkConfig();
         clientNetworkConfig.getAutoDetectionConfig().setEnabled(false);
 
-        LOGGER.info("useViridian='{}'", myProperties.isUseViridian());
+        LOGGER.info("useHzCloud='{}'", myProperties.isUseHzCloud());
         boolean dockerEnabled = Boolean.valueOf(System.getProperty("my.docker.enabled", "false"));
         boolean kubernetesEnabled = Boolean.valueOf(System.getProperty("my.kubernetes.enabled", "false"));
         boolean localhost = !dockerEnabled && !kubernetesEnabled;
 
-        if (localhost && myProperties.isUseViridian()) {
-            String message = "Localhost access not implemented for Viridian, keystore/truststore location"
+        if (localhost && myProperties.isUseHzCloud()) {
+            String message = "Localhost access not implemented for Hazelcast Cloud, keystore/truststore location"
                     + " not known, use Docker script instead";
             throw new RuntimeException(message);
         }
 
-        if (myProperties.isUseViridian()) {
-            UtilsViridian.configure(clientConfig,
-                    myProperties.getViridianCluster1Id(),
-                    myProperties.getViridianCluster1DiscoveryToken(),
-                    myProperties.getViridianCluster1KeyPassword());
+        if (myProperties.isUseHzCloud()) {
+            UtilsHazelcastCloud.configure(clientConfig,
+                    myProperties.getHzCloudCluster1Name(),
+                    myProperties.getHzCloudCluster1DiscoveryToken(),
+                    myProperties.getHzCloudCluster1KeyPassword());
 
-            LOGGER.info("Viridian configured, cluster id: "
+            LOGGER.info("Hazecast Cloud configured, cluster id: "
                     + clientConfig.getClusterName());
         } else {
             clientConfig.setClusterName(myProperties.getSite().toString());

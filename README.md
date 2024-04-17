@@ -58,12 +58,12 @@ and apply the value in your build.
         <my.slack.bot.channel.name>GOES HERE</my.slack.bot.channel.name>
         <my.slack.bot.channel.id>GOES HERE</my.slack.bot.channel.id>
 
-        <my.viridian.cluster1.id>GOES HERE</my.viridian.cluster1.id>
-        <my.viridian.cluster1.discovery.token>GOES HERE</my.viridian.cluster1.discovery.token>
-        <my.viridian.cluster1.keys.location>GOES HERE</my.viridian.cluster1.keys.location>
-        <my.viridian.cluster1.key.password>GOES HERE</my.viridian.cluster1.key.password>
-        <my.viridian.api.key>GOES HERE</my.viridian.api.key>
-        <my.viridian.api.secret>GOES HERE</my.viridian.api.secret>
+        <my.hz.cloud.cluster1.id>GOES HERE</my.hz.cloud.cluster1.id>
+        <my.hz.cloud.cluster1.discovery.token>GOES HERE</my.hz.cloud.cluster1.discovery.token>
+        <my.hz.cloud.cluster1.keys.location>GOES HERE</my.hz.cloud.cluster1.keys.location>
+        <my.hz.cloud.cluster1.key.password>GOES HERE</my.hz.cloud.cluster1.key.password>
+        <my.hz.cloud.api.key>GOES HERE</my.hz.cloud.api.key>
+        <my.hz.cloud.api.secret>GOES HERE</my.hz.cloud.api.secret>
       </properties>
     </profile>
   </profiles>
@@ -74,7 +74,7 @@ and apply the value in your build.
 If you leave it blank (e.g. `<my.something></my.something>`) then an empty string will be used instead of the default,
 which might cause problems.
 
-There are three groups of properties: licensing, Slack and Viridian. All are optional.
+There are three groups of properties: licensing, Slack and Hazelcast Cloud. All are optional.
 
 #### Licensing settings
 
@@ -97,55 +97,55 @@ Refer to the Slack documentation for registering a bot and obtaining such a toke
 `<my.slack.bot.channel.name>` and `my.slack.bot.channel.id` are the name and Id of the Slack channel that Hazelcast will
 interact with.
 
-#### Viridian settings
+#### Hazelcast Cloud settings
 
-Some of the demos can run the Hazelcast server code on Viridian or on a Hazelcast instance that you host.
+Some of the demos can run the Hazelcast server code on Hazelcast Cloud or on a Hazelcast instance that you host.
 
 ##### Activation
 
-To build for Hazelcast Viridian, set the property `use.viridian` to `true` in the top-level _pom.xml_.
+To build for Hazelcast Cloud, set the property `use.hz.cloud` to `true` in the top-level _pom.xml_.
 
 ##### Properties
 
-If you wish to use a managed Hazelcast instance, sign-up for [Hazelcast Viridian](https://viridian.hazelcast.com) and create a cluster.
+If you wish to use a managed Hazelcast instance, sign-up for [Hazelcast Cloud](https://cloud.hazelcast.com) and create a cluster.
 
 This needs 6 properties.
 
-For the first four, you can find them on the cluster list page [here](https://viridian.hazelcast.com/cluster/list), and then
+For the first four, you can find them on the cluster list page [here](https://cloud.hazelcast.com/cluster/list), and then
 select the cluster you want.
 
 From there, the easiest way is to click on the "_Connect Client_" button, then the "_Advanced Set-up_" tab.
 
-`<my.viridian.cluster1.id>` is the id of the cluster you create on Viridian. This is the name internally allocated, and will be
+`<my.hz.cloud.cluster1.id>` is the id of the cluster you create on Hazelcast Cloud. This is the name internally allocated, and will be
 something like `pr-1234`.
 
-`<my.viridian.cluster1.discovery.token>` is the counterpart to the ID, to enable the cluster to be found in the cloud.
+`<my.hz.cloud.cluster1.discovery.token>` is the counterpart to the ID, to enable the cluster to be found in the cloud.
 
 On the "_Advanced Set-up_" tab, you should download the keystore files and put them somewhere suitable.
 
-`<my.viridian.cluster1.keys.location>` specifies the location where you have placed the keystore files.
+`<my.hz.cloud.cluster1.keys.location>` specifies the location where you have placed the keystore files.
 It might have a value such as `/home/myname/keys/hzcloud_1234_keys`. The build script will copy files from this directory
 into the Docker images it builds.
 
-`<my.viridian.cluster1.key.password>` is the password
+`<my.hz.cloud.cluster1.key.password>` is the password
 shown on "_Advanced Set-up_" for the keystore and truststore. The same password is currently used for both.
 
-Finally `<my.viridian.api.key>` and `<my.viridian.api.secret>` are used for automated upload of Maven artifacts
-to Viridian. You can create API access [here](https://viridian.hazelcast.com/settings/developer).
+Finally `<my.hz.cloud.api.key>` and `<my.hz.cloud.api.secret>` are used for automated upload of Maven artifacts
+to Hazelcast Cloud. You can create API access [here](https://cloud.hazelcast.com/settings/developer).
 
-You may have several Viridian clusters (`my.viridian.cluster1.id`, `my.viridian.cluster2.id`, etc) but the same API is used for all.
+You may have several Hazelcast Cloud clusters (`my.hz.cloud.cluster1.id`, `my.hz.cloud.cluster2.id`, etc) but the same API is used for all.
 
 ### `docker-maven-plugin`
 
 If building Docker images (activated by `mvn install -Prelease`), not all properties are needed.
 
-As per above, `my.viridian.cluster1.discovery.token` can be set, omitted but not null. (docker-maven-plugin)[https://dmp.fabric8.io/]
+As per above, `my.hz.cloud.cluster1.discovery.token` can be set, omitted but not null. (docker-maven-plugin)[https://dmp.fabric8.io/]
 rejects empty string as a null value.
 
 So do not have this in your `settings.xml`:
 
 ```
-        <my.viridian.cluster1.discovery.token></my.viridian.cluster1.discovery.token>
+        <my.hz.cloud.cluster1.discovery.token></my.hz.cloud.cluster1.discovery.token>
 ```
 
 Omit the line if you have no token.

@@ -73,7 +73,7 @@ public class IMapLogger implements Logger {
 
         String hashStr = nullSafeTruncate(this.socketAddress, FORTY_EIGHT) + LocalDateTime.now();
         long hash = hashStr.hashCode();
-        /*FIXME Once MySql compound key supported by Data Link
+        /*TODO Once MySql compound key supported by Data Link
         GenericRecord key = GenericRecordBuilder.compact(MyConstants.IMAP_NAME_MYSQL_SLF4J + ".key")
                 .setString(MyConstants.MYSQL_DATASTORE_TABLE_COLUMN0, nullSafeTruncate(this.socketAddress, FORTY_EIGHT))
                 .setTimestamp(MyConstants.MYSQL_DATASTORE_TABLE_COLUMN1, LocalDateTime.now())
@@ -105,7 +105,7 @@ public class IMapLogger implements Logger {
                         nullSafeTruncate(this.name, FORTY_EIGHT))
                 .build();
 
-        //FIXME Once GenericRecord as key is supported
+        //TODO Once GenericRecord as key is supported
         this.mySqlSlf4jMap.set(hash, value);
     }
 

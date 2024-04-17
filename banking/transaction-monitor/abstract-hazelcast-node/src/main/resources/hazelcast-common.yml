@@ -9,6 +9,8 @@ hazelcast:
     hazelcast.member.naming.moby.enabled: true
     # Graceful shutdown is helpful for Kubernetes scale-down.
     hazelcast.shutdownhook.policy: GRACEFUL
+    #
+    hazelcast.sql.tstore.enabled: true
   #
   # Assuming Kubernetes, but override from Java code if we detect otherwise
   network:
@@ -44,3 +46,7 @@ hazelcast:
         - serializer: hazelcast.platform.demos.banking.transactionmonitor.PerspectiveEcommerceSerializer
         - serializer: hazelcast.platform.demos.banking.transactionmonitor.PerspectivePaymentsSerializer
         - serializer: hazelcast.platform.demos.banking.transactionmonitor.PerspectiveTradeSerializer
+
+  user-code-namespaces:
+    # Off by default, can be activated by ApplicationConfig.java
+    enabled: false

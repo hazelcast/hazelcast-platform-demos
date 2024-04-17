@@ -29,9 +29,9 @@ Shell script to create a YAML ConfigMap with external IPs of Kafka brokers.
 
 YAML to create Kafka brokers using above ConfigMap to configure.
 
-### 4. `kubernetes-4-kafdrop-topic-mysql.yaml`
+### 4. `kubernetes-4-kafdrop-topic-rdbms.yaml`
 
-YAML to create Kakfa topic with non-default partition count for optimal reading, Kafdrop for inspection, and MySql and Postgres databases.
+YAML to create Kakfa topic with non-default partition count for optimal reading, Kafdrop for inspection. Also MySql, Postgres, etc databases.
 
 ### 5
 
@@ -41,25 +41,25 @@ Do one of 5.A, 5.B or 5.C.
 
 Create Enterprise Hazelcast clusters for transaction storage, and Grafana/Prometheus for charting.
 
-Use `kubectl exec --stdin --tty transaction-monitor-ecommerce-grid1-hazelcast-0 -- /bin/bash` to connect to see tiered store
+Use `kubectl exec --stdin --tty transaction-monitor-ecommerce-live-hazelcast-0 -- /bin/bash` to connect to see tiered store
 directory "/data/transaction-monitor".
 
 ### 5.B `kubernetes-5-optional-hazelcast.yaml`
 
 Create open source Hazelcast cluster for transaction storage.
 
-### 5.C Viridian
+### 5.C Hazelcast Cloud
 
-Use an existing Viridian cluster, so don't run any YAML for step 5.
+Use an existing Hazelcast Cloud cluster, so don't run any YAML for step 5.
 
 ### 6=. `kubernetes-6-webapp.yaml`
 
 YAML to create WebApp connecting to Hazelcast Cloud.
 
-Can be run before or after `kubernetes-7-transaction-producer.yaml`. Before would be usual, but there is no dependency
+Can be run before or after `kubernetes-7-data-producers.yaml`. Before would be usual, but there is no dependency
 between these two.
 
-### 6=. `kubernetes-6-transaction-producer.yaml`
+### 6=. `kubernetes-7-data-producers.yaml`
 
 YAML to create a stream of transactions.
 

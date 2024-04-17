@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastJsonValue;
+import com.hazelcast.core.IExecutorService;
 import com.hazelcast.crdt.pncounter.PNCounter;
 import com.hazelcast.jet.datamodel.Tuple3;
 import com.hazelcast.map.IMap;
@@ -71,7 +73,8 @@ public class ApplicationRunner {
     private final TransactionMonitorFlavor transactionMonitorFlavor;
     private final String moduleName;
     private final boolean localhost;
-    private final boolean useViridian;
+    private final boolean kubernetes;
+    private final boolean useHzCloud;
     private IMap<String, Tuple3<Long, Long, Integer>> aggregateQueryResultsMap;
     private IMap<String, BicInfo> bicsMap;
     private IMap<String, ProductInfo> productsMap;
@@ -89,10 +92,11 @@ public class ApplicationRunner {
         this.hazelcastInstance = arg0;
         this.transactionMonitorFlavor = arg1;
         this.moduleName = arg2;
-        // If specifically indicated as localhost, don't do some steps
         this.localhost =
            System.getProperty("my.docker.enabled", "").equalsIgnoreCase("false");
-        this.useViridian = arg3;
+        this.kubernetes =
+           System.getProperty("my.kubernetes.enabled", "").equalsIgnoreCase("true");
+        this.useHzCloud = arg3;
     }
 
     /**
@@ -131,18 +135,20 @@ public class ApplicationRunner {
 
         System.out.println("");
         System.out.println("");
-
         if (ok) {
             PNCounter updateCounter = this.hazelcastInstance.getPNCounter(MyConstants.PN_UPDATER);
             if (updateCounter.get() == 0L) {
-                PerspectiveUpdater perspectiveUpdater
-                    = new PerspectiveUpdater(transactionMonitorFlavor, this.useViridian);
-                this.hazelcastInstance.getExecutorService("default").execute(perspectiveUpdater);
+                LOGGER.info("Launching admin runnables");
+                TransactionMonitorIdempotentInitializationAdmin.launchAdminRunners(hazelcastInstance,
+                        transactionMonitorFlavor, useHzCloud);
                 updateCounter.incrementAndGet();
-                LOGGER.info("Launch '{}'", perspectiveUpdater.getClass());
             } else {
-                LOGGER.info("Skip launch '{}', PNCounter '{}'=={}", PerspectiveUpdater.class.getSimpleName(),
+                LOGGER.info("Skip launch admin runnables, PNCounter '{}'=={}",
                         updateCounter.getName(), updateCounter.get());
+            }
+            // Additional code to demonstrate namespaces where applicable
+            if (this.namespacesApplicable()) {
+                ApplicationRunnerNamespaces.runNamespaceActions(this.hazelcastInstance, this.useHzCloud);
             }
 
             ok = demoSql();
@@ -157,9 +163,7 @@ public class ApplicationRunner {
             Javalin javalin = Javalin.create();
 
             // ReactJS, see src/main/app
-            javalin.config
-            .addStaticFiles("/app")
-            .addSinglePageRoot("/", "/app/index.html");
+            javalin.config.addStaticFiles("/app").addSinglePageRoot("/", "/app/index.html");
 
             // REST
             MyRestController myRestController = new MyRestController(this.hazelcastInstance);
@@ -181,6 +185,40 @@ public class ApplicationRunner {
             }
         }
     }
+
+    /**
+     * <p>Probe a server to see if it is Enterprise or Open Source.
+     * Only run if Docker or Kubernetes, to prove classpath not shared on filesystem.
+     * </p>
+     *
+     * @return
+     */
+    private boolean namespacesApplicable() {
+        if (this.localhost) {
+            LOGGER.info("namespacesApplicable(): false as localhost.");
+            return false;
+        }
+
+        IExecutorService iExecutorService = hazelcastInstance.getExecutorService("default");
+
+        boolean isEnterprise = false;
+        EnterpriseChecker enterpriseChecker = new EnterpriseChecker(useHzCloud);
+        try {
+            Future<Boolean> future = iExecutorService.submit(enterpriseChecker);
+            Boolean b = future.get();
+            if (b == null) {
+                LOGGER.error("namespacesApplicable(), future.get() null");
+            } else {
+                isEnterprise = b;
+            }
+        } catch (Exception e) {
+            LOGGER.error("namespacesApplicable(), future.get()", e);
+        }
+
+        LOGGER.info("namespacesApplicable(): isEnterprise=={}", isEnterprise);
+        return isEnterprise;
+    }
+
 
     /**
      * <p>Handle the start of a new browser session, stashing
@@ -504,11 +542,11 @@ public class ApplicationRunner {
             //{ "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_AGGREGATE_QUERY_RESULTS + " LIMIT 5" },
             //{ "IMap",    "SELECT * FROM " + MyConstants.IMAP_NAME_TRANSACTIONS + " LIMIT 5"},
             //{ "IMap",    "SELECT stock FROM " + MyConstants.IMAP_NAME_PORTFOLIOS + " ORDER BY 1 DESC LIMIT 3"},
+            { "IMap",    "SHOW DATA CONNECTIONS" },
+            { "IMap",    "SHOW JOBS" },
             { "IMap",    "SHOW MAPPINGS" },
             { "IMap",    "SHOW VIEWS" },
-            //{ "IMap",    "SELECT * FROM \"" + MyConstants.IMAP_NAME_MYSQL_SLF4J + "\""},
         };
-
         int originalLen = queries.length;
         String[][] additionalQueries;
 
@@ -568,14 +606,15 @@ public class ApplicationRunner {
     private boolean initialize(String clusterName) throws Exception {
         LOGGER.info("initialize(): -=-=-=-=- START -=-=-=-=-=-");
 
-        String propertyName1 = "my.bootstrap.servers";
-        String bootstrapServers = System.getProperty(propertyName1, "");
-        String pulsarList = System.getProperty(MyConstants.PULSAR_CONFIG_KEY, "");
+        String bootstrapServers = System.getProperty(MyConstants.BOOTSTRAP_SERVERS_CONFIG_KEY, "");
+        String pulsarAddress = System.getProperty(MyConstants.PULSAR_CONFIG_KEY, "");
         String postgresAddress = System.getProperty(MyConstants.POSTGRES_CONFIG_KEY, "");
-        for (String propertyName : List.of(propertyName1, MyConstants.PULSAR_CONFIG_KEY, MyConstants.POSTGRES_CONFIG_KEY)) {
+        for (String propertyName : List.of(MyConstants.BOOTSTRAP_SERVERS_CONFIG_KEY, MyConstants.CASSANDRA_CONFIG_KEY,
+                MyConstants.MARIA_CONFIG_KEY, MyConstants.MONGO_CONFIG_KEY, MyConstants.MYSQL_CONFIG_KEY,
+                MyConstants.POSTGRES_CONFIG_KEY, MyConstants.PULSAR_CONFIG_KEY)) {
             String propertyValue = System.getProperty(propertyName, "");
             if (propertyValue.isEmpty()) {
-                LOGGER.error("No value for '{}' " + propertyName);
+                LOGGER.error("No value for '{}' ", propertyName);
                 return false;
             } else {
                 LOGGER.debug("Using '{}'=='{}'", propertyName, propertyValue);
@@ -584,7 +623,6 @@ public class ApplicationRunner {
 
         CheckConnectIdempotentCallable.silentCheckCustomClasses(this.hazelcastInstance);
         boolean ok = true;
-
         if (ok) {
             Properties properties;
             try {
@@ -598,9 +636,9 @@ public class ApplicationRunner {
             String pulsarOrKafka = properties.getProperty(MyConstants.PULSAR_OR_KAFKA_KEY);
             boolean usePulsar = MyUtils.usePulsar(pulsarOrKafka);
             LOGGER.debug("usePulsar='{}'", usePulsar);
-            String kubernetesOrViridian = properties.getProperty(MyConstants.USE_VIRIDIAN);
-            boolean useViridian = MyUtils.useViridian(kubernetesOrViridian);
-            LOGGER.debug("useViridian='{}'", useViridian);
+            String kubernetesOrHzCloud = properties.getProperty(MyConstants.USE_HZ_CLOUD);
+            boolean useHzCloud = MyUtils.useHzCloud(kubernetesOrHzCloud);
+            LOGGER.debug("useHzCloud='{}'", useHzCloud);
             TransactionMonitorFlavor transactionMonitorFlavor = MyUtils.getTransactionMonitorFlavor(properties);
             LOGGER.info("TransactionMonitorFlavor=='{}'", transactionMonitorFlavor);
 
@@ -608,24 +646,16 @@ public class ApplicationRunner {
             properties.put(MyConstants.POSTGRES_ADDRESS, postgresAddress);
             String ourProjectProvenance = properties.getProperty(MyConstants.PROJECT_PROVENANCE);
 
-            Properties postgresProperties = null;
-            try {
-                postgresProperties = MyUtils.getPostgresProperties(properties);
-            } catch (Exception e) {
-                LOGGER.error("initialize()", e);
-                return false;
-            }
-
             ok &= TransactionMonitorIdempotentInitialization.createNeededObjects(hazelcastInstance,
-                    properties, ourProjectProvenance, transactionMonitorFlavor, this.localhost, useViridian);
-            ok &= TransactionMonitorIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers, pulsarList,
-                    usePulsar, useViridian, transactionMonitorFlavor);
+                    properties, ourProjectProvenance, transactionMonitorFlavor, this.localhost, useHzCloud);
+            ok &= TransactionMonitorIdempotentInitialization.loadNeededData(hazelcastInstance, bootstrapServers,
+                    pulsarAddress, usePulsar, useHzCloud, transactionMonitorFlavor);
             ok &= TransactionMonitorIdempotentInitialization.defineQueryableObjects(hazelcastInstance, bootstrapServers,
-                    transactionMonitorFlavor);
+                    properties, transactionMonitorFlavor, this.localhost, this.kubernetes, this.useHzCloud);
             if (ok && !this.localhost) {
                 // Don't even try if broken by this point
                 ok = TransactionMonitorIdempotentInitialization.launchNeededJobs(hazelcastInstance, bootstrapServers,
-                        pulsarList, postgresProperties, properties, clusterName, transactionMonitorFlavor);
+                        pulsarAddress, properties, clusterName, transactionMonitorFlavor, this.kubernetes);
             } else {
                 LOGGER.info("ok=={}, localhost=={} - no job submission", ok, this.localhost);
             }
@@ -634,5 +664,4 @@ public class ApplicationRunner {
         LOGGER.info("initialize(): -=-=-=-=- END, success=={} -=-=-=-=-=-", ok);
         return ok;
     }
-
 }

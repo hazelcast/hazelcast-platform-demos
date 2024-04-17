@@ -2,7 +2,7 @@
 
 PROJECT=transaction-monitor
 MODULE=hazelcast-node-enterprise-1
-CLUSTER_NAME=grid1
+CLUSTER_NAME=live
 CLONE=0
 
 BASEDIR=`dirname $0`
@@ -12,9 +12,8 @@ cd $BASEDIR/../../../$MODULE
 # Darwin vs Linux
 OS=`uname -s`
 if [ "$OS" = "Darwin" ]; then
-    HOST_IP=`ifconfig | grep -w inet | grep -v 127.0.0.1 | cut -d" " -f2`
+    HOST_IP=`ifconfig | grep -v 127.0.0.1 | grep -w inet -m 1 | cut -d" " -f2`
 fi
-
 if [ "$OS" = "Linux" ]; then
     HOST_IP=`ifconfig | grep -w inet -m 1 | awk '{print $2}'`
 fi
@@ -31,11 +30,14 @@ then
 fi
 
 MY_BOOTSTRAP_SERVERS=kafka-broker0:9092,kafka-broker1:9093,kafka-broker2:9094
+MY_CASSANDRA_ADDRESS=cassandra:9042
+MY_MARIA_ADDRESS=maria:4306
+MY_MONGO_ADDRESS=mongo:27017
 MY_MYSQL_ADDRESS=mysql:3306
 MY_POSTGRES_ADDRESS=postgres:5432
 # See also $MEMORY. Need to allow at least 500MB for heap
 MY_NATIVE_MEGABYTES=4400
-MY_PULSAR_LIST=pulsar:6650
+MY_PULSAR_ADDRESS=pulsar:6650
 
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${FLAVOR}-${MODULE}
 
@@ -55,10 +57,13 @@ PORT=$(($CLONE + 5701))
 
 CMD="docker run -e MY_BOOTSTRAP_SERVERS=$MY_BOOTSTRAP_SERVERS \
  -e MY_KUBERNETES_ENABLED=false \
+ -e MY_CASSANDRA_ADDRESS=$MY_CASSANDRA_ADDRESS \
+ -e MY_MARIA_ADDRESS=$MY_MARIA_ADDRESS \
+ -e MY_MONGO_ADDRESS=$MY_MONGO_ADDRESS \
  -e MY_MYSQL_ADDRESS=$MY_MYSQL_ADDRESS \
  -e MY_NATIVE_MEGABYTES=$MY_NATIVE_MEGABYTES \
  -e MY_POSTGRES_ADDRESS=$MY_POSTGRES_ADDRESS \
- -e MY_PULSAR_LIST=$MY_PULSAR_LIST \
+ -e MY_PULSAR_ADDRESS=$MY_PULSAR_ADDRESS \
  -e JAVA_ARGS=-Dhazelcast.local.publicAddress=${HOST_IP}:${PORT} \
  -p ${PORT}:${PORT} ${MEMORY} ${VOLUMES} --name=${MODULE}${CLONE} --rm --network=${PROJECT} ${DOCKER_IMAGE}"
 echo $CMD

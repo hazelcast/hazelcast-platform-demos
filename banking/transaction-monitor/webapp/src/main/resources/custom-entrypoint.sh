@@ -13,12 +13,29 @@ fi
 echo "$0: - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 
 # Run Java
-exec java $JAVA_ARGS $JAVA_OPTS \
+echo java $JAVA_ARGS $JAVA_OPTS \
  -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS \
+ -Dmy.cassandra.address=$MY_CASSANDRA_ADDRESS \
  -Dmy.docker.enabled=$MY_DOCKER_ENABLED \
  -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+ -Dmy.maria.address=$MY_MARIA_ADDRESS \
+ -Dmy.mongo.address=$MY_MONGO_ADDRESS \
  -Dmy.mysql.address=$MY_MYSQL_ADDRESS \
  -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
- -Dmy.pulsar.list=$MY_PULSAR_LIST \
+ -Dmy.pulsar.address=$MY_PULSAR_ADDRESS \
  -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
- -jar application.jar
+ -cp ./application.jar:./namespace1.jar:./namespace2.jar:./namespace3.jar \
+ $MAIN_CLASS
+exec java $JAVA_ARGS $JAVA_OPTS \
+ -Dmy.bootstrap.servers=$MY_BOOTSTRAP_SERVERS \
+ -Dmy.cassandra.address=$MY_CASSANDRA_ADDRESS \
+ -Dmy.docker.enabled=$MY_DOCKER_ENABLED \
+ -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+ -Dmy.maria.address=$MY_MARIA_ADDRESS \
+ -Dmy.mongo.address=$MY_MONGO_ADDRESS \
+ -Dmy.mysql.address=$MY_MYSQL_ADDRESS \
+ -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
+ -Dmy.pulsar.address=$MY_PULSAR_ADDRESS \
+ -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
+ -cp ./application.jar:./namespace1.jar:./namespace2.jar:./namespace3.jar \
+ $MAIN_CLASS

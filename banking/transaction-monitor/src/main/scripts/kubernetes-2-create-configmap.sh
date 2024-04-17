@@ -1,5 +1,8 @@
 #!/bin/bash
 
+BASEDIR=`dirname $0`
+cd $BASEDIR
+
 ARG1=`echo $1 | awk '{print tolower($0)}'`
 if [ "${ARG1}" == "ecommerce" ]
 then
@@ -20,15 +23,61 @@ then
  exit 1
 fi
 
-STATEFULSET_NAME=transaction-monitor-${FLAVOR}-kafka-broker
-MYSQL_NAME=transaction-monitor-${FLAVOR}-mysql
-POSTGRES_NAME=transaction-monitor-${FLAVOR}-postgres
-PULSAR_NAME=transaction-monitor-${FLAVOR}-pulsar
+PREFIX=transaction-monitor-${FLAVOR}
+STATEFULSET_NAME=${PREFIX}-kafka-broker
+SERVICE_NAMES=cassandra,maria,mongo,mysql,postgres,pulsar
+SERVICE_NAMES_COUNT=`echo $SERVICE_NAMES | tr ',' '\n' | grep -v '^$' | wc -l`
+SERVICE_IPS=""
 IPLIST=""
-MYSQLADDRESS=""
-POSTGRESADDRESS=""
-PULSARLIST=""
 TMPFILE=/tmp/`basename $0`.$$
+
+# 
+captureIP() {
+ SVC_NAME=${PREFIX}-${1}
+ SVC_INFO=`kubectl get svc $SVC_NAME 2>&1`
+ SVC_IP=""
+ PENDING=`echo $SVC_INFO | egrep -c '<pending>'\|'<none>'`
+ NOT_RUNNING=`echo $SVC_INFO | grep -c '(NotFound)'`
+ if [ $PENDING -gt 0 ] || [ $NOT_RUNNING -gt 0 ]
+ then
+  echo ""
+  echo `basename $0`: ERROR: Service \"$SVC_NAME\" not ready for IP capture: $SVC_INFO
+  echo ""
+  if [ $NOT_RUNNING -gt 0 ]
+  then
+   echo Was kubernetes-1-zookeeper-kafka-firsthalf.yaml run\?
+  else
+   echo Try again in 30 seconds\? '<pending>'/'<none>' will clear.
+  fi
+  echo ""
+ else
+  local TMP_IP=`kubectl get svc $SVC_NAME -o jsonpath='{.status.loadBalancer.ingress[0].ip}'`
+  if [ "$TMP_IP" != "" ]
+  then
+   SVC_IP="$TMP_IP"
+  fi
+ fi
+}
+
+# Single services, try all to find which are running
+while read SVC
+do
+ captureIP $SVC
+ COMMA=""
+ if [ "$SERVICE_IPS" != "" ]
+ then
+  COMMA=","
+ fi
+ SERVICE_IPS=${SERVICE_IPS}${COMMA}${SVC_IP}
+done < <( echo $SERVICE_NAMES | tr ',' '\n')
+
+SERVICE_IPS_COUNT=`echo $SERVICE_IPS | tr ',' '\n' | grep -v '^$' | wc -l`
+if [ $SERVICE_NAMES_COUNT -ne $SERVICE_IPS_COUNT ]
+then
+ echo `basename $0`: ERROR: In services \"$SERVICE_NAMES\" missing some IPs
+ echo `basename $0`: ERROR: Got \"$SERVICE_IPS\"
+ exit 1
+fi
 
 # 3 Kafkas, each with their own LB
 for REPLICA in 0 1 2
@@ -63,103 +112,10 @@ do
  fi
 done
 
-# One MYSQL
-SVC=${MYSQL_NAME}
-SVC_INFO=`kubectl get svc $SVC 2>&1`
-PENDING=`echo $SVC_INFO | egrep -c '<pending>'\|'<none>'`
-NOT_RUNNING=`echo $SVC_INFO | grep -c '(NotFound)'`
-if [ $PENDING -gt 0 ] || [ $NOT_RUNNING -gt 0 ]
-then
- echo ""
- echo `basename $0`: ERROR: Service \"$SVC\" not ready for IP capture: $SVC_INFO
- echo ""
- if [ $NOT_RUNNING -gt 0 ]
- then
-  echo Was kubernetes-1-zookeeper-kafka-firsthalf.yaml run\?
- else
-  echo Try again in 30 seconds\? '<pending>'/'<none>' will clear.
- fi
- echo ""
-else
- IP=`kubectl get svc $SVC -o jsonpath='{.status.loadBalancer.ingress[0].ip}'`
- if [ "$IP" != "" ]
- then
-  MYSQLADDRESS="$IP"
- fi
-fi
-
-# One POSTGRES
-SVC=${POSTGRES_NAME}
-SVC_INFO=`kubectl get svc $SVC 2>&1`
-PENDING=`echo $SVC_INFO | egrep -c '<pending>'\|'<none>'`
-NOT_RUNNING=`echo $SVC_INFO | grep -c '(NotFound)'`
-if [ $PENDING -gt 0 ] || [ $NOT_RUNNING -gt 0 ]
-then
- echo ""
- echo `basename $0`: ERROR: Service \"$SVC\" not ready for IP capture: $SVC_INFO
- echo ""
- if [ $NOT_RUNNING -gt 0 ]
- then
-  echo Was kubernetes-1-zookeeper-kafka-firsthalf.yaml run\?
- else
-  echo Try again in 30 seconds\? '<pending>'/'<none>' will clear.
- fi
- echo ""
-else
- IP=`kubectl get svc $SVC -o jsonpath='{.status.loadBalancer.ingress[0].ip}'`
- if [ "$IP" != "" ]
- then
-  POSTGRESADDRESS="$IP"
- fi
-fi
-
-# One Pulsar
-SVC=${PULSAR_NAME}
-SVC_INFO=`kubectl get svc $SVC 2>&1`
-PENDING=`echo $SVC_INFO | egrep -c '<pending>'\|'<none>'`
-NOT_RUNNING=`echo $SVC_INFO | grep -c '(NotFound)'`
-if [ $PENDING -gt 0 ] || [ $NOT_RUNNING -gt 0 ]
-then
- echo ""
- echo `basename $0`: ERROR: Service \"$SVC\" not ready for IP capture: $SVC_INFO
- echo ""
- if [ $NOT_RUNNING -gt 0 ]
- then
-  echo Was kubernetes-1-zookeeper-kafka-firsthalf.yaml run\?
- else
-  echo Try again in 30 seconds\? '<pending>'/'<none>' will clear.
- fi
- echo ""
-else
- IP=`kubectl get svc $SVC -o jsonpath='{.status.loadBalancer.ingress[0].ip}'`
- if [ "$IP" != "" ]
- then
-  PULSARLIST="$IP"
- fi
-fi
-
 IPCOUNT=`echo $IPLIST | sed 's/,/ /g' | wc -w`
 if [ $IPCOUNT -ne 3 ]
 then
  echo `basename $0`: ERROR: Need 3 IPs in Kafka IP list: \"$IPLIST\"
- exit 1
-fi
-MYSQLCOUNT=`echo $MYSQLADDRESS | sed 's/,/ /g' | wc -w`
-if [ $MYSQLCOUNT -ne 1 ]
-then
- echo `basename $0`: ERROR: Need 1 IPs in Postgres IP list: \"$MYSQLADDRESS\"
- exit 1
-fi
-POSTGRESCOUNT=`echo $POSTGRESADDRESS | sed 's/,/ /g' | wc -w`
-if [ $POSTGRESCOUNT -ne 1 ]
-then
- echo `basename $0`: ERROR: Need 1 IPs in Postgres IP list: \"$POSTGRESADDRESS\"
- exit 1
-fi
-PULSARCOUNT=`echo $PULSARLIST | sed 's/,/ /g' | wc -w`
-if [ $PULSARCOUNT -ne 1 ]
-then
- echo `basename $0`: ERROR: Need 1 IPs in Pulsar IP list: \"$PULSARLIST\"
  exit 1
 fi
 
@@ -187,12 +143,17 @@ echo "    INTERNAL_PORT=19092" >> $TMPFILE
 echo "    echo ID \"\$ID\"" >> $TMPFILE
 echo "    IPLIST=$IPLIST" >> $TMPFILE
 echo "    echo IPLIST \"\$IPLIST\"" >> $TMPFILE
-echo "    MYSQLADDRESS=$MYSQLADDRESS" >> $TMPFILE
-echo "    echo MYSQLADDRESS \"\$MYSQLADDRESS\"" >> $TMPFILE
-echo "    POSTGRESADDRESS=$POSTGRESADDRESS" >> $TMPFILE
-echo "    echo POSTGRESADDRESS \"\$POSTGRESADDRESS\"" >> $TMPFILE
-echo "    PULSARLIST=$PULSARLIST" >> $TMPFILE
-echo "    echo PULSARLIST \"\$PULSARLIST\"" >> $TMPFILE
+ITEM=1
+while [ $ITEM -le $SERVICE_NAMES_COUNT ]
+do
+ SERVICE_NAME_UC=`echo $SERVICE_NAMES | cut -d, -f$ITEM | tr '[a-z]' '[A-Z'`
+ SERVICE_IP=`echo $SERVICE_IPS | cut -d, -f$ITEM | tr '[a-z]' '[A-Z'`
+ echo "    ${SERVICE_NAME_UC}ADDRESS=${SERVICE_IP}" >> $TMPFILE
+ echo "    echo ${SERVICE_NAME_UC}ADDRESS \"\$${SERVICE_NAME_UC}ADDRESS\"" >> $TMPFILE
+ echo "    export MY_${SERVICE_NAME_UC}_ADDRESS=\${${SERVICE_NAME_UC}ADDRESS}" >> $TMPFILE
+ echo "    echo Set: MY_${SERVICE_NAME_UC}_ADDRESS \"\$MY_${SERVICE_NAME_UC}_ADDRESS\"" >> $TMPFILE
+ ITEM=$(($ITEM + 1))
+done
 echo "    IP0=\`echo \$IPLIST | cut -d, -f1\`:\${EXTERNAL_PORT}" >> $TMPFILE
 echo "    IP1=\`echo \$IPLIST | cut -d, -f2\`:\${EXTERNAL_PORT}" >> $TMPFILE
 echo "    IP2=\`echo \$IPLIST | cut -d, -f3\`:\${EXTERNAL_PORT}" >> $TMPFILE
@@ -217,15 +178,11 @@ echo "    export KAFKA_CFG_ADVERTISED_LISTENERS=EXTERNAL_PLAINTEXT://\$EXTERNAL,
 # Use below to turn off external access
 #echo "    export KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL_PLAINTEXT://\$INTERNAL" >> $TMPFILE
 echo "    export MY_BOOTSTRAP_SERVERS=\${IP0},\${IP1},\${IP2}" >> $TMPFILE
-echo "    export MY_MYSQL_ADDRESS=\${MYSQLADDRESS}" >> $TMPFILE
-echo "    export MY_POSTGRES_ADDRESS=\${POSTGRESADDRESS}" >> $TMPFILE
-echo "    export MY_PULSAR_LIST=\${PULSARLIST}" >> $TMPFILE
 #
 echo "    echo Set: KAFKA_CFG_BROKER_ID \"\$KAFKA_CFG_BROKER_ID\"" >> $TMPFILE
 echo "    echo Set: KAFKA_CFG_LISTENERS \"\$KAFKA_CFG_LISTENERS\"" >> $TMPFILE
 echo "    echo Set: KAFKA_CFG_ADVERTISED_LISTENERS \"\$KAFKA_CFG_ADVERTISED_LISTENERS\"" >> $TMPFILE
 echo "    echo Set: MY_BOOTSTRAP_SERVERS \"\$MY_BOOTSTRAP_SERVERS\"" >> $TMPFILE
-echo "    echo Set: MY_PULSAR_LIST \"\$MY_PULSAR_LIST\"" >> $TMPFILE
 echo "---" >> $TMPFILE
 
 cat $TMPFILE
