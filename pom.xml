@@ -93,7 +93,7 @@
 		<kafka-connect.version>2.6.0</kafka-connect.version>
 		<logback.version>1.4.8</logback.version>
 		<mariadb-java-client.version>3.1.4</mariadb-java-client.version>
-		<mongo-java-driver.version>3.12.8</mongo-java-driver.version>
+		<mongo-java-driver.version>3.12.14</mongo-java-driver.version>
 		<mysql-connector-j.version>8.0.33</mysql-connector-j.version>
 		<netty-tcnative.version>2.0.62.Final</netty-tcnative.version>
 		<poi-ooxml.version>5.2.3</poi-ooxml.version>
@@ -105,7 +105,7 @@
 		<slf4j.version>2.0.7</slf4j.version>
 		<spotbugs-annotations.version>4.7.3</spotbugs-annotations.version>
 		<springdoc.version>2.3.0</springdoc.version>
-		<spring-boot.version>3.2.5</spring-boot.version>
+		<spring-boot.version>3.3.0</spring-boot.version>
 		<spring-cloud.version>2021.0.0</spring-cloud.version>
 		<spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
 		<zipkin.version>2.23.3-SNAPSHOT</zipkin.version>
@@ -292,6 +292,22 @@
 				<groupId>io.debezium</groupId>
 				<artifactId>debezium-connector-mongodb</artifactId>
 				<version>${debezium-connector-mongodb.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.grpc</groupId>
+				<artifactId>grpc-netty-shaded</artifactId>
+				<version>${grpc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.grpc</groupId>
+				<artifactId>grpc-protobuf</artifactId>
+				<version>${grpc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.grpc</groupId>
+				<artifactId>grpc-stub</artifactId>
+				<version>${grpc.version}</version>
 			</dependency>
 
 			<dependency>

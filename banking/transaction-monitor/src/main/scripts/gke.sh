@@ -83,16 +83,18 @@ then
  echo $TOP_LEVEL_POM is configured with FLAVOR=$POM_FLAVOR and USE_HZ_CLOUD=$POM_USE_HZ_CLOUD
  echo '************************************************************'
  echo '************************************************************'
- echo -n Proceeding in 10 seconds
- COUNTDOWN=10
- while [ $COUNTDOWN -gt 0 ]
- do
-  echo -n .
-  sleep 1
-  COUNTDOWN=$(($COUNTDOWN - 1))
- done
- echo ""
 fi
+
+echo ""
+echo -n Proceeding in 10 seconds
+COUNTDOWN=10
+while [ $COUNTDOWN -gt 0 ]
+do
+ echo -n .
+ sleep 1
+ COUNTDOWN=$(($COUNTDOWN - 1))
+done
+echo ""
 
 echo ----
 echo $START | cut -d- -f4- | tr '-' ':'

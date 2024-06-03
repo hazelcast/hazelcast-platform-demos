@@ -30,6 +30,19 @@
                         <groupId>com.hazelcast.jet</groupId>
                         <artifactId>hazelcast-jet-python</artifactId>
                 </dependency>
+
+                <dependency>
+                        <groupId>io.grpc</groupId>
+                        <artifactId>grpc-netty-shaded</artifactId>
+                </dependency>
+                <dependency>
+                        <groupId>io.grpc</groupId>
+                        <artifactId>grpc-protobuf</artifactId>
+                </dependency>
+                <dependency>
+                        <groupId>io.grpc</groupId>
+                        <artifactId>grpc-stub</artifactId>
+                </dependency>
         </dependencies>
 
         <build>
