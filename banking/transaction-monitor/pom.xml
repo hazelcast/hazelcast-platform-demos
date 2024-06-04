@@ -18,9 +18,6 @@
 	<description>Example implementation for monitoring a series of transactions</description>
 
 	<properties>
-		<!-- Don't want Java 19 dependencies -->
-		<jackson.version>2.14.0</jackson.version>
-		
 		<my.docker.image.prefix>transaction-monitor-${my.transaction-monitor.flavor}</my.docker.image.prefix>
 		<main.basedir>${project.parent.parent.basedir}</main.basedir>
 		<my.cluster1.name>live</my.cluster1.name>

@@ -82,7 +82,7 @@
 
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
 		<hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
-		<jackson.version>2.15.2</jackson.version>
+		<jackson.version>2.17.1</jackson.version>
 		<json.version>20231013</json.version>
 		<json-smart.version>2.4.11</json-smart.version>
 		<junit-jupiter.version>5.9.3</junit-jupiter.version>
@@ -91,7 +91,7 @@
 		<!--  Kafka Clients must match cloud target -->
 		<kafka-clients.version>3.6.1</kafka-clients.version>
 		<kafka-connect.version>2.6.0</kafka-connect.version>
-		<logback.version>1.4.8</logback.version>
+		<logback.version>1.5.6</logback.version>
 		<mariadb-java-client.version>3.1.4</mariadb-java-client.version>
 		<mongo-java-driver.version>3.12.14</mongo-java-driver.version>
 		<mysql-connector-j.version>8.0.33</mysql-connector-j.version>
