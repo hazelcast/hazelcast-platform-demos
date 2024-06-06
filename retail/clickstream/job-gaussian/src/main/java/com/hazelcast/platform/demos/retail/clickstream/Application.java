@@ -16,13 +16,14 @@
 
 package com.hazelcast.platform.demos.retail.clickstream;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.jet.config.JobConfig;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.platform.demos.retail.clickstream.job.GaussianPrediction;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * <p>
@@ -32,26 +33,42 @@ import lombok.extern.slf4j.Slf4j;
  * submission.
  * </p>
  */
-@Slf4j
 public class Application {
 
     public static void main(String[] args) throws Exception {
+        String filename = "application.properties";
+
+        ClassLoader classLoader = Application.class.getClassLoader();
+
+        Properties properties = new Properties();
+        try (InputStream inputStream = classLoader.getResourceAsStream(filename)) {
+            if (inputStream == null) {
+                throw new RuntimeException(filename + ": not found in Jar");
+            } else {
+                properties.load(inputStream);
+            }
+        }
+        properties.list(System.out);
+
         HazelcastInstance hazelcastInstance = Hazelcast.bootstrappedInstance();
 
         String graphiteHost = hazelcastInstance
                 .getMap(MyConstants.IMAP_NAME_CONFIG)
                 .get(MyConstants.CONFIG_MAP_KEY_GRAPHITE).toString();
 
-        String jobName = GaussianPrediction.class.getSimpleName() + "@" + MyUtils.getBuildTimestamp();
+        String jobName = GaussianPrediction.class.getSimpleName() + "@" + properties.getProperty("my.build-timestamp", "");
         if (jobName.endsWith("Z")) {
             jobName = jobName.substring(0, jobName.length() - 1);
         }
-        log.info(jobName);
+        System.out.println("~~~");
+        System.out.println("jobName == '" + jobName + "'");
+        System.out.println("~~~");
 
-        Pipeline pipelineGaussianPrediction = GaussianPrediction.buildPipeline(graphiteHost);
+        Pipeline pipelineGaussianPrediction = GaussianPrediction.buildPipeline(graphiteHost, classLoader);
 
         JobConfig jobConfigGaussianPrediction = new JobConfig();
         jobConfigGaussianPrediction.addClass(GaussianPrediction.class);
+        jobConfigGaussianPrediction.addClass(MyUtils.class);
         jobConfigGaussianPrediction.setName(jobName);
 
         // Fails if job exists with same job name, unlike "newJobIfAbsent"

@@ -49,6 +49,7 @@ public class RandomForestRetraining {
 
     public static Pipeline buildPipeline(long start, long end, String modelName) {
         Pipeline pipeline = Pipeline.create();
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
         try {
             BatchStage<Entry<String, Tuple3<Long, Long, String>>> input =
@@ -80,7 +81,7 @@ public class RandomForestRetraining {
             BatchStage<String> pythonOutput =
                     inputRangeReformattedSingleton
                     .apply(PythonTransforms.mapUsingPythonBatch(
-                            MyUtils.getPythonServiceConfig(PYTHON_MODULE, PYTHON_HANDLER_FN)))
+                            MyUtils.getPythonServiceConfig(PYTHON_MODULE, PYTHON_HANDLER_FN, classLoader)))
                                 .setLocalParallelism(1)
                                 .setName(PYTHON_MODULE)
                     .filter(line -> line.length() > 0);

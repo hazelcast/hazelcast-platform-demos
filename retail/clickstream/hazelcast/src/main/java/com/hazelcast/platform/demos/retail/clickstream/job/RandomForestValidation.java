@@ -70,6 +70,7 @@ public class RandomForestValidation {
      */
     public static Pipeline buildPipeline(long start, long end, String modelName) {
         Pipeline pipeline = Pipeline.create();
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
         try {
             // Left leg, first handled, is the model to use
@@ -85,8 +86,7 @@ public class RandomForestValidation {
                     .readFrom(Sources.<String, Tuple3<Long, Long, String>>map(MyConstants.IMAP_NAME_CHECKOUT));
 
             BatchStage<Tuple3<String, Long, Long>> inputRightRange =
-                    inputRight
-                    .filter(entry -> entry.getValue().f0() >= start && entry.getValue().f0() <= end)
+                    inputRight.filter(entry -> entry.getValue().f0() >= start && entry.getValue().f0() <= end)
                     .map(entry -> Tuple3.<String, Long, Long>
                         tuple3(entry.getKey(), entry.getValue().f0(), entry.getValue().f1()));
 
@@ -112,7 +112,8 @@ public class RandomForestValidation {
             BatchStage<String> pythonOutput =
                 inputMerged
                 .apply(PythonTransforms.mapUsingPythonBatch(
-                            MyUtils.getPythonServiceConfig(PYTHON_MODULE, PYTHON_HANDLER_FN))).setName(PYTHON_MODULE);
+                            MyUtils.getPythonServiceConfig(PYTHON_MODULE, PYTHON_HANDLER_FN, classLoader)))
+                            .setName(PYTHON_MODULE);
 
             // Reformat and add reality to prediction - prediction, reality
             BatchStage<Tuple2<Integer, Integer>> pythonOutputAndReality = pythonOutput

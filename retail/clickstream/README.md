@@ -267,7 +267,7 @@ Note this uses *no security*, so it not suitable for production usage.
 Then you can submit either or both of the Gaussian and Decision Tree ML predictions.
 
 ```
-hazelcast-enterprise-5.0/bin/hz-cli -t blue@1.2.3.4 submit job-gaussian/target/clickstream-job-gaussian-5.0.jar
-hazelcast-enterprise-5.0/bin/hz-cli -t blue@1.2.3.4 submit job-decisiontree/target/clickstream-job-decisiontree-5.0.jar
+hazelcast-enterprise-5.5.0/bin/hz-cli -t blue@1.2.3.4 submit job-gaussian/target/clickstream-job-gaussian-5.5-jar-with-dependencies.jar
+hazelcast-enterprise-5.5.0/bin/hz-cli -t blue@1.2.3.4 submit job-decisiontree/target/clickstream-job-decisiontree-5.5-jar-with-dependencies.jar
 
 ```
