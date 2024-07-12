@@ -222,6 +222,7 @@ int main (int argc, char *argv[]) {
 
 	std::cout << "Sleeping one minute, so cluster populated with data" << std::endl;
 	std::this_thread::sleep_for(std::chrono::minutes(1));
+	std::cout << "AWAKE" << std::endl;
 
 	run_sql_query(hazelcast_client, "SHOW MAPPINGS");
 	run_sql_query(hazelcast_client, "SHOW VIEWS");

@@ -1,6 +1,7 @@
 ---
 # Service DNS for Webapp will be "transaction-monitor-FLAVOR-webapp.default.svc.cluster.local".
-# Service DNS for FINOS Node.js will be "transaction-monitor-FLAVOR-finos.default.svc.cluster.local".
+# Service DNS for FINOS will be "transaction-monitor-FLAVOR-finos.default.svc.cluster.local".
+# Service DNS for Flow will be "transaction-monitor-FLAVOR-flow.default.svc.cluster.local".
 ---
 # Webapp
 ---
@@ -93,6 +94,37 @@ spec:
         - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-finos"
           imagePullPolicy: Never
           name: transaction-monitor-FLAVOR-finos-container
+          volumeMounts:
+            - name: configmap
+              mountPath: /customize/my-env.sh
+              subPath: my-env.sh
+      volumes:
+        - name: configmap
+          configMap:
+            name: transaction-monitor-FLAVOR-configmap
+            defaultMode: 0755
+---
+# Flow - service defined in step 1
+---
+# Only need 1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transaction-monitor-FLAVOR-flow
+spec:
+  selector:
+    matchLabels:
+      app: transaction-monitor-FLAVOR-flow
+  template:
+    metadata:
+      labels:
+        app: transaction-monitor-FLAVOR-flow
+    spec:
+      containers:
+        - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-flow"
+          imagePullPolicy: Never
+          name: transaction-monitor-FLAVOR-flow-container
           volumeMounts:
             - name: configmap
               mountPath: /customize/my-env.sh

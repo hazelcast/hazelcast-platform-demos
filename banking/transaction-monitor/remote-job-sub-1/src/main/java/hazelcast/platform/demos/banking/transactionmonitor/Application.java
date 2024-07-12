@@ -16,6 +16,7 @@
 
 package hazelcast.platform.demos.banking.transactionmonitor;
 
+import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -40,20 +41,38 @@ public class Application {
      * </p>
      */
     public static void main(String[] args) throws Exception {
+        ClassLoader classLoader = Application.class.getClassLoader();
+
+        Properties properties = new Properties();
+        try (InputStream inputStream = classLoader.getResourceAsStream(FILENAME)) {
+            if (inputStream == null) {
+                throw new RuntimeException(FILENAME + ": not found in Jar");
+            } else {
+                properties.load(inputStream);
+            }
+        }
+        properties.list(System.out);
+
         HazelcastInstance hazelcastInstance = Hazelcast.bootstrappedInstance();
 
-        Properties buildProperties = MyUtils.loadProperties(FILENAME);
-
-        checkFlavor(hazelcastInstance, buildProperties);
+        checkFlavor(hazelcastInstance, properties);
 
         Properties clusterProperties = buildKafkaProperties(hazelcastInstance);
-        String buildTimestamp = getBuildTimestamp(buildProperties);
+        String buildTimestamp = getBuildTimestamp(properties);
 
-        Pipeline pipelinePythonAnalysis = PythonAnalysis.buildPipeline(clusterProperties, buildTimestamp);
+        Pipeline pipelinePythonAnalysis = PythonAnalysis.buildPipeline(clusterProperties, buildTimestamp, classLoader);
+
+        String jobName = PythonAnalysis.class.getSimpleName() + "@" + properties.getProperty("my.build-timestamp", "");
+        if (jobName.endsWith("Z")) {
+            jobName = jobName.substring(0, jobName.length() - 1);
+        }
+        System.out.println("~~~");
+        System.out.println("jobName == '" + jobName + "'");
+        System.out.println("~~~");
 
         JobConfig jobConfigPythonAnalysis = new JobConfig();
         jobConfigPythonAnalysis.addClass(PythonAnalysis.class);
-        jobConfigPythonAnalysis.setName(PythonAnalysis.class.getSimpleName() + "@" + buildTimestamp);
+        jobConfigPythonAnalysis.setName(jobName);
 
         // Fails if job exists with same job name, unlike "newJobIfAbsent"
         hazelcastInstance.getJet().newJob(pipelinePythonAnalysis, jobConfigPythonAnalysis);

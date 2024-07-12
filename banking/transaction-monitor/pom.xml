@@ -47,6 +47,7 @@
 		<module>common</module>
 		<module>custom-classes</module>
 		<module>finos</module>
+		<module>flow</module>
 		<module>grafana</module>
 		<module>hazelcast-node-enterprise-1</module>
 		<module>hazelcast-node-enterprise-2</module>

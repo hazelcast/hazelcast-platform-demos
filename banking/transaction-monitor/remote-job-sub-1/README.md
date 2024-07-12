@@ -8,7 +8,7 @@ Check and submit using the Jet command line:
 
 ```
 ~/Downloads/hazelcast-enterprise-5.5.0/bin/hz-cli -t live@123.456.789.0 list-jobs
-~/Downloads/hazelcast-enterprise-5.5.0/bin/hz-cli -t live@123.456.789.0 submit target/transaction-monitor-remote-job-sub-1-5.0.jar
+~/Downloads/hazelcast-enterprise-5.5.0/bin/hz-cli -t live@123.456.789.0 submit target/transaction-monitor-remote-job-sub-1-5.5-jar-with-dependencies.jar
 ~/Downloads/hazelcast-enterprise-5.5.0/bin/hz-cli -t live@123.456.789.0 list-jobs
 ```
 
