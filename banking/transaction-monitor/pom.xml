@@ -39,7 +39,9 @@
 		<module>abstract-hazelcast-node</module>
 		<module>cassandra</module>
 		<module>client-command-line</module>
+<!-- Issue 220
 		<module>client-cpp</module>
+-->
 		<module>client-csharp</module>
 		<module>client-golang</module>
 		<module>client-nodejs</module>
