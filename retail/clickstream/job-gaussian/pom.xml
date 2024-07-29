@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.retail.clickstream</groupId>
 		<artifactId>clickstream-root</artifactId>
-		<version>5.4</version>
+		<version>5.5</version>
 	</parent>
 
 	<artifactId>clickstream-job-gaussian</artifactId>
@@ -16,6 +16,7 @@
 
 	<properties>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
+		<main.class>com.hazelcast.platform.demos.retail.clickstream.Application</main.class>
 	</properties>
 
 	<dependencies>
@@ -36,7 +37,6 @@
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet-python</artifactId>
-			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
@@ -53,8 +53,7 @@
 
 		<plugins>
 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
+				<artifactId>maven-assembly-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

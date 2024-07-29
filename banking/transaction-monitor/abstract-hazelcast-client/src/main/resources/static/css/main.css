@@ -41,8 +41,9 @@ h5 {
 	font-family: "Courier New", Courier, monospace;
 }
 
-.finos_pane {
-	color: var(--color-ice);
+.minor_pane {
+	background-color: var(--color-ice);
+	color: var(--color-raspberry);
 }
 
 .finosInnerBox {

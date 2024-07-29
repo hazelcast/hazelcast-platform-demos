@@ -4,7 +4,7 @@ PROJECT=nexmark
 MODULE=webapp
 HOST_IP=$1
 
-JAR_FILE=${PROJECT}-${MODULE}-5.4.jar
+JAR_FILE=${PROJECT}-${MODULE}-5.5.jar
 JAVA_ARGS="-Dhazelcast.client.config="$HOME/hazelcast-client.xml
 JAVA_ARGS="${JAVA_ARGS} -Dhost.ip=$HOST_IP"
 

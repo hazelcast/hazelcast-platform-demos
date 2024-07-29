@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 ubuntu:23.10
+FROM --platform=linux/amd64 ubuntu:24.10
 
 ARG CONTROL_FILE
 ARG DEBIAN_FRONTEND=noninteractive
