@@ -6,7 +6,7 @@
 
 	<groupId>com.hazelcast.platform.demos</groupId>
 	<artifactId>hazelcast-platform-demos-root</artifactId>
-	<version>5.4</version>
+	<version>5.5</version>
 	<packaging>pom</packaging>
 
 	<name>Hazelcast Platform Demo Applications</name>
@@ -76,10 +76,13 @@
 		<!-- See also banking/credit-value-adjustment/cpp/Dockerfile -->
 		<!-- Same as version using in Hazelcast https://github.com/hazelcast/hazelcast/blob/master/pom.xml#L99 -->
 		<grpc.version>1.48.0</grpc.version>
-		<hazelcast.version>5.4.0</hazelcast.version>
+
+                <!-- When advancing to GA, also update Dockerfile FROM line for Management Center -->
+		<hazelcast.version>5.5.0</hazelcast.version>
+
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
 		<hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
-		<jackson.version>2.15.2</jackson.version>
+		<jackson.version>2.17.1</jackson.version>
 		<json.version>20231013</json.version>
 		<json-smart.version>2.4.11</json-smart.version>
 		<junit-jupiter.version>5.9.3</junit-jupiter.version>
@@ -88,9 +91,9 @@
 		<!--  Kafka Clients must match cloud target -->
 		<kafka-clients.version>3.6.1</kafka-clients.version>
 		<kafka-connect.version>2.6.0</kafka-connect.version>
-		<logback.version>1.4.8</logback.version>
+		<logback.version>1.5.6</logback.version>
 		<mariadb-java-client.version>3.1.4</mariadb-java-client.version>
-		<mongo-java-driver.version>3.12.8</mongo-java-driver.version>
+		<mongo-java-driver.version>3.12.14</mongo-java-driver.version>
 		<mysql-connector-j.version>8.0.33</mysql-connector-j.version>
 		<netty-tcnative.version>2.0.62.Final</netty-tcnative.version>
 		<poi-ooxml.version>5.2.3</poi-ooxml.version>
@@ -102,7 +105,7 @@
 		<slf4j.version>2.0.7</slf4j.version>
 		<spotbugs-annotations.version>4.7.3</spotbugs-annotations.version>
 		<springdoc.version>2.3.0</springdoc.version>
-		<spring-boot.version>3.2.4</spring-boot.version>
+		<spring-boot.version>3.3.2</spring-boot.version>
 		<spring-cloud.version>2021.0.0</spring-cloud.version>
 		<spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
 		<zipkin.version>2.23.3-SNAPSHOT</zipkin.version>
@@ -289,6 +292,22 @@
 				<groupId>io.debezium</groupId>
 				<artifactId>debezium-connector-mongodb</artifactId>
 				<version>${debezium-connector-mongodb.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.grpc</groupId>
+				<artifactId>grpc-netty-shaded</artifactId>
+				<version>${grpc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.grpc</groupId>
+				<artifactId>grpc-protobuf</artifactId>
+				<version>${grpc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.grpc</groupId>
+				<artifactId>grpc-stub</artifactId>
+				<version>${grpc.version}</version>
 			</dependency>
 
 			<dependency>

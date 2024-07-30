@@ -108,13 +108,13 @@ public class PythonAnalysis {
      * then see the {@link IngestTransactions#buildPipeline(String)}</p>
      * @return
      */
-    public static Pipeline buildPipeline(Properties properties, String buildTimestamp) throws Exception {
+    public static Pipeline buildPipeline(Properties properties, String buildTimestamp, ClassLoader classLoader) throws Exception {
         return
                 Pipeline
                 .create()
                 .readFrom(KafkaSources.<String, String, String>
                     kafka(properties, ConsumerRecord::value, MyConstants.KAFKA_TOPIC_NAME_TRANSACTIONS)).withoutTimestamps()
-                .apply(PythonTransforms.mapUsingPython(MyUtils.getPythonServiceConfig("slow", "processFn")))
+                .apply(PythonTransforms.mapUsingPython(MyUtils.getPythonServiceConfig("slow", "processFn", classLoader)))
                 .map(csv -> {
                     String[] tokens = csv.split(",");
                     return new SimpleImmutableEntry<String, String>(tokens[0] + "@" + buildTimestamp, tokens[1]);

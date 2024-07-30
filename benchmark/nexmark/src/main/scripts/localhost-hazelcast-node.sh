@@ -18,7 +18,7 @@ then
  exit 1
 fi
 
-JAR_FILE=${PROJECT}-${MODULE}-5.4-jar-with-dependencies.jar
+JAR_FILE=${PROJECT}-${MODULE}-5.5-jar-with-dependencies.jar
 
 JAVA_ARGS="-Dhazelcast.config="`pwd`/../src/main/scripts/hazelcast.xml
 JAVA_ARGS="${JAVA_ARGS} -Dmy.cooperative.thread.count=1"

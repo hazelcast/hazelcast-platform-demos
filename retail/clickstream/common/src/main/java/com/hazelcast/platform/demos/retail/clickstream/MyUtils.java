@@ -156,9 +156,10 @@ public class MyUtils {
      * @param handler The function in the Python file to call
      * @return Python configuration for use in a Jet job.
      */
-    public static PythonServiceConfig getPythonServiceConfig(String name, String handler) throws Exception {
+    public static PythonServiceConfig getPythonServiceConfig(String name, String handler, ClassLoader classLoader)
+            throws Exception {
         String subdir = "python";
-        File temporaryDir = MyUtils.getTemporaryDir(subdir, name);
+        File temporaryDir = MyUtils.getTemporaryDir(subdir, name, classLoader);
 
         PythonServiceConfig pythonServiceConfig = new PythonServiceConfig();
         pythonServiceConfig.setBaseDir(temporaryDir.toString());
@@ -184,12 +185,10 @@ public class MyUtils {
      * @param name The job name, eg. "{@code noop}", used as a folder prefix
      * @return A folder containing the Python code copied from the classpath.
      */
-    private static File getTemporaryDir(String sourceDirectory, String name) throws Exception {
+    private static File getTemporaryDir(String sourceDirectory, String name, ClassLoader classLoader) throws Exception {
 
         Path targetDirectory = Files.createTempDirectory(name);
         targetDirectory.toFile().deleteOnExit();
-
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
         String[] resourcesToCopy = { name + ".py", "requirements.txt" };
         for (String resourceToCopy : resourcesToCopy) {

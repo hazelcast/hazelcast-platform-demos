@@ -1,6 +1,9 @@
 ---
-# Runs 1 Zookeeper, creates services for Kafka Brokers but not the brokers
+# Runs 1 Zookeeper, creates services for Kafka Brokers but not the brokers.
 # Also, 1 Pulsar to show as an alternative to Kakfa
+# Create services for anything accessed externally where it is useful as
+# services take a while to provision, or more when the service IP is
+# needed for the config map
 ---
 ############################################################################
 # Services
@@ -68,6 +71,20 @@ spec:
   ports:
   - port: 9042
     targetPort: 9042
+  type: LoadBalancer
+---
+# Flow : DNS will be "transaction-monitor-FLAVOR-flow.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-FLAVOR-flow
+spec:
+  selector:
+    app: transaction-monitor-FLAVOR-flow
+  ports:
+  - port: 8080
+    targetPort: 8080
   type: LoadBalancer
 ---
 # Maria : DNS will be "transaction-monitor-FLAVOR-maria.default.svc.cluster.local".

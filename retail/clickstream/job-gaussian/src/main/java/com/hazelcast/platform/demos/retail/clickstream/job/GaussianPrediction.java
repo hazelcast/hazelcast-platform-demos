@@ -56,7 +56,7 @@ public class GaussianPrediction {
     private static final String PYTHON_HANDLER_FN = "predict";
     private static final long FIVE = 5L;
 
-    public static Pipeline buildPipeline(String graphiteHost) {
+    public static Pipeline buildPipeline(String graphiteHost, ClassLoader classLoader) {
         Pipeline pipeline = Pipeline.create();
 
         try {
@@ -85,7 +85,7 @@ public class GaussianPrediction {
             StreamStage<String> pythonOutput =
                 inputFormatted
                 .apply(PythonTransforms.mapUsingPython(
-                            MyUtils.getPythonServiceConfig(PYTHON_MODULE, PYTHON_HANDLER_FN)))
+                            MyUtils.getPythonServiceConfig(PYTHON_MODULE, PYTHON_HANDLER_FN, classLoader)))
                                 .setLocalParallelism(1)
                                 .setName(PYTHON_MODULE);
 

@@ -25,7 +25,7 @@ fi
 
 PREFIX=transaction-monitor-${FLAVOR}
 STATEFULSET_NAME=${PREFIX}-kafka-broker
-SERVICE_NAMES=cassandra,maria,mongo,mysql,postgres,pulsar
+SERVICE_NAMES=cassandra,flow,maria,mongo,mysql,postgres,pulsar
 SERVICE_NAMES_COUNT=`echo $SERVICE_NAMES | tr ',' '\n' | grep -v '^$' | wc -l`
 SERVICE_IPS=""
 IPLIST=""

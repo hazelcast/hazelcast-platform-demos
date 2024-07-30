@@ -20,8 +20,10 @@ hazelcast:
         HEALTH_CHECK:
           enabled: true
   #
+  map:
+    'heap*':
+      backup-count: 0
 # TURN THIS OFF, AS NOW ADDED BY `CommonIdempotentInitialization.java`  
-#  map:
 #     # Any map with a name matching this pattern has a journal
 #    'alerts*':
 #      event-journal:
