@@ -75,7 +75,7 @@
 		<javax-validation.version>2.0.1.Final</javax-validation.version>
 		<!-- See also banking/credit-value-adjustment/cpp/Dockerfile -->
 		<!-- Same as version using in Hazelcast https://github.com/hazelcast/hazelcast/blob/master/pom.xml#L99 -->
-		<grpc.version>1.48.0</grpc.version>
+		<grpc.version>1.53.0</grpc.version>
 
                 <!-- When advancing to GA, also update Dockerfile FROM line for Management Center -->
 		<hazelcast.version>5.5.0</hazelcast.version>
