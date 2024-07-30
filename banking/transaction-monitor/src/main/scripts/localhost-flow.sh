@@ -18,7 +18,7 @@ then
  exit 1
 fi
 
-JAR_FILE=${PROJECT}-${MODULE}-5.5.jar
+JAR_FILE=${PROJECT}-${MODULE}-6.0.jar
 
 JAVA_ARGS="-Dmy.kubernetes.enabled=false"
 JAVA_ARGS="${JAVA_ARGS} -Dhazelcast.local.publicAddress=${HOST_IP}"

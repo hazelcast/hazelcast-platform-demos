@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.utils</groupId>
 		<artifactId>utils-root</artifactId>
-		<version>5.5</version>
+		<version>6.0</version>
 	</parent>
 
 	<artifactId>utils-zoom-integration</artifactId>

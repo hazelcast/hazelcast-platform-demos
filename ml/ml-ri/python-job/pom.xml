@@ -6,7 +6,7 @@
         <parent>
                 <groupId>com.hazelcast.platform.demos.ml.ri</groupId>
                 <artifactId>ml-ri-root</artifactId>
-                <version>5.5</version>
+                <version>6.0</version>
         </parent>
 
         <artifactId>ml-ri-python-job</artifactId>
