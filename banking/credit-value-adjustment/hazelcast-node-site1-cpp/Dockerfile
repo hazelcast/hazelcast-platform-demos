@@ -13,13 +13,13 @@ COPY target/classes/cvaWrapper.sh /cvaWrapper.sh
 RUN chmod u+x /cvaWrapper.sh
 
 # Default values provided
-ENV MY_KUBERNETES_ENABLED "true"
-ENV MY_INITSIZE ""
-ENV MY_PARTITIONS ""
+ENV MY_KUBERNETES_ENABLED="true"
+ENV MY_INITSIZE=""
+ENV MY_PARTITIONS=""
 
-ENV JAVA_ARGS ""
-ENV JAVA_HEAP_SIZE "4g"
-ENV JAVA_OPTS "--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
+ENV JAVA_ARGS=""
+ENV JAVA_HEAP_SIZE="4g"
+ENV JAVA_OPTS="--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
 
 ENTRYPOINT exec /cvaWrapper.sh $0 $1 \
   $JAVA_ARGS \
