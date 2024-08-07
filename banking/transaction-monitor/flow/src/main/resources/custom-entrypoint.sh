@@ -13,8 +13,11 @@ fi
 echo "$0: - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 
 # Run Java
+echo exec java $JAVA_ARGS $JAVA_OPTS \
+ -Dmy.docker.enabled=$MY_DOCKER_ENABLED \
+ -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
+ -jar application.jar
 exec java $JAVA_ARGS $JAVA_OPTS \
  -Dmy.docker.enabled=$MY_DOCKER_ENABLED \
  -Dmy.kubernetes.enabled=$MY_KUBERNETES_ENABLED \
- -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
  -jar application.jar
