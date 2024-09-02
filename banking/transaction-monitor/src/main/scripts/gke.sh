@@ -11,10 +11,10 @@ POM_USE_HZ_CLOUD=`grep '<use.hz.cloud>' $TOP_LEVEL_POM | tail -1 | cut -d'>' -f2
 
 # For Kubernetes cluster creation
 K_MACHINE_TYPE="c2-standard-4"
-K_NETWORK="neil-europe-west1"
-K_NETWORK_SUBNET="neil-europe-west1-subnet"
+K_NETWORK="nstevenson-europe-west1"
+K_NETWORK_SUBNET="nstevenson-europe-west1"
 K_NUM_NODES=15
-K_PROJECT=hazelcast-33
+K_PROJECT=solution-architects-415712
 K_ZONE=europe-west1-d
 
 ARG1=`echo $1 | awk '{print tolower($0)}'`
@@ -259,10 +259,11 @@ fi
 K_CLUSTER_NAME=${USER}-${FLAVOR}-${START}
 LEN_K_CLUSTER_NAME=`echo $K_CLUSTER_NAME | wc -c`
 MAX_LEN=40
+MAX_LEN_TRUNC=$(($MAX_LEN - 1))
 if [ $LEN_K_CLUSTER_NAME -gt $MAX_LEN ]
 then
  echo Truncating cluster name: $K_CLUSTER_NAME from $LEN_K_CLUSTER_NAME to $MAX_LEN
- K_CLUSTER_NAME=`echo $K_CLUSTER_NAME | cut -c-$MAX_LEN`
+ K_CLUSTER_NAME=`echo $K_CLUSTER_NAME | cut -c-$MAX_LEN_TRUNC`
  echo Truncated cluster name: $K_CLUSTER_NAME
 fi
 if [ "$CREATE_KUBERNETES_CLUSTER" == true ]
@@ -321,7 +322,7 @@ then
   if [ $IS_YAML -eq 1 ]
   then
    # Assumed naming standard to find image
-   sed "s#image: \"hazelcast-platform-demos#image: \"europe-west1-docker.pkg.dev/hazelcast-33/${USER}#" < $INPUT_FILE | \
+   sed "s#image: \"hazelcast-platform-demos#image: \"europe-west1-docker.pkg.dev/solution-architects-415712/${USER}#" < $INPUT_FILE | \
    sed "s#FLAVOR#${FLAVOR}#g" | \
    sed 's#imagePullPolicy: Never#imagePullPolicy: Always#' > ${OUTPUT_FILE}
    CMD="kubectl create -f $OUTPUT_FILE"
