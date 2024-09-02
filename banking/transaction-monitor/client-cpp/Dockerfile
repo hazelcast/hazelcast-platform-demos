@@ -8,22 +8,30 @@ WORKDIR /build
 
 RUN apt upgrade
 RUN apt update
-RUN apt-get install -y binutils curl g++ git-all libssl-dev linux-libc-dev make ninja-build pkg-config tar unzip wget zip
+RUN apt-get install -y autoconf automake autoconf-archive binutils curl g++ git-all libssl-dev linux-libc-dev make ninja-build pkg-config tar unzip wget zip
 
-RUN wget --quiet https://github.com/Kitware/CMake/releases/download/v3.27.8/cmake-3.27.8-Linux-x86_64.sh && \
-    chmod +x ./cmake-3.27.8-Linux-x86_64.sh && \
-    ./cmake-3.27.8-Linux-x86_64.sh --prefix=/usr/local/ --exclude-subdir && \
-    rm cmake-3.27.8-Linux-x86_64.sh
+RUN wget --quiet https://github.com/Kitware/CMake/releases/download/v3.30.3/cmake-3.30.3-Linux-x86_64.sh && \
+    chmod +x ./cmake-3.30.3-Linux-x86_64.sh && \
+    ./cmake-3.30.3-Linux-x86_64.sh --prefix=/usr/local/ --exclude-subdir && \
+    rm cmake-3.30.3-Linux-x86_64.sh
 
 RUN git clone https://github.com/microsoft/vcpkg && vcpkg/bootstrap-vcpkg.sh 
 # Use revision for builtin-baseline in vcpkg.json
 RUN cd vcpkg && git rev-parse HEAD
+#RUN cd vcpkg && ./vcpkg install "hazelcast-cpp-client[openssl]" --recurse
 
 # build client application
 COPY target/classes/Client.cpp /build
 COPY target/classes/CMakeLists.txt /build
-COPY target/classes/vcpkg.json /build
+COPY target/classes/vcpkg* /build
 
+RUN echo @@@@@@@@@@@@@@@@@@
+RUN cmake --version
+RUN echo @@@@@@@@@@@@@@@@@@
+RUN /usr/bin/c++ --version
+RUN echo @@@@@@@@@@@@@@@@@@
+
+RUN cd /build
 RUN cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
  -DCMAKE_CXX_COMPILER=/usr/bin/g++ \
  -DCMAKE_TOOLCHAIN_FILE=/build/vcpkg/scripts/buildsystems/vcpkg.cmake

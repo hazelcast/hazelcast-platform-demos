@@ -602,10 +602,10 @@
 								<directory>src/main/resources/bin</directory>
 							</fileset>
 							<fileset>
-								<directory>src/main/resources/deleteme</directory>
+								<directory>src/main/resources/obj</directory>
 							</fileset>
 							<fileset>
-								<directory>src/main/resources/obj</directory>
+								<directory>src/main/resources/tmp</directory>
 							</fileset>
 						</filesets>
 					</configuration>

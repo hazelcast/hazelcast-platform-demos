@@ -25,6 +25,9 @@
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
+				<excludes>
+					<exclude>tmp/**</exclude>
+				</excludes>
 			</resource>
 		</resources>
 
