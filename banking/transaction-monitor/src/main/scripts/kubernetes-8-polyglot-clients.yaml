@@ -54,14 +54,6 @@ spec:
         - image: "hazelcast-platform-demos/transaction-monitor-FLAVOR-client-cpp"
           imagePullPolicy: Never
           name: transaction-monitor-FLAVOR-client-cpp-container
-    livenessProbe:
-      exec:
-        command:
-        - true
-    readinessProbe:
-      exec:
-        command:
-        - true
 ---
 apiVersion: apps/v1
 kind: Deployment
