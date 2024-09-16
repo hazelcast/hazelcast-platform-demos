@@ -55,6 +55,7 @@
 
 		<!-- docker-maven-plugin does not like empty/null. Modules using the below 
 			can override. -->
+		<my.docker.control.file>unset</my.docker.control.file>
 		<my.docker.jar.file>unset</my.docker.jar.file>
 		<my.docker.jar.file1>unset</my.docker.jar.file1>
 		<my.docker.jar.file2>unset</my.docker.jar.file2>
@@ -78,12 +79,12 @@
 		<grpc.version>1.48.0</grpc.version>
 
                 <!-- When advancing to GA, also update Dockerfile FROM line for Management Center -->
-		<hazelcast.version>5.5.0</hazelcast.version>
+		<hazelcast.version>5.5.2-SNAPSHOT</hazelcast.version>
 
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
 		<hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
 		<jackson.version>2.17.1</jackson.version>
-		<json.version>20231013</json.version>
+		<json.version>20240303</json.version>
 		<json-smart.version>2.4.11</json-smart.version>
 		<junit-jupiter.version>5.9.3</junit-jupiter.version>
 		<junit-vintage.version>5.9.3</junit-vintage.version>
@@ -93,8 +94,8 @@
 		<kafka-connect.version>2.6.0</kafka-connect.version>
 		<logback.version>1.5.6</logback.version>
 		<mariadb-java-client.version>3.1.4</mariadb-java-client.version>
-		<mongo-java-driver.version>3.12.14</mongo-java-driver.version>
-		<mysql-connector-j.version>8.0.33</mysql-connector-j.version>
+		<mongodb-driver-sync.version>4.11.1</mongodb-driver-sync.version>
+		<mysql-connector-j.version>8.2.0</mysql-connector-j.version>
 		<netty-tcnative.version>2.0.62.Final</netty-tcnative.version>
 		<poi-ooxml.version>5.2.3</poi-ooxml.version>
 		<!-- Run same version with 'protoc - -grpc_out=. - -plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin' 
@@ -102,10 +103,10 @@
 		<proto-google-common-protos.version>2.14.3</proto-google-common-protos.version>
 		<protobuf.version>3.22.1</protobuf.version>
 		<pulsar.version>3.1.0</pulsar.version>
-		<slf4j.version>2.0.7</slf4j.version>
+		<slf4j.version>2.0.13</slf4j.version>
 		<spotbugs-annotations.version>4.7.3</spotbugs-annotations.version>
 		<springdoc.version>2.3.0</springdoc.version>
-		<spring-boot.version>3.3.2</spring-boot.version>
+		<spring-boot.version>3.3.3</spring-boot.version>
 		<spring-cloud.version>2021.0.0</spring-cloud.version>
 		<spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
 		<zipkin.version>2.23.3-SNAPSHOT</zipkin.version>
@@ -114,20 +115,20 @@
 		<build-helper-maven-plugin.version>3.1.0</build-helper-maven-plugin.version>
 		<!-- dockerfile-maven-plugin not being updated on Maven Central, fails 
 			on Mac M1 ARM chip -->
-		<docker-maven-plugin.version>0.44.0</docker-maven-plugin.version>
+		<docker-maven-plugin.version>0.45.0</docker-maven-plugin.version>
 		<exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
 		<frontend-maven-plugin.version>1.13.4</frontend-maven-plugin.version>
 		<hazelcast-cloud-maven-plugin.version>0.0.6</hazelcast-cloud-maven-plugin.version>
 		<maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
-		<maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
+		<maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
 		<maven-checkstyle-plugin.version>3.2.1</maven-checkstyle-plugin.version>
-		<maven-clean-plugin.version>3.3.1</maven-clean-plugin.version>
+		<maven-clean-plugin.version>3.4.0</maven-clean-plugin.version>
 		<maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
-		<maven-failsafe-plugin.version>3.0.0</maven-failsafe-plugin.version>
-		<maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
+		<maven-failsafe-plugin.version>3.3.1</maven-failsafe-plugin.version>
+		<maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
 		<maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
-		<maven-shade-plugin.version>3.4.1</maven-shade-plugin.version>
-		<maven-surefire-plugin.version>3.0.0</maven-surefire-plugin.version>
+		<maven-shade-plugin.version>3.6.0</maven-shade-plugin.version>
+		<maven-surefire-plugin.version>3.3.1</maven-surefire-plugin.version>
 		<os-maven-plugin.version>1.6.2</os-maven-plugin.version>
 		<protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
 		<spotbugs-maven-plugin.version>4.7.3.4</spotbugs-maven-plugin.version>
@@ -414,8 +415,8 @@
 
 			<dependency>
 				<groupId>org.mongodb</groupId>
-				<artifactId>mongo-java-driver</artifactId>
-				<version>${mongo-java-driver.version}</version>
+				<artifactId>mongodb-driver-sync</artifactId>
+				<version>${mongodb-driver-sync.version}</version>
 			</dependency>
 
 			<dependency>
@@ -454,6 +455,17 @@
 		<repository>
 			<id>Hazelcast Private Snapshot Repository</id>
 			<url>https://repository.hazelcast.com/snapshot/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>interval:720</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>snapshot-internal</id>
+			<url>https://repository.hazelcast.com/snapshot-internal/</url>
 			<releases>
 				<enabled>false</enabled>
 			</releases>
@@ -587,11 +599,13 @@
 								<directory>src/main/app/static</directory>
 							</fileset>
 							<fileset>
-								<directory>src/main/resources</directory>
-                                                                <includes>
-                                                                	<include>bin</include>
-                                                                	<include>obj</include>
-                                                                </includes>
+								<directory>src/main/resources/bin</directory>
+							</fileset>
+							<fileset>
+								<directory>src/main/resources/obj</directory>
+							</fileset>
+							<fileset>
+								<directory>src/main/resources/tmp</directory>
 							</fileset>
 						</filesets>
 					</configuration>

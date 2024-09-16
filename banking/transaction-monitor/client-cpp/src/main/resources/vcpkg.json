@@ -4,9 +4,21 @@
   	"builtin-baseline": "ae59b93af0c1dce4126e963fca5b330662495fa1",
     "dependencies": [ 
 		{
+			"name": "boost",
+            "version>=": "1.85.0"
+		},
+		{
+			"name": "boost-scope",
+            "version>=": "1.85.0"
+		},
+		{
 			"name": "hazelcast-cpp-client",
 			"features": ["openssl"],
             "version>=": "5.3.0"
+		},
+		{
+			"name": "openssl",
+            "version>=": "3.3.1"
 		}
     ],
     "overrides": [

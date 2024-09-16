@@ -39,7 +39,7 @@
 		<module>abstract-hazelcast-node</module>
 		<module>cassandra</module>
 		<module>client-command-line</module>
-<!-- Issue 220
+<!-- Until https://github.com/hazelcast/hazelcast-platform-demos/issues/220 fixed
 		<module>client-cpp</module>
 -->
 		<module>client-csharp</module>
