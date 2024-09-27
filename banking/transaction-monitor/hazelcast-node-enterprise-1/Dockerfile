@@ -3,9 +3,9 @@ FROM --platform=linux/amd64 library/python:3.8-buster
 # Add Java
 RUN apt update
 RUN cd /tmp ; \
-    wget -q https://download.java.net/java/GA/jdk21/fd2272bbf8e04c3dbaee13770090416c/35/GPL/openjdk-21_linux-x64_bin.tar.gz ; \
-    tar xf openjdk-21_linux-x64_bin.tar.gz ;
-RUN update-alternatives --install /usr/bin/java java /tmp/jdk-21/bin/java 1
+    wget -q https://download.java.net/java/GA/jdk23/3c5b90190c68498b986a97f276efd28a/37/GPL/openjdk-23_linux-x64_bin.tar.gz ; \
+    tar xf openjdk-23_linux-x64_bin.tar.gz ;
+RUN update-alternatives --install /usr/bin/java java /tmp/jdk-23/bin/java 1
 
 # Download requirements into image makes start up faster when growing cluster
 COPY target/classes/requirements.txt /
