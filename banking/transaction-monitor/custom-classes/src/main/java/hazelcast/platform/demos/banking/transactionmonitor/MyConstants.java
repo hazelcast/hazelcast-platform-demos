@@ -131,6 +131,7 @@ public class MyConstants {
 
     public static final String VECTOR_COLLECTION_TRANSACTIONS = "transactions";
     public static final String VECTOR_DOCUMENT_MOMENTS = "moments";
+    public static final int MOMENTS_IN_HOUR = 40;
 
     public static final String WEBSOCKET_PATH_TRANSACTIONS = "/transactions";
 

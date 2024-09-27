@@ -37,7 +37,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * </p>
  */
 public class VectorCollectionMomentsSink {
-    private static final int MOMENTS_IN_HOUR = 40;
     private final VectorCollection<String, String> transactions;
 
     @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Object is thread-safe")
@@ -82,7 +81,7 @@ public class VectorCollectionMomentsSink {
 
             float[] moments;
             if (vectorDocument == null) {
-                moments = new float[MOMENTS_IN_HOUR];
+                moments = new float[MyConstants.MOMENTS_IN_HOUR];
             } else {
                 VectorValues vectors = vectorDocument.getVectors();
                 if (vectors instanceof MultiIndexVectorValues) {
@@ -91,7 +90,7 @@ public class VectorCollectionMomentsSink {
                 } else {
                     System.out.println(VectorCollectionMomentsSink.class.getName()
                             + ":Class expected '" + vectors.getClass().getCanonicalName() + "'");
-                    moments = new float[MOMENTS_IN_HOUR];
+                    moments = new float[MyConstants.MOMENTS_IN_HOUR];
                 }
             }
             moments[moment] = keyedWindowResult.getValue();
