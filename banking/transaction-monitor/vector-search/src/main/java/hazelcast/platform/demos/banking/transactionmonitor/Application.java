@@ -16,18 +16,32 @@
 
 package hazelcast.platform.demos.banking.transactionmonitor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 /**
  * <p>Entry point, "{@code main()}" method.
  * </p>
  */
+@SpringBootApplication
 public class Application {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
-    /**
-     * <p>Start with specific configuration, and leave it running.
-     * </p>
-     */
+    static {
+        // Set HZ to use Slf4j
+        System.setProperty("hazelcast.logging.type", "slf4j");
+        // Confirm environment
+        System.getProperties().keySet().stream().forEach(key -> {
+            if (key.toString().startsWith("my")) {
+                LOGGER.info("{} {}", key, System.getProperty(key.toString()));
+            }
+        });
+    }
+
     public static void main(String[] args) throws Exception {
-        ApplicationInitializerEnterprise.build(args);
+        SpringApplication.run(Application.class, args);
     }
 
 }

@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package hazelcast.platform.demos.banking.transactionmonitor;
+'use strict';
 
-/**
- * <p>Entry point, "{@code main()}" method.
- * </p>
- */
-public class Application {
+import React, { Component } from 'react';
 
-    /**
-     * <p>Start with specific configuration, and leave it running.
-     * </p>
-     */
-    public static void main(String[] args) throws Exception {
-        ApplicationInitializerEnterprise.build(args);
-    }
-
+class App extends Component {
+        render() {
+                return (
+                                <div>
+                                        <div class="minor_pane">
+                                        	<h1>VECTOR SEARCH WILL APPEAR HERE</h1>
+                                        </div>
+                                </div>
+                )
+        }
 }
+
+export default App;

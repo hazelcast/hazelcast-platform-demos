@@ -3,7 +3,8 @@ hazelcast:
   cluster-name: '@my.cluster1.name@'
   import:
     # Import section same for three clusters in this example
-    - hazelcast-common.yml  
+    - hazelcast-common.yml
+    - hazelcast-common-opensource.yml
   #
   # Assuming Kubernetes, but override from Java code if we detect otherwise
   network:

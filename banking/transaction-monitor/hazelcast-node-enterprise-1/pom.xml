@@ -24,23 +24,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast-enterprise</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>transaction-monitor-abstract-hazelcast-node</artifactId>
+			<artifactId>transaction-monitor-abstract-hazelcast-node-enterprise</artifactId>
 			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.hazelcast</groupId>
-					<artifactId>hazelcast</artifactId>
-				</exclusion>
-                                <exclusion>
-                                        <groupId>com.hazelcast.jet.contrib</groupId>
-                                        <artifactId>pulsar</artifactId>
-                                </exclusion>
-			</exclusions>
 		</dependency>
 	</dependencies>
 

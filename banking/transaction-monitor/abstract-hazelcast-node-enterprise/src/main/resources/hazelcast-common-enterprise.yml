@@ -1,0 +1,8 @@
+hazelcast:
+  # Special configuration for Enterprise deployments.
+  vector-collection:
+    'transactions':
+      indexes:
+        - name: moments
+          dimension: 40
+          metric: EUCLIDEAN

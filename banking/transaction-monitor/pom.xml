@@ -37,6 +37,7 @@
 	<modules>
 		<module>abstract-hazelcast-client</module>
 		<module>abstract-hazelcast-node</module>
+		<module>abstract-hazelcast-node-enterprise</module>
 		<module>cassandra</module>
 		<module>client-command-line</module>
 <!-- Until https://github.com/hazelcast/hazelcast-platform-demos/issues/220 fixed
@@ -70,6 +71,7 @@
 		<module>remote-job-sub-1</module>
 		<module>topic-create</module>
 		<module>transaction-producer</module>
+		<module>vector-search</module>
 		<module>webapp</module>
 		<module>zookeeper</module>
 	</modules>
