@@ -73,6 +73,20 @@ spec:
     targetPort: 9042
   type: LoadBalancer
 ---
+# FinOS : DNS will be "transaction-monitor-FLAVOR-finos.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-FLAVOR-finosf
+spec:
+  selector:
+    app: transaction-monitor-FLAVOR-finos
+  ports:
+  - port: 8080
+    targetPort: 8080
+  type: LoadBalancer
+---
 # Flow : DNS will be "transaction-monitor-FLAVOR-flow.default.svc.cluster.local".
 ---
 apiVersion: v1
@@ -159,6 +173,35 @@ spec:
     - name: pulsar-http
       port: 8080
       targetPort: 8080
+  type: LoadBalancer
+---
+# Vector Search : DNS will be "transaction-monitor-FLAVOR-vector-search.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-FLAVOR-vector-search
+spec:
+  selector:
+    app: transaction-monitor-FLAVOR-vector-search
+  ports:
+  - port: 8080
+    targetPort: 8080
+  type: LoadBalancer
+---
+# Webapp : DNS will be "transaction-monitor-FLAVOR-webapp.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-FLAVOR-webapp
+spec:
+  selector:
+    app: transaction-monitor-FLAVOR-webapp
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
   type: LoadBalancer
 ---
 # Zookeeper : DNS will be "transaction-monitor-FLAVOR-zookeeper.default.svc.cluster.local".

@@ -129,6 +129,9 @@ public class MyConstants {
 
     public static final String PN_UPDATER = "updater-" + PerspectiveTrade.class.getSimpleName();
 
+    public static final String VECTOR_COLLECTION_TRANSACTIONS = "transactions";
+    public static final String VECTOR_DOCUMENT_MOMENTS = "moments";
+
     public static final String WEBSOCKET_PATH_TRANSACTIONS = "/transactions";
 
     // For demonstration of queries

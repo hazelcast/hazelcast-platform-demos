@@ -1,21 +1,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+        <modelVersion>4.0.0</modelVersion>
 
-	<parent>
+        <parent>
 		<groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
-		<artifactId>transaction-monitor-root</artifactId>
-		<version>6.0</version>
-	</parent>
+        	<artifactId>transaction-monitor-root</artifactId>
+                <version>6.0</version>
+        </parent>
 
-	<artifactId>transaction-monitor-flow</artifactId>
+        <artifactId>transaction-monitor-vector-search</artifactId>
 
-	<name>Hazelcast Platform - Transaction Monitor - Flow</name>
-	<description>Transaction Monitor - Flow</description>
+        <name>Hazelcast Platform - Transaction Monitor - Vector Search</name>
+        <description>Transaction Monitor - Vector Search client</description>
 
 	<properties>
-		<my.docker.image.name>flow</my.docker.image.name>
+		<my.docker.image.name>vector-search</my.docker.image.name>
 		<my.docker.jar.file>
 			${project.artifactId}-${project.version}.jar</my.docker.jar.file>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
@@ -157,7 +157,7 @@
                                         </execution>
                                 </executions>
                         </plugin>
-                   	<plugin>
+                       	<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
