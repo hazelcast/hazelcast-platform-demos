@@ -17,13 +17,14 @@
 'use strict';
 
 import React, { Component } from 'react';
+import Search from './components/search'
 
 class App extends Component {
         render() {
                 return (
                                 <div>
-                                        <div class="minor_pane">
-                                        	<h1>VECTOR SEARCH WILL APPEAR HERE</h1>
+                                        <div class="major_pane">
+						<Search />
                                         </div>
                                 </div>
                 )

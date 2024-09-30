@@ -16,7 +16,6 @@
 
 package hazelcast.platform.demos.banking.transactionmonitor;
 
-import java.util.Arrays;
 import java.util.Iterator;
 
 import org.slf4j.Logger;
@@ -58,7 +57,7 @@ public class MyRestController {
      */
     @GetMapping(value = "/vectorsearch", produces = MediaType.APPLICATION_JSON_VALUE)
     public String vectorSearch(@RequestParam("ints") String intCsv) {
-        LOGGER.info("vectorSearch()");
+        LOGGER.info("vectorSearch(): {}", intCsv);
 
         boolean error = false;
         String errorMessage = "";
@@ -68,7 +67,6 @@ public class MyRestController {
 
         try {
             float[] targetMoments = this.parse(intCsv);
-            LOGGER.debug("vectorSearch(): search for {}", Arrays.toString(targetMoments));
             VectorValues targetVectorValues = VectorValues.of(MyConstants.VECTOR_DOCUMENT_MOMENTS, targetMoments);
 
             SearchResults<String, String> searchResults =
@@ -85,7 +83,6 @@ public class MyRestController {
                 stringBuilder.append(formatMatch(iterator.next()));
                 count++;
             }
-
         } catch (Exception e) {
             LOGGER.error(String.format("vectorSearch(%s)", intCsv, e));
             error = true;
@@ -113,14 +110,14 @@ public class MyRestController {
         String[] input = intCsv.split(",");
         if (input.length != result.length) {
             throw new RuntimeException(String.format("Parse '%s' found %d not %d items",
-                    input, input.length, result.length));
+                    intCsv, input.length, result.length));
         }
         for (int i = 0; i < input.length; i++) {
             try {
                 result[i] = Float.parseFloat(input[i]);
             } catch (NumberFormatException nfe) {
                 throw new RuntimeException(String.format("Parse '%s' item %d not a number, '%s'",
-                        input, i, input[i]));
+                        intCsv, i, input[i]));
             }
         }
         return result;
