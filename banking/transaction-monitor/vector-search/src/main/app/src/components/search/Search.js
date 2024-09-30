@@ -185,7 +185,7 @@ class Search extends Component {
 									}
 								}
 								var start = j * COLS;
-								var end = j * COLS + (ROWS - 1);
+								var end = j * (COLS + 1) - 1;
 								var line = String(start).padStart(2, "0") + '-' + String(end).padStart(2, "0") + ":";
 								vv.push(<p><b>{line}</b>{remainder}</p>);
 							}
