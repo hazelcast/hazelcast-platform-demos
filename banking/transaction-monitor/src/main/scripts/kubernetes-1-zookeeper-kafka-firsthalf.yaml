@@ -78,7 +78,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: transaction-monitor-FLAVOR-finosf
+  name: transaction-monitor-FLAVOR-finos
 spec:
   selector:
     app: transaction-monitor-FLAVOR-finos
