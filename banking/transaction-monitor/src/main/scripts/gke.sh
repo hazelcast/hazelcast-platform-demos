@@ -1,6 +1,7 @@
 #!/bin/bash
 
 START=`date +"%Y-%m-%d-%H-%M-%S"`
+START_UTC=`date -u +"%Y-%m-%d-%H-%M-%S"`
 
 DIRNAME=`dirname $0`
 cd $DIRNAME
@@ -256,7 +257,7 @@ then
 fi
 
 # Create Kubernetes cluster
-K_CLUSTER_NAME=${USER}-${FLAVOR}-${START}
+K_CLUSTER_NAME=${USER}-${FLAVOR}-${START_UTC}
 LEN_K_CLUSTER_NAME=`echo $K_CLUSTER_NAME | wc -c`
 MAX_LEN=40
 MAX_LEN_TRUNC=$(($MAX_LEN - 1))
