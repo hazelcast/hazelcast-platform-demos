@@ -79,7 +79,7 @@
 		<grpc.version>1.48.0</grpc.version>
 
                 <!-- When advancing to GA, also update Dockerfile FROM line for Management Center -->
-		<hazelcast.version>5.5.2-SNAPSHOT</hazelcast.version>
+		<hazelcast.version>5.5.2</hazelcast.version>
 
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
 		<hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
