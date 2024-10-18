@@ -1,5 +1,5 @@
-#FROM --platform=linux/amd64 hazelcast/management-center:latest-snapshot
-FROM --platform=linux/amd64 hazelcast/management-center:5.5.0
+FROM --platform=linux/amd64 hazelcast/management-center:latest-snapshot
+#FROM --platform=linux/amd64 hazelcast/management-center:5.5.2
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MC_LICENSE
@@ -24,7 +24,7 @@ ENV JAVA_OPTS="-Dhazelcast.mc.healthCheck.enable=true \
 #ENV MC_ADMIN_PASSWORD=$MY_ADMINPASSWORD
 
 # Preconfigure cluster connections
-ENV HOST_IP ""
+ENV HOST_IP=""
 ENV MC_CLUSTER1_NAME=$MC_CLUSTER1_NAME
 ENV MC_CLUSTER1_ADDRESSLIST=$MC_CLUSTER1_ADDRESSLIST
 ENV MC_CLUSTER1_PORTLIST=$MC_CLUSTER1_PORTLIST

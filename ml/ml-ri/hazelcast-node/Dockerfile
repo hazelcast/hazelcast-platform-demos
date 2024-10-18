@@ -21,10 +21,10 @@ ARG JAR_FILE
 COPY target/${JAR_FILE} application.jar
 
 # Default true
-ENV MY_KUBERNETES_ENABLED "true"
+ENV MY_KUBERNETES_ENABLED="true"
 
-ENV JAVA_ARGS ""
-ENV JAVA_OPTS "--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
+ENV JAVA_ARGS=""
+ENV JAVA_OPTS="--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
 
 CMD ["bash", "-c", "set -euo pipefail \
       && echo @@@@@@@@@@ \

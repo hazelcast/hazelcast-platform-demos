@@ -127,8 +127,7 @@ public class ApplicationRunner {
             break;
         }
 
-        this.transactionsMap =
-                this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_TRANSACTIONS);
+        this.transactionsMap = this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_TRANSACTIONS);
 
         // Be aware of new transactions
         this.transactionsMap.addEntryListener(new TransactionsMapListener(transactionMonitorFlavor), true);
@@ -146,11 +145,12 @@ public class ApplicationRunner {
                 LOGGER.info("Skip launch admin runnables, PNCounter '{}'=={}",
                         updateCounter.getName(), updateCounter.get());
             }
-            // Additional code to demonstrate namespaces where applicable
-            if (this.namespacesApplicable()) {
+            // Additional code to demonstrate enterprise features where applicable
+            if (this.isEnterprise()) {
                 ApplicationRunnerNamespaces.runNamespaceActions(this.hazelcastInstance, this.useHzCloud);
+                TransactionMonitorIdempotentInitializationEnterprise
+                    .launchNeededEnterpriseJobs(this.hazelcastInstance, this.useHzCloud, transactionMonitorFlavor);
             }
-
             ok = demoSql();
         }
 
@@ -193,9 +193,9 @@ public class ApplicationRunner {
      *
      * @return
      */
-    private boolean namespacesApplicable() {
+    private boolean isEnterprise() {
         if (this.localhost) {
-            LOGGER.info("namespacesApplicable(): false as localhost.");
+            LOGGER.info("isEnterprise(): false as localhost.");
             return false;
         }
 
@@ -207,15 +207,15 @@ public class ApplicationRunner {
             Future<Boolean> future = iExecutorService.submit(enterpriseChecker);
             Boolean b = future.get();
             if (b == null) {
-                LOGGER.error("namespacesApplicable(), future.get() null");
+                LOGGER.error("isEnterprise(), future.get() null");
             } else {
                 isEnterprise = b;
             }
         } catch (Exception e) {
-            LOGGER.error("namespacesApplicable(), future.get()", e);
+            LOGGER.error("isEnterprise(), future.get()", e);
         }
 
-        LOGGER.info("namespacesApplicable(): isEnterprise=={}", isEnterprise);
+        LOGGER.info("isEnterprise(): isEnterprise=={}", isEnterprise);
         return isEnterprise;
     }
 
