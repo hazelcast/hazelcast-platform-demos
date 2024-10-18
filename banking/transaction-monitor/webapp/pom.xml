@@ -74,7 +74,6 @@
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-sql</artifactId>
-<scope>provided</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>com.hazelcast</groupId>
@@ -83,6 +82,7 @@
 			</exclusions>
 		</dependency>
 		<!-- Need this for SSL for Hazelcast Cloud -->
+		<!-- TODO -java-client -->
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-enterprise</artifactId>

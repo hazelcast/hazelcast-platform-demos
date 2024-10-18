@@ -58,6 +58,9 @@
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-enterprise</artifactId>
+			<!-- TODO
+			<artifactId>hazelcast-enterprise-java-client</artifactId>
+ 			-->
 		</dependency>
 
 		<dependency>
