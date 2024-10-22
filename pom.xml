@@ -80,6 +80,7 @@
 
                 <!-- When advancing to GA, also update Dockerfile FROM line for Management Center -->
 		<hazelcast.version>5.5.2</hazelcast.version>
+		<hazelcast-client.version>5.5.0-BETA</hazelcast-client.version>
 
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
 		<hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
@@ -222,6 +223,11 @@
 				<groupId>com.hazelcast</groupId>
 				<artifactId>hazelcast-enterprise</artifactId>
 				<version>${hazelcast.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.hazelcast</groupId>
+				<artifactId>hazelcast-enterprise-java-client</artifactId>
+				<version>${hazelcast-client.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast</groupId>
