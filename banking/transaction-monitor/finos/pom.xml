@@ -57,7 +57,10 @@
 		<!-- Need this for SSL for Hazelcast Cloud -->
 		<dependency>
 			<groupId>com.hazelcast</groupId>
+<!-- Needs Kubernetes Config
 			<artifactId>hazelcast-enterprise-java-client</artifactId>
+-->
+			<artifactId>hazelcast-enterprise</artifactId>
 		</dependency>
 
 		<dependency>
