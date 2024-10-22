@@ -700,13 +700,13 @@ every 100,000th after that.
 There will be output from the `IngestTrades` job, which is an upload, so the format is the same as the `trade-producer`.
 
 ```
-14:42:40.090 INFO  hz.wonderful_goldwasser.jet.blocking.thread-4 c.h.j.i.c.W.IngestTrades/loggerSink#0 - [192.168.0.125]:5701 [trade-monitor] [4.0] 846b4539-e4de-4545-a3cd-9976c1fa0a9f={"id": "846b4539-e4de-4545-a3cd-9976c1fa0a9f","timestamp": 1583934115940,"symbol": "AMSF","price": 2501,"quantity": 378} 
+14:42:40.090 INFO  hz.wonderful_goldwasser.jet.blocking.thread-4 c.h.j.i.c.W.IngestTrades/loggerSink#0 - [192.168.0.125]:5701 [trade-monitor] [5.5] 846b4539-e4de-4545-a3cd-9976c1fa0a9f={"id": "846b4539-e4de-4545-a3cd-9976c1fa0a9f","timestamp": 1583934115940,"symbol": "AMSF","price": 2501,"quantity": 378} 
 ```
 
 And there will be output from the `AggregateQuery` job. As below, the stock symbol is "_WPCS_" and for this a trio of numbers are produced "_(1, 702219, 2499)_" (which means 1 trade for that symbol, volume is 702,219, price $24.99).
 
 ```
-14:42:40.354 INFO  hz.wonderful_goldwasser.jet.blocking.thread-9 c.h.j.i.c.W.AggregateQuery/loggerSink#0 - [192.168.0.125]:5701 [trade-monitor] [4.0] WPCS=(1, 702219, 2499) 
+14:42:40.354 INFO  hz.wonderful_goldwasser.jet.blocking.thread-9 c.h.j.i.c.W.AggregateQuery/loggerSink#0 - [192.168.0.125]:5701 [trade-monitor] [5.5] WPCS=(1, 702219, 2499) 
 ```
 
 Finally, the `webapp` also produces logs, of trade changes it is listening to. Again, this is the raw trade not the

@@ -23,6 +23,21 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>transaction-monitor-common</artifactId>
 			<version>${project.version}</version>
+                        <exclusions>
+                        	<exclusion>
+					<groupId>com.hazelcast</groupId>
+					<artifactId>hazelcast</artifactId>
+                        	</exclusion>
+                        	<exclusion>
+					<groupId>com.hazelcast</groupId>
+					<artifactId>hazelcast-enterprise</artifactId>
+                        	</exclusion>
+                        </exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 

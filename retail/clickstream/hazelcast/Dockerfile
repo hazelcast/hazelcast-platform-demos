@@ -25,7 +25,7 @@ ARG JAR_FILE
 COPY target/${JAR_FILE} application.jar
 
 # Default values provided
-ENV MY_KUBERNETES_ENABLED "true"
+ENV MY_KUBERNETES_ENABLED="true"
 
 # Preconfigure cluster connections
 ENV MC_CLUSTER1_NAME=$MC_CLUSTER1_NAME
@@ -35,8 +35,8 @@ ENV MC_CLUSTER2_NAME=$MC_CLUSTER2_NAME
 ENV MC_CLUSTER2_ADDRESSLIST=$MC_CLUSTER2_ADDRESSLIST
 ENV MC_CLUSTER2_PORTLIST=$MC_CLUSTER2_PORTLIST
 
-ENV JAVA_ARGS "-Xmx3G -Xms3G"
-ENV JAVA_OPTS "--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
+ENV JAVA_ARGS="-Xmx3G -Xms3G"
+ENV JAVA_OPTS="--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
 
 ENTRYPOINT exec java \
    $JAVA_ARGS $JAVA_OPTS \

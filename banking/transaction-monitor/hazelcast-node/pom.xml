@@ -27,6 +27,12 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>transaction-monitor-abstract-hazelcast-node</artifactId>
 			<version>${project.version}</version>
+                        <exclusions>
+                                <exclusion>
+                                        <groupId>com.hazelcast.jet.contrib</groupId>
+                                        <artifactId>pulsar</artifactId>
+                                </exclusion>
+                        </exclusions>
 		</dependency>
 	</dependencies>
 

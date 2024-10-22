@@ -10,13 +10,13 @@ COPY target/${JAR_FILE} target/client.truststore* /
 RUN rm /${JAR_FILE}
 
 # Default values provided
-ENV MY_CPP_SERVICE "cva-cpp"
-ENV MY_KUBERNETES_ENABLED "true"
-ENV MY_SITE ""
-ENV MY_THRESHOLD ""
+ENV MY_CPP_SERVICE="cva-cpp"
+ENV MY_KUBERNETES_ENABLED="true"
+ENV MY_SITE=""
+ENV MY_THRESHOLD=""
 
-ENV JAVA_ARGS ""
-ENV JAVA_OPTS "--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
+ENV JAVA_ARGS=""
+ENV JAVA_OPTS="--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
 
 COPY target/classes/custom-entrypoint.sh  /
 CMD ["bash", "-c", "set -euo pipefail \

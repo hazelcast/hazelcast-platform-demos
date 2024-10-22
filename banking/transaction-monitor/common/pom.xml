@@ -51,7 +51,8 @@
 
 		<dependency>
 			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast</artifactId>
+			<artifactId>hazelcast-enterprise</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast</groupId>
@@ -104,7 +105,7 @@
 
 		<dependency>
 			<groupId>org.mongodb</groupId>
-			<artifactId>mongo-java-driver</artifactId>
+			<artifactId>mongodb-driver-sync</artifactId>
 		</dependency>
 
 		<dependency>

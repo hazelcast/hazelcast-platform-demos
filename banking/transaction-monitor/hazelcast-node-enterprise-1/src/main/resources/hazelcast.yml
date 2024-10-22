@@ -4,6 +4,7 @@ hazelcast:
   import:
     # Import section same for three clusters in this example
     - hazelcast-common.yml  
+    - hazelcast-common-enterprise.yml
   #
   # Assuming Kubernetes, but override from Java code if we detect otherwise
   network:

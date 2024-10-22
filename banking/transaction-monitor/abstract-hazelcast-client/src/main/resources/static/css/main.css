@@ -129,6 +129,33 @@ h5 {
 	font-weight: bold;
 }
 
+.vectorButton {
+	text-align: center;
+    font-family: "Courier New", Courier, monospace;	
+}
+
+.vectorInput {
+	border: 2px solid var(--color-blueberry);
+	background-color: var(--color-ice);
+	color: black;
+}
+
+.vectorInputTable {
+	width: 100%
+}
+
+.vectorOutputTable {
+	width: 100%;
+	color: black;
+	font-size: small;
+}
+
+.vectorOutput {
+	border: 2px solid var(--color-blueberry);
+	background-color: white;        
+	color: black;
+}
+
 .warninginner {
 	color: var(--color-carrot);
 }

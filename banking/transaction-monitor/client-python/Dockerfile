@@ -14,8 +14,8 @@ COPY target/classes/${CONTROL_FILE} target/*.pfx /tmp/
 COPY target/classes/${CONTROL_FILE} target/*.pem /tmp/
 
 # Default assume in Kubernetes, else Docker
-ENV HOST_IP ""
-ENV MY_KUBERNETES_ENABLED "true"
+ENV HOST_IP=""
+ENV MY_KUBERNETES_ENABLED="true"
 
 CMD ["bash", "-c", "set -euo pipefail \
       && echo @@@@@@@@@@ \

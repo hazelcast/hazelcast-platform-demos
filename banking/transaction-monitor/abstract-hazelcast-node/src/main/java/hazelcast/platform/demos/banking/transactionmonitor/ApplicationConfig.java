@@ -33,6 +33,7 @@ import com.hazelcast.config.DataPersistenceConfig;
 import com.hazelcast.config.DiscoveryConfig;
 import com.hazelcast.config.DiscoveryStrategyConfig;
 import com.hazelcast.config.DiskTierConfig;
+import com.hazelcast.config.EventJournalConfig;
 import com.hazelcast.config.ExecutorConfig;
 import com.hazelcast.config.InMemoryFormat;
 import com.hazelcast.config.JoinConfig;
@@ -250,6 +251,7 @@ public class ApplicationConfig {
             LOGGER.debug("Setting map '{}' for TieredStore", mapConfig.getName());
             mapConfig.setInMemoryFormat(InMemoryFormat.NATIVE);
             mapConfig.setTieredStoreConfig(tieredStoreConfig);
+            mapConfig.setEventJournalConfig(new EventJournalConfig().setEnabled(true));
         }
     }
 

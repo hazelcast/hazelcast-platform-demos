@@ -4,7 +4,7 @@ FROM --platform=linux/amd64 bitnami/kafka:3.4.0
 RUN java --version
 
 # Default values provided
-ENV MY_BOOTSTRAP_SERVERS "0.0.0.0:9092,0.0.0.0:9093,0.0.0.0:9094"
+ENV MY_BOOTSTRAP_SERVERS="0.0.0.0:9092,0.0.0.0:9093,0.0.0.0:9094"
 
 # Create topics shared between producer and consumer, so either can start first.
 # kafka-connect creates some extras at runtime for it's own use.

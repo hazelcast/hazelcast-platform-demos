@@ -1,0 +1,25 @@
+{
+  "name": "vector-search",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "immutability-helper": "^3.1.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-table": "^7.8.0",
+    "rest": "^2.0.0",
+    "styled-components": "^5.3.9"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.2",
+    "@babel/preset-react": "^7.24.7",	  
+    "babel-loader": "^9.2.1",
+    "css-loader": "^7.1.2",
+    "@types/react": "^18.3.9",
+    "@types/react-dom": "^18.3.0",
+    "style-loader": "^3.3.3",
+    "webpack": "^5.94.0",
+    "webpack-cli": "^5.1.4"
+  }
+}

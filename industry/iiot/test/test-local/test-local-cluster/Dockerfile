@@ -22,8 +22,8 @@ COPY target/${JAR_FILE2} application2.jar
 
 # Preconfigure
 ENV HZ_CLOUD_CLUSTER1_NAME=$HZ_CLOUD_CLUSTER1_NAME
-ENV JAVA_ARGS ""
-ENV JAVA_OPTS "--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
+ENV JAVA_ARGS=""
+ENV JAVA_OPTS="--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
 ENV MAIN_CLASS=${MAIN_CLASS}
 
 ENTRYPOINT exec java \

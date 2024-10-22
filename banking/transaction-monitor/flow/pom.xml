@@ -15,7 +15,6 @@
 	<description>Transaction Monitor - Flow</description>
 
 	<properties>
-		<my.docker.control.file>control.file</my.docker.control.file>
 		<my.docker.image.name>flow</my.docker.image.name>
 		<my.docker.jar.file>
 			${project.artifactId}-${project.version}.jar</my.docker.jar.file>
@@ -33,6 +32,10 @@
 			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+				<exclusion>
 					<groupId>com.hazelcast</groupId>
 					<artifactId>hazelcast</artifactId>
 				</exclusion>
@@ -44,6 +47,10 @@
 					<groupId>com.hazelcast.jet.contrib</groupId>
 					<artifactId>pulsar</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4-api</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
@@ -51,6 +58,9 @@
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-enterprise</artifactId>
+			<!-- TODO
+			<artifactId>hazelcast-enterprise-java-client</artifactId>
+ 			-->
 		</dependency>
 
 		<dependency>
@@ -150,7 +160,7 @@
                                         </execution>
                                 </executions>
                         </plugin>
-                        			<plugin>
+                        <plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>

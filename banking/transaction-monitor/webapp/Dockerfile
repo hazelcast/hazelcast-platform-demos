@@ -1,4 +1,4 @@
-FROM amd64/ubuntu:22.04
+FROM --platform=linux/amd64 amd64/ubuntu:24.10
 
 # Add and confirm Java installed
 RUN apt upgrade
@@ -32,12 +32,12 @@ RUN rm /${JAR_FILE}
 
 # Default values provided
 ENV MAIN_CLASS=${MAIN_CLASS}
-ENV MY_BOOTSTRAP_SERVERS "0.0.0.0:9092,0.0.0.0:9093,0.0.0.0:9094"
-ENV MY_DOCKER_ENABLED "true"
-ENV MY_KUBERNETES_ENABLED "true"
+ENV MY_BOOTSTRAP_SERVERS="0.0.0.0:9092,0.0.0.0:9093,0.0.0.0:9094"
+ENV MY_DOCKER_ENABLED="true"
+ENV MY_KUBERNETES_ENABLED="true"
 
-ENV JAVA_ARGS ""
-ENV JAVA_OPTS "--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
+ENV JAVA_ARGS=""
+ENV JAVA_OPTS="--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
 
 COPY target/classes/custom-entrypoint.sh  /
 CMD ["bash", "-c", "set -euo pipefail \

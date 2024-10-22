@@ -1,0 +1,51 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.hazelcast.platform.demos.banking.transaction.monitor</groupId>
+		<artifactId>transaction-monitor-root</artifactId>
+		<version>5.5</version>
+	</parent>
+
+	<artifactId>transaction-monitor-abstract-hazelcast-node-enterprise</artifactId>
+
+	<name>Hazelcast Platform - Transaction Monitor - Abstract Hazelcast Node Enterprise</name>
+	<description>Transaction Monitor - Abstract Hazelcast Node Enterprise</description>
+
+	<properties>
+		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-enterprise</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>transaction-monitor-abstract-hazelcast-node</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.hazelcast</groupId>
+					<artifactId>hazelcast</artifactId>
+				</exclusion>
+				<exclusion>
+                    <groupId>com.hazelcast.jet.contrib</groupId>
+                    <artifactId>pulsar</artifactId>
+                </exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+	</build>
+</project>

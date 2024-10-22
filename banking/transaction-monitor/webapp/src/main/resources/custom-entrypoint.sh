@@ -23,7 +23,6 @@ echo java $JAVA_ARGS $JAVA_OPTS \
  -Dmy.mysql.address=$MY_MYSQL_ADDRESS \
  -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
  -Dmy.pulsar.address=$MY_PULSAR_ADDRESS \
- -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
  -cp ./application.jar:./namespace1.jar:./namespace2.jar:./namespace3.jar \
  $MAIN_CLASS
 exec java $JAVA_ARGS $JAVA_OPTS \
@@ -36,6 +35,5 @@ exec java $JAVA_ARGS $JAVA_OPTS \
  -Dmy.mysql.address=$MY_MYSQL_ADDRESS \
  -Dmy.postgres.address=$MY_POSTGRES_ADDRESS \
  -Dmy.pulsar.address=$MY_PULSAR_ADDRESS \
- -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
  -cp ./application.jar:./namespace1.jar:./namespace2.jar:./namespace3.jar \
  $MAIN_CLASS
