@@ -74,6 +74,7 @@
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-sql</artifactId>
+<scope>provided</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>com.hazelcast</groupId>
