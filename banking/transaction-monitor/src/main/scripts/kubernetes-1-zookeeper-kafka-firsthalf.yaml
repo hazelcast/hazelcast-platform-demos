@@ -23,6 +23,45 @@ spec:
   ports:
   - port: 19092
 ---
+# Kafka Broker : DNS will be "transaction-monitor-FLAVOR-kafka-prometheus.default.svc.cluster.local".
+# For Prometheus to access /metrcis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-FLAVOR-kafka-prometheus-0
+spec:
+  selector:
+    statefulset.kubernetes.io/pod-name: transaction-monitor-FLAVOR-kafka-broker-0
+  ports:
+    - port: 7071
+      targetPort: 7071
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-FLAVOR-kafka-prometheus-1
+spec:
+  selector:
+    statefulset.kubernetes.io/pod-name: transaction-monitor-FLAVOR-kafka-broker-1
+  ports:
+    - port: 7071
+      targetPort: 7071
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-FLAVOR-kafka-prometheus-2
+spec:
+  selector:
+    statefulset.kubernetes.io/pod-name: transaction-monitor-FLAVOR-kafka-broker-2
+  ports:
+    - port: 7071
+      targetPort: 7071
+  type: LoadBalancer
+---
 # FOR EXTERNAL ACCESS: ONE EACH PER KAFKA BROKER
 # "LoadBalancer" allows the ConfigMap to find all 3, needed for Webapp
 ---

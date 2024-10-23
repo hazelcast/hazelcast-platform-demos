@@ -6,3 +6,12 @@ scrape_configs:
   - job_name: 'HZ MC'
     static_configs:
     - targets: ['@my.management.center.name@.default.svc.cluster.local:8080'] 
+  - job_name: 'kafka0'
+    static_configs:
+    - targets: ['@my.kafka.broker.name@-0.default.svc.cluster.local:7071']
+  - job_name: 'kafka1'
+    static_configs:
+    - targets: ['@my.kafka.broker.name@-1.default.svc.cluster.local:7071']
+  - job_name: 'kafka2'
+    static_configs:
+    - targets: ['@my.kafka.broker.name@-2.default.svc.cluster.local:7071']
