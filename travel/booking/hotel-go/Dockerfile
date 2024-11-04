@@ -1,4 +1,4 @@
-FROM library/golang:1.22.0-bullseye
+FROM --platform=linux/amd64 library/golang:1.22.0-bullseye
 
 WORKDIR /root
 

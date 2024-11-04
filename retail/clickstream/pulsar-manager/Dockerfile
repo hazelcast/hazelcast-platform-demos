@@ -1,4 +1,4 @@
-FROM apachepulsar/pulsar-manager:v0.2.0
+FROM --platform=linux/amd64 apachepulsar/pulsar-manager:v0.2.0
 
 COPY target/classes/pulsar-manager.properties      /tmp/pulsar-manager.properties
 

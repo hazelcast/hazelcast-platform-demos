@@ -1,8 +1,9 @@
-FROM amd64/ubuntu:22.04
+FROM --platform=linux/amd64 amd64/ubuntu:24.10
 
 # Add Java to Ubuntu image
-RUN apt-get update && \
-        apt-get install -y wget
+RUN apt upgrade
+RUN apt update
+RUN apt-get install -y wget
 RUN cd /tmp ; \
     wget -q https://download.java.net/java/GA/jdk21/fd2272bbf8e04c3dbaee13770090416c/35/GPL/openjdk-21_linux-x64_bin.tar.gz ; \
     tar xf openjdk-21_linux-x64_bin.tar.gz ;
