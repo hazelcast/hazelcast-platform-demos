@@ -1,4 +1,4 @@
-FROM amd64/ubuntu:22.04
+FROM --platform=linux/amd64 amd64/ubuntu:24.10
 
 # Add and confirm Java installed
 RUN apt upgrade
