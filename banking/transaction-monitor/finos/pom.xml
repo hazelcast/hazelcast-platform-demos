@@ -15,7 +15,6 @@
 	<description>Transaction Monitor - Finos</description>
 
 	<properties>
-		<my.docker.control.file>control.file</my.docker.control.file>
 		<my.docker.image.name>finos</my.docker.image.name>
 		<my.docker.jar.file>
 			${project.artifactId}-${project.version}.jar</my.docker.jar.file>
@@ -33,6 +32,10 @@
 			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+				<exclusion>
 					<groupId>com.hazelcast</groupId>
 					<artifactId>hazelcast</artifactId>
 				</exclusion>
@@ -44,12 +47,19 @@
 					<groupId>com.hazelcast.jet.contrib</groupId>
 					<artifactId>pulsar</artifactId>
 				</exclusion>
+                                <exclusion>
+                                        <groupId>org.slf4j</groupId>
+                                        <artifactId>slf4-api</artifactId>
+                                </exclusion>
 			</exclusions>
 		</dependency>
 
 		<!-- Need this for SSL for Hazelcast Cloud -->
 		<dependency>
 			<groupId>com.hazelcast</groupId>
+<!-- Needs Kubernetes Config
+			<artifactId>hazelcast-enterprise-java-client</artifactId>
+-->
 			<artifactId>hazelcast-enterprise</artifactId>
 		</dependency>
 

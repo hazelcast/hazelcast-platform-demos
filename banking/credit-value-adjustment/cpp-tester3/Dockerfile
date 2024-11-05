@@ -1,4 +1,4 @@
-FROM amd64/ubuntu:22.04
+FROM --platform=linux/amd64 amd64/ubuntu:24.10
 
 # Add and confirm Java installed
 RUN apt upgrade
@@ -13,10 +13,10 @@ RUN update-alternatives --install /usr/bin/java java /tmp/jdk-21/bin/java 1
 ARG JAR_FILE
 COPY target/classes/*.json /
 COPY target/${JAR_FILE} application.jar
-ENV HOST_IP ""
+ENV HOST_IP=""
 
-ENV JAVA_ARGS ""
-ENV JAVA_OPTS "--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
+ENV JAVA_ARGS=""
+ENV JAVA_OPTS="--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
 
 ENTRYPOINT exec java $JAVA_ARGS $JAVA_OPTS \
  -Dhost.ip=$HOST_IP \

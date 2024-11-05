@@ -31,15 +31,17 @@
 		<!-- So Grafana can find Prometheus service, must match K8S YAML -->
 		<my.prometheus.name>${my.docker.image.prefix}-prometheus</my.prometheus.name>
 		<my.prometheus.port>9090</my.prometheus.port>
+		<my.kafka.broker.name>${my.docker.image.prefix}-kafka-prometheus</my.kafka.broker.name>
 		<my.management.center.name>${my.docker.image.prefix}-management-center</my.management.center.name>
 	</properties>
 
 	<modules>
 		<module>abstract-hazelcast-client</module>
 		<module>abstract-hazelcast-node</module>
+		<module>abstract-hazelcast-node-enterprise</module>
 		<module>cassandra</module>
 		<module>client-command-line</module>
-<!-- Issue 220
+<!-- Until https://github.com/hazelcast/hazelcast-platform-demos/issues/220 fixed
 		<module>client-cpp</module>
 -->
 		<module>client-csharp</module>
@@ -70,6 +72,7 @@
 		<module>remote-job-sub-1</module>
 		<module>topic-create</module>
 		<module>transaction-producer</module>
+		<module>vector-search</module>
 		<module>webapp</module>
 		<module>zookeeper</module>
 	</modules>

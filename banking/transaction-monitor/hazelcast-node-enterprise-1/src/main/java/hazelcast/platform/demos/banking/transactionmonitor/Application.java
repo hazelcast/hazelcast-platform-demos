@@ -27,7 +27,7 @@ public class Application {
      * </p>
      */
     public static void main(String[] args) throws Exception {
-        ApplicationInitializer.build(args);
+        ApplicationInitializerEnterprise.build(args);
     }
 
 }

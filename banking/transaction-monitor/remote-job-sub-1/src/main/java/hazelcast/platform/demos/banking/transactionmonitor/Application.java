@@ -33,7 +33,7 @@ import com.hazelcast.map.IMap;
  * </p>
  */
 public class Application {
-    private static final String FILENAME = "application.properties";
+    private static final String FILENAME = "job.properties";
 
     /**
      * <p>Use the Jet connection provided by "{@code Jet.bootstrappedInstance()}"

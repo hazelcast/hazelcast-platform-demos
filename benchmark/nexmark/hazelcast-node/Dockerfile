@@ -1,8 +1,9 @@
-FROM amd64/ubuntu:22.04
+FROM --platform=linux/amd64 amd64/ubuntu:24.10
 
 # Add Java to Ubuntu image
-RUN apt-get update && \
-        apt-get install -y wget
+RUN apt upgrade
+RUN apt update
+RUN apt-get install -y wget
 RUN cd /tmp ; \
     wget -q https://download.java.net/java/GA/jdk21/fd2272bbf8e04c3dbaee13770090416c/35/GPL/openjdk-21_linux-x64_bin.tar.gz ; \
     tar xf openjdk-21_linux-x64_bin.tar.gz ;
@@ -13,14 +14,14 @@ ARG JAR_FILE
 COPY target/${JAR_FILE} application.jar
 
 # Default values, provide from kubernetes-1.yaml
-ENV JAVA_ARGS ""
-ENV JAVA_HEAP_SIZE "20g"
-ENV MY_COOPERATIVE_THREAD_COUNT ""
-ENV MY_GC_LOGGING ""
-ENV MY_GC_TUNING ""
-ENV MY_PARTITIONS ""
+ENV JAVA_ARGS=""
+ENV JAVA_HEAP_SIZE="20g"
+ENV MY_COOPERATIVE_THREAD_COUNT=""
+ENV MY_GC_LOGGING=""
+ENV MY_GC_TUNING=""
+ENV MY_PARTITIONS=""
 
-ENV JAVA_OPTS "--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
+ENV JAVA_OPTS="--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
 
 CMD ["bash", "-c", "set -euo pipefail \
       && echo @@@@@@@@@@@@@@@@@@@@ \

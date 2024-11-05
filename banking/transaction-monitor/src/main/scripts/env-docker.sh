@@ -22,7 +22,15 @@ then
 fi
 
 # May need host machine IP for clustering
-HOST_IP=`ifconfig | grep -w inet | grep -v 127.0.0.1 | cut -d" " -f2`
+OS=`uname -s`
+if [ "$OS" = "Darwin" ]; then
+    HOST_IP=`ifconfig | grep -v 127.0.0.1 | grep -w inet -m 1 | cut -d" " -f2`
+fi
+
+if [ "$OS" = "Linux" ]; then
+    HOST_IP=`ifconfig | grep -w inet -m 1 | awk '{print $2}'`
+fi
+
 if [ "$HOST_IP" == "" ]
 then
  HOST_IP=127.0.0.1

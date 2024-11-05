@@ -34,6 +34,8 @@
       "pluginVersion": "8.3.3",
       "type": "text"
     },
+	
+	
     {
       "aliasColors": {},
       "bars": false,
@@ -50,7 +52,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 0
+        "y": 3
       },
       "hiddenSeries": false,
       "id": 6,
@@ -128,6 +130,8 @@
         "alignLevel": null
       }
     },
+	
+	
     {
       "aliasColors": {},
       "bars": false,
@@ -141,10 +145,10 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 12,
-        "w": 14,
+        "h": 11,
+        "w": 12,
         "x": 0,
-        "y": 8
+        "y": 11
       },
       "hiddenSeries": false,
       "id": 2,
@@ -221,6 +225,8 @@
         "alignLevel": null
       }
     },
+
+
     {
       "aliasColors": {},
       "bars": false,
@@ -313,7 +319,207 @@
         "align": false,
         "alignLevel": null
       }
-    }
+    },
+	
+
+	{
+	  "aliasColors": {},
+	  "bars": false,
+	  "dashLength": 10,
+	  "dashes": false,
+	  "datasource": "Prometheus",
+	  "fieldConfig": {
+	    "defaults": {},
+	    "overrides": []
+	  },
+	  "fill": 1,
+	  "fillGradient": 0,
+	  "gridPos": {
+	    "h": 8,
+	    "w": 12,
+	    "x": 12,
+	    "y": 3
+	  },
+	  "hiddenSeries": false,
+	  "id": 5,
+	  "legend": {
+	    "avg": false,
+	    "current": false,
+	    "max": false,
+	    "min": false,
+	    "show": true,
+	    "total": false,
+	    "values": false
+	  },
+	  "lines": true,
+	  "linewidth": 1,
+	  "nullPointMode": "null",
+	  "options": {
+	    "alertThreshold": true
+	  },
+	  "percentage": false,
+	  "pluginVersion": "7.5.3",
+	  "pointradius": 2,
+	  "points": false,
+	  "renderer": "flot",
+	  "seriesOverrides": [],
+	  "spaceLength": 10,
+	  "stack": false,
+	  "steppedLine": false,
+	  "targets": [
+	    {
+	      "expr": "rate(kafka_server_brokertopicmetrics_messagesinpersec{topic=\"kf_transactions\"}[$__rate_interval])",
+	      "interval": "",
+	      "legendFormat": "",
+	      "refId": "A"
+	    }
+	  ],
+	  "thresholds": [],
+	  "timeFrom": null,
+	  "timeRegions": [],
+	  "timeShift": null,
+	  "title": "\"kf_transactions\" messages per second",
+	  "tooltip": {
+	    "shared": true,
+	    "sort": 0,
+	    "value_type": "individual"
+	  },
+	  "type": "graph",
+	  "xaxis": {
+	    "buckets": null,
+	    "mode": "time",
+	    "name": null,
+	    "show": true,
+	    "values": []
+	  },
+	  "yaxes": [
+	    {
+	      "format": "short",
+	      "label": null,
+	      "logBase": 1,
+	      "max": null,
+	      "min": null,
+	      "show": true
+	    },
+	    {
+	      "format": "short",
+	      "label": null,
+	      "logBase": 1,
+	      "max": null,
+	      "min": null,
+	      "show": true
+	    }
+	  ],
+	  "yaxis": {
+	    "align": false,
+	    "alignLevel": null
+	  }
+	},
+	
+
+	{
+	  "aliasColors": {},
+	  "bars": false,
+	  "dashLength": 10,
+	  "dashes": false,
+	  "datasource": "Prometheus",
+	  "fieldConfig": {
+	    "defaults": {},
+	    "overrides": []
+	  },
+	  "fill": 1,
+	  "fillGradient": 0,
+	  "gridPos": {
+	    "h": 8,
+	    "w": 12,
+	    "x": 12,
+	    "y": 11
+	  },
+	  "hiddenSeries": false,
+	  "id": 6,
+	  "legend": {
+	    "avg": false,
+	    "current": false,
+	    "max": false,
+	    "min": false,
+	    "show": true,
+	    "total": false,
+	    "values": false
+	  },
+	  "lines": true,
+	  "linewidth": 1,
+	  "nullPointMode": "null",
+	  "options": {
+	    "alertThreshold": true
+	  },
+	  "percentage": false,
+	  "pluginVersion": "7.5.3",
+	  "pointradius": 2,
+	  "points": false,
+	  "renderer": "flot",
+	  "seriesOverrides": [],
+	  "spaceLength": 10,
+	  "stack": false,
+	  "steppedLine": false,
+	  "targets": [
+	    {
+	      "exemplar": true,
+	      "expr": "rate(kafka_server_brokertopicmetrics_bytesinpersec{topic=\"kf_transactions\"}[$__rate_interval])",
+	      "interval": "",
+	      "legendFormat": "Bytes In",
+	      "refId": "A"
+	    },
+	    {
+	      "exemplar": true,
+		  "expr": "rate(kafka_server_brokertopicmetrics_bytesoutpersec{topic=\"kf_transactions\"}[$__rate_interval])",
+	      "interval": "",
+	      "legendFormat": "Bytes Out",
+	      "refId": "B"
+	    }
+	  ],	  
+	  "thresholds": [],
+	  "timeFrom": null,
+	  "timeRegions": [],
+	  "timeShift": null,
+	  "title": "\"kf_transactions\" bytes in/out",
+	  "tooltip": {
+	    "shared": true,
+	    "sort": 0,
+	    "value_type": "individual"
+	  },
+	  "type": "graph",
+	  "xaxis": {
+	    "buckets": null,
+	    "mode": "time",
+	    "name": null,
+	    "show": true,
+	    "values": []
+	  },
+	  "yaxes": [
+	    {
+	      "format": "short",
+	      "label": null,
+	      "logBase": 1,
+	      "max": null,
+	      "min": null,
+	      "show": true
+	    },
+	    {
+	      "format": "short",
+	      "label": null,
+	      "logBase": 1,
+	      "max": null,
+	      "min": null,
+	      "show": true
+	    }
+	  ],
+	  "yaxis": {
+	    "align": false,
+	    "alignLevel": null
+	  }
+	}
+	
+	
   ],
   "refresh": "10s",
   "schemaVersion": 27,

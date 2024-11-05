@@ -23,6 +23,45 @@ spec:
   ports:
   - port: 19092
 ---
+# Kafka Broker : DNS will be "transaction-monitor-FLAVOR-kafka-prometheus.default.svc.cluster.local".
+# For Prometheus to access /metrcis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-FLAVOR-kafka-prometheus-0
+spec:
+  selector:
+    statefulset.kubernetes.io/pod-name: transaction-monitor-FLAVOR-kafka-broker-0
+  ports:
+    - port: 7071
+      targetPort: 7071
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-FLAVOR-kafka-prometheus-1
+spec:
+  selector:
+    statefulset.kubernetes.io/pod-name: transaction-monitor-FLAVOR-kafka-broker-1
+  ports:
+    - port: 7071
+      targetPort: 7071
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-FLAVOR-kafka-prometheus-2
+spec:
+  selector:
+    statefulset.kubernetes.io/pod-name: transaction-monitor-FLAVOR-kafka-broker-2
+  ports:
+    - port: 7071
+      targetPort: 7071
+  type: LoadBalancer
+---
 # FOR EXTERNAL ACCESS: ONE EACH PER KAFKA BROKER
 # "LoadBalancer" allows the ConfigMap to find all 3, needed for Webapp
 ---
@@ -71,6 +110,20 @@ spec:
   ports:
   - port: 9042
     targetPort: 9042
+  type: LoadBalancer
+---
+# FinOS : DNS will be "transaction-monitor-FLAVOR-finos.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-FLAVOR-finos
+spec:
+  selector:
+    app: transaction-monitor-FLAVOR-finos
+  ports:
+  - port: 8080
+    targetPort: 8080
   type: LoadBalancer
 ---
 # Flow : DNS will be "transaction-monitor-FLAVOR-flow.default.svc.cluster.local".
@@ -159,6 +212,35 @@ spec:
     - name: pulsar-http
       port: 8080
       targetPort: 8080
+  type: LoadBalancer
+---
+# Vector Search : DNS will be "transaction-monitor-FLAVOR-vector-search.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-FLAVOR-vector-search
+spec:
+  selector:
+    app: transaction-monitor-FLAVOR-vector-search
+  ports:
+  - port: 8080
+    targetPort: 8080
+  type: LoadBalancer
+---
+# Webapp : DNS will be "transaction-monitor-FLAVOR-webapp.default.svc.cluster.local".
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-monitor-FLAVOR-webapp
+spec:
+  selector:
+    app: transaction-monitor-FLAVOR-webapp
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
   type: LoadBalancer
 ---
 # Zookeeper : DNS will be "transaction-monitor-FLAVOR-zookeeper.default.svc.cluster.local".

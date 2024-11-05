@@ -41,6 +41,10 @@
 					<groupId>com.hazelcast</groupId>
 					<artifactId>hazelcast</artifactId>
 				</exclusion>
+                                <exclusion>
+                                        <groupId>com.hazelcast.jet.contrib</groupId>
+                                        <artifactId>pulsar</artifactId>
+                                </exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -70,6 +74,7 @@
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-sql</artifactId>
+<scope>provided</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>com.hazelcast</groupId>
@@ -78,6 +83,7 @@
 			</exclusions>
 		</dependency>
 		<!-- Need this for SSL for Hazelcast Cloud -->
+		<!-- TODO -java-client -->
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-enterprise</artifactId>
@@ -96,6 +102,12 @@
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
