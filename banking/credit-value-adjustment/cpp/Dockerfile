@@ -12,7 +12,7 @@ RUN apt-get update && \
 # https://github.blog/2021-09-01-improving-git-protocol-security-github/
 RUN git config --global url.https://github.insteadOf git://github
 
-RUN git clone https://github.com/grpc/grpc.git -b v1.52.0  \
+RUN git clone https://github.com/grpc/grpc.git -b v1.66.0  \
   && mkdir -p grpc/cmake/build \
   && cd grpc \
   && git submodule update --init
