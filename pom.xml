@@ -76,10 +76,10 @@
 		<javax-validation.version>2.0.1.Final</javax-validation.version>
 		<!-- See also banking/credit-value-adjustment/cpp/Dockerfile -->
 		<!-- Same as version using in Hazelcast https://github.com/hazelcast/hazelcast/blob/master/pom.xml#L99 -->
-		<grpc.version>1.48.0</grpc.version>
+		<grpc.version>1.66.0</grpc.version>
 
                 <!-- When advancing to GA, also update Dockerfile FROM line for Management Center -->
-		<hazelcast.version>5.5.2</hazelcast.version>
+		<hazelcast.version>5.5.3-SNAPSHOT</hazelcast.version>
 		<hazelcast-client.version>5.5.0-BETA</hazelcast-client.version>
 
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
@@ -102,12 +102,12 @@
 		<!-- Run same version with 'protoc - -grpc_out=. - -plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin' 
 			banking/credit-value-adjustment/common/src/main/proto/JetToCpp.proto -->
 		<proto-google-common-protos.version>2.14.3</proto-google-common-protos.version>
-		<protobuf.version>3.22.1</protobuf.version>
+		<protobuf.version>4.28.3</protobuf.version>
 		<pulsar.version>3.1.0</pulsar.version>
 		<slf4j.version>2.0.13</slf4j.version>
 		<spotbugs-annotations.version>4.7.3</spotbugs-annotations.version>
 		<springdoc.version>2.3.0</springdoc.version>
-		<spring-boot.version>3.3.4</spring-boot.version>
+		<spring-boot.version>3.3.5</spring-boot.version>
 		<spring-cloud.version>2021.0.0</spring-cloud.version>
 		<spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
 		<zipkin.version>2.23.3-SNAPSHOT</zipkin.version>
