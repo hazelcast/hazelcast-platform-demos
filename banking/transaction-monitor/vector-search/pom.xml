@@ -55,6 +55,7 @@
 		</dependency>
 
 		<!-- Need this for SSL for Hazelcast Cloud -->
+		<!-- -java-client but needs Vector Collection -->
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-enterprise</artifactId>

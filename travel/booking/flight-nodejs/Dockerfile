@@ -1,4 +1,4 @@
-FROM library/node:18.7.0
+FROM --platform=linux/amd64 library/node:18.7.0
 
 COPY target/classes/package.json ./
 COPY target/classes/flight.js ./

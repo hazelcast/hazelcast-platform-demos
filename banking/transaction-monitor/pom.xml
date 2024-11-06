@@ -31,6 +31,7 @@
 		<!-- So Grafana can find Prometheus service, must match K8S YAML -->
 		<my.prometheus.name>${my.docker.image.prefix}-prometheus</my.prometheus.name>
 		<my.prometheus.port>9090</my.prometheus.port>
+		<my.kafka.broker.name>${my.docker.image.prefix}-kafka-prometheus</my.kafka.broker.name>
 		<my.management.center.name>${my.docker.image.prefix}-management-center</my.management.center.name>
 	</properties>
 
