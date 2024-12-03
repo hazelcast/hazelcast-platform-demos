@@ -84,18 +84,18 @@
 
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
 		<hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
-		<jackson.version>2.17.1</jackson.version>
+		<jackson.version>2.18.2</jackson.version>
 		<json.version>20240303</json.version>
 		<json-smart.version>2.4.11</json-smart.version>
-		<junit-jupiter.version>5.9.3</junit-jupiter.version>
-		<junit-vintage.version>5.9.3</junit-vintage.version>
+		<junit-jupiter.version>5.11.3</junit-jupiter.version>
+		<junit-vintage.version>5.11.3</junit-vintage.version>
 		<jython.version>2.7.2</jython.version>
 		<!--  Kafka Clients must match cloud target -->
 		<kafka-clients.version>3.6.1</kafka-clients.version>
 		<kafka-connect.version>2.6.0</kafka-connect.version>
 		<logback.version>1.5.6</logback.version>
 		<mariadb-java-client.version>3.1.4</mariadb-java-client.version>
-		<mongodb-driver-sync.version>5.2.1</mongodb-driver-sync.version>
+		<mongodb.version>5.2.1</mongodb.version>
 		<mysql-connector-j.version>8.2.0</mysql-connector-j.version>
 		<netty-tcnative.version>2.0.62.Final</netty-tcnative.version>
 		<poi-ooxml.version>5.2.3</poi-ooxml.version>
@@ -107,7 +107,7 @@
 		<slf4j.version>2.0.13</slf4j.version>
 		<spotbugs-annotations.version>4.7.3</spotbugs-annotations.version>
 		<springdoc.version>2.3.0</springdoc.version>
-		<spring-boot.version>3.3.6</spring-boot.version>
+		<spring-boot.version>3.4.0</spring-boot.version>
 		<spring-cloud.version>2021.0.0</spring-cloud.version>
 		<spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
 		<zipkin.version>2.23.3-SNAPSHOT</zipkin.version>
@@ -421,8 +421,18 @@
 
 			<dependency>
 				<groupId>org.mongodb</groupId>
+				<artifactId>bson</artifactId>
+				<version>${mongodb.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mongodb</groupId>
+				<artifactId>mongodb-driver-core</artifactId>
+				<version>${mongodb.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mongodb</groupId>
 				<artifactId>mongodb-driver-sync</artifactId>
-				<version>${mongodb-driver-sync.version}</version>
+				<version>${mongodb.version}</version>
 			</dependency>
 
 			<dependency>
