@@ -37,7 +37,7 @@ public class ModelMapStore implements MapStore<String, String> {
 
     public ModelMapStore(ModelRepository arg0, String arg1) {
         this.modelRepository = arg0;
-        log.trace("ModelVaultMapStore({}) to {}", this.modelRepository, arg1);
+        log.debug("ModelMapStore({}) to {}", this.modelRepository, arg1);
     }
 
     /**
