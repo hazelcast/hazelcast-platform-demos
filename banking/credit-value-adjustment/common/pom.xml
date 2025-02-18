@@ -15,7 +15,6 @@
 	<description>Credit Value Adjustment - Common</description>
 
 	<properties>
-                <guava.version>32.0.0-jre</guava.version>
 		<main.basedir>${project.parent.parent.parent.basedir}</main.basedir>
 	</properties>
 
@@ -34,12 +33,6 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-yaml</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-                        <version>${guava.version}</version>
 		</dependency>
 
 		<dependency>
@@ -68,12 +61,6 @@
 			<version>${grpc.version}</version>
 		</dependency>
 
-		<!-- Validates configuration properties -->
-		<dependency>
-			<groupId>org.hibernate.validator</groupId>
-			<artifactId>hibernate-validator</artifactId>
-		</dependency>
-
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
@@ -88,6 +75,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-log4j2</artifactId>
+		</dependency>
+		<!-- Validates configuration properties -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 		<!-- Kubernetes uses REST to validate containers -->
 		<dependency>

@@ -1,5 +1,5 @@
-#FROM --platform=linux/amd64 hazelcast/management-center:latest-snapshot
-FROM --platform=linux/amd64 hazelcast/management-center:5.7.0
+FROM --platform=linux/amd64 hazelcast/management-center:latest-snapshot
+#FROM --platform=linux/amd64 hazelcast/management-center:5.7.0
 
 # From pom.xml
 ARG MC_LICENSE

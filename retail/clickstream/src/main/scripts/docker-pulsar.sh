@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROJECT=clickstream
-MODULE=cassandra
+MODULE=pulsar
 
 BASEDIR=`dirname $0`
 cd $BASEDIR/../../../$MODULE
@@ -23,7 +23,7 @@ docker network create $PROJECT --driver bridge > /dev/null 2>&1
 
 DOCKER_IMAGE=hazelcast-platform-demos/${PROJECT}-${MODULE}
 
-CMD="docker run -e CASSANDRA_BROADCAST_ADDRESS=$HOST_IP -p 9042:9042 --name=${MODULE} --rm --network=${PROJECT} ${DOCKER_IMAGE}"
+CMD="docker run -e CASSANDRA_BROADCAST_ADDRESS=$HOST_IP -p 6650:6650 --name=${MODULE} --rm --network=${PROJECT} ${DOCKER_IMAGE}"
 #echo $CMD
 
 $CMD

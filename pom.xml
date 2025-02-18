@@ -67,8 +67,8 @@
 		<my.mc.cluster2.addresslist>unset</my.mc.cluster2.addresslist>
 
 		<!-- Version dependencies -->
-		<cassandra-driver.version>4.15.0</cassandra-driver.version>
-                <cassandra-jdbc-wrapper.version>4.9.0</cassandra-jdbc-wrapper.version>
+		<cassandra-driver.version>4.17.0</cassandra-driver.version>
+                <cassandra-jdbc-wrapper.version>4.14.0</cassandra-jdbc-wrapper.version>
 		<debezium-connector-cassandra-4.version>2.1.3.Final</debezium-connector-cassandra-4.version>
 		<debezium-connector-mongodb.version>1.3.1.Final</debezium-connector-mongodb.version>
 		<error_prone_annotations.version>2.18.0</error_prone_annotations.version>
@@ -76,10 +76,10 @@
 		<javax-validation.version>2.0.1.Final</javax-validation.version>
 		<!-- See also banking/credit-value-adjustment/cpp/Dockerfile -->
 		<!-- Same as version using in Hazelcast https://github.com/hazelcast/hazelcast/blob/master/pom.xml#L99 -->
-		<grpc.version>1.66.0</grpc.version>
+		<grpc.version>1.70.0</grpc.version>
 
                 <!-- When advancing to GA, also update Dockerfile FROM line for Management Center -->
-		<hazelcast.version>5.5.3</hazelcast.version>
+		<hazelcast.version>5.5.4-SNAPSHOT</hazelcast.version>
 		<hazelcast-client.version>5.5.0</hazelcast-client.version>
 
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
@@ -301,6 +301,11 @@
 				<version>${debezium-connector-mongodb.version}</version>
 			</dependency>
 
+			<dependency>
+				<groupId>io.grpc</groupId>
+				<artifactId>grpc-api</artifactId>
+				<version>${grpc.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>io.grpc</groupId>
 				<artifactId>grpc-netty-shaded</artifactId>
