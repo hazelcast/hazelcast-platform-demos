@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2024, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2025, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,13 +49,20 @@ public class PulsarIngest {
      * </p>
      */
     public static Pipeline buildPipeline() {
-        String serviceUrl = MyUtils.getPulsarServiceUrl();
-        log.trace("serviceUrl='{}'", serviceUrl);
+        String serviceUrl = "";
+        try {
+            serviceUrl = MyUtils.getPulsarServiceUrl();
+            log.trace("serviceUrl='{}'", serviceUrl);
+        } catch (Exception e) {
+            log.error("buildPipeline", e);
+            return null;
+        }
+        final String serviceUrlF = serviceUrl;
 
         SupplierEx<PulsarClient> pulsarConnectionSupplier =
                 () -> PulsarClient.builder()
                 .connectionTimeout(1, TimeUnit.SECONDS)
-                .serviceUrl(serviceUrl)
+                .serviceUrl(serviceUrlF)
                 .build();
 
         SupplierEx<Schema<String>> pulsarSchemaSupplier =

@@ -22,7 +22,7 @@
 		<!-- "provided" scope, caller can use hazelcast or hazelcast-enterprise -->
 		<dependency>
 			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast</artifactId>
+			<artifactId>hazelcast-enterprise</artifactId>
 			<scope>provided</scope>
 		</dependency>
 

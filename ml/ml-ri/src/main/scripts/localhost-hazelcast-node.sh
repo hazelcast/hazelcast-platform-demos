@@ -6,7 +6,7 @@ MODULE=hazelcast-node
 BASEDIR=`dirname $0`
 cd $BASEDIR/../../../$MODULE
 
-HOST_IP=`ifconfig | grep -w inet | grep -v 127.0.0.1 | cut -d" " -f2`
+HOST_IP=`ifconfig | grep -v 127.0.0.1 | grep -w inet -m 1 | cut -d" " -f2`
 if [ "$HOST_IP" == "" ]
 then
  HOST_IP=127.0.0.1
@@ -18,7 +18,7 @@ then
  exit 1
 fi
 
-JAR_FILE=${PROJECT}-${MODULE}-5.5-jar-with-dependencies.jar
+JAR_FILE=${PROJECT}-${MODULE}-6.0-jar-with-dependencies.jar
 
 JAVA_ARGS="-Dmy.kubernetes.enabled=false"
 JAVA_ARGS="${JAVA_ARGS} -Dhazelcast.local.publicAddress=${HOST_IP}"

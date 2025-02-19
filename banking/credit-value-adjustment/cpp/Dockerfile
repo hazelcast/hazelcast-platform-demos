@@ -12,6 +12,7 @@ RUN apt-get update && \
 # https://github.blog/2021-09-01-improving-git-protocol-security-github/
 RUN git config --global url.https://github.insteadOf git://github
 
+# Newer branches (eg. 1.64.1) fail - incomplete type 'grpc::SerializationTraits<com_hazelcast_platform_demos_banking_cva::InputMessage, void>' used in nested name specifier
 RUN git clone https://github.com/grpc/grpc.git -b v1.52.0  \
   && mkdir -p grpc/cmake/build \
   && cd grpc \

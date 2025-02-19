@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2024, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2025, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,8 @@ public class ApplicationConfig {
 
         NetworkConfig networkConfig = config.getNetworkConfig();
         String remoteClusterMembers;
-        if (System.getProperty("my.kubernetes.enabled", "").equals("true")) {
+        boolean isKubernetes = System.getProperty("my.kubernetes.enabled", "").equals("true");
+        if (isKubernetes) {
 
             remoteClusterMembers =
                 this.setKubernetesNetworking(networkConfig, config.getClusterName(), cluster1Name);
@@ -101,13 +102,15 @@ public class ApplicationConfig {
 
         // Can have more than 1 publisher, each to more than 1 target cluster
         String publisher = "publisher-1-from-" + config.getClusterName();
-        this.addWan(config, publisher, remoteClusterName, remoteClusterMembers);
+        if (isKubernetes) {
+            this.addWan(config, publisher, remoteClusterName, remoteClusterMembers);
+        }
 
         // Select disk directory for saving data
         this.addPersistence(config);
 
         // Non-default configuration for selected maps.
-        this.setMapsForJournalWanAndPersistence(config, myMapStoreFactory, publisher, true);
+        this.setMapsForJournalWanAndPersistence(config, myMapStoreFactory, publisher, isKubernetes);
 
         return config;
     }
@@ -157,6 +160,7 @@ public class ApplicationConfig {
         networkConfig.getJoin().setTcpIpConfig(tcpIpConfig);
 
         String publicAddress = System.getProperty("hazelcast.local.publicAddress", "");
+        log.info("publicAddress={}", publicAddress);
         String dockerHost = publicAddress.split(":")[0];
         String cluster1Ports = System.getProperty("CLUSTER1_PORTLIST");
         String cluster2Ports = System.getProperty("CLUSTER2_PORTLIST");
@@ -165,11 +169,11 @@ public class ApplicationConfig {
 
         if (clusterName.equals(cluster1Name)) {
             tcpIpConfig.setMembers(Arrays.asList(cluster1Members));
-            networkConfig.setPort(Integer.parseInt(cluster1Ports.split(",")[0]));
+            networkConfig.setPort(Integer.parseInt(publicAddress.split(":")[1]));
             return cluster2Members;
         } else {
             tcpIpConfig.setMembers(Arrays.asList(cluster2Members));
-            networkConfig.setPort(Integer.parseInt(cluster2Ports.split(",")[0]));
+            networkConfig.setPort(Integer.parseInt(publicAddress.split(":")[1]));
             return cluster1Members;
         }
     }
