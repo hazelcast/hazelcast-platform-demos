@@ -79,7 +79,7 @@
 		<grpc.version>1.70.0</grpc.version>
 
                 <!-- When advancing to GA, also update Dockerfile FROM line for Management Center -->
-		<hazelcast.version>5.5.4-SNAPSHOT</hazelcast.version>
+		<hazelcast.version>5.5.4</hazelcast.version>
 		<hazelcast-client.version>5.5.0</hazelcast-client.version>
 
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
