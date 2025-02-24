@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2024, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2025, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.util.Properties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import com.hazelcast.map.MapLoader;
@@ -36,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @SuppressWarnings("rawtypes")
 @Component
+@DependsOn("cassandraTemplate")
 @Slf4j
 public class MyMapStoreFactory implements MapStoreFactory {
 
@@ -49,6 +51,7 @@ public class MyMapStoreFactory implements MapStoreFactory {
         if (arg0.equals(MyConstants.IMAP_NAME_MODEL_VAULT)) {
             ModelRepository modelRepository =
                     this.applicationContext.getBean(ModelRepository.class);
+            log.info("newMapStore({})", modelRepository);
             return new ModelMapStore(modelRepository, contactPoints);
         }
         log.error("No map loader/store for map name '{}'", arg0);

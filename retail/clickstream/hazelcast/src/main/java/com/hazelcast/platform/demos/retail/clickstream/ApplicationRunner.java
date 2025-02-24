@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2024, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2025, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,6 +147,7 @@ public class ApplicationRunner {
                 .getMap(MyConstants.IMAP_NAME_CONFIG)
                 .get(MyConstants.CONFIG_MAP_KEY_GRAPHITE).toString();
         log.info("------------------------------------");
+        boolean isKubernetes = System.getProperty("my.kubernetes.enabled", "").equals("true");
 
         // Jobs that run on both clusters
         this.launchClickstreamHandlerJob();
@@ -156,7 +157,9 @@ public class ApplicationRunner {
         // Prediction on "blue"
         if (clusterName.equals(cluster1Name)) {
             this.launchRandomForestPredictionJob();
-            this.launchSlackSQLJob();
+            if (isKubernetes) {
+                this.launchSlackSQLJob();
+            }
             this.launchStatisticsAccuracyByOrderJob(clusterName, graphiteHost);
             this.launchStatisticsLatencyJob(clusterName, graphiteHost);
         }
@@ -197,7 +200,11 @@ public class ApplicationRunner {
         jobConfigPulsarIngest.addClass(PulsarIngest.class);
         jobConfigPulsarIngest.setName(jobNamePulsarIngest);
 
-        this.launchPipelineJob(pipelinePulsarIngest, jobConfigPulsarIngest);
+        if (pipelinePulsarIngest == null) {
+            log.error("pipelinePulsarIngest is null, skipping launch");
+        } else {
+            this.launchPipelineJob(pipelinePulsarIngest, jobConfigPulsarIngest);
+        }
     }
 
     /**
@@ -373,6 +380,11 @@ public class ApplicationRunner {
             IMap<?, ?> iMap = this.hazelcastInstance.getMap(name);
             log.info("MAP '{}'.size() => {}", iMap.getName(), iMap.size());
         });
+
+        String key = "dummy";
+        IMap<String, String> modelMap = this.hazelcastInstance.getMap(MyConstants.IMAP_NAME_MODEL_VAULT);
+        log.info("Request '{}' from map size {}", key, modelMap.size());
+        log.info(" -> {}", modelMap.get(key));
     }
 
     /**

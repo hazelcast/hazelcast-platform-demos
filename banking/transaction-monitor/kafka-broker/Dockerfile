@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 bitnami/kafka:3.8.0
+FROM --platform=linux/amd64 bitnami/kafka:3.9.0
 
 USER root
 RUN apt upgrade

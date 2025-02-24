@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 cassandra:4.1.1
+FROM --platform=linux/amd64 cassandra:5.0.3
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MY_OTHERUSER

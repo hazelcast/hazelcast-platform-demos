@@ -1,15 +1,23 @@
-FROM --platform=linux/amd64 amd64/ubuntu:24.10
+#FROM --platform=linux/amd64 amd64/ubuntu:rolling
+FROM --platform=linux/amd64 library/python:3.12.8
 
-# Add and confirm Java installed
-RUN apt upgrade
-RUN apt update
-RUN apt-get install -y wget
 # Add Java
 RUN apt update
 RUN cd /tmp ; \
-    wget -q https://download.java.net/java/GA/jdk21/fd2272bbf8e04c3dbaee13770090416c/35/GPL/openjdk-21_linux-x64_bin.tar.gz ; \
-    tar xf openjdk-21_linux-x64_bin.tar.gz ;
-RUN update-alternatives --install /usr/bin/java java /tmp/jdk-21/bin/java 1
+    wget -q https://download.java.net/java/GA/jdk23/3c5b90190c68498b986a97f276efd28a/37/GPL/openjdk-23_linux-x64_bin.tar.gz ; \
+    tar xf openjdk-23_linux-x64_bin.tar.gz ;
+RUN update-alternatives --install /usr/bin/java java /tmp/jdk-23/bin/java 1
+
+## Add and confirm Java installed
+#RUN apt upgrade
+#RUN apt update
+#RUN apt-get install -y wget
+## Add Java
+#RUN apt update
+#RUN cd /tmp ; \
+#    wget -q https://download.java.net/java/GA/jdk21/fd2272bbf8e04c3dbaee13770090416c/35/GPL/openjdk-21_linux-x64_bin.tar.gz ; \
+#    tar xf openjdk-21_linux-x64_bin.tar.gz ;
+#RUN update-alternatives --install /usr/bin/java java /tmp/jdk-21/bin/java 1
 ARG JAR_FILE
 ARG JAR_FILE1
 ARG JAR_FILE2
