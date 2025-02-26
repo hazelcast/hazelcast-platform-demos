@@ -20,4 +20,4 @@ exec java $JAVA_ARGS $JAVA_OPTS \
  -Dmy.site=$MY_SITE \
  -Dmy.threshold=$MY_THRESHOLD \
  -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
- -jar application.jar $0 $1
+ -jar application.jar
