@@ -23,20 +23,55 @@
 	</properties>
 	
 	<dependencies>
+		<!-- Debezium requires old version for jetty -->
 		<dependency>
-	            <groupId>com.datastax.oss</groupId>
-    	            <artifactId>java-driver-core</artifactId>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-http</artifactId>
+			<version>${debezium-required-jetty.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-io</artifactId>
+			<version>${debezium-required-jetty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-security</artifactId>
+			<version>${debezium-required-jetty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlet</artifactId>
+			<version>${debezium-required-jetty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>${debezium-required-jetty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-util</artifactId>
+			<version>${debezium-required-jetty.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>io.debezium</groupId>
-			<artifactId>debezium-connector-cassandra-4</artifactId>
+			<artifactId>debezium-connector-cassandra-5</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.yaml</groupId>
+					<artifactId>snakeyaml</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-		<!--
+
+		<!-- Debezium requires old version for snakeyaml -->
 		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-tcnative</artifactId>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>${debezium-required-snakeyaml.version}</version>
 		</dependency>
-		-->
 	</dependencies>
 
 	<build>

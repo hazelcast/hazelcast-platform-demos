@@ -151,12 +151,8 @@ hazelcast:
         - name: "*"
           principal: "JobSubmitter"
           actions:
+            - add-resources
             - read
             - submit
     client-block-unmapped-actions: false
-    
-    # Doesn't block, just logs
-    # java.security.AccessControlException is deprecated
-#    security-interceptors:
-#      - com.hazelcast.platform.demos.telco.churn.security.MyLoggingSecurityInterceptor
  

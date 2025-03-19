@@ -67,13 +67,20 @@
 		<my.mc.cluster2.addresslist>unset</my.mc.cluster2.addresslist>
 
 		<!-- Version dependencies -->
-		<cassandra-driver.version>4.17.0</cassandra-driver.version>
+		<antlr4.version>4.13.2</antlr4.version>
+		<antlrST4.version>4.3.4</antlrST4.version>
+
+                <!-- Debezium 3.1 series needs 4.14.0 and specific versions for Jetty and SnakeYaml-->
+		<cassandra-driver.version>4.14.0</cassandra-driver.version>
                 <cassandra-jdbc-wrapper.version>4.14.0</cassandra-jdbc-wrapper.version>
-		<debezium-connector-cassandra-4.version>2.1.3.Final</debezium-connector-cassandra-4.version>
-		<debezium-connector-mongodb.version>1.3.1.Final</debezium-connector-mongodb.version>
+		<debezium-connector.version>3.0.8.Final</debezium-connector.version>
+               	<debezium-required-jetty.version>9.4.12.v20180830</debezium-required-jetty.version>
+		<debezium-required-snakeyaml.version>1.33</debezium-required-snakeyaml.version>
+
 		<error_prone_annotations.version>2.18.0</error_prone_annotations.version>
 		<javax-annotation.version>1.3.2</javax-annotation.version>
 		<javax-validation.version>2.0.1.Final</javax-validation.version>
+		<jetty-client.version>12.0.9</jetty-client.version>
 		<!-- See also banking/credit-value-adjustment/cpp/Dockerfile -->
 		<!-- Same as version using in Hazelcast https://github.com/hazelcast/hazelcast/blob/master/pom.xml#L99 -->
 		<grpc.version>1.70.0</grpc.version>
@@ -84,7 +91,7 @@
 
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
 		<hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
-		<jackson.version>2.18.2</jackson.version>
+		<jackson.version>2.18.3</jackson.version>
 		<json.version>20240303</json.version>
 		<json-smart.version>2.4.11</json-smart.version>
 		<junit-jupiter.version>5.11.3</junit-jupiter.version>
@@ -96,7 +103,7 @@
 		<logback.version>1.5.6</logback.version>
 		<mariadb-java-client.version>3.1.4</mariadb-java-client.version>
 		<mongodb.version>5.2.1</mongodb.version>
-		<mysql-connector-j.version>8.2.0</mysql-connector-j.version>
+		<mysql-connector-j.version>9.2.0</mysql-connector-j.version>
 		<netty-tcnative.version>2.0.62.Final</netty-tcnative.version>
 		<poi-ooxml.version>5.2.3</poi-ooxml.version>
 		<!-- Run same version with 'protoc - -grpc_out=. - -plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin' 
@@ -236,28 +243,49 @@
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast</groupId>
-				<artifactId>hazelcast-spring</artifactId>
-				<version>${hazelcast.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.hazelcast</groupId>
 				<artifactId>hazelcast-sql</artifactId>
 				<version>${hazelcast.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>
-				<artifactId>hazelcast-jet-cdc-debezium</artifactId>
+				<artifactId>hazelcast-enterprise-cdc-debezium</artifactId>
 				<version>${hazelcast.version}</version>
+                                <exclusions>
+                                    <exclusion>
+                                       <groupId>io.debezium</groupId>
+                                       <artifactId>debezium-core</artifactId>
+                                    </exclusion>
+                                    <exclusion>
+                                       <groupId>io.debezium</groupId>
+                                       <artifactId>debezium-ddl-parser</artifactId>
+                                    </exclusion>
+                                    <exclusion>
+                                       <groupId>io.debezium</groupId>
+                                       <artifactId>debezium-embedded</artifactId>
+                                    </exclusion>
+                                </exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>
-				<artifactId>hazelcast-jet-cdc-postgres</artifactId>
+				<artifactId>hazelcast-enterprise-cdc-postgres</artifactId>
 				<version>${hazelcast.version}</version>
+                                <exclusions>
+                                    <exclusion>
+                                       <groupId>io.debezium</groupId>
+                                       <artifactId>debezium-connector-postgres</artifactId>
+                                    </exclusion>
+                                </exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>
-				<artifactId>hazelcast-jet-cdc-mysql</artifactId>
+				<artifactId>hazelcast-enterprise-cdc-mysql</artifactId>
 				<version>${hazelcast.version}</version>
+                                <exclusions>
+                                    <exclusion>
+                                       <groupId>io.debezium</groupId>
+                                       <artifactId>debezium-connector-mysql</artifactId>
+                                    </exclusion>
+                                </exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast.jet</groupId>
@@ -292,13 +320,43 @@
 
 			<dependency>
 				<groupId>io.debezium</groupId>
-				<artifactId>debezium-connector-cassandra-4</artifactId>
-				<version>${debezium-connector-cassandra-4.version}</version>
+				<artifactId>debezium-api</artifactId>
+				<version>${debezium-connector.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.debezium</groupId>
+				<artifactId>debezium-connector-cassandra-5</artifactId>
+				<version>${debezium-connector.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>io.debezium</groupId>
 				<artifactId>debezium-connector-mongodb</artifactId>
-				<version>${debezium-connector-mongodb.version}</version>
+				<version>${debezium-connector.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.debezium</groupId>
+				<artifactId>debezium-connector-mysql</artifactId>
+				<version>${debezium-connector.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.debezium</groupId>
+				<artifactId>debezium-connector-postgres</artifactId>
+				<version>${debezium-connector.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.debezium</groupId>
+				<artifactId>debezium-core</artifactId>
+				<version>${debezium-connector.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.debezium</groupId>
+				<artifactId>debezium-ddl-parser</artifactId>
+				<version>${debezium-connector.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.debezium</groupId>
+				<artifactId>debezium-embedded</artifactId>
+				<version>${debezium-connector.version}</version>
 			</dependency>
 
 			<dependency>
@@ -353,8 +411,14 @@
             </dependency>
 
 			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-client</artifactId>
+				<version>${jetty-client.version}</version>
+			</dependency>
+
+			<dependency>
 				<groupId>org.mariadb.jdbc</groupId>
-				<artifactId>mariadb-java-client </artifactId>
+				<artifactId>mariadb-java-client</artifactId>
 				<version>${mariadb-java-client.version}</version>
 			</dependency>
 

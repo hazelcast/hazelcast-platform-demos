@@ -1,5 +1,5 @@
 alter user '@my.other.admin.user@'@'%'
-identified with mysql_native_password by '@my.other.admin.password@';
+identified with caching_sha2_password by '@my.other.admin.password@';
 
 grant all privileges on *.* to '@my.other.admin.user@'@'%';
 

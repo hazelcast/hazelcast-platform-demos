@@ -16,7 +16,6 @@
 
 package com.hazelcast.platform.demos.telco.churn;
 
-import java.security.AccessControlException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -105,7 +104,7 @@ public class ApplicationRunner {
                     hazelcastInstance.getTopic(MyConstants.ITOPIC_NAME_SLACK);
             // Listen for "slack" topic messages to a web socket
             slackTopic.addMessageListener(this.mySocketTopicListener);
-        } catch (AccessControlException e) {
+        } catch (Exception e) {
             String message = String.format("Topic '%s' probably doesn't yet exist,"
                     + " client started before server initialization",
                     MyConstants.ITOPIC_NAME_SLACK);
@@ -183,7 +182,7 @@ public class ApplicationRunner {
      */
     private void sqlFeatures(HazelcastInstance hazelcastInstance) {
         String[] queries = new String[] {
-                // IMap with Portable
+                // IMap with Compact
                 "SELECT * FROM " + MyConstants.IMAP_NAME_SENTIMENT
                         + " ORDER BY \"current\" DESC",
                 // Above with function, need to escape as current is reserved word

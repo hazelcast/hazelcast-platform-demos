@@ -17,17 +17,20 @@
 package com.hazelcast.platform.demos.telco.churn;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hazelcast.core.HazelcastJsonValue;
-import com.hazelcast.jet.cdc.ChangeRecord;
-import com.hazelcast.jet.cdc.Operation;
-import com.hazelcast.jet.cdc.mysql.MySqlCdcSources;
+import com.hazelcast.enterprise.jet.cdc.ChangeRecord;
+import com.hazelcast.enterprise.jet.cdc.Operation;
+import com.hazelcast.enterprise.jet.cdc.mysql.MySqlCdcSources;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.Sinks;
 import com.hazelcast.jet.pipeline.StreamSource;
@@ -137,7 +140,6 @@ public class MySqlDebeziumOneWayCDC extends MyJobWrapper {
      * @return
      */
     private StreamSource<ChangeRecord> buildMySqlCdcStreamSource() {
-        String dbServerName = "_";
         String dbSchema = MyConstants.MYSQL_SCHEMA_NAME;
         String dbSchemaTable = dbSchema + "." + MyConstants.MYSQL_TABLE_NAME;
 
@@ -146,9 +148,11 @@ public class MySqlDebeziumOneWayCDC extends MyJobWrapper {
                 .setDatabasePort(MYSQL_PORT)
                 .setDatabaseUser(this.mySqlUsername)
                 .setDatabasePassword(this.mySqlPassword)
-                .setClusterName(dbServerName)
-                .setDatabaseWhitelist(dbSchema)
-                .setTableWhitelist(dbSchemaTable)
+                .setDatabaseIncludeList(dbSchema)
+                .setTableIncludeList(dbSchemaTable)
+                .setProperty("allowPublicKeyRetrieval", "true")
+                .setProperty("useSSL", "false")
+                .setProperty("serverTimezone", "UTC")
                 .build();
     }
 
@@ -172,9 +176,12 @@ public class MySqlDebeziumOneWayCDC extends MyJobWrapper {
             long timestamp, String valueAsJson) {
         LOGGER.debug("cdcToEntry({}, {}, '{}')", operation, new Date(timestamp), valueAsJson);
 
-        JSONObject json = new JSONObject(valueAsJson);
-        String key = null;
+        JSONObject json = nullOrValid(valueAsJson);
+        if (json == null) {
+            return null;
+        }
 
+        String key = null;
         StringBuilder stringBuilder = new StringBuilder("{ ");
         for (int i = 0 ; i < TariffMetadata.getFieldNames().size(); i++) {
             if (i != 0) {
@@ -222,6 +229,33 @@ public class MySqlDebeziumOneWayCDC extends MyJobWrapper {
         } else {
             return new SimpleImmutableEntry<String, HazelcastJsonValue>(key,
                     new HazelcastJsonValue(stringBuilder.toString()));
+        }
+    }
+
+    /**
+     * <p>Filter out unparseable JSON and other CDC records.
+     * </p>
+     *
+     * @param valueAsJson
+     * @return
+     */
+    private static JSONObject nullOrValid(String valueAsJson) {
+        try {
+            JSONObject json = new JSONObject(valueAsJson);
+            List<String> names = Arrays.asList(JSONObject.getNames(json));
+            if (!names.contains(TariffMetadata.ID)
+                    || !names.contains(TariffMetadata.NAME)
+                    || !names.contains(TariffMetadata.INTERNATIONAL)
+                    || !names.contains(TariffMetadata.YEAR)
+                    || !names.contains("rate")
+                    ) {
+                LOGGER.warn("Ignoring, names=='{}'", names);
+                return null;
+            }
+            return json;
+        } catch (JSONException e) {
+            LOGGER.error("JSONException: {}", valueAsJson);
+            return null;
         }
     }
 }

@@ -55,22 +55,12 @@
 			<artifactId>hazelcast-enterprise</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast-spring</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>com.hazelcast</groupId>
-					<artifactId>hazelcast</artifactId>
-				</exclusion>
-			</exclusions>
+			<groupId>com.hazelcast.jet</groupId>
+			<artifactId>hazelcast-enterprise-cdc-debezium</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet-cdc-debezium</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet-cdc-mysql</artifactId>
+			<artifactId>hazelcast-enterprise-cdc-mysql</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>

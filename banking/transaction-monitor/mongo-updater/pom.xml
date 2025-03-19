@@ -45,11 +45,11 @@
 				</exclusion>
 				<exclusion>
 					<groupId>com.hazelcast.jet</groupId>
-					<artifactId>hazelcast-jet-cdc-debezium</artifactId>
+					<artifactId>hazelcast-enterprise-cdc-debezium</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>com.hazelcast.jet</groupId>
-					<artifactId>hazelcast-jet-cdc-postgres</artifactId>
+					<artifactId>hazelcast-enterprise-cdc-postgres</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>com.hazelcast.jet</groupId>

@@ -16,58 +16,17 @@
 
 package com.hazelcast.platform.demos.telco.churn.domain;
 
-import java.io.IOException;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-
-import com.hazelcast.nio.serialization.Portable;
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
-import com.hazelcast.platform.demos.telco.churn.MyConstants;
 
 /**
  * <p>Derived sentiment for the customer's happiness, the higher the better.
  * </p>
  */
-public class Sentiment implements Portable {
+public class Sentiment {
 
     private LocalDateTime updated = LocalDateTime.now();
     private double current;
     private double previous;
-
-    @Override
-    public int getClassId() {
-        return MyConstants.CLASS_ID_SENTIMENT;
-    }
-
-    @Override
-    public int getFactoryId() {
-        return MyConstants.CLASS_ID_MYPORTABLEFACTORY;
-    }
-
-    /**
-     * <p>Read fields, use defined order.</p>
-     */
-    @Override
-    public void readPortable(PortableReader reader) throws IOException {
-        long timestamp = reader.readLong("updated");
-        this.updated = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp),
-                ZoneId.systemDefault());
-        this.current = reader.readDouble("current");
-        this.previous = reader.readDouble("previous");
-    }
-
-    /**
-     * <p>Write fields, use defined order.</p>
-     */
-    @Override
-    public void writePortable(PortableWriter writer) throws IOException {
-        long timestamp = this.updated.atZone(ZoneId.systemDefault()).toEpochSecond();
-        writer.writeLong("updated", timestamp);
-        writer.writeDouble("current", this.current);
-        writer.writeDouble("previous", this.previous);
-    }
 
     // Generated code below
 

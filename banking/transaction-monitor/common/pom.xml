@@ -60,11 +60,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet-cdc-debezium</artifactId>
+			<artifactId>hazelcast-enterprise-cdc-debezium</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet-cdc-postgres</artifactId>
+			<artifactId>hazelcast-enterprise-cdc-postgres</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
@@ -101,6 +101,27 @@
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>${logback.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.debezium</groupId>
+			<artifactId>debezium-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.debezium</groupId>
+			<artifactId>debezium-connector-postgres</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.debezium</groupId>
+			<artifactId>debezium-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.debezium</groupId>
+			<artifactId>debezium-ddl-parser</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.debezium</groupId>
+			<artifactId>debezium-embedded</artifactId>
 		</dependency>
 
 		<dependency>

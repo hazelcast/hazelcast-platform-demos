@@ -39,8 +39,8 @@ CMD ["bash", "-c", "set -euo pipefail \
 #      && bin/mc-conf.sh cluster add -H=${MC_DATA} --cluster-name=${MC_CLUSTER1_NAME} --member-addresses=${MC_CLUSTER1_ADDRESSLIST} \
 #      && echo @@@@@@@@@@@@@@@@@@@@ \
       && echo @@@@@@@@@@@@@@@@@@@@ \
-      && echo bin/mc-conf.sh cluster add -H=${MC_DATA} --client-config=/hazelcast-client-cluster1.xml \
-      && bin/mc-conf.sh cluster add -H=${MC_DATA} --client-config=/hazelcast-client-cluster1.xml \
+      && echo bin/hz-mc conf cluster add -H=${MC_DATA} --client-config=/hazelcast-client-cluster1.xml \
+      && bin/hz-mc conf cluster add -H=${MC_DATA} --client-config=/hazelcast-client-cluster1.xml \
       && echo @@@@@@@@@@@@@@@@@@@@ \
       && echo bin/hz-mc start \
       && bin/hz-mc start \

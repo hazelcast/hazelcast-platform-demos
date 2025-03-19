@@ -101,7 +101,7 @@ public class ApplicationInitializer {
      * </p>
      */
     @Bean
-    public CommandLineRunner commandLineRunner() {
+    CommandLineRunner commandLineRunner() {
         return args -> {
             LOGGER.info("-=-=-=-=- START '{}' START -=-=-=-=-=-", this.hazelcastInstance.getName());
 
@@ -122,7 +122,7 @@ public class ApplicationInitializer {
                 // Turn off any that are unwanted
                 String jobName = myJobWrapper.getJobConfig().getName();
                 boolean include = !jobName.contains("FILTER OUT NAME");
-                if (!include) {
+                if (!include || myJobWrapper.getPipeline() == null) {
                     LOGGER.warn("Skip '{}', not wanted", jobName);
                 }
                 return include;

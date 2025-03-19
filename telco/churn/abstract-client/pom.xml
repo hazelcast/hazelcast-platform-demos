@@ -34,16 +34,6 @@
 			<groupId>com.hazelcast.jet</groupId>
             <artifactId>hazelcast-jet-kafka</artifactId>
 		</dependency>
-                <dependency>
-                        <groupId>com.hazelcast</groupId>
-                        <artifactId>hazelcast-spring</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>com.hazelcast</groupId>
-					<artifactId>hazelcast</artifactId>
-				</exclusion>
-			</exclusions>
-                </dependency>
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>

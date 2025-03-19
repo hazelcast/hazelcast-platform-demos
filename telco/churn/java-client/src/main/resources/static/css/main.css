@@ -63,7 +63,7 @@ h3 {
 }
 
 .major_pane {
-	border-size: 5px;
+	border-width: 5px;
 	border-style: solid;
 	border-color: var(--hazelcast-blue-dark);
 	padding: 5px 5px 5px 5px;
