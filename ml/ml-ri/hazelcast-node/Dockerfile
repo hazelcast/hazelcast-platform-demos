@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 library/python:3.8-buster
+FROM --platform=linux/amd64 library/python:3.11-buster
 
 # Add and confirm Java installed
 RUN apt upgrade
