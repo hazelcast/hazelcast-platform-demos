@@ -17,6 +17,7 @@
 package com.hazelcast.platform.demos.telco.churn;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,8 +131,9 @@ public class ApplicationInitializer {
             .forEach(this::trySubmit);
             try {
                 // Wait and report jobs, Python can take a while to start due to requirements.txt
-                LOGGER.info("Sleep 1 minute");
-                java.util.concurrent.TimeUnit.MINUTES.sleep(1L);
+                long sleep = 1L;
+                LOGGER.info("Sleep {} minute", sleep);
+                TimeUnit.MINUTES.sleep(sleep);
                 LOGGER.info("-=-=-=-= MIDDLE '{}' MIDDLE =-=-=-=-=-", this.hazelcastInstance.getName());
                 for (Job job : this.hazelcastInstance.getJet().getJobs()) {
                     LOGGER.info("Job '{}' status: {}", job.getName(), job.getStatus());
