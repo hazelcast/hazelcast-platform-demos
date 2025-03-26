@@ -128,7 +128,17 @@ public class ApplicationInitializer {
                 return include;
             })
             .forEach(this::trySubmit);
-
+            try {
+                // Wait and report jobs, Python can take a while to start due to requirements.txt
+                LOGGER.info("Sleep 1 minute");
+                java.util.concurrent.TimeUnit.MINUTES.sleep(1L);
+                LOGGER.info("-=-=-=-= MIDDLE '{}' MIDDLE =-=-=-=-=-", this.hazelcastInstance.getName());
+                for (Job job : this.hazelcastInstance.getJet().getJobs()) {
+                    LOGGER.info("Job '{}' status: {}", job.getName(), job.getStatus());
+                }
+            } catch (Exception e) {
+                LOGGER.error("commandLineRunner()", e);
+            }
             LOGGER.info("-=-=-=-=-  END  '{}'  END  -=-=-=-=-=-", hazelcastInstance.getName());
             hazelcastInstance.shutdown();
         };

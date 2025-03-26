@@ -37,7 +37,7 @@ public class AlertingToKafka {
      * <p>Read from the journal, write to the topic. A {@link Pipeline}
      * currently.
      * TODO: Convert to streaming SQL "{@code SINK INTO kafka SELECT * FROM map}"
-     * once 5.3 available.
+     * once available.
      * </p>
      *
      * @param bootstrapServers Connection list for Kafka

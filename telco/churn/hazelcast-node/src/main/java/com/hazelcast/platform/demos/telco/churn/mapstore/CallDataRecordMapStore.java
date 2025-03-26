@@ -205,7 +205,7 @@ public class CallDataRecordMapStore implements MapStore<CallDataRecordKey, Hazel
                 LOGGER.trace("store({}, {}) not stored as LastModifiedBy='{}'",
                         key, value, previousLastModifiedBy);
             } else {
-                LOGGER.debug("store({}, {}) with LastModifiedDate={}, LastModifiedBy='{}'",
+                LOGGER.trace("store({}, {}) with LastModifiedDate={}, LastModifiedBy='{}'",
                         key, value, now, this.modifierFilter);
                 this.callDataRecordRepository.save(callDataRecord);
             }

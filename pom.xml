@@ -86,6 +86,7 @@
 		<grpc.version>1.70.0</grpc.version>
 
                 <!-- When advancing to GA, also update Dockerfile FROM line for Management Center -->
+                <!-- If building against SNAPSHOT, you will need username/password for <server><id>snapshot-internal</id></server> in your ~/.m2/settings.xml -->
 		<hazelcast.version>6.0.0-SNAPSHOT</hazelcast.version>
 		<hazelcast-client.version>5.5.0-BETA</hazelcast-client.version>
 
@@ -114,7 +115,7 @@
 		<slf4j.version>2.0.13</slf4j.version>
 		<spotbugs-annotations.version>4.7.3</spotbugs-annotations.version>
 		<springdoc.version>2.3.0</springdoc.version>
-		<spring-boot.version>3.4.3</spring-boot.version>
+		<spring-boot.version>3.4.4</spring-boot.version>
 		<spring-cloud.version>2021.0.0</spring-cloud.version>
 		<spring-cloud-zipkin.version>2.2.8.RELEASE</spring-cloud-zipkin.version>
 		<zipkin.version>2.23.3-SNAPSHOT</zipkin.version>
@@ -231,11 +232,13 @@
 				<artifactId>hazelcast-enterprise</artifactId>
 				<version>${hazelcast.version}</version>
 			</dependency>
+			<!-- Does not yet support Kubernetes discovery
 			<dependency>
 				<groupId>com.hazelcast</groupId>
 				<artifactId>hazelcast-enterprise-java-client</artifactId>
 				<version>${hazelcast-client.version}</version>
 			</dependency>
+			-->
 			<dependency>
 				<groupId>com.hazelcast</groupId>
 				<artifactId>hazelcast-mapstore</artifactId>
