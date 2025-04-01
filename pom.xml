@@ -88,7 +88,7 @@
                 <!-- When advancing to GA, also update Dockerfile FROM line for Management Center -->
                 <!-- If building against SNAPSHOT, you will need username/password for <server><id>snapshot-internal</id></server> in your ~/.m2/settings.xml -->
 		<hazelcast.version>6.0.0-SNAPSHOT</hazelcast.version>
-		<hazelcast-client.version>5.5.0-BETA</hazelcast-client.version>
+		<hazelcast-client.version>5.5.0</hazelcast-client.version>
 
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
 		<hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
