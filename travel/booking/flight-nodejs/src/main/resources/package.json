@@ -8,7 +8,7 @@
   },
   "author": "",
   "dependencies": {
-    "async": "3.2.0",
+    "async": "3.2.2",
     "fastify": "3.19.2",
     "hazelcast-client": "4.2.0"
   }
