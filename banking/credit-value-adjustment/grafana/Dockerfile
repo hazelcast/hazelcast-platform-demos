@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 grafana/grafana:11.5.1
+FROM --platform=linux/amd64 grafana/grafana:11.5.2
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MY_ADMINUSER

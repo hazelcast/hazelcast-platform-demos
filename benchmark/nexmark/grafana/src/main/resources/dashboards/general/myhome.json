@@ -28,7 +28,7 @@
       "id": 8,
       "links": [],
       "options": {
-        "content": "<center><img src=\"https://hazelcast.com/brand-assets/files/hazelcast-horz-flat-rev-sm.png\" width=\"200\" height=\"42\"></img></center>\n",
+        "content": "<center><img src=\"https://hazelcast.com/files/brand-images/logo/hazelcast-logo-reverse.png\" width=\"360\" height=\"45\"></img></center>\n",
         "mode": "html"
       },
       "pluginVersion": "8.3.3",

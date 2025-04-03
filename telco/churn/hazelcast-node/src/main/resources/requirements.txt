@@ -1,2 +1,4 @@
 # Python requirements to pre-load to server at Docker build-time rather than at run-time. Optional but speeds up deployment.
-grpcio
+# NEED TO MATCH com.hazelcast.jet:hazelcast-jet-python DEPENDENCIES
+protobuf==4.25.3
+grpcio==1.71.0

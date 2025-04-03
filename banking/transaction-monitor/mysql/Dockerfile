@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 mysql:8.3.0
+FROM --platform=linux/amd64 mysql:9.2.0
 
 # Args to pass to ENV, set by dockerfile-maven-plugin.
 ARG MY_OTHERUSER

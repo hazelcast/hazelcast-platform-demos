@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.telco.churn</groupId>
 		<artifactId>churn-root</artifactId>
-		<version>5.5</version>
+		<version>6.0</version>
 	</parent>
 
 	<artifactId>churn-jet-jobs</artifactId>
@@ -30,26 +30,16 @@
 
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet-cdc-debezium</artifactId>
+			<artifactId>hazelcast-enterprise-cdc-debezium</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
-			<artifactId>hazelcast-jet-cdc-mysql</artifactId>
+			<artifactId>hazelcast-enterprise-cdc-mysql</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast.jet</groupId>
 			<artifactId>hazelcast-jet-python</artifactId>
 		</dependency>
-                <dependency>
-                        <groupId>com.hazelcast</groupId>
-                        <artifactId>hazelcast-spring</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>com.hazelcast</groupId>
-					<artifactId>hazelcast</artifactId>
-				</exclusion>
-			</exclusions>
-                </dependency>
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-sql</artifactId>

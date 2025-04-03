@@ -20,14 +20,14 @@ ENV JAVA_OPTS="--add-modules java.se --add-exports java.base/jdk.internal.ref=AL
 
 COPY target/classes/custom-entrypoint.sh  /
 CMD ["bash", "-c", "set -euo pipefail \
-      && echo @@@@@@@@@@ \
-      && echo arch \
-      && arch \
-      && echo @@@@@@@@@@ \
-      && echo java --version \
-      && java --version \
-      && echo @@@@@@@@@@ \
-      && chmod 755 /custom-entrypoint.sh \
-      && echo /custom-entrypoint.sh \
-      && /custom-entrypoint.sh \
-     "]
+&& echo @@@@@@@@@@ \
+&& echo arch \
+&& arch \
+&& echo @@@@@@@@@@ \
+&& echo java --version \
+&& java --version \
+&& echo @@@@@@@@@@ \
+&& chmod 755 /custom-entrypoint.sh \
+&& echo /custom-entrypoint.sh \
+&& /custom-entrypoint.sh \
+"]

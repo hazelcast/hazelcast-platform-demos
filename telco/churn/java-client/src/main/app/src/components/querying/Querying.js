@@ -111,7 +111,7 @@ class Querying extends Component {
     handleChange(e) {
         if (e.target.name == 'query') {
         	console.log("Querying.js", "handleChange()", this.state.query);
-            this.setState({query: event.target.value});
+            this.setState({query: e.target.value});
         }
     }
     
@@ -122,7 +122,7 @@ class Querying extends Component {
                 var client = rest.wrap(mime);
                 var self = this;
                 
-                var restURL = '/rest/sql/?query=' + this.state.query;
+                var restURL = '/rest/sql?query=' + this.state.query;
 
                 client({path:restURL}).then(
                                 function(response) {

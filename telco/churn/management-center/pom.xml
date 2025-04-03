@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.hazelcast.platform.demos.telco.churn</groupId>
 		<artifactId>churn-root</artifactId>
-		<version>5.5</version>
+		<version>6.0</version>
 	</parent>
 
 	<artifactId>churn-management-center</artifactId>
@@ -31,6 +31,11 @@
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-enterprise</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

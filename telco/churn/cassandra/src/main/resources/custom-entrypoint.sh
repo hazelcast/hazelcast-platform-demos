@@ -26,6 +26,7 @@ cat /debezium-connector-cassandra/debezium-connector-cassandra.conf.orig \
 (
  until `cqlsh -e exit 2> /dev/null` 
  do 
+  echo "$0:"
   echo "$0: - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
   echo "$0 : background script, waiting for Cassandra to come online"
   echo "$0: - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -47,6 +48,7 @@ cat /debezium-connector-cassandra/debezium-connector-cassandra.conf.orig \
  DIR=/cql
  ls $DIR | while read -r ALINE
  do
+  echo "$0:"
   echo "$0: - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
   echo "$0 : background script, apply $ALINE"
   cqlsh -f $DIR/$ALINE
@@ -56,9 +58,18 @@ cat /debezium-connector-cassandra/debezium-connector-cassandra.conf.orig \
  done
 
  sleep 3
+ echo "$0:"
+ echo "$0:" `date`
+ echo "$0:"
+ sleep 3
 
- # Start CDC, with Kafka server addresses from environment. Container probably Java 8
- (cd /debezium-connector-cassandra ;java -Dlog4j.configurationFile=./log4j.properties -Dcassandra.storagedir=$CASSANDRA_HOME -jar debezium-connector-cassandra.jar debezium-connector-cassandra.conf) &
+ # Start CDC, with Kafka server addresses from environment.
+ DEBEZIUM_ARGS="-Dlog4j.configurationFile=/debezium-connector-cassandra/logback.xml -Dcassandra.storagedir=$CASSANDRA_HOME -jar debezium-connector-cassandra.jar debezium-connector-cassandra.conf"
+ JAVA_OPTS="--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED"
+ echo "$0: - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+ echo "$0: Invoking: java ${DEBEZIUM_ARGS}"
+ echo "$0: - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+ (cd /debezium-connector-cassandra ; java ${JAVA_OPTS} ${DEBEZIUM_ARGS}) &
  #
  #
  while true 

@@ -6,7 +6,7 @@
         <parent>
                 <groupId>com.hazelcast.platform.demos.telco.churn</groupId>
                 <artifactId>churn-root</artifactId>
-                <version>5.5</version>
+                <version>6.0</version>
         </parent>
 
 	<artifactId>churn-abstract-client</artifactId>
@@ -34,16 +34,6 @@
 			<groupId>com.hazelcast.jet</groupId>
             <artifactId>hazelcast-jet-kafka</artifactId>
 		</dependency>
-                <dependency>
-                        <groupId>com.hazelcast</groupId>
-                        <artifactId>hazelcast-spring</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>com.hazelcast</groupId>
-					<artifactId>hazelcast</artifactId>
-				</exclusion>
-			</exclusions>
-                </dependency>
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>

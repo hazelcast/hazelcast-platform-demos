@@ -55,7 +55,7 @@ public class ApplicationInitializer {
      * </p>
      */
     @Bean
-    public CommandLineRunner commandLineRunner() {
+    CommandLineRunner commandLineRunner() {
         return args -> {
             boolean isLocalhost = !System.getProperty("my.docker.enabled", "false")
                     .equalsIgnoreCase(Boolean.TRUE.toString())
@@ -193,16 +193,16 @@ public class ApplicationInitializer {
                 + ") TYPE IMap OPTIONS ( "
                 + " 'keyFormat' = 'java', 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
                 + " 'valueFormat' = 'json-flat',"
-                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
-                + " )";
-        String definition3 = "CREATE MAPPING " + MyConstants.IMAP_NAME_SENTIMENT
-                + " TYPE IMap OPTIONS ( "
+                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "' )";
+        String definition3 = "CREATE MAPPING " + MyConstants.IMAP_NAME_SENTIMENT + "("
+                + " __key VARCHAR"
+                + ", updated BIGINT"
+                + ", \"current\" DOUBLE"
+                + ", previous DOUBLE"
+                + ") TYPE IMap OPTIONS ( "
                 + " 'keyFormat' = 'java', 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
-                + " 'valueFormat' = 'portable',"
-                + " 'valueJavaClass' = '" + Sentiment.class.getCanonicalName() + "',"
-                + " 'valuePortableFactoryId' = '" + MyConstants.CLASS_ID_MYPORTABLEFACTORY + "',"
-                + " 'valuePortableClassId' = '" + MyConstants.CLASS_ID_SENTIMENT + "'"
-                + " )";
+                + " 'valueFormat' = 'compact',"
+                + " 'valueCompactTypeName' = '" + Sentiment.class.getSimpleName() + "' )";
         String definition4 = "CREATE MAPPING " + MyConstants.IMAP_NAME_TARIFF
                 + "( __key VARCHAR,"
                 + "    \"id\" VARCHAR,"
@@ -213,8 +213,7 @@ public class ApplicationInitializer {
                 + ") TYPE IMap OPTIONS ( "
                 + " 'keyFormat' = 'java', 'keyJavaClass' = '" + String.class.getCanonicalName() + "',"
                 + " 'valueFormat' = 'json-flat',"
-                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "'"
-                + " )";
+                + " 'valueJavaClass' = '" + HazelcastJsonValue.class.getCanonicalName() + "' )";
         this.define(definition1);
         this.define(definition2);
         this.define(definition3);

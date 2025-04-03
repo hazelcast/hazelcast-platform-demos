@@ -11,20 +11,16 @@ of streaming analytics and in-memory data.
   * [Credit Value Adjustment](./banking/credit-value-adjustment) Risk exposure calculation for Interest Rate Swaps.
 2. Benchmark
   * [NEXMark](./benchmark/nexmark) Processing billions of events per second
-3. Industry 4.0
-  * [IIOT](./industry/iiot) Predictive maintenance for plant machinery
-4. Machine Learning
+3. Machine Learning
   * [RI](./ml/ml-ri) Reference Implementation for Machine Learning Inference, minimal dependencies.
-5. Retail
+4. Retail
   * [Clickstream](./retail/clickstream) E-Commerce analysis using ML prediction.
-6. Telco
+5. Telco
   * [Churn](./telco/churn) Uses ML to predict customer churn
-7. Travel
-  * [Booking](./travel/booking) Integrated travel booking for accommodation and transport
 
 Also
 
-8. Utils
+6. Utils
   * [Utils](./utils) Utillity modules for the above projects to share.
 
 ## Build Instructions

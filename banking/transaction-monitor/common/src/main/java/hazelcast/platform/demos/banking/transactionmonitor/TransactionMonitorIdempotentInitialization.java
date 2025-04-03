@@ -1133,7 +1133,7 @@ public class TransactionMonitorIdempotentInitialization {
         logUseHzCloud(useHzCloud, kubernetesOrHzCloud);
 
         // CP needs a big enough cluster, only known to be true for Kubernetes
-        //TODO Not yet available on Hazelcast Cloud @ January 2024.
+        //TODO Not yet available on Hazelcast Cloud @ March 2025.
         boolean useCP = kubernetes & (!useHzCloud);
 
         if (System.getProperty("my.autostart.enabled", "").equalsIgnoreCase("false")) {
@@ -1258,7 +1258,7 @@ public class TransactionMonitorIdempotentInitialization {
                 pulsarInputSource1, transactionMonitorFlavor);
 
         if (pulsarAddress != null && useHzCloud) {
-            //TODO Not yet available on Hazelcast Cloud @ January 2024.
+            //TODO Not yet available on Hazelcast Cloud @ March 2025.
             LOGGER_TO_IMAP.error("Pulsar is not currently supported on Hazelcast Cloud");
             return false;
         } else {
@@ -1290,7 +1290,7 @@ public class TransactionMonitorIdempotentInitialization {
                 clusterName, transactionMonitorFlavor, useCP);
 
         if (pulsarAddress != null && useHzCloud) {
-            //TODO Not yet available on Hazelcast Cloud @ January 2024.
+            //TODO Not yet available on Hazelcast Cloud @ March 2025.
             LOGGER_TO_IMAP.error("Pulsar is not currently supported on Hazelcast Cloud");
             return false;
         } else {
@@ -1363,7 +1363,7 @@ public class TransactionMonitorIdempotentInitialization {
 
         // Slack alerting (writing), indirectly uses common utils
         if (useHzCloud) {
-            //TODO Not yet available on Hazelcast Cloud @ January 2024.
+            //TODO Not yet available on Hazelcast Cloud @ March 2025.
             LOGGER.error("Slack is not currently supported on Hazelcast Cloud");
         } else {
             try {

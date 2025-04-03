@@ -17,6 +17,7 @@
 package com.hazelcast.platform.demos.telco.churn;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +102,7 @@ public class ApplicationInitializer {
      * </p>
      */
     @Bean
-    public CommandLineRunner commandLineRunner() {
+    CommandLineRunner commandLineRunner() {
         return args -> {
             LOGGER.info("-=-=-=-=- START '{}' START -=-=-=-=-=-", this.hazelcastInstance.getName());
 
@@ -122,13 +123,24 @@ public class ApplicationInitializer {
                 // Turn off any that are unwanted
                 String jobName = myJobWrapper.getJobConfig().getName();
                 boolean include = !jobName.contains("FILTER OUT NAME");
-                if (!include) {
+                if (!include || myJobWrapper.getPipeline() == null) {
                     LOGGER.warn("Skip '{}', not wanted", jobName);
                 }
                 return include;
             })
             .forEach(this::trySubmit);
-
+            try {
+                // Wait and report jobs, Python can take a while to start due to requirements.txt
+                long sleep = 1L;
+                LOGGER.info("Sleep {} minute", sleep);
+                TimeUnit.MINUTES.sleep(sleep);
+                LOGGER.info("-=-=-=-= MIDDLE '{}' MIDDLE =-=-=-=-=-", this.hazelcastInstance.getName());
+                for (Job job : this.hazelcastInstance.getJet().getJobs()) {
+                    LOGGER.info("Job '{}' status: {}", job.getName(), job.getStatus());
+                }
+            } catch (Exception e) {
+                LOGGER.error("commandLineRunner()", e);
+            }
             LOGGER.info("-=-=-=-=-  END  '{}'  END  -=-=-=-=-=-", hazelcastInstance.getName());
             hazelcastInstance.shutdown();
         };

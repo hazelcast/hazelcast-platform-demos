@@ -55,6 +55,8 @@ import com.hazelcast.platform.demos.utils.UtilsSlackSink;
 @Configuration
 public class ApplicationInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInitializer.class);
+    // Probably 32 but could be more.
+    private static final int OAUTH_MINIMUM = ("unset" + " ").length();
 
     @Autowired
     private HazelcastInstance hazelcastInstance;
@@ -67,7 +69,7 @@ public class ApplicationInitializer {
      * </p>
      */
     @Bean
-    public CommandLineRunner commandLineRunner() {
+    CommandLineRunner commandLineRunner() {
         return args -> {
             LOGGER.info("-=-=-=-=- START '{}' START -=-=-=-=-=-", hazelcastInstance.getName());
 
@@ -83,6 +85,7 @@ public class ApplicationInitializer {
             boolean slackUseable = false;
             Properties properties = new Properties();
             if (this.myProperties.getSlackAccessToken() != null
+                    && this.myProperties.getSlackAccessToken().length() > OAUTH_MINIMUM
                     && this.myProperties.getSlackChannelId() != null
                     && this.myProperties.getSlackChannelName() != null) {
                 if (this.myProperties.getSlackAccessToken().length() > 0
@@ -94,6 +97,10 @@ public class ApplicationInitializer {
                     properties.setProperty(MyConstants.SLACK_CHANNEL_NAME, this.myProperties.getSlackChannelName());
                     slackUseable = true;
                 }
+            }
+
+            if (!slackUseable) {
+                jobNameTopicToSlack = jobNameTopicToSlack.replace("Slack", "Stdout");
             }
 
             String projectName = this.myProperties.getProject();
@@ -116,6 +123,8 @@ public class ApplicationInitializer {
                 } catch (Exception e) {
                     LOGGER.error("launchNeededJobs:" + UtilsSlackSQLJob.class.getSimpleName(), e);
                 }
+            } else {
+                LOGGER.info("Skip '{}', Slack not useable", UtilsSlackSQLJob.class.getSimpleName());
             }
 
             LOGGER.info("-=-=-=-=-  END  '{}'  END  -=-=-=-=-=-", hazelcastInstance.getName());

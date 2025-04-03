@@ -22,9 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hazelcast.core.HazelcastJsonValue;
+import com.hazelcast.enterprise.jet.cdc.ChangeRecord;
+import com.hazelcast.enterprise.jet.cdc.postgres.PostgresCdcSources;
 import com.hazelcast.function.FunctionEx;
-import com.hazelcast.jet.cdc.ChangeRecord;
-import com.hazelcast.jet.cdc.postgres.PostgresCdcSources;
 import com.hazelcast.jet.datamodel.Tuple2;
 import com.hazelcast.jet.pipeline.Pipeline;
 import com.hazelcast.jet.pipeline.Sinks;
@@ -118,9 +118,9 @@ public class PostgresCDC {
             address = address.substring(0, colon);
         }
 
-        String whitelist = schema + "." + table;
+        String includelist = schema + "." + table;
         if (!useHzCloud) {
-            LOGGER.info("Database: '{}', whitelisting: '{}'", database, whitelist);
+            LOGGER.info("Database: '{}', including: '{}'", database, includelist);
         }
 
         return PostgresCdcSources.postgres("postgres-cdc-from-database:" + database)
@@ -130,7 +130,7 @@ public class PostgresCDC {
                 .setDatabasePort(port)
                 .setDatabaseUser(user)
                 .setReplicationSlotName(clusterName)
-                .setTableWhitelist(whitelist)
+                .setTableIncludeList(includelist)
                 .build();
     }
 

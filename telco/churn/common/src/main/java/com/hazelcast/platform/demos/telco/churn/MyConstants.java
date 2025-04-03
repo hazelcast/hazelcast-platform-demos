@@ -26,9 +26,7 @@ public class MyConstants {
 
     // Used also in Node.js clients, Java clients and Java servers.
     public static final int CLASS_ID_MYDATASERIALIZABLEFACTORY = 1000;
-    public static final int CLASS_ID_MYPORTABLEFACTORY = 2000;
     public static final int CLASS_ID_MYCREDENTIALS = 1;
-    public static final int CLASS_ID_SENTIMENT = 1 + CLASS_ID_MYCREDENTIALS;
 
     // Map names, for eager creation
     public static final String IMAP_NAME_CDR  = "cdr";
