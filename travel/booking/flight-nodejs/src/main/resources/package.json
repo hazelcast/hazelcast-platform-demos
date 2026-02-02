@@ -9,7 +9,7 @@
   "author": "",
   "dependencies": {
     "async": "3.2.0",
-    "fastify": "3.19.2",
+    "fastify": "5.7.3",
     "hazelcast-client": "4.2.0"
   }
 }
