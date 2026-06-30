@@ -83,7 +83,7 @@
 
 		<hazelcast-jet-pulsar.version>0.1</hazelcast-jet-pulsar.version>
 		<hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
-		<jackson.version>2.18.2</jackson.version>
+		<jackson.version>2.22.0</jackson.version>
 		<json.version>20240303</json.version>
 		<json-smart.version>2.4.11</json-smart.version>
 		<junit-jupiter.version>5.11.3</junit-jupiter.version>
