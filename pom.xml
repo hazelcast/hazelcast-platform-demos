@@ -68,7 +68,7 @@
 
 		<!-- Version dependencies -->
 		<cassandra-driver.version>4.17.0</cassandra-driver.version>
-                <cassandra-jdbc-wrapper.version>4.14.0</cassandra-jdbc-wrapper.version>
+                <cassandra-jdbc-wrapper.version>4.16.4</cassandra-jdbc-wrapper.version>
 		<debezium-connector-cassandra-4.version>2.1.3.Final</debezium-connector-cassandra-4.version>
 		<debezium-connector-mongodb.version>1.3.1.Final</debezium-connector-mongodb.version>
 		<error_prone_annotations.version>2.18.0</error_prone_annotations.version>
