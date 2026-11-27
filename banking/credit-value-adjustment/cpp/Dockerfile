@@ -6,8 +6,7 @@ RUN apt-get update && \
         apt-get install -y build-essential \
         git cmake autoconf libtool pkg-config \
         automake libtool curl make g++ unzip \
-        wget libgflags-dev clang-15 libc++-dev \
-        curl
+        wget libgflags-dev clang-15 libc++-dev
         
 # https://github.blog/2021-09-01-improving-git-protocol-security-github/
 RUN git config --global url.https://github.insteadOf git://github
